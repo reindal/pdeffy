@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Package lock (opcjonalnie, niektórzy wolą commitować)
+# package-lock.json

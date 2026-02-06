@@ -1,0 +1,278 @@
+:root {
+    --primary-color: #ff9800;
+    --primary-dark: #af6900;
+
+    --btn-color: #e8ba7f;
+    --btn-dark: #f4b565;
+    --danger-color: #dc3545;
+    --danger-dark: #c82333;
+
+    --bg-light: #f5f5f5;
+    --bg-white: #ffffff;
+    --bg-info: #e8f4f8;
+
+    --text-dark: #333;
+    --text-light: #666;
+    --text-white: #ffffff;
+
+    --border-color: #ddd;
+
+    --success-bg: #d4edda;
+    --success-text: #155724;
+    --success-border: #c3e6cb;
+    --error-bg: #f8d7da;
+    --error-text: #721c24;
+    --error-border: #f5c6cb;
+}
+
+.mergeContainer {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--bg-light);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.mergeContainer h1 {
+    text-align: center;
+    color: var(--text-dark);
+    margin-bottom: 30px;
+}
+
+.mergeContainer h3 {
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+}
+
+.formGroup input,
+.formGroup select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.fileInputWrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+
+.fileInputWrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.fileInputLabel {
+    display: block;
+    padding: 12px;
+    background-color: var(--btn-color);
+    color: var(--text-white);
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.fileInputLabel:hover {
+    background-color: var(--btn-dark);
+}
+
+.filesList {
+    margin-top: 12px;
+    padding: 12px;
+    background-color: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.filesList.active {
+    background-color: var(--bg-info);
+    border-color: var(--primary-color);
+}
+
+.fileItem {
+    padding: 8px;
+    margin-bottom: 5px;
+    background-color: var(--bg-white);
+    border-radius: 4px;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.fileItem:last-child {
+    margin-bottom: 0;
+}
+
+.filesOrder {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.filesOrderContainer {
+    margin-bottom: 10px;
+}
+
+.fileOrderItem {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    cursor: move;
+    transition: all 0.3s ease;
+}
+
+.fileOrderItem:hover {
+    border-color: var(--primary-color);
+    background-color: var(--bg-info);
+}
+
+.fileOrderItem.dragging {
+    opacity: 0.5;
+}
+
+.fileOrderItem.dragover {
+    border-color: var(--primary-color);
+    background-color: #fff3cd;
+}
+
+.fileOrderIndex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    margin-right: 10px;
+    background-color: var(--primary-color);
+    color: var(--text-white);
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.fileOrderName {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-dark);
+    word-break: break-word;
+}
+
+.fileOrderRemove {
+    margin-left: 10px;
+    padding: 6px 10px;
+    background-color: var(--danger-color);
+    color: var(--text-white);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.fileOrderRemove:hover {
+    background-color: var(--danger-dark);
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--btn-color);
+    color: var(--text-dark);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background-color: var(--btn-dark);
+}
+
+.submitBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.status {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    display: none;
+    word-break: break-word;
+}
+
+.status.success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border-color: var(--success-border);
+    display: block;
+}
+
+.status.error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border-color: var(--error-border);
+    display: block;
+}
+
+.helpText {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 6px;
+    font-style: italic;
+}
+
+.backLink {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--btn-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.backLink:hover {
+    color: var(--btn-dark);
+    text-decoration: underline;
+}

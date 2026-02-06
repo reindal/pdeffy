@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Merge PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./merge.css">
+</head>
+<body>
+<div class="headerContainer">
+    <header>
+        <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
+        <h1>Merge PDF</h1>
+    </header>
+</div>
+
+<main>
+    <div class="mergeContainer">
+        <h1>Merge PDF Documents</h1>
+
+        <form id="mergeForm">
+            <div class="formGroup">
+                <label for="pdfFiles">Select PDF files (can select multiple):</label>
+                <div class="fileInputWrapper">
+                    <input type="file" id="pdfFiles" accept=".pdf" multiple required>
+                    <label for="pdfFiles" class="fileInputLabel">Click to select files</label>
+                </div>
+                <div id="filesList" class="filesList"></div>
+            </div>
+
+            <div id="filesOrder" class="filesOrder">
+                <h3>Files Order</h3>
+                <div id="filesOrderContainer"></div>
+                <p class="helpText">Drag to reorder files (top to bottom = first to last in merged PDF)</p>
+            </div>
+
+            <div class="formGroup">
+                <label for="outputName">Output file name:</label>
+                <input type="text" id="outputName" name="outputName" placeholder="merged_document" value="merged_document">
+            </div>
+
+            <button type="submit" class="submitBtn" id="submitBtn">Merge PDF</button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <a href="../../index.html" class="backLink">← Back to main page</a>
+    </div>
+</main>
+
+<script src="./merge.js"></script>
+</body>
+</html>

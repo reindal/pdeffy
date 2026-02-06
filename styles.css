@@ -1,0 +1,90 @@
+:root{
+    --primary-color: #ff9800;
+    --secondary-color: #f8ead4;
+    --hover-color: #f1ddbf;
+}
+
+body{
+    background-color: white;
+}
+
+.optionCard>p{
+    font-size: 17px;
+    font-weight: bolder;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px;
+    text-align: center;
+    margin: 0;
+    border-radius: 20px;
+    width: 650px;
+    align-items: center;
+    display: flex;
+    font-family: 'Inter', sans-serif;
+    box-shadow: rgba(0, 0, 0, 0.36) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+}
+
+.headerContainer{
+    display: flex;
+    justify-content: center;
+}
+
+.headerIcon{
+    width: 150px;
+    margin-right: 10px;
+    float: left;
+}
+
+.optionContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.optionCard{
+    background-color: var(--secondary-color);
+    border-radius: 15px;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    width: 250px;
+    height: 250px;
+    text-decoration: none;
+    color: black;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.optionCard:hover{
+    transform: translateY(-3px);
+    box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
+    background-color: var(--hover-color);
+}
+
+.optionIcon{
+    width: 80px;
+    margin-bottom: 10px;
+}
+
+.optionCard h2{
+    margin: 10px 0;
+    color: black;
+}
+
+.optionCard p{
+    margin: 0;
+    color: black;
+    text-align: center;
+    font-size: 14px;
+}

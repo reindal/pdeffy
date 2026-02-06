@@ -1,0 +1,18 @@
+{
+  "name": "pdfapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Lukas and Mikolaj",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "electron": "^40.1.0"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "fs-extra": "^11.2.0"
+  }
+}

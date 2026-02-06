@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Split PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./split.css">
+</head>
+<body>
+<div class="headerContainer">
+    <header>
+        <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
+        <h1>Split PDF</h1>
+    </header>
+</div>
+
+<main>
+    <div class="splitContainer">
+        <h1>Split PDF Document</h1>
+
+        <form id="splitForm">
+            <div class="formGroup">
+                <label for="pdfFile">Select PDF file:</label>
+                <div class="fileInputWrapper">
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                    <label for="pdfFile" class="fileInputLabel">Click to select file</label>
+                </div>
+                <div id="fileName" class="fileName"></div>
+            </div>
+
+            <div class="formGroup">
+                <label>Select page ranges to extract:</label>
+                <div id="rangesContainer"></div>
+                <button type="button" id="addRangeBtn" class="addRangeBtn">+ Add Another Range</button>
+            </div>
+
+            <div class="formGroup">
+                <label for="outputName">Output file name:</label>
+                <input type="text" id="outputName" name="outputName" placeholder="document_name">
+                <p class="helpText">Files will be named: name_1.pdf, name_2.pdf etc.</p>
+            </div>
+
+            <button type="submit" class="submitBtn" id="submitBtn">Split PDF</button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <a href="../../index.html" class="backLink">← Back to main page</a>
+    </div>
+</main>
+
+<script src="./split.js"></script>
+</body>
+</html>
