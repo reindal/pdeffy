@@ -10,7 +10,13 @@
 <div class="headerContainer">
     <header>
         <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
-        <h1>Split PDF</h1>
+        <h1 class="langText" id="splitHeader">Split PDF</h1>
+        <select id="languageSelector">
+            <option value="en" id="languageText" class="langText">Language</option>
+            <option value="en">English</option>
+            <option value="it">Italiano</option>
+            <option value="pl">Polski</option>
+        </select>
     </header>
 </div>
 
@@ -51,4 +57,5 @@
 
 <script src="./split.js"></script>
 </body>
+<script src="../../changeLang.js"></script>
 </html>
