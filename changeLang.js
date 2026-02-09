@@ -17,6 +17,7 @@ const languages = {
         mergeHeader: "Merge PDF",
 
         splitHeader: "Split PDF",
+        splitHeader2: "Split PDF Document",
         splitSelectBtnLabel: "Select PDF to split",
         splitSelectButton: "Select PDF",
         splitPageRangesLabel: "Select page ranges to extract:",
@@ -43,6 +44,7 @@ const languages = {
         mergeHeader: "Unisci file PDF",
 
         splitHeader: "Dividi PDF",
+        splitHeader2: "Dividi documento PDF",
         splitSelectBtnLabel: "Seleziona PDF da dividere",
         splitSelectButton: "Seleziona PDF",
         splitPageRangesLabel: "Seleziona le pagine da estrarre:",
@@ -71,6 +73,7 @@ const languages = {
         mergeHeader: "Scal dokumenty PDF",
 
         splitHeader: "Podziel PDF",
+        splitHeader2: "Podziel dokument PDF",
         splitSelectBtnLabel: "Wybierz PDF do podzielenia",
         splitSelectButton: "Wybierz PDF",
         splitPageRangesLabel: "Wybierz zakresy stron do wyodrębnienia:",

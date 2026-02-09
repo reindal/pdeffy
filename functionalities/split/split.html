@@ -10,20 +10,26 @@
 <div class="headerContainer">
     <header>
         <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
-        <h1>Split PDF</h1>
+        <h1 id="splitHeader" class="langText">Split PDF</h1>
+        <select id="languageSelector">
+            <option value="en" id="languageText" class="langText">Language</option>
+            <option value="en">English</option>
+            <option value="it">Italiano</option>
+            <option value="pl">Polski</option>
+        </select>
     </header>
 </div>
 
 <main>
     <div class="splitContainer">
-        <h1>Split PDF Document</h1>
+        <h1 class="langText" id="splitHeader2">Split PDF Document</h1>
 
         <form id="splitForm">
             <div class="formGroup">
-                <label for="pdfFile">Select PDF file:</label>
+                <label for="pdfFile" id="splitSelectBtnLabel" class="langText">Select PDF file:</label>
                 <div class="fileInputWrapper">
                     <input type="file" id="pdfFile" accept=".pdf" required>
-                    <label for="pdfFile" class="fileInputLabel">Click to select file</label>
+                    <label for="pdfFile" class="fileInputLabel langText" id="splitSelectButton">Click to select file</label>
                 </div>
                 <div id="fileName" class="fileName"></div>
             </div>
@@ -87,7 +93,7 @@
         <a href="../../index.html" class="backLink">← Back to main page</a>
     </div>
 </main>
-
+<script src="../../changeLang.js"></script>
 <script src="./split.js"></script>
 </body>
 </html>
