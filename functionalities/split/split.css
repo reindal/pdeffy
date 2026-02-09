@@ -238,3 +238,176 @@
 .backLink:hover {
     color: var(--btn-dark);
 }
+
+/* Mode Selector Styles */
+.modeSelector {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modeOption {
+    display: flex;
+    align-items: center;
+    padding: 16px 18px;
+    background-color: var(--bg-white);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.modeOption:hover {
+    border-color: var(--btn-color);
+    background-color: rgba(232, 186, 127, 0.1);
+    transform: translateX(4px);
+}
+
+.modeOption input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 14px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.modeOption input[type="radio"]:checked + span {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.modeOption:has(input[type="radio"]:checked) {
+    border-color: var(--primary-color);
+    background-color: var(--bg-info);
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.modeOption:has(input[type="radio"]:checked)::before {
+    content: '✓';
+    position: absolute;
+    right: 18px;
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.modeOption span {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 15px;
+}
+
+.modeContainer {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: var(--bg-white);
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+}
+
+/* Custom Files Container */
+#customFilesContainer {
+    margin-bottom: 15px;
+}
+
+.customFileItem {
+    margin-bottom: 20px;
+    padding: 18px;
+    background-color: var(--bg-light);
+    border-radius: 10px;
+    border: 2px solid var(--btn-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.customFileHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.customFileHeader h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.customFileRanges {
+    margin-bottom: 10px;
+}
+
+.customRangeItem {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: flex-end;
+    margin-bottom: 10px;
+    padding: 15px;
+    background-color: var(--bg-white);
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.customRangeItem:hover {
+    border-color: var(--btn-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.customRangeItem label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--text-dark);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.customRangeItem input {
+    width: 100% !important;
+}
+
+.customRangeItem button,
+.removeFileBtn {
+    padding: 10px 15px;
+    background-color: var(--danger-color);
+    color: var(--text-white);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.3s ease;
+    height: fit-content;
+    font-size: 13px;
+}
+
+.customRangeItem button:hover,
+.removeFileBtn:hover {
+    background-color: var(--danger-dark);
+}
+
+.addCustomRangeBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+    border: 2px dashed var(--btn-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.addCustomRangeBtn:hover {
+    border-style: solid;
+    border-color: var(--primary-color);
+    background-color: var(--btn-color);
+    color: var(--text-white);
+}
