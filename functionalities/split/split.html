@@ -12,10 +12,9 @@
         <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
         <h1 id="splitHeader" class="langText">Split PDF</h1>
         <select id="languageSelector">
-            <option value="en" id="languageText" class="langText">Language</option>
-            <option value="en">English</option>
-            <option value="it">Italiano</option>
-            <option value="pl">Polski</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="pl">🇵🇱 Polski</option>
         </select>
     </header>
 </div>
@@ -35,62 +34,83 @@
             </div>
 
             <div class="formGroup">
-                <label>Split mode:</label>
+                <label class="langText" id="splitModeLabel">Split mode:</label>
                 <div class="modeSelector">
                     <label class="modeOption">
                         <input type="radio" name="splitMode" value="range" checked>
-                        <span>Custom Page Ranges</span>
+                        <span class="langText" id="modeRange">Custom Page Ranges</span>
                     </label>
                     <label class="modeOption">
                         <input type="radio" name="splitMode" value="every">
-                        <span>Split Every X Pages</span>
+                        <span class="langText" id="modeEvery">Split Every X Pages</span>
                     </label>
                     <label class="modeOption">
                         <input type="radio" name="splitMode" value="custom">
-                        <span>Custom Multi-Range Files</span>
+                        <span class="langText" id="modeCustom">Custom Multi-Range Files</span>
+                    </label>
+                    <label class="modeOption">
+                        <input type="radio" name="splitMode" value="size">
+                        <span class="langText" id="modeSize">Split by File Size</span>
                     </label>
                 </div>
             </div>
 
             <div id="rangeModeContainer" class="modeContainer">
                 <div class="formGroup">
-                    <label>Select page ranges to extract:</label>
+                    <label class="langText" id="rangeSelectLabel">Select page ranges to extract:</label>
                     <div id="rangesContainer"></div>
-                    <button type="button" id="addRangeBtn" class="addRangeBtn">+ Add Another Range</button>
+                    <button type="button" id="addRangeBtn" class="addRangeBtn langText">+ Add Another Range</button>
                 </div>
             </div>
 
             <!-- Every X Pages Mode -->
             <div id="everyModeContainer" class="modeContainer" style="display: none;">
                 <div class="formGroup">
-                    <label for="pagesInterval">Split every X pages:</label>
+                    <label for="pagesInterval" class="langText" id="everyPagesLabel">Split every X pages:</label>
                     <input type="number" id="pagesInterval" min="1" value="10" placeholder="10">
-                    <p class="helpText">PDF will be split into documents of this many pages each</p>
+                    <p class="helpText langText" id="everyPagesHelpText">PDF will be split into documents of this many pages each</p>
                 </div>
             </div>
 
             <!-- Custom Multi-Range Files Mode -->
             <div id="customModeContainer" class="modeContainer" style="display: none;">
                 <div class="formGroup">
-                    <label>Define output files with multiple page ranges:</label>
+                    <label class="langText" id="customRangesLabel">Define output files with multiple page ranges:</label>
                     <div id="customFilesContainer"></div>
-                    <button type="button" id="addCustomFileBtn" class="addRangeBtn">+ Add Another Output File</button>
-                    <p class="helpText">Each output file can contain multiple page ranges (e.g., pages 1-4 and 6-12 in one file)</p>
+                    <button type="button" id="addCustomFileBtn" class="addRangeBtn langText">+ Add Another Output File</button>
+                    <p class="helpText langText" id="customHelpText">Each output file can contain multiple page ranges (e.g., pages 1-4 and 6-12 in one file)</p>
+                </div>
+            </div>
+
+            <!-- Split by Size Mode -->
+            <div id="sizeModeContainer" class="modeContainer" style="display: none;">
+                <div class="formGroup">
+                    <div class="fileSizeInfo" id="fileSizeInfo"></div>
+                    <label for="maxFileSize" class="langText" id="maxFileSizeLabel">Maximum file size per output:</label>
+                    <div class="sizeInputGroup">
+                        <input type="number" id="maxFileSize" min="1" value="5" placeholder="5">
+                        <select id="sizeUnit">
+                            <option value="KB">KB</option>
+                            <option value="MB" selected>MB</option>
+                            <option value="GB">GB</option>
+                        </select>
+                    </div>
+                    <p class="helpText langText" id="sizeHelpText">PDF will be split into files not exceeding this size</p>
                 </div>
             </div>
 
             <div class="formGroup">
-                <label for="outputName">Output file name:</label>
-                <input type="text" id="outputName" name="outputName" placeholder="document_name">
-                <p class="helpText">Files will be named: name_1.pdf, name_2.pdf etc.</p>
+                <label for="outputName" class="langText" id="outputSplitName">Output file name:</label>
+                <input type="text" id="outputName" name="outputName" placeholder="document_name" class="langTextPlaceholder">
+                <p class="helpText langText" id="namesSplitExamples">Files will be named: name_1.pdf, name_2.pdf etc.</p>
             </div>
 
-            <button type="submit" class="submitBtn" id="submitBtn">Split PDF</button>
+            <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="splitSubmitBtn">Split PDF</span></button>
         </form>
 
         <div id="status" class="status"></div>
 
-        <a href="../../index.html" class="backLink">← Back to main page</a>
+        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
     </div>
 </main>
 <script src="../../changeLang.js"></script>

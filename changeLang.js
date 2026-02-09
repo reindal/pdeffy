@@ -15,6 +15,14 @@ const languages = {
         selectedFile: "✓ Selected file: ",
 
         mergeHeader: "Merge PDF",
+        mergeHeader2: "Merge PDF Documents",
+        mergeSelectLabel: "Select PDF files (can select multiple):",
+        mergeSelectButton: "Click to select files",
+        filesOrderTitle: "Files Order",
+        mergeHelpText: "Drag to reorder files (top to bottom = first to last in merged PDF)",
+        mergeOutputName: "Output file name:",
+        mergeSubmitBtn: "Merge PDF",
+        outputName: "merged_document",
 
         splitHeader: "Split PDF",
         splitHeader2: "Split PDF Document",
@@ -24,11 +32,35 @@ const languages = {
         addRangeBtn: "+ Add Another Range",
         outputSplitName: "Output file name:",
         namesSplitExamples:"Files will be named: name_1.pdf, name_2.pdf etc.",
-        submitBtn: "Split PDF",
+        splitSubmitBtn: "Split PDF",
         startPageLabel: "Start page:",
         endPageLabel: "End page:",
         rangeError: "At least one range is required",
-        createdSuccesful: '✓ Successfully created ${successCount} file(s) in Downloads folder'
+        createdSuccesful: '✓ Successfully created ${successCount} file(s) in Downloads folder',
+
+        // Split mode labels
+        splitModeLabel: "Split mode:",
+        modeRange: "Custom Page Ranges",
+        modeEvery: "Split Every X Pages",
+        modeCustom: "Custom Multi-Range Files",
+        modeSize: "Split by File Size",
+
+        // Range mode
+        rangeSelectLabel: "Select page ranges to extract:",
+
+        // Every mode
+        everyPagesLabel: "Split every X pages:",
+        everyPagesHelpText: "PDF will be split into documents of this many pages each",
+
+        // Custom mode
+        customRangesLabel: "Define output files with multiple page ranges:",
+        addCustomFileBtn: "+ Add Another Output File",
+        customHelpText: "Each output file can contain multiple page ranges (e.g., pages 1-4 and 6-12 in one file)",
+
+        // Size mode
+        maxFileSizeLabel: "Maximum file size per output:",
+        sizeHelpText: "PDF will be split into files not exceeding this size",
+        currentFileSize: "Current file size: "
     },
     it: {
         languageText: "Lingua",
@@ -42,6 +74,14 @@ const languages = {
         selectedFile: "✓ File selezionato: ",
 
         mergeHeader: "Unisci file PDF",
+        mergeHeader2: "Unisci documenti PDF",
+        mergeSelectLabel: "Seleziona file PDF (puoi selezionare più file):",
+        mergeSelectButton: "Clicca per selezionare i file",
+        filesOrderTitle: "Ordine dei file",
+        mergeHelpText: "Trascina per riordinare i file (dall'alto al basso = dal primo all'ultimo nel PDF unito)",
+        mergeOutputName: "Nome file di output:",
+        mergeSubmitBtn: "Unisci PDF",
+        outputName: "documento_unito",
 
         splitHeader: "Dividi PDF",
         splitHeader2: "Dividi documento PDF",
@@ -51,13 +91,35 @@ const languages = {
         addRangeBtn: "+ Aggiungi un'altra fascia",
         outputSplitName: "Nome file di output:",
         namesSplitExamples:"I file saranno denominati: nome_1.pdf, nome_2.pdf ecc.",
-        submitBtn: "Dividi PDF",
+        splitSubmitBtn: "Dividi PDF",
         startPageLabel: "Pagina iniziale:",
         endPageLabel: "Pagina finale:",
         rangeError: "Almeno una fascia è richiesta",
-        createdSuccesful: '✓ Creato con successo ${successCount} file in cartella Download'
+        createdSuccesful: '✓ Creato con successo ${successCount} file in cartella Download',
 
+        // Split mode labels
+        splitModeLabel: "Modalità di divisione:",
+        modeRange: "Intervalli di pagine personalizzati",
+        modeEvery: "Dividi ogni X pagine",
+        modeCustom: "File multi-intervallo personalizzati",
+        modeSize: "Dividi per dimensione file",
 
+        // Range mode
+        rangeSelectLabel: "Seleziona gli intervalli di pagine da estrarre:",
+
+        // Every mode
+        everyPagesLabel: "Dividi ogni X pagine:",
+        everyPagesHelpText: "Il PDF sarà diviso in documenti con questo numero di pagine ciascuno",
+
+        // Custom mode
+        customRangesLabel: "Definisci file di output con più intervalli di pagine:",
+        addCustomFileBtn: "+ Aggiungi un altro file di output",
+        customHelpText: "Ogni file di output può contenere più intervalli di pagine (es. pagine 1-4 e 6-12 in un file)",
+
+        // Size mode
+        maxFileSizeLabel: "Dimensione massima per file:",
+        sizeHelpText: "Il PDF sarà diviso in file che non superano questa dimensione",
+        currentFileSize: "Dimensione file attuale: "
     },
     pl: {
         languageText: "Język",
@@ -70,7 +132,15 @@ const languages = {
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
 
-        mergeHeader: "Scal dokumenty PDF",
+        mergeHeader: "Scal PDF",
+        mergeHeader2: "Scal dokumenty PDF",
+        mergeSelectLabel: "Wybierz pliki PDF (możesz wybrać wiele):",
+        mergeSelectButton: "Kliknij, aby wybrać pliki",
+        filesOrderTitle: "Kolejność plików",
+        mergeHelpText: "Przeciągnij, aby zmienić kolejność (od góry do dołu = od pierwszego do ostatniego w scalonym PDF)",
+        mergeOutputName: "Nazwa pliku wynikowego:",
+        mergeSubmitBtn: "Scal PDF",
+        outputName: "scalony_dokument",
 
         splitHeader: "Podziel PDF",
         splitHeader2: "Podziel dokument PDF",
@@ -80,12 +150,34 @@ const languages = {
         addRangeBtn: "+ Dodaj kolejny zakres",
         outputSplitName: "Nazwa pliku wynikowego:",
         namesSplitExamples:"Pliki będą nazwane: nazwa_1.pdf, nazwa_2.pdf itd.",
-        submitBtn: "Podziel PDF",
+        splitSubmitBtn: "Podziel PDF",
         startPageLabel: "Strona początkowa:",
         endPageLabel: "Strona końcowa:",
         rangeError: "Wymagany jest co najmniej jeden zakres",
-        outputPlaceholderName: "nazwa_pliku"
 
+        // Split mode labels
+        splitModeLabel: "Tryb podziału:",
+        modeRange: "Własne zakresy stron",
+        modeEvery: "Podziel co X stron",
+        modeCustom: "Własne pliki wielozakresowe",
+        modeSize: "Podziel według rozmiaru pliku",
+
+        // Range mode
+        rangeSelectLabel: "Wybierz zakresy stron do wyodrębnienia:",
+
+        // Every mode
+        everyPagesLabel: "Podziel co X stron:",
+        everyPagesHelpText: "PDF zostanie podzielony na dokumenty zawierające tyle stron każdy",
+
+        // Custom mode
+        customRangesLabel: "Zdefiniuj pliki wyjściowe z wieloma zakresami stron:",
+        addCustomFileBtn: "+ Dodaj kolejny plik wyjściowy",
+        customHelpText: "Każdy plik wyjściowy może zawierać wiele zakresów stron (np. strony 1-4 i 6-12 w jednym pliku)",
+
+        // Size mode
+        maxFileSizeLabel: "Maksymalny rozmiar pliku:",
+        sizeHelpText: "PDF zostanie podzielony na pliki nieprzekraczające tego rozmiaru",
+        currentFileSize: "Aktualny rozmiar pliku: "
     }
 }
 
@@ -107,6 +199,9 @@ document.getElementById('languageSelector').addEventListener('change', (event) =
 
     changeLanguage(event.target.value);
 });
+
+// Set the selector to the saved language
+document.getElementById('languageSelector').value = language;
 
 changeLanguage(language);
 
