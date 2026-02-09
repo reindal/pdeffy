@@ -9,22 +9,29 @@
 <div class="headerContainer">
     <header>
         <img src="./assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
-        <h1>Welcome to the PDF Converter</h1>
+        <h1 id="welcomeText" class="langText">Welcome to the PDF Converter</h1>
+        <select id="languageSelector">
+            <option value="en" id="languageText" class="langText">Language</option>
+            <option value="en">English</option>
+            <option value="it">Italiano</option>
+            <option value="pl">Polski</option>
+        </select>
     </header>
 </div>
-    <main>
-        <div class="optionContainer">
-            <a href="./functionalities/split/split.html" class="optionCard" id="splitPDF">
-                <img src="./assets/split.png" alt="PDF Split Icon" class="optionIcon">
-                <h2>Split PDF</h2>
-                <p>Split your PDF document into multiple files.</p>
-            </a>
-            <a href="./functionalities/merge/merge.html" class="optionCard" id="mergePDF">
-                <img src="./assets/merge.png" alt="PDF Merge Icon" class="optionIcon">
-                <h2>Merge PDF</h2>
-                <p>Merge your PDF documents into single file.</p>
-            </a>
-        </div>
-    </main>
+<main>
+    <div class="optionContainer">
+        <a href="./functionalities/split/split.html" class="optionCard" id="splitPDF">
+            <img src="./assets/split.png" alt="PDF Split Icon" class="optionIcon">
+            <h2 id="splitPdfText" class="langText">Split PDF</h2>
+            <p id="splitPdfDesc" class="langText">Split your PDF document into multiple files.</p>
+        </a>
+        <a href="./functionalities/merge/merge.html" class="optionCard" id="mergePDF">
+            <img src="./assets/merge.png" alt="PDF Merge Icon" class="optionIcon">
+            <h2 id="mergePdfText" class="langText">Merge PDF</h2>
+            <p id="mergePdfDesc" class="langText">Merge your PDF documents into single file.</p>
+        </a>
+    </div>
+</main>
 </body>
+<script src="./changeLang.js"></script>
 </html>
