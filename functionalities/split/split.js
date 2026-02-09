@@ -22,7 +22,7 @@ addRangeBtn.addEventListener('click', function(e) {
 
 pdfFile.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
-        fileNameDisplay.textContent = '✓ Selected file: ' + e.target.files[0].name;
+        fileNameDisplay.textContent = languages[localStorage.getItem("language")].selectedFile + e.target.files[0].name;
         fileNameDisplay.classList.add('active');
     }
 });
@@ -105,7 +105,7 @@ form.addEventListener('submit', async function(e) {
             successCount++;
         }
 
-        showStatus(`✓ Successfully created ${successCount} file(s) in Downloads folder! (${outputNamePrefix}_1.pdf, ${outputNamePrefix}_2.pdf, etc.)`, 'success');
+        showStatus(languages[localStorage.getItem("language")].createdSuccesful.replace('${successCount}', successCount), 'success');
         submitBtn.disabled = false;
 
         form.reset();
@@ -126,14 +126,14 @@ function addRange() {
     rangeDiv.className = 'rangeItem';
     rangeDiv.innerHTML = `
         <div>
-            <label>Start page:</label>
+            <label id="startPageLabel" class="langText">${languages[localStorage.getItem("language")].startPageLabel}</label>
             <input type="number" class="startPage" min="1" value="${rangeCount}" required>
         </div>
         <div>
-            <label>End page:</label>
+            <label id="endPageLabel" class="langText">${languages[localStorage.getItem("language")].endPageLabel}</label>
             <input type="number" class="endPage" min="1" value="${rangeCount}" required>
         </div>
-        <button type="button" class="removeRangeBtn">Remove</button>
+        <button type="button" class="removeRangeBtn langText" id="removeBtn">${languages[localStorage.getItem("language")].removeBtn}</button>
     `;
 
     const removeBtn = rangeDiv.querySelector('.removeRangeBtn');
@@ -142,7 +142,8 @@ function addRange() {
         if (rangesContainer.querySelectorAll('.rangeItem').length > 1) {
             rangeDiv.remove();
         } else {
-            showStatus('You must have at least one range', 'error');
+            let statusMsg = languages[localStorage.getItem("language")].rangeError || 'At least one range is required';
+            showStatus(statusMsg, 'error');
         }
     });
 

@@ -10,7 +10,13 @@
 <div class="headerContainer">
     <header>
         <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
-        <h1>Merge PDF</h1>
+        <h1  id="mergeHeader" class="langText">Merge PDF</h1>
+        <select id="languageSelector">
+            <option value="en" id="languageText" class="langText">Language</option>
+            <option value="en">English</option>
+            <option value="it">Italiano</option>
+            <option value="pl">Polski</option>
+        </select>
     </header>
 </div>
 
@@ -47,7 +53,7 @@
         <a href="../../index.html" class="backLink">← Back to main page</a>
     </div>
 </main>
-
+<script src="../../changeLang.js"></script>
 <script src="./merge.js"></script>
 </body>
 </html>
