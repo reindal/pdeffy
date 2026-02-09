@@ -313,14 +313,14 @@ function addCustomRange(container) {
     rangeDiv.className = 'customRangeItem';
     rangeDiv.innerHTML = `
         <div>
-            <label id="startPageLabel" class="langText">${languages[localStorage.getItem("language")].startPageLabel}</label>
-            <input type="number" class="startPage" min="1" value="${rangeCount}" required>
+            <label>Start page:</label>
+            <input type="number" class="customStartPage" min="1" value="1" required>
         </div>
         <div>
-            <label id="endPageLabel" class="langText">${languages[localStorage.getItem("language")].endPageLabel}</label>
-            <input type="number" class="endPage" min="1" value="${rangeCount}" required>
+            <label>End page:</label>
+            <input type="number" class="customEndPage" min="1" value="1" required>
         </div>
-        <button type="button" class="removeRangeBtn langText" id="removeBtn">${languages[localStorage.getItem("language")].removeBtn}</button>
+        <button type="button" class="removeCustomRangeBtn">Remove</button>
     `;
 
     const removeBtn = rangeDiv.querySelector('.removeCustomRangeBtn');
