@@ -46,7 +46,7 @@ function updateFilesOrder() {
         fileOrderItem.innerHTML = `
             <div class="fileOrderIndex">${index + 1}</div>
             <div class="fileOrderName">${file.name}</div>
-            <button type="button" class="fileOrderRemove" data-index="${index}">Remove</button>
+            <button type="button" class="fileOrderRemove langText" data-index="${index}" id="removeBtn">${languages[localStorage.getItem("language")].removeBtn}</button>
         `;
 
         const removeBtn = fileOrderItem.querySelector('.fileOrderRemove');
