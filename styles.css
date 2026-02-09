@@ -20,7 +20,7 @@ header {
     text-align: center;
     margin: 0;
     border-radius: 20px;
-    width: 750px;
+    width: 650px;
     align-items: center;
     display: flex;
     font-family: 'Inter', sans-serif;
@@ -87,13 +87,4 @@ header {
     color: black;
     text-align: center;
     font-size: 14px;
-}
-
-#languageSelector{
-    margin-left: auto;
-    padding: 5px;
-    border-radius: 5px;
-    border: none;
-    font-size: 13px;
-    cursor: pointer;
 }
