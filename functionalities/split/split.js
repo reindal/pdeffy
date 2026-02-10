@@ -16,6 +16,8 @@ const addCustomFileBtn = document.getElementById('addCustomFileBtn');
 const rangeModeContainer = document.getElementById('rangeModeContainer');
 const everyModeContainer = document.getElementById('everyModeContainer');
 const customModeContainer = document.getElementById('customModeContainer');
+const sizeModeContainer = document.getElementById('sizeModeContainer');
+const fileSizeInfo = document.getElementById('fileSizeInfo');
 
 let rangeCount = 1;
 let customFileCount = 1;
@@ -28,6 +30,7 @@ document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
         rangeModeContainer.style.display = 'none';
         everyModeContainer.style.display = 'none';
         customModeContainer.style.display = 'none';
+        sizeModeContainer.style.display = 'none';
 
         if (this.value === 'range') {
             rangeModeContainer.style.display = 'block';
@@ -35,6 +38,9 @@ document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
             everyModeContainer.style.display = 'block';
         } else if (this.value === 'custom') {
             customModeContainer.style.display = 'block';
+        } else if (this.value === 'size') {
+            sizeModeContainer.style.display = 'block';
+            updateFileSizeInfo();
         }
     });
 });
@@ -53,6 +59,7 @@ pdfFile.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
         fileNameDisplay.textContent = '✓ Selected file: ' + e.target.files[0].name;
         fileNameDisplay.classList.add('active');
+        updateFileSizeInfo();
     }
 });
 
@@ -215,6 +222,122 @@ form.addEventListener('submit', async function(e) {
                 await fs.writeFile(filePath, newPdfBytes);
                 successCount++;
             }
+        } else if (splitMode === 'size') {
+            const maxSize = parseFloat(document.getElementById('maxFileSize').value);
+            const sizeUnit = document.getElementById('sizeUnit').value;
+
+            if (maxSize <= 0 || isNaN(maxSize)) {
+                showStatus('Please enter a valid file size', 'error');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // Convert to bytes
+            let maxBytes;
+            switch (sizeUnit) {
+                case 'KB':
+                    maxBytes = maxSize * 1024;
+                    break;
+                case 'MB':
+                    maxBytes = maxSize * 1024 * 1024;
+                    break;
+                case 'GB':
+                    maxBytes = maxSize * 1024 * 1024 * 1024;
+                    break;
+                default:
+                    maxBytes = maxSize * 1024 * 1024;
+            }
+
+            // Calculate minimum page size to check if split is possible
+            let minPageSize = Infinity;
+            let maxPageSize = 0;
+
+            for (let i = 0; i < totalPages; i++) {
+                const singlePagePdf = await PDFDocument.create();
+                const [copiedPage] = await singlePagePdf.copyPages(pdfDoc, [i]);
+                singlePagePdf.addPage(copiedPage);
+                const singlePageBytes = await singlePagePdf.save();
+
+                if (singlePageBytes.length < minPageSize) {
+                    minPageSize = singlePageBytes.length;
+                }
+                if (singlePageBytes.length > maxPageSize) {
+                    maxPageSize = singlePageBytes.length;
+                }
+            }
+
+            // Check if the requested size is too small
+            if (maxBytes < minPageSize) {
+                const minSizeFormatted = formatFileSize(minPageSize);
+                const lang = localStorage.getItem('language') || 'en';
+                const errorMessages = {
+                    en: `Cannot split: minimum required size is ${minSizeFormatted} (smallest page size)`,
+                    it: `Impossibile dividere: la dimensione minima richiesta è ${minSizeFormatted} (dimensione pagina più piccola)`,
+                    pl: `Nie można podzielić: minimalny wymagany rozmiar to ${minSizeFormatted} (rozmiar najmniejszej strony)`
+                };
+                showStatus(errorMessages[lang] || errorMessages.en, 'error');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            let currentPage = 0;
+            let fileIndex = 1;
+
+            while (currentPage < totalPages) {
+                let newPdf = await PDFDocument.create();
+                let currentSize = 0;
+                let pagesInCurrentFile = 0;
+
+                while (currentPage < totalPages) {
+                    // Create a temporary PDF with current pages + next page
+                    const tempPdf = await PDFDocument.create();
+
+                    // Copy all pages we already have
+                    if (pagesInCurrentFile > 0) {
+                        const existingBytes = await newPdf.save();
+                        const existingPdf = await PDFDocument.load(existingBytes);
+                        const existingPages = await tempPdf.copyPages(existingPdf, existingPdf.getPageIndices());
+                        existingPages.forEach(page => tempPdf.addPage(page));
+                    }
+
+                    // Add the next page
+                    const [nextPage] = await tempPdf.copyPages(pdfDoc, [currentPage]);
+                    tempPdf.addPage(nextPage);
+
+                    const tempBytes = await tempPdf.save();
+
+                    // Check if adding this page would exceed the limit
+                    if (pagesInCurrentFile > 0 && tempBytes.length > maxBytes) {
+                        // Don't add this page, save current file and start new one
+                        break;
+                    }
+
+                    // If even a single page exceeds the limit, we still need to save it
+                    if (pagesInCurrentFile === 0 && tempBytes.length > maxBytes) {
+                        const [copiedPage] = await newPdf.copyPages(pdfDoc, [currentPage]);
+                        newPdf.addPage(copiedPage);
+                        currentPage++;
+                        pagesInCurrentFile++;
+                        break;
+                    }
+
+                    // Add the page to our actual PDF
+                    const [copiedPage] = await newPdf.copyPages(pdfDoc, [currentPage]);
+                    newPdf.addPage(copiedPage);
+                    currentPage++;
+                    pagesInCurrentFile++;
+                    currentSize = tempBytes.length;
+                }
+
+                if (pagesInCurrentFile > 0) {
+                    const newPdfBytes = await newPdf.save();
+                    const outputFileName = `${outputNamePrefix}_${fileIndex}.pdf`;
+                    const filePath = path.join(downloadsPath, outputFileName);
+                    await fs.writeFile(filePath, newPdfBytes);
+                    fileIndex++;
+                    successCount++;
+                }
+            }
         }
 
         showStatus(`✓ Successfully created ${successCount} file(s) in Downloads folder!`, 'success');
@@ -235,6 +358,7 @@ form.addEventListener('submit', async function(e) {
         rangeModeContainer.style.display = 'block';
         everyModeContainer.style.display = 'none';
         customModeContainer.style.display = 'none';
+        sizeModeContainer.style.display = 'none';
 
     } catch (error) {
         console.error('Error splitting PDF:', error);
@@ -320,8 +444,7 @@ function addCustomRange(container) {
             <label>End page:</label>
             <input type="number" class="customEndPage" min="1" value="1" required>
         </div>
-        <button type="button" class="removeCustomRangeBtn">Remove</button>
-    `;
+        <button type="button" class="removeCustomRangeBtn">Remove</button>`;  
 
     const removeBtn = rangeDiv.querySelector('.removeCustomRangeBtn');
     removeBtn.addEventListener('click', function(e) {
@@ -340,3 +463,36 @@ function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + type;
 }
+
+function updateFileSizeInfo() {
+    const file = pdfFile.files[0];
+    if (file && fileSizeInfo) {
+        const sizeInBytes = file.size;
+        let sizeText = formatFileSize(sizeInBytes);
+
+        const lang = localStorage.getItem('language') || 'en';
+        const fileSizeLabels = {
+            en: 'Current file size: ',
+            it: 'Dimensione file: ',
+            pl: 'Rozmiar pliku: '
+        };
+
+        fileSizeInfo.textContent = (fileSizeLabels[lang] || fileSizeLabels.en) + sizeText;
+        fileSizeInfo.style.display = 'block';
+    } else if (fileSizeInfo) {
+        fileSizeInfo.style.display = 'none';
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes >= 1024 * 1024 * 1024) {
+        return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+    } else if (bytes >= 1024 * 1024) {
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    } else if (bytes >= 1024) {
+        return (bytes / 1024).toFixed(2) + ' KB';
+    } else {
+        return bytes + ' B';
+    }
+}
+

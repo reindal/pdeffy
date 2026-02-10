@@ -411,3 +411,44 @@
     background-color: var(--btn-color);
     color: var(--text-white);
 }
+
+/* Size Mode Styles */
+.sizeInputGroup {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sizeInputGroup input {
+    flex: 1;
+    width: auto !important;
+}
+
+.sizeInputGroup select {
+    width: 100px !important;
+    padding: 12px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    background-color: var(--bg-white);
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.sizeInputGroup select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.fileSizeInfo {
+    display: none;
+    padding: 12px 16px;
+    background-color: var(--bg-info);
+    border-radius: 8px;
+    color: var(--text-dark);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border-left: 4px solid var(--primary-color);
+}
