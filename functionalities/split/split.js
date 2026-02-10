@@ -444,8 +444,7 @@ function addCustomRange(container) {
             <label>End page:</label>
             <input type="number" class="customEndPage" min="1" value="1" required>
         </div>
-        <button type="button" class="removeCustomRangeBtn">Remove</button>
-    `;  
+        <button type="button" class="removeCustomRangeBtn">Remove</button>`;  
 
     const removeBtn = rangeDiv.querySelector('.removeCustomRangeBtn');
     removeBtn.addEventListener('click', function(e) {
