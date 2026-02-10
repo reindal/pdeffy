@@ -469,17 +469,7 @@ function updateFileSizeInfo() {
     const file = pdfFile.files[0];
     if (file && fileSizeInfo) {
         const sizeInBytes = file.size;
-        let sizeText = '';
-
-        if (sizeInBytes >= 1024 * 1024 * 1024) {
-            sizeText = (sizeInBytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
-        } else if (sizeInBytes >= 1024 * 1024) {
-            sizeText = (sizeInBytes / (1024 * 1024)).toFixed(2) + ' MB';
-        } else if (sizeInBytes >= 1024) {
-            sizeText = (sizeInBytes / 1024).toFixed(2) + ' KB';
-        } else {
-            sizeText = sizeInBytes + ' B';
-        }
+        let sizeText = formatFileSize(sizeInBytes);
 
         const lang = localStorage.getItem('language') || 'en';
         const fileSizeLabels = {
