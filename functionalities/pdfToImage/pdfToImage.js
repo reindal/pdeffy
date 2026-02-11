@@ -2,18 +2,27 @@ const fs = require('fs').promises;
 const path = require('path');
 const { ipcRenderer } = require('electron');
 
-// Dynamically import pdfjs-dist as it's an ESM module
+// Wait for PDF.js to load from CDN
 let pdfjsLib = null;
 
 // Initialize PDF.js
 async function initPdfJs() {
     if (!pdfjsLib) {
-        // Use dynamic import for ESM module
-        pdfjsLib = await import('pdfjs-dist');
+        // Wait for PDF.js to be available from CDN
+        let attempts = 0;
+        while (!window.pdfjsLib && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
 
-        // Configure worker for Electron environment
-        // Using CDN as workaround for module resolution issues
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+        if (!window.pdfjsLib) {
+            throw new Error('PDF.js library failed to load');
+        }
+
+        pdfjsLib = window.pdfjsLib;
+
+        // Configure worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
     }
     return pdfjsLib;
 }
@@ -21,21 +30,92 @@ async function initPdfJs() {
 let pdfDocument = null;
 let selectedFile = null;
 
-const form = document.getElementById('pdfToImageForm');
-const pdfFile = document.getElementById('pdfFile');
-const fileInfo = document.getElementById('fileInfo');
-const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
-const pagesPreview = document.getElementById('pagesPreview');
-const pagesPreviewContainer = document.getElementById('pagesPreviewContainer');
-const imageFormat = document.getElementById('imageFormat');
+let form, pdfFile, fileInfo, submitBtn, statusDiv, pagesPreview, pagesPreviewContainer, imageFormat;
+let togglePreviewBtn, togglePreviewText, togglePreviewIcon;
 
-pdfFile.addEventListener('change', async function(e) {
-    selectedFile = e.target.files[0];
-    if (selectedFile) {
-        await loadPDF(selectedFile);
+// Toggle preview functionality
+let isPreviewCollapsed = false;
+
+// Initialize DOM elements when ready
+document.addEventListener('DOMContentLoaded', function() {
+    form = document.getElementById('pdfToImageForm');
+    pdfFile = document.getElementById('pdfFile');
+    fileInfo = document.getElementById('fileInfo');
+    submitBtn = document.getElementById('submitBtn');
+    statusDiv = document.getElementById('status');
+    pagesPreview = document.getElementById('pagesPreview');
+    pagesPreviewContainer = document.getElementById('pagesPreviewContainer');
+    imageFormat = document.getElementById('imageFormat');
+    togglePreviewBtn = document.getElementById('togglePreviewBtn');
+    togglePreviewText = document.getElementById('togglePreviewText');
+    togglePreviewIcon = document.getElementById('togglePreviewIcon');
+
+    // Add toggle button event listener
+    if (togglePreviewBtn) {
+        togglePreviewBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            isPreviewCollapsed = !isPreviewCollapsed;
+
+            if (isPreviewCollapsed) {
+                // Ukrywamy podgląd
+                pagesPreviewContainer.style.display = 'none';
+                updateToggleButtonText('show');  // Przycisk: "Show preview"
+            } else {
+                // Pokazujemy podgląd
+                pagesPreviewContainer.style.display = 'grid';
+                updateToggleButtonText('hide');  // Przycisk: "Hide preview"
+            }
+        });
+    }
+
+    // Add file input listener
+    if (pdfFile) {
+        pdfFile.addEventListener('change', async function(e) {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                await loadPDF(selectedFile);
+            }
+        });
+    }
+
+    // Add form submit listener
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+    }
+
+    // Add language change listener
+    const langSelector = document.getElementById('languageSelector');
+    if (langSelector) {
+        langSelector.addEventListener('change', () => {
+            if (pagesPreview && pagesPreview.style.display !== 'none') {
+                updateToggleButtonText(isPreviewCollapsed ? 'show' : 'hide');
+            }
+        });
     }
 });
+
+function updateToggleButtonText(action) {
+    const lang = localStorage.getItem('language') || 'en';
+    const texts = {
+        en: {
+            show: 'Show preview',
+            hide: 'Hide preview'
+        },
+        it: {
+            show: 'Mostra anteprima',
+            hide: 'Nascondi anteprima'
+        },
+        pl: {
+            show: 'Pokaż podgląd',
+            hide: 'Ukryj podgląd'
+        }
+    };
+
+    if (togglePreviewText) {
+        togglePreviewText.textContent = texts[lang][action] || texts['en'][action];
+    }
+}
 
 async function loadPDF(file) {
     try {
@@ -59,6 +139,17 @@ async function loadPDF(file) {
 
         // Generate previews
         await generatePreviews(pdfDocument, numPages);
+
+        // Auto-collapse preview if more than 10 pages
+        if (numPages > 10) {
+            isPreviewCollapsed = true;
+            pagesPreviewContainer.style.display = 'none';
+            updateToggleButtonText('show');
+        } else {
+            isPreviewCollapsed = false;
+            pagesPreviewContainer.style.display = 'grid';
+            updateToggleButtonText('hide');
+        }
 
         statusDiv.style.display = 'none';
     } catch (error) {
@@ -104,7 +195,7 @@ async function generatePreviews(pdfDoc, numPages) {
     }
 }
 
-form.addEventListener('submit', async function(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
     if (!pdfDocument || !selectedFile) {
@@ -177,7 +268,7 @@ form.addEventListener('submit', async function(e) {
     } finally {
         submitBtn.disabled = false;
     }
-});
+}
 
 function showStatus(message, type) {
     statusDiv.textContent = message;

@@ -1,11 +1,9 @@
-:root{
-    --primary-color: #ff9800;
-    --secondary-color: #f8ead4;
-    --hover-color: #f1ddbf;
-}
+@import url('variables.css');
 
 body{
-    background-color: white;
+    background-color: #505050;
+    margin: 0;
+    padding: 0;
 }
 
 .optionCard>p{
@@ -14,8 +12,8 @@ body{
 }
 
 header {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--bg-info);
+    color: var(--text-primary);
     padding: 10px;
     text-align: center;
     margin: 0;
@@ -23,13 +21,14 @@ header {
     width: 750px;
     align-items: center;
     display: flex;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary), serif;
     box-shadow: rgba(0, 0, 0, 0.36) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 }
 
 .headerContainer{
     display: flex;
     justify-content: center;
+    padding: 20px 0;
 }
 
 .headerIcon{
@@ -47,7 +46,7 @@ header {
 }
 
 .optionCard{
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
     border-radius: 15px;
     padding: 15px;
     margin: 10px;
@@ -56,11 +55,11 @@ header {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary), serif;
     width: 250px;
     height: 250px;
     text-decoration: none;
-    color: black;
+    color: #2a2a2a;
     border: none;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -69,7 +68,7 @@ header {
 .optionCard:hover{
     transform: translateY(-3px);
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
-    background-color: var(--hover-color);
+    background-color: var(--primary-dark);
 }
 
 .optionIcon{
@@ -79,12 +78,12 @@ header {
 
 .optionCard h2{
     margin: 10px 0;
-    color: black;
+    color: #4a4a4a;
 }
 
 .optionCard p{
     margin: 0;
-    color: black;
+    color: #4a4a4a;
     text-align: center;
     font-size: 14px;
 }
@@ -93,7 +92,9 @@ header {
     margin-left: auto;
     padding: 5px;
     border-radius: 5px;
-    border: none;
+    border: 2px solid var(--primary-color);
+    background-color: var(--bg-dark);
+    color: white;
     font-size: 13px;
     cursor: pointer;
 }
@@ -104,7 +105,7 @@ header {
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary), serif;
     font-size: 14px;
     margin: 10px 0;
 }
@@ -131,7 +132,7 @@ header {
     right: 20px;
     width: 40px;
     height: 40px;
-    background-color: var(--primary-color);
+    background-color: var(--bg-info);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -145,12 +146,17 @@ header {
 .settingsIcon:hover {
     transform: scale(1.1);
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
+    background-color: var(--primary-color);
 }
 
 .settingsIcon svg {
     width: 24px;
     height: 24px;
-    fill: white;
+    fill: var(--primary-color);
+}
+
+.settingsIcon:hover svg {
+    fill: var(--bg-dark);
 }
 
 /* Settings modal */
@@ -178,7 +184,7 @@ header {
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
     max-width: 450px;
     width: 90%;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary), serif;
 }
 
 .settingsContent h2 {
@@ -239,20 +245,20 @@ header {
 
 .settingsBtn.save {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--text-dark);
 }
 
 .settingsBtn.save:hover {
-    background-color: #e68900;
+    background-color: var(--primary-dark);
 }
 
 .settingsBtn.cancel {
-    background-color: #ddd;
-    color: #333;
+    background-color: var(--btn-secondary);
+    color: var(--text-primary);
 }
 
 .settingsBtn.cancel:hover {
-    background-color: #ccc;
+    background-color: var(--btn-secondary-dark);
 }
 
 .settingsStatus {

@@ -17,7 +17,7 @@ function createWindow() {
             contextIsolation: false
         },
         show: false,
-        icon: path.join(__dirname, "assets", "logo.png")
+        icon: path.join(__dirname, "assets", "navbarLogo.png")
     });
     mainWindow.maximize();
     mainWindow.loadURL(url.format({
