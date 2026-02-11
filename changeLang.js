@@ -10,6 +10,10 @@ const languages = {
         splitPdfDesc: "Split your PDF document into multiple files.",
         mergePdfText: "Merge PDF",
         mergePdfDesc: "Merge your PDF documents into single file.",
+        imageToPdfText: "Image to PDF",
+        imageToPdfDesc: "Convert one or more images into a PDF document.",
+        pdfToImageText: "PDF to Image",
+        pdfToImageDesc: "Convert PDF pages into image files.",
         removeBtn: "Remove",
         backLink: "← Back to main page",
         selectedFile: "✓ Selected file: ",
@@ -37,6 +41,27 @@ const languages = {
         endPageLabel: "End page:",
         rangeError: "At least one range is required",
         createdSuccesful: '✓ Successfully created ${successCount} file(s) in Downloads folder',
+
+        // Image to PDF
+        imageToPdfHeader: "Image to PDF",
+        imageToPdfHeader2: "Convert Images to PDF",
+        imageToPdfSelectLabel: "Select image files (can select multiple):",
+        imageToPdfSelectButton: "Click to select images",
+        imagesOrderTitle: "Images Order",
+        imageToPdfHelpText: "Drag to reorder images (top to bottom = first to last page in PDF)",
+        imageToPdfOutputName: "Output file name:",
+        imageToPdfSubmitBtn: "Create PDF",
+
+        // PDF to Image
+        pdfToImageHeader: "PDF to Image",
+        pdfToImageHeader2: "Convert PDF to Images",
+        pdfToImageSelectLabel: "Select PDF file:",
+        pdfToImageSelectButton: "Click to select PDF",
+        pagesPreviewTitle: "PDF Pages Preview",
+        pdfToImageFormatLabel: "Output image format:",
+        pdfToImageOutputName: "Output file name prefix:",
+        pdfToImageNamesExample: "Files will be named: prefix_1.png, prefix_2.png etc.",
+        pdfToImageSubmitBtn: "Convert to Images",
 
         // Split mode labels
         splitModeLabel: "Split mode:",
@@ -69,6 +94,10 @@ const languages = {
         splitPdfDesc: "Dividi il tuo documento PDF in più file.",
         mergePdfText: "Unisci PDF",
         mergePdfDesc: "Unisci i tuoi documenti PDF in un unico file.",
+        imageToPdfText: "Immagine a PDF",
+        imageToPdfDesc: "Converti una o più immagini in un documento PDF.",
+        pdfToImageText: "PDF a Immagine",
+        pdfToImageDesc: "Converti le pagine PDF in file immagine.",
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
         selectedFile: "✓ File selezionato: ",
@@ -96,6 +125,27 @@ const languages = {
         endPageLabel: "Pagina finale:",
         rangeError: "Almeno una fascia è richiesta",
         createdSuccesful: '✓ Creato con successo ${successCount} file in cartella Download',
+
+        // Image to PDF
+        imageToPdfHeader: "Immagine a PDF",
+        imageToPdfHeader2: "Converti Immagini in PDF",
+        imageToPdfSelectLabel: "Seleziona file immagine (puoi selezionare più file):",
+        imageToPdfSelectButton: "Clicca per selezionare immagini",
+        imagesOrderTitle: "Ordine delle Immagini",
+        imageToPdfHelpText: "Trascina per riordinare le immagini (dall'alto al basso = dalla prima all'ultima pagina nel PDF)",
+        imageToPdfOutputName: "Nome file di output:",
+        imageToPdfSubmitBtn: "Crea PDF",
+
+        // PDF to Image
+        pdfToImageHeader: "PDF a Immagine",
+        pdfToImageHeader2: "Converti PDF in Immagini",
+        pdfToImageSelectLabel: "Seleziona file PDF:",
+        pdfToImageSelectButton: "Clicca per selezionare PDF",
+        pagesPreviewTitle: "Anteprima Pagine PDF",
+        pdfToImageFormatLabel: "Formato immagine di output:",
+        pdfToImageOutputName: "Prefisso nome file di output:",
+        pdfToImageNamesExample: "I file saranno denominati: prefisso_1.png, prefisso_2.png ecc.",
+        pdfToImageSubmitBtn: "Converti in Immagini",
 
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
@@ -128,6 +178,10 @@ const languages = {
         splitPdfDesc: "Podziel swój dokument PDF na wiele plików.",
         mergePdfText: "Scal PDF",
         mergePdfDesc: "Scal swoje dokumenty PDF w jeden plik.",
+        imageToPdfText: "Obrazy do PDF",
+        imageToPdfDesc: "Konwertuj jeden lub więcej obrazów na dokument PDF.",
+        pdfToImageText: "PDF do Obrazów",
+        pdfToImageDesc: "Konwertuj strony PDF na pliki obrazów.",
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
@@ -154,6 +208,27 @@ const languages = {
         startPageLabel: "Strona początkowa:",
         endPageLabel: "Strona końcowa:",
         rangeError: "Wymagany jest co najmniej jeden zakres",
+
+        // Image to PDF
+        imageToPdfHeader: "Obrazy do PDF",
+        imageToPdfHeader2: "Konwertuj Obrazy do PDF",
+        imageToPdfSelectLabel: "Wybierz pliki obrazów (możesz wybrać wiele):",
+        imageToPdfSelectButton: "Kliknij, aby wybrać obrazy",
+        imagesOrderTitle: "Kolejność Obrazów",
+        imageToPdfHelpText: "Przeciągnij, aby zmienić kolejność (od góry do dołu = od pierwszej do ostatniej strony w PDF)",
+        imageToPdfOutputName: "Nazwa pliku wynikowego:",
+        imageToPdfSubmitBtn: "Utwórz PDF",
+
+        // PDF to Image
+        pdfToImageHeader: "PDF do Obrazów",
+        pdfToImageHeader2: "Konwertuj PDF na Obrazy",
+        pdfToImageSelectLabel: "Wybierz plik PDF:",
+        pdfToImageSelectButton: "Kliknij, aby wybrać PDF",
+        pagesPreviewTitle: "Podgląd Stron PDF",
+        pdfToImageFormatLabel: "Format obrazu wyjściowego:",
+        pdfToImageOutputName: "Prefiks nazwy pliku wynikowego:",
+        pdfToImageNamesExample: "Pliki będą nazwane: prefiks_1.png, prefiks_2.png itd.",
+        pdfToImageSubmitBtn: "Konwertuj na Obrazy",
 
         // Split mode labels
         splitModeLabel: "Tryb podziału:",

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF to Image</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./pdfToImage.css">
+</head>
+<body>
+<div class="headerContainer">
+    <header>
+        <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
+        <h1 id="pdfToImageHeader" class="langText">PDF to Image</h1>
+
+        <select id="languageSelector">
+            <option value="en">🇬🇧 English</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="pl">🇵🇱 Polski</option>
+        </select>
+    </header>
+</div>
+
+<main>
+    <div class="pdfToImageContainer">
+        <h1 id="pdfToImageHeader2" class="langText">Convert PDF to Images</h1>
+
+        <form id="pdfToImageForm">
+            <div class="formGroup">
+                <label for="pdfFile" id="pdfToImageSelectLabel" class="langText">Select PDF file:</label>
+                <div class="fileInputWrapper">
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                    <label for="pdfFile" class="fileInputLabel langText" id="pdfToImageSelectButton">Click to select PDF</label>
+                </div>
+                <div id="fileInfo" class="fileInfo"></div>
+            </div>
+
+            <div id="pagesPreview" class="pagesPreview" style="display: none;">
+                <h3 id="pagesPreviewTitle" class="langText">PDF Pages Preview</h3>
+                <div id="pagesPreviewContainer"></div>
+            </div>
+
+            <div class="formGroup">
+                <label for="imageFormat" id="pdfToImageFormatLabel" class="langText">Output image format:</label>
+                <select id="imageFormat" name="imageFormat">
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPEG</option>
+                </select>
+            </div>
+
+            <div class="formGroup">
+                <label for="outputName" id="pdfToImageOutputName" class="langText">Output file name prefix:</label>
+                <input type="text" id="outputName" name="outputName" placeholder="page" class="langTextPlaceholder">
+                <p class="helpText langText" id="pdfToImageNamesExample">Files will be named: prefix_1.png, prefix_2.png etc.</p>
+            </div>
+
+            <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="pdfToImageSubmitBtn">Convert to Images</span></button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+    </div>
+</main>
+
+<script src="../../changeLang.js"></script>
+<script src="./pdfToImage.js"></script>
+</body>
+</html>
+
+
