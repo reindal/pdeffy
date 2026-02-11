@@ -452,3 +452,24 @@
     margin-bottom: 15px;
     border-left: 4px solid var(--primary-color);
 }
+
+/* Checkbox styling */
+.formGroup .checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.formGroup .checkboxLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    margin: 0;
+    padding: 0;
+}

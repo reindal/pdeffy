@@ -129,6 +129,12 @@ form.addEventListener('submit', async function(e) {
                 const range = ranges[i];
                 const newPdf = await PDFDocument.create();
 
+                // Get metadata from environment variables
+                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+                if (metadata.author) newPdf.setAuthor(metadata.author);
+                if (metadata.title) newPdf.setTitle(metadata.title);
+                if (metadata.subject) newPdf.setSubject(metadata.subject);
+
                 for (let pageIdx = range.startPage - 1; pageIdx < range.endPage; pageIdx++) {
                     const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
                     newPdf.addPage(copiedPage);
@@ -138,6 +144,17 @@ form.addEventListener('submit', async function(e) {
                 const outputFileName = `${outputNamePrefix}_${i + 1}.pdf`;
                 const filePath = path.join(downloadsPath, outputFileName);
                 await fs.writeFile(filePath, newPdfBytes);
+
+                // Set read-only if checkbox is checked
+                const readOnlyCheckbox = document.getElementById('readOnlyCheckbox');
+                if (readOnlyCheckbox && readOnlyCheckbox.checked) {
+                    try {
+                        await ipcRenderer.invoke('set-file-readonly', filePath);
+                    } catch (error) {
+                        console.error('Error setting read-only:', error);
+                    }
+                }
+
                 successCount++;
             }
 
@@ -155,6 +172,13 @@ form.addEventListener('submit', async function(e) {
 
             while (currentPage < totalPages) {
                 const newPdf = await PDFDocument.create();
+
+                // Get metadata from environment variables
+                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+                if (metadata.author) newPdf.setAuthor(metadata.author);
+                if (metadata.title) newPdf.setTitle(metadata.title);
+                if (metadata.subject) newPdf.setSubject(metadata.subject);
+
                 const endPage = Math.min(currentPage + interval, totalPages);
 
                 for (let pageIdx = currentPage; pageIdx < endPage; pageIdx++) {
@@ -185,6 +209,12 @@ form.addEventListener('submit', async function(e) {
                 const fileItem = customFileItems[i];
                 const rangeItems = fileItem.querySelectorAll('.customRangeItem');
                 const newPdf = await PDFDocument.create();
+
+                // Get metadata from environment variables
+                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+                if (metadata.author) newPdf.setAuthor(metadata.author);
+                if (metadata.title) newPdf.setTitle(metadata.title);
+                if (metadata.subject) newPdf.setSubject(metadata.subject);
 
                 for (let rangeItem of rangeItems) {
                     const startInput = rangeItem.querySelector('.customStartPage');
@@ -269,13 +299,7 @@ form.addEventListener('submit', async function(e) {
             // Check if the requested size is too small
             if (maxBytes < minPageSize) {
                 const minSizeFormatted = formatFileSize(minPageSize);
-                const lang = localStorage.getItem('language') || 'en';
-                const errorMessages = {
-                    en: `Cannot split: minimum required size is ${minSizeFormatted} (smallest page size)`,
-                    it: `Impossibile dividere: la dimensione minima richiesta è ${minSizeFormatted} (dimensione pagina più piccola)`,
-                    pl: `Nie można podzielić: minimalny wymagany rozmiar to ${minSizeFormatted} (rozmiar najmniejszej strony)`
-                };
-                showStatus(errorMessages[lang] || errorMessages.en, 'error');
+                showStatus(getMessage('cannotSplitMinSize', { size: minSizeFormatted }), 'error');
                 submitBtn.disabled = false;
                 return;
             }
@@ -285,6 +309,13 @@ form.addEventListener('submit', async function(e) {
 
             while (currentPage < totalPages) {
                 let newPdf = await PDFDocument.create();
+
+                // Get metadata from environment variables
+                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+                if (metadata.author) newPdf.setAuthor(metadata.author);
+                if (metadata.title) newPdf.setTitle(metadata.title);
+                if (metadata.subject) newPdf.setSubject(metadata.subject);
+
                 let currentSize = 0;
                 let pagesInCurrentFile = 0;
 
@@ -362,7 +393,7 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error splitting PDF:', error);
-        showStatus(`Error: ${error.message}`, 'error');
+        showStatus(getMessage('errorPrefix') + error.message, 'error');
         submitBtn.disabled = false;
     }
 });
@@ -424,7 +455,7 @@ function addCustomFile() {
         if (customFilesContainer.querySelectorAll('.customFileItem').length > 1) {
             fileDiv.remove();
         } else {
-            showStatus('You must have at least one output file', 'error');
+            showStatus(getMessage('atLeastOneFileRequired'), 'error');
         }
     });
 
@@ -444,7 +475,7 @@ function addCustomRange(container) {
             <label>End page:</label>
             <input type="number" class="customEndPage" min="1" value="1" required>
         </div>
-        <button type="button" class="removeCustomRangeBtn">Remove</button>`;  
+        <button type="button" class="removeCustomRangeBtn">Remove</button>`;
 
     const removeBtn = rangeDiv.querySelector('.removeCustomRangeBtn');
     removeBtn.addEventListener('click', function(e) {
@@ -452,7 +483,7 @@ function addCustomRange(container) {
         if (container.querySelectorAll('.customRangeItem').length > 1) {
             rangeDiv.remove();
         } else {
-            showStatus('Each file must have at least one range', 'error');
+            showStatus(getMessage('eachFileMustHaveRange'), 'error');
         }
     });
 
@@ -462,6 +493,72 @@ function addCustomRange(container) {
 function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + type;
+}
+
+// Helper function to get translated message
+function getMessage(key, params = {}) {
+    const lang = localStorage.getItem('language') || 'en';
+    const messages = {
+        en: {
+            pleaseSelectFile: "Please select a PDF file",
+            processing: "Processing",
+            pageNumbersGreaterThanZero: "Page numbers must be greater than 0",
+            startPageCannotBeGreater: "Start page cannot be greater than end page",
+            pdfHasOnlyPages: "PDF has only {total} pages. Please select valid page range.",
+            pleaseAddAtLeastOneRange: "Please add at least one page range",
+            intervalAtLeastOne: "Interval must be at least 1",
+            pleaseAddAtLeastOneOutputFile: "Please add at least one output file",
+            pleaseEnterValidFileSize: "Please enter a valid file size",
+            cannotSplitMinSize: "Cannot split: minimum required size is {size} (smallest page size)",
+            successSplitFiles: "✓ Successfully created {count} file(s) in Downloads folder!",
+            errorPrefix: "Error: ",
+            atLeastOneRangeRequired: "You must have at least one range",
+            atLeastOneFileRequired: "You must have at least one output file",
+            eachFileMustHaveRange: "Each file must have at least one range"
+        },
+        it: {
+            pleaseSelectFile: "Seleziona un file PDF",
+            processing: "Elaborazione",
+            pageNumbersGreaterThanZero: "I numeri di pagina devono essere maggiori di 0",
+            startPageCannotBeGreater: "La pagina iniziale non può essere maggiore della pagina finale",
+            pdfHasOnlyPages: "Il PDF ha solo {total} pagine. Seleziona un intervallo di pagine valido.",
+            pleaseAddAtLeastOneRange: "Aggiungi almeno un intervallo di pagine",
+            intervalAtLeastOne: "L'intervallo deve essere almeno 1",
+            pleaseAddAtLeastOneOutputFile: "Aggiungi almeno un file di output",
+            pleaseEnterValidFileSize: "Inserisci una dimensione file valida",
+            cannotSplitMinSize: "Impossibile dividere: la dimensione minima richiesta è {size} (dimensione pagina più piccola)",
+            successSplitFiles: "✓ Creati con successo {count} file nella cartella Download!",
+            errorPrefix: "Errore: ",
+            atLeastOneRangeRequired: "Devi avere almeno un intervallo",
+            atLeastOneFileRequired: "Devi avere almeno un file di output",
+            eachFileMustHaveRange: "Ogni file deve avere almeno un intervallo"
+        },
+        pl: {
+            pleaseSelectFile: "Proszę wybrać plik PDF",
+            processing: "Przetwarzanie",
+            pageNumbersGreaterThanZero: "Numery stron muszą być większe niż 0",
+            startPageCannotBeGreater: "Strona początkowa nie może być większa niż strona końcowa",
+            pdfHasOnlyPages: "PDF ma tylko {total} stron. Proszę wybrać prawidłowy zakres stron.",
+            pleaseAddAtLeastOneRange: "Dodaj co najmniej jeden zakres stron",
+            intervalAtLeastOne: "Interwał musi wynosić co najmniej 1",
+            pleaseAddAtLeastOneOutputFile: "Dodaj co najmniej jeden plik wyjściowy",
+            pleaseEnterValidFileSize: "Wprowadź prawidłowy rozmiar pliku",
+            cannotSplitMinSize: "Nie można podzielić: minimalny wymagany rozmiar to {size} (rozmiar najmniejszej strony)",
+            successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów) w folderze Pobrane!",
+            errorPrefix: "Błąd: ",
+            atLeastOneRangeRequired: "Musisz mieć co najmniej jeden zakres",
+            atLeastOneFileRequired: "Musisz mieć co najmniej jeden plik wyjściowy",
+            eachFileMustHaveRange: "Każdy plik musi mieć co najmniej jeden zakres"
+        }
+    };
+
+    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
+
+    Object.keys(params).forEach(param => {
+        message = message.replace(`{${param}}`, params[param]);
+    });
+
+    return message;
 }
 
 function updateFileSizeInfo() {

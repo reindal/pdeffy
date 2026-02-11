@@ -97,3 +97,174 @@ header {
     font-size: 13px;
     cursor: pointer;
 }
+
+/* Checkbox styling */
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.checkboxLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary-color);
+    margin: 0;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.checkboxLabel span {
+    line-height: 18px;
+    vertical-align: middle;
+}
+
+/* Settings icon */
+.settingsIcon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1000;
+}
+
+.settingsIcon:hover {
+    transform: scale(1.1);
+    box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
+}
+
+.settingsIcon svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+/* Settings modal */
+.settingsModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.settingsModal.active {
+    display: flex;
+}
+
+.settingsContent {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
+    max-width: 450px;
+    width: 90%;
+    font-family: 'Inter', sans-serif;
+}
+
+.settingsContent h2 {
+    margin-top: 0;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+.settingsContent h3 {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.settingsFormGroup {
+    margin-bottom: 15px;
+}
+
+.settingsFormGroup label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.settingsFormGroup input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.settingsFormGroup input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.settingsButtons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.settingsBtn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.settingsBtn.save {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.settingsBtn.save:hover {
+    background-color: #e68900;
+}
+
+.settingsBtn.cancel {
+    background-color: #ddd;
+    color: #333;
+}
+
+.settingsBtn.cancel:hover {
+    background-color: #ccc;
+}
+
+.settingsStatus {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    display: none;
+}
+
+.settingsStatus.success {
+    display: block;
+    background-color: #d4edda;
+    color: #155724;
+}

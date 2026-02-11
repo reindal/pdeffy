@@ -130,15 +130,21 @@ form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     if (selectedImages.length === 0) {
-        showStatus('Please select at least one image', 'error');
+        showStatus(getMessage('pleaseSelectAtLeastOneImage'), 'error');
         return;
     }
 
     submitBtn.disabled = true;
-    showStatus('Creating PDF...', 'info');
+    showStatus(getMessage('creatingPdf'), 'info');
 
     try {
         const pdfDoc = await PDFDocument.create();
+
+        // Get metadata from environment variables
+        const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+        if (metadata.author) pdfDoc.setAuthor(metadata.author);
+        if (metadata.title) pdfDoc.setTitle(metadata.title);
+        if (metadata.subject) pdfDoc.setSubject(metadata.subject);
 
         for (const imageFile of selectedImages) {
             const imageBytes = await imageFile.arrayBuffer();
@@ -198,7 +204,17 @@ form.addEventListener('submit', async function(e) {
 
         await fs.writeFile(outputPath, pdfBytes);
 
-        showStatus(`✓ PDF created successfully: ${fileName}`, 'success');
+        // Set read-only if checkbox is checked
+        const readOnlyCheckbox = document.getElementById('readOnlyCheckbox');
+        if (readOnlyCheckbox && readOnlyCheckbox.checked) {
+            try {
+                await ipcRenderer.invoke('set-file-readonly', outputPath);
+            } catch (error) {
+                console.error('Error setting read-only:', error);
+            }
+        }
+
+        showStatus(getMessage('successPdfCreated', { filename: fileName }), 'success');
 
         // Reset form
         setTimeout(() => {
@@ -210,7 +226,7 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error creating PDF:', error);
-        showStatus(`Error: ${error.message}`, 'error');
+        showStatus(getMessage('errorPrefix') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -226,6 +242,39 @@ function showStatus(message, type) {
             statusDiv.style.display = 'none';
         }, 5000);
     }
+}
+
+// Helper function to get translated message
+function getMessage(key, params = {}) {
+    const lang = localStorage.getItem('language') || 'en';
+    const messages = {
+        en: {
+            pleaseSelectAtLeastOneImage: "Please select at least one image",
+            creatingPdf: "Creating PDF...",
+            successPdfCreated: "✓ PDF created successfully: {filename}",
+            errorPrefix: "Error: "
+        },
+        it: {
+            pleaseSelectAtLeastOneImage: "Seleziona almeno un'immagine",
+            creatingPdf: "Creazione PDF...",
+            successPdfCreated: "✓ PDF creato con successo: {filename}",
+            errorPrefix: "Errore: "
+        },
+        pl: {
+            pleaseSelectAtLeastOneImage: "Proszę wybrać co najmniej jeden obraz",
+            creatingPdf: "Tworzenie PDF...",
+            successPdfCreated: "✓ PDF utworzony pomyślnie: {filename}",
+            errorPrefix: "Błąd: "
+        }
+    };
+
+    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
+
+    Object.keys(params).forEach(param => {
+        message = message.replace(`{${param}}`, params[param]);
+    });
+
+    return message;
 }
 
 
