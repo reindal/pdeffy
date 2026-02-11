@@ -48,7 +48,7 @@
 .formGroup input:focus,
 .formGroup select:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: var(--reindalYellow);
 }
 
 .fileInputWrapper {
@@ -66,7 +66,7 @@
 .fileInputLabel {
     display: block;
     padding: 12px;
-    background-color: var(--btn-primary);
+    background-color: var(--reindalYellow);
     color: #2a2a2a;
     text-align: center;
     border-radius: 8px;
@@ -76,7 +76,7 @@
 }
 
 .fileInputLabel:hover {
-    background-color: var(--btn-primary-dark);
+    background-color: var(--reindalYellowHover);
 }
 
 .imagesList {
@@ -124,17 +124,17 @@
 }
 
 .imageOrderItem:hover {
-    border-color: var(--primary-color);
+    border-color: var(--reindalYellow);
     box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 8px;
 }
 
 .imageOrderItem.dragging {
     opacity: 0.5;
-    border-color: var(--primary-color);
+    border-color: var(--reindalYellow);
 }
 
 .imageOrderItem.dragover {
-    border-color: var(--primary-color);
+    border-color: var(--reindalYellow);
     background-color: var(--bg-info);
     transform: scale(1.02);
 }
@@ -145,7 +145,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--primary-color);
+    background-color: var(--reindalYellow);
     color: var(--text-white);
     border-radius: 50%;
     font-weight: 600;
@@ -195,7 +195,7 @@
 .submitBtn {
     width: 100%;
     padding: 14px;
-    background-color: var(--primary-color);
+    background-color: var(--reindalYellow);
     color: var(--text-dark);
     border: none;
     border-radius: 8px;
@@ -207,7 +207,7 @@
 }
 
 .submitBtn:hover {
-    background-color: var(--primary-dark);
+    background-color: var(--reindalYellowHover);
 }
 
 .submitBtn:disabled {
@@ -267,7 +267,7 @@
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: var(--primary-color);
+    accent-color: var(--reindalYellow);
     margin: 0;
     padding: 0;
 }
