@@ -1,5 +1,3 @@
-const { remove } = require("fs-extra");
-
 let language = localStorage.getItem('language') || 'en';
 
 const languages = {
@@ -35,7 +33,7 @@ const languages = {
         splitPageRangesLabel: "Select page ranges to extract:",
         addRangeBtn: "+ Add Another Range",
         outputSplitName: "Output file name:",
-        namesSplitExamples:"Files will be named: name_1.pdf, name_2.pdf etc.",
+        namesSplitExamples: "Files will be named: name_1.pdf, name_2.pdf etc.",
         splitSubmitBtn: "Split PDF",
         startPageLabel: "Start page:",
         endPageLabel: "End page:",
@@ -163,7 +161,7 @@ const languages = {
         splitPageRangesLabel: "Seleziona le pagine da estrarre:",
         addRangeBtn: "+ Aggiungi un'altra fascia",
         outputSplitName: "Nome file di output:",
-        namesSplitExamples:"I file saranno denominati: nome_1.pdf, nome_2.pdf ecc.",
+        namesSplitExamples: "I file saranno denominati: nome_1.pdf, nome_2.pdf ecc.",
         splitSubmitBtn: "Dividi PDF",
         startPageLabel: "Pagina iniziale:",
         endPageLabel: "Pagina finale:",
@@ -291,7 +289,7 @@ const languages = {
         splitPageRangesLabel: "Wybierz zakresy stron do wyodrębnienia:",
         addRangeBtn: "+ Dodaj kolejny zakres",
         outputSplitName: "Nazwa pliku wynikowego:",
-        namesSplitExamples:"Pliki będą nazwane: nazwa_1.pdf, nazwa_2.pdf itd.",
+        namesSplitExamples: "Pliki będą nazwane: nazwa_1.pdf, nazwa_2.pdf itd.",
         splitSubmitBtn: "Podziel PDF",
         startPageLabel: "Strona początkowa:",
         endPageLabel: "Strona końcowa:",
@@ -419,7 +417,7 @@ const languages = {
         splitPageRangesLabel: "Selecciona el rango de páginas para extraer:",
         addRangeBtn: "+ Añadir otro rango",
         outputSplitName: "Nombre del archivo:",
-        namesSplitExamples:"Los archivos se llamrán: nombre_1.pdf, nombre_2.pdf etc.",
+        namesSplitExamples: "Los archivos se llamrán: nombre_1.pdf, nombre_2.pdf etc.",
         splitSubmitBtn: "Dividir PDF",
         startPageLabel: "Página de inicio:",
         endPageLabel: "Página final:",
@@ -470,9 +468,10 @@ const languages = {
         maxFileSizeLabel: "Tamaño máximo de salida por archivo:",
         sizeHelpText: "El PDF se dividirá en archivos que no excedan este tamaño",
         currentFileSize: "Tamaño del archivo actual: "
-    }
+    },
+};
 
-function changeLanguage(lang) {
+function changeLanguage(lang){
     let objects = document.getElementsByClassName('langText');
     let objectsP = document.getElementsByClassName('langTextPlaceholder');
 
