@@ -17,3 +17,5 @@ npm-debug.log*
 
 # Package lock (opcjonalnie, niektórzy wolą commitować)
 # package-lock.json
+
+out/
