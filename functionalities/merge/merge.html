@@ -9,7 +9,7 @@
 <body>
 <div class="headerContainer">
     <header>
-        <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
+        <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon">
         <h1 id="mergeHeader" class="langText">Merge PDF</h1>
 
         <select id="languageSelector">
@@ -43,6 +43,13 @@
             <div class="formGroup">
                 <label for="outputName" id="mergeOutputName" class="langText">Output file name:</label>
                 <input type="text" id="outputName" name="outputName" placeholder="merged_document" class="langTextPlaceholder">
+            </div>
+
+            <div class="formGroup">
+                <label class="checkboxLabel">
+                    <input type="checkbox" id="readOnlyCheckbox" name="readOnly">
+                    <span class="langText" id="readOnlyLabel">Make PDF read-only</span>
+                </label>
             </div>
 
             <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="mergeSubmitBtn">Merge PDF</span></button>

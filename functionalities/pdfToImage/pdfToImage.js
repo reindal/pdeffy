@@ -1,37 +1,131 @@
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 const fs = require('fs').promises;
 const path = require('path');
 const { ipcRenderer } = require('electron');
 
-// Configure worker path - using the bundled worker
-const workerPath = path.join(__dirname, '../../node_modules/pdfjs-dist/legacy/build/pdf.worker.js');
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerPath;
+// Wait for PDF.js to load from CDN
+let pdfjsLib = null;
 
-const form = document.getElementById('pdfToImageForm');
-const pdfFile = document.getElementById('pdfFile');
-const fileInfo = document.getElementById('fileInfo');
-const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
-const pagesPreview = document.getElementById('pagesPreview');
-const pagesPreviewContainer = document.getElementById('pagesPreviewContainer');
-const imageFormat = document.getElementById('imageFormat');
+// Initialize PDF.js
+async function initPdfJs() {
+    if (!pdfjsLib) {
+        // Wait for PDF.js to be available from CDN
+        let attempts = 0;
+        while (!window.pdfjsLib && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+
+        if (!window.pdfjsLib) {
+            throw new Error('PDF.js library failed to load');
+        }
+
+        pdfjsLib = window.pdfjsLib;
+
+        // Configure worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+    }
+    return pdfjsLib;
+}
 
 let pdfDocument = null;
 let selectedFile = null;
 
-pdfFile.addEventListener('change', async function(e) {
-    selectedFile = e.target.files[0];
-    if (selectedFile) {
-        await loadPDF(selectedFile);
+let form, pdfFile, fileInfo, submitBtn, statusDiv, pagesPreview, pagesPreviewContainer, imageFormat;
+let togglePreviewBtn, togglePreviewText, togglePreviewIcon;
+
+// Toggle preview functionality
+let isPreviewCollapsed = false;
+
+// Initialize DOM elements when ready
+document.addEventListener('DOMContentLoaded', function() {
+    form = document.getElementById('pdfToImageForm');
+    pdfFile = document.getElementById('pdfFile');
+    fileInfo = document.getElementById('fileInfo');
+    submitBtn = document.getElementById('submitBtn');
+    statusDiv = document.getElementById('status');
+    pagesPreview = document.getElementById('pagesPreview');
+    pagesPreviewContainer = document.getElementById('pagesPreviewContainer');
+    imageFormat = document.getElementById('imageFormat');
+    togglePreviewBtn = document.getElementById('togglePreviewBtn');
+    togglePreviewText = document.getElementById('togglePreviewText');
+    togglePreviewIcon = document.getElementById('togglePreviewIcon');
+
+    // Add toggle button event listener
+    if (togglePreviewBtn) {
+        togglePreviewBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            isPreviewCollapsed = !isPreviewCollapsed;
+
+            if (isPreviewCollapsed) {
+                // Ukrywamy podgląd
+                pagesPreviewContainer.style.display = 'none';
+                updateToggleButtonText('show');  // Przycisk: "Show preview"
+            } else {
+                // Pokazujemy podgląd
+                pagesPreviewContainer.style.display = 'grid';
+                updateToggleButtonText('hide');  // Przycisk: "Hide preview"
+            }
+        });
+    }
+
+    // Add file input listener
+    if (pdfFile) {
+        pdfFile.addEventListener('change', async function(e) {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                await loadPDF(selectedFile);
+            }
+        });
+    }
+
+    // Add form submit listener
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+    }
+
+    // Add language change listener
+    const langSelector = document.getElementById('languageSelector');
+    if (langSelector) {
+        langSelector.addEventListener('change', () => {
+            if (pagesPreview && pagesPreview.style.display !== 'none') {
+                updateToggleButtonText(isPreviewCollapsed ? 'show' : 'hide');
+            }
+        });
     }
 });
 
+function updateToggleButtonText(action) {
+    const lang = localStorage.getItem('language') || 'en';
+    const texts = {
+        en: {
+            show: 'Show preview',
+            hide: 'Hide preview'
+        },
+        it: {
+            show: 'Mostra anteprima',
+            hide: 'Nascondi anteprima'
+        },
+        pl: {
+            show: 'Pokaż podgląd',
+            hide: 'Ukryj podgląd'
+        }
+    };
+
+    if (togglePreviewText) {
+        togglePreviewText.textContent = texts[lang][action] || texts['en'][action];
+    }
+}
+
 async function loadPDF(file) {
     try {
-        showStatus('Loading PDF...', 'info');
+        showStatus(getMessage('loadingPdf'), 'info');
+
+        // Initialize PDF.js if not already initialized
+        const pdfjs = await initPdfJs();
 
         const arrayBuffer = await file.arrayBuffer();
-        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
         pdfDocument = await loadingTask.promise;
 
         const numPages = pdfDocument.numPages;
@@ -46,10 +140,21 @@ async function loadPDF(file) {
         // Generate previews
         await generatePreviews(pdfDocument, numPages);
 
+        // Auto-collapse preview if more than 10 pages
+        if (numPages > 10) {
+            isPreviewCollapsed = true;
+            pagesPreviewContainer.style.display = 'none';
+            updateToggleButtonText('show');
+        } else {
+            isPreviewCollapsed = false;
+            pagesPreviewContainer.style.display = 'grid';
+            updateToggleButtonText('hide');
+        }
+
         statusDiv.style.display = 'none';
     } catch (error) {
         console.error('Error loading PDF:', error);
-        showStatus(`Error loading PDF: ${error.message}`, 'error');
+        showStatus(getMessage('errorLoadingPdf', { error: error.message }), 'error');
     }
 }
 
@@ -90,17 +195,17 @@ async function generatePreviews(pdfDoc, numPages) {
     }
 }
 
-form.addEventListener('submit', async function(e) {
+async function handleFormSubmit(e) {
     e.preventDefault();
 
     if (!pdfDocument || !selectedFile) {
-        showStatus('Please select a PDF file first', 'error');
+        showStatus(getMessage('pleaseSelectPdfFirst'), 'error');
         return;
     }
 
     submitBtn.disabled = true;
     const numPages = pdfDocument.numPages;
-    showStatus(`Converting ${numPages} page(s) to images...`, 'info');
+    showStatus(getMessage('convertingPages', { count: numPages }), 'info');
 
     try {
         const outputName = document.getElementById('outputName').value || 'page';
@@ -108,7 +213,7 @@ form.addEventListener('submit', async function(e) {
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-            showStatus(`Converting page ${pageNum} of ${numPages}...`, 'info');
+            showStatus(getMessage('convertingPage', { current: pageNum, total: numPages }), 'info');
 
             const page = await pdfDocument.getPage(pageNum);
 
@@ -144,7 +249,7 @@ form.addEventListener('submit', async function(e) {
             await fs.writeFile(outputPath, Buffer.from(buffer));
         }
 
-        showStatus(`✓ Successfully converted ${numPages} page(s) to ${format.toUpperCase()} images`, 'success');
+        showStatus(getMessage('successConverted', { count: numPages, format: format.toUpperCase() }), 'success');
 
         // Reset form
         setTimeout(() => {
@@ -159,11 +264,11 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error converting PDF:', error);
-        showStatus(`Error: ${error.message}`, 'error');
+        showStatus(getMessage('errorPrefix') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
-});
+}
 
 function showStatus(message, type) {
     statusDiv.textContent = message;
@@ -175,6 +280,47 @@ function showStatus(message, type) {
             statusDiv.style.display = 'none';
         }, 5000);
     }
+}
+
+function getMessage(key, params = {}) {
+    const lang = localStorage.getItem('language') || 'en';
+    const messages = {
+        en: {
+            loadingPdf: "Loading PDF...",
+            errorLoadingPdf: "Error loading PDF: {error}",
+            pleaseSelectPdfFirst: "Please select a PDF file first",
+            convertingPages: "Converting {count} page(s) to images...",
+            convertingPage: "Converting page {current} of {total}...",
+            successConverted: "✓ Successfully converted {count} page(s) to {format} images",
+            errorPrefix: "Error: "
+        },
+        it: {
+            loadingPdf: "Caricamento PDF...",
+            errorLoadingPdf: "Errore nel caricamento del PDF: {error}",
+            pleaseSelectPdfFirst: "Seleziona prima un file PDF",
+            convertingPages: "Conversione di {count} pagina/e in immagini...",
+            convertingPage: "Conversione pagina {current} di {total}...",
+            successConverted: "✓ Convertite con successo {count} pagina/e in immagini {format}",
+            errorPrefix: "Errore: "
+        },
+        pl: {
+            loadingPdf: "Ładowanie PDF...",
+            errorLoadingPdf: "Błąd ładowania PDF: {error}",
+            pleaseSelectPdfFirst: "Najpierw wybierz plik PDF",
+            convertingPages: "Konwersja {count} stron(y) na obrazy...",
+            convertingPage: "Konwersja strony {current} z {total}...",
+            successConverted: "✓ Pomyślnie przekonwertowano {count} stron(y) na obrazy {format}",
+            errorPrefix: "Błąd: "
+        }
+    };
+
+    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
+
+    Object.keys(params).forEach(param => {
+        message = message.replace(`{${param}}`, params[param]);
+    });
+
+    return message;
 }
 
 
