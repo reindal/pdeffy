@@ -2,7 +2,7 @@
 
 .mergeContainer {
     max-width: 600px;
-    margin: 40px auto;
+    margin: 5px auto 40px;
     padding: 30px;
     background-color: var(--reindalLight);
     border-radius: 15px;
@@ -81,24 +81,24 @@
 }
 
 .filesList {
-    margin-top: 12px;
-    padding: 12px;
+    margin-top: 15px;
+    padding: 15px;
     background-color: var(--reindalExtraLight);
-    border: 2px solid var(--reindalGray);
     border-radius: 8px;
+    display: none;
     max-height: 150px;
     overflow-y: auto;
 }
 
 .filesList.active {
-    background-color: var(--reindalGray);
-    border-color: var(--reindalYellow);
+    display: block;
+    background-color: var(--reindalExtraLight);
 }
 
 .fileItem {
     padding: 8px;
     margin-bottom: 5px;
-    background-color: var(--reindalExtraLight);
+    background-color: var(--reindalTab);
     border-radius: 4px;
     font-size: 14px;
     color: var(--reindalDark);

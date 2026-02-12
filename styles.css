@@ -1,7 +1,7 @@
 @import url('variables.css');
 
 body{
-    background-color: #505050;
+    background-color: var(--reindalDark);
     margin: 0;
     padding: 0;
 }
@@ -12,7 +12,7 @@ body{
 }
 
 header {
-    background-color: var(--reindalGray);
+    background-color: var(--reindalDark);
     color: var(--reindalYellow);
     padding: 10px;
     text-align: center;
@@ -22,8 +22,7 @@ header {
     align-items: center;
     display: flex;
     font-family: var(--font-primary), serif;
-    box-shadow: rgba(0, 0, 0, 0.36) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-}
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);}
 
 .headerContainer{
     display: flex;
@@ -59,7 +58,7 @@ header {
     width: 250px;
     height: 250px;
     text-decoration: none;
-    color: #2a2a2a;
+    color: var(--reindalGray);
     border: none;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -132,7 +131,7 @@ header {
     right: 20px;
     width: 40px;
     height: 40px;
-    background-color: var(--reindalGray);
+    background-color: var(--reindalYellow);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -146,13 +145,13 @@ header {
 .settingsIcon:hover {
     transform: scale(1.1);
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
-    background-color: var(--reindalYellow);
+    background-color: var(--reindalYellowHover);
 }
 
 .settingsIcon svg {
     width: 24px;
     height: 24px;
-    fill: var(--reindalYellow);
+    fill: var(--reindalDark);
 }
 
 .settingsIcon:hover svg {
@@ -178,7 +177,7 @@ header {
 }
 
 .settingsContent {
-    background-color: white;
+    background-color: var(--reindalLight);
     padding: 30px;
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
@@ -189,7 +188,7 @@ header {
 
 .settingsContent h2 {
     margin-top: 0;
-    color: var(--reindalYellow);
+    color: var(--reindalDark);
     border-bottom: 2px solid var(--reindalYellow);
     padding-bottom: 10px;
 }
@@ -271,6 +270,6 @@ header {
 
 .settingsStatus.success {
     display: block;
-    background-color: #d4edda;
-    color: #155724;
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
 }

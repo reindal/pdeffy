@@ -2,7 +2,7 @@
 
 .pdfToImageContainer {
     max-width: 600px;
-    margin: 40px auto;
+    margin: 5px auto 40px;
     padding: 30px;
     background-color: var(--reindalLight);
     border-radius: 15px;

@@ -15,7 +15,5 @@ dist/
 *.log
 npm-debug.log*
 
-# Package lock (opcjonalnie, niektórzy wolą commitować)
-# package-lock.json
-
+package-lock.json
 out/
