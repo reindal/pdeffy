@@ -276,5 +276,3 @@ function getMessage(key, params = {}) {
 
     return message;
 }
-
-

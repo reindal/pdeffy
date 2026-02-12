@@ -12,8 +12,8 @@ body{
 }
 
 header {
-    background-color: var(--bg-info);
-    color: var(--text-primary);
+    background-color: var(--reindalGray);
+    color: var(--reindalYellow);
     padding: 10px;
     text-align: center;
     margin: 0;
@@ -93,7 +93,7 @@ header {
     padding: 5px;
     border-radius: 5px;
     border: 2px solid var(--reindalYellow);
-    background-color: var(--bg-dark);
+    background-color: var(--reindalDark);
     color: white;
     font-size: 13px;
     cursor: pointer;
@@ -132,7 +132,7 @@ header {
     right: 20px;
     width: 40px;
     height: 40px;
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -156,7 +156,7 @@ header {
 }
 
 .settingsIcon:hover svg {
-    fill: var(--bg-dark);
+    fill: var(--reindalDark);
 }
 
 /* Settings modal */
@@ -245,7 +245,7 @@ header {
 
 .settingsBtn.save {
     background-color: var(--reindalYellow);
-    color: var(--text-dark);
+    color: var(--reindalDark);
 }
 
 .settingsBtn.save:hover {
@@ -253,12 +253,12 @@ header {
 }
 
 .settingsBtn.cancel {
-    background-color: var(--btn-secondary);
-    color: var(--text-primary);
+    background-color: var(--reindalGray);
+    color: var(--reindalYellow);
 }
 
 .settingsBtn.cancel:hover {
-    background-color: var(--btn-secondary-dark);
+    background-color: var(--reindalDark);
 }
 
 .settingsStatus {

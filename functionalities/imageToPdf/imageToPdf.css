@@ -4,19 +4,19 @@
     max-width: 600px;
     margin: 40px auto;
     padding: 30px;
-    background-color: var(--bg-light);
+    background-color: var(--reindalLight);
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
 
 .imageToPdfContainer h1 {
     text-align: center;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     margin-bottom: 30px;
 }
 
 .imageToPdfContainer h3 {
-    color: var(--text-dark);
+    color: var(--reindalDark);
     margin-bottom: 15px;
     font-size: 16px;
 }
@@ -28,7 +28,7 @@
 .formGroup label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-weight: 600;
     font-family: var(--font-primary), serif;
 }
@@ -37,7 +37,7 @@
 .formGroup select {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--reindalGray);
     border-radius: 8px;
     font-family: var(--font-primary), serif;
     font-size: 14px;
@@ -82,7 +82,7 @@
 .imagesList {
     margin-top: 15px;
     padding: 15px;
-    background-color: var(--bg-white);
+    background-color: var(--reindalExtraLight);
     border-radius: 8px;
     display: none;
 }
@@ -94,16 +94,16 @@
 .imageItem {
     padding: 8px;
     margin-bottom: 5px;
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
     border-radius: 4px;
     font-size: 14px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
 }
 
 .imagesOrder {
     margin-bottom: 20px;
     padding: 20px;
-    background-color: var(--bg-white);
+    background-color: var(--reindalExtraLight);
     border-radius: 8px;
 }
 
@@ -116,8 +116,8 @@
     align-items: center;
     padding: 12px;
     margin-bottom: 8px;
-    background-color: var(--bg-light);
-    border: 2px solid var(--border-color);
+    background-color: var(--reindalLight);
+    border: 2px solid var(--reindalGray);
     border-radius: 8px;
     cursor: move;
     transition: all 0.3s ease;
@@ -135,7 +135,7 @@
 
 .imageOrderItem.dragover {
     border-color: var(--reindalYellow);
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
     transform: scale(1.02);
 }
 
@@ -146,7 +146,7 @@
     align-items: center;
     justify-content: center;
     background-color: var(--reindalYellow);
-    color: var(--text-white);
+    color: var(--reindalExtraLight);
     border-radius: 50%;
     font-weight: 600;
     margin-right: 12px;
@@ -155,7 +155,7 @@
 
 .imageOrderName {
     flex: 1;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-size: 14px;
     word-break: break-all;
 }
@@ -166,13 +166,13 @@
     object-fit: cover;
     border-radius: 4px;
     margin-right: 12px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--reindalGray);
 }
 
 .imageOrderRemove {
     padding: 6px 12px;
-    background-color: var(--danger-color);
-    color: var(--text-white);
+    background-color: var(--reindalRed);
+    color: var(--reindalExtraLight);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -182,11 +182,11 @@
 }
 
 .imageOrderRemove:hover {
-    background-color: var(--danger-dark);
+    background-color: var(--reindalDarkRed);
 }
 
 .helpText {
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-size: 13px;
     margin-top: 10px;
     font-style: italic;
@@ -196,7 +196,7 @@
     width: 100%;
     padding: 14px;
     background-color: var(--reindalYellow);
-    color: var(--text-dark);
+    color: var(--reindalDark);
     border: none;
     border-radius: 8px;
     font-size: 16px;
@@ -211,7 +211,7 @@
 }
 
 .submitBtn:disabled {
-    background-color: var(--text-light);
+    background-color: var(--reindalLight);
     cursor: not-allowed;
 }
 
@@ -225,29 +225,29 @@
 
 .status.success {
     display: block;
-    background-color: var(--success-bg);
-    color: var(--success-text);
-    border: 1px solid var(--success-border);
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
+    border: 1px solid var(--reindalGreen);
 }
 
 .status.error {
     display: block;
-    background-color: var(--error-bg);
-    color: var(--error-text);
-    border: 1px solid var(--error-border);
+    background-color: var(--reindalLightPink);
+    color: var(--reindalWineRed);
+    border: 1px solid var(--reindalPink);
 }
 
 .backLink {
     display: inline-block;
     margin-top: 20px;
-    color: var(--btn-secondary);
+    color: var(--reindalGray);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .backLink:hover {
-    color: var(--btn-secondary-dark);
+    color: var(--reindalDark);
 }
 
 /* Checkbox styling */
@@ -260,7 +260,7 @@
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 0;
-    color: var(--text-dark);
+    color: var(--reindalDark);
 }
 
 .formGroup .checkboxLabel input[type="checkbox"] {

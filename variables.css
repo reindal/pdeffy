@@ -1,10 +1,5 @@
 :root {
-    /*--primary-color: #f0d818;*/
-    /*--primary-dark: #ddca19;*/
-    /*--secondary-color: #4a4a4a;*/
-    /*--hover-color: #3a3a3a;*/
-    /*--accent-color: #FFE511;*/
-
+    /* Colors */
     --reindalYellow: #f0d818;
     --reindalYellowHover: #ddca19;
     --reindalLight: #fffbe1;
@@ -14,41 +9,14 @@
     --reindalDark: #3c3c3c;
     --reindalBody: #fefefe;
     --reindalGrayLight: #ddddddc5;
-
-
-    /* Button colors */
-    /*--reindalYellow: #FFE511;*/
-    /*--reindalYellowHover: #F0D818;*/
-    --danger-color: #dc3545; /* use bootrap's danger color */
-    --danger-dark: #c82333; /* use bootrap's danger color */
-    --btn-secondary: #6c757d;
-    --btn-secondary-dark: #5a6268;
-
-    /* Background colors */
-    --bg-light: #fffbe1;
-    --bg-white: #ffffff;
-    --bg-medium: #e0e0e0;
-    --bg-info: #505050;
-    --bg-dark: #3a3a3a;
-
-    /* Text colors */
-    --text-dark: #2a2a2a;
-    --text-light: #cccccc;
-    --text-medium: #999999;
-    --text-white: #ffffff;
-    --text-primary: #FFE511;
-
-    /* Border colors */
-    --border-color: #5a5a5a;
-
-    /* Status colors */
-    --success-bg: #d4edda;
-    --success-text: #155724; /* use bootrap's success color */
-    --success-border: #c3e6cb; /* use bootrap's success color */
-    --success-color: #61CE70;
-    --error-bg: #f8d7da;
-    --error-text: #721c24;
-    --error-border: #f5c6cb;
+    --reindalRed: #dc3545;
+    --reindalDarkRed: #c82333;
+    --reindalMint: #d4edda;
+    --reindalDarkGreen: #155724;
+    --reindalGreen: #c3e6cb;
+    --reindalLightPink: #f8d7da;
+    --reindalWineRed: #721c24;
+    --reindalPink: #f5c6cb;
 
     /* Fonts */
     --font-primary: 'POPPINS';

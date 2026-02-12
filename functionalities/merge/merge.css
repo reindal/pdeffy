@@ -4,20 +4,20 @@
     max-width: 600px;
     margin: 40px auto;
     padding: 30px;
-    background-color: var(--bg-light);
+    background-color: var(--reindalLight);
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
 
 .mergeContainer h1 {
     text-align: center;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     margin-bottom: 30px;
     font-family: var(--font-primary), serif;
 }
 
 .mergeContainer h3 {
-    color: var(--text-dark);
+    color: var(--reindalDark);
     margin-bottom: 15px;
     font-size: 16px;
 }
@@ -29,7 +29,7 @@
 .formGroup label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-weight: 600;
     font-family: var(--font-primary), serif;
 }
@@ -38,7 +38,7 @@
 .formGroup select {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--reindalGray);
     border-radius: 8px;
     font-family: var(--font-primary), serif;
     font-size: 14px;
@@ -83,25 +83,25 @@
 .filesList {
     margin-top: 12px;
     padding: 12px;
-    background-color: var(--bg-white);
-    border: 2px solid var(--border-color);
+    background-color: var(--reindalExtraLight);
+    border: 2px solid var(--reindalGray);
     border-radius: 8px;
     max-height: 150px;
     overflow-y: auto;
 }
 
 .filesList.active {
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
     border-color: var(--reindalYellow);
 }
 
 .fileItem {
     padding: 8px;
     margin-bottom: 5px;
-    background-color: var(--bg-white);
+    background-color: var(--reindalExtraLight);
     border-radius: 4px;
     font-size: 14px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
 }
 
 .fileItem:last-child {
@@ -111,8 +111,8 @@
 .filesOrder {
     margin-bottom: 20px;
     padding: 15px;
-    background-color: var(--bg-white);
-    border: 2px solid var(--border-color);
+    background-color: var(--reindalExtraLight);
+    border: 2px solid var(--reindalGray);
     border-radius: 8px;
 }
 
@@ -125,8 +125,8 @@
     align-items: center;
     padding: 10px;
     margin-bottom: 8px;
-    background-color: var(--bg-light);
-    border: 2px solid var(--border-color);
+    background-color: var(--reindalLight);
+    border: 2px solid var(--reindalGray);
     border-radius: 6px;
     cursor: move;
     transition: all 0.3s ease;
@@ -134,7 +134,7 @@
 
 .fileOrderItem:hover {
     border-color: var(--reindalYellow);
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
 }
 
 .fileOrderItem.dragging {
@@ -155,7 +155,7 @@
     min-width: 30px;
     margin-right: 10px;
     background-color: var(--reindalYellow);
-    color: var(--text-white);
+    color: var(--reindalExtraLight);
     border-radius: 50%;
     font-weight: 600;
     font-size: 14px;
@@ -164,15 +164,15 @@
 .fileOrderName {
     flex: 1;
     font-size: 14px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     word-break: break-word;
 }
 
 .fileOrderRemove {
     margin-left: 10px;
     padding: 6px 10px;
-    background-color: var(--danger-color);
-    color: var(--text-white);
+    background-color: var(--reindalRed);
+    color: var(--reindalExtraLight);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -182,14 +182,14 @@
 }
 
 .fileOrderRemove:hover {
-    background-color: var(--danger-dark);
+    background-color: var(--reindalDarkRed);
 }
 
 .submitBtn {
     width: 100%;
     padding: 14px;
     background-color: var(--reindalYellow);
-    color: var(--text-dark);
+    color: var(--reindalDark);
     border: none;
     border-radius: 8px;
     font-size: 16px;
@@ -219,22 +219,22 @@
 }
 
 .status.success {
-    background-color: var(--success-bg);
-    color: var(--success-text);
-    border-color: var(--success-border);
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
+    border-color: var(--reindalGreen);
     display: block;
 }
 
 .status.error {
-    background-color: var(--error-bg);
-    color: var(--error-text);
-    border-color: var(--error-border);
+    background-color: var(--reindalLightPink);
+    color: var(--reindalWineRed);
+    border-color: var(--reindalPink);
     display: block;
 }
 
 .helpText {
     font-size: 12px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     margin-top: 6px;
     font-style: italic;
 }
@@ -242,14 +242,14 @@
 .backLink {
     display: inline-block;
     margin-top: 20px;
-    color: var(--btn-secondary);
+    color: var(--reindalGray);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .backLink:hover {
-    color: var(--btn-secondary-dark);
+    color: var(--reindalDark);
     text-decoration: underline;
 }
 
@@ -262,7 +262,7 @@
     font-family: var(--font-primary), serif;
     font-size: 14px;
     margin-bottom: 0;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-weight: bold;
 }
 

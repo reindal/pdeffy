@@ -4,14 +4,14 @@
     max-width: 600px;
     margin: 40px auto;
     padding: 30px;
-    background-color: var(--bg-light);
+    background-color: var(--reindalLight);
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
 
 .splitContainer h1 {
     text-align: center;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     margin-bottom: 30px;
     font-family: var(--font-primary), serif;
 }
@@ -23,7 +23,7 @@
 .formGroup label {
     display: block;
     margin-bottom: 8px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-weight: 600;
     font-family: var(--font-primary), serif;
 }
@@ -32,7 +32,7 @@
 .formGroup select {
     width: 100%;
     padding: 12px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--reindalGray);
     border-radius: 8px;
     font-family: var(--font-primary), serif;
     font-size: 14px;
@@ -77,9 +77,9 @@
 .fileName {
     margin-top: 8px;
     padding: 10px;
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
     border-radius: 6px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-size: 14px;
     display: none;
 }
@@ -105,9 +105,9 @@
     align-items: flex-end;
     margin-bottom: 15px;
     padding: 15px;
-    background-color: var(--bg-white);
+    background-color: var(--reindalExtraLight);
     border-radius: 8px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--reindalGray);
 }
 
 .rangeItem input {
@@ -116,8 +116,8 @@
 
 .rangeItem button {
     padding: 10px 15px;
-    background-color: var(--danger-color);
-    color: var(--text-white);
+    background-color: var(--reindalRed);
+    color: var(--reindalExtraLight);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -128,14 +128,14 @@
 }
 
 .rangeItem button:hover {
-    background-color: var(--danger-dark);
+    background-color: var(--reindalDarkRed);
 }
 
 .addRangeBtn {
     width: 100%;
     padding: 12px;
     background-color: var(--reindalYellow);
-    color: var(--text-dark);
+    color: var(--reindalDark);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -152,7 +152,7 @@
 .helpText {
     margin-top: 8px;
     font-size: 13px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-style: italic;
 }
 
@@ -160,7 +160,7 @@
     width: 100%;
     padding: 14px;
     background-color: var(--reindalYellow);
-    color: var(--text-dark);;
+    color: var(--reindalDark);;
     border: none;
     border-radius: 8px;
     font-size: 16px;
@@ -176,7 +176,7 @@
 }
 
 .submitBtn:disabled {
-    background-color: var(--border-color);
+    background-color: var(--reindalGray);
     cursor: not-allowed;
 }
 
@@ -190,29 +190,29 @@
 
 .status.success {
     display: block;
-    background-color: var(--success-bg);
-    color: var(--success-text);
-    border: 1px solid var(--success-border);
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
+    border: 1px solid var(--reindalGreen);
 }
 
 .status.error {
     display: block;
-    background-color: var(--error-bg);
-    color: var(--error-text);
-    border: 1px solid var(--error-border);
+    background-color: var(--reindalLightPink);
+    color: var(--reindalWineRed);
+    border: 1px solid var(--reindalPink);
 }
 
 .backLink {
     display: inline-block;
     margin-top: 20px;
-    color: var(--btn-secondary);
+    color: var(--reindalGray);
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
 }
 
 .backLink:hover {
-    color: var(--btn-secondary-dark);
+    color: var(--reindalDark);
 }
 
 /* Mode Selector Styles */
@@ -226,8 +226,8 @@
     display: flex;
     align-items: center;
     padding: 16px 18px;
-    background-color: var(--bg-white);
-    border: 2px solid var(--border-color);
+    background-color: var(--reindalExtraLight);
+    border: 2px solid var(--reindalGray);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -256,7 +256,7 @@
 
 .modeOption:has(input[type="radio"]:checked) {
     border-color: var(--reindalYellow);
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
     box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
 }
 
@@ -271,16 +271,16 @@
 
 .modeOption span {
     font-weight: 600;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-size: 15px;
 }
 
 .modeContainer {
     margin-top: 15px;
     padding: 15px;
-    background-color: var(--bg-white);
+    background-color: var(--reindalExtraLight);
     border-radius: 8px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--reindalGray);
 }
 
 /* Custom Files Container */
@@ -291,7 +291,7 @@
 .customFileItem {
     margin-bottom: 20px;
     padding: 18px;
-    background-color: var(--bg-light);
+    background-color: var(--reindalLight);
     border-radius: 10px;
     border: 2px solid var(--reindalYellow);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -303,12 +303,12 @@
     align-items: center;
     margin-bottom: 15px;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 2px solid var(--reindalGray);
 }
 
 .customFileHeader h4 {
     margin: 0;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-size: 16px;
     font-weight: 700;
 }
@@ -324,9 +324,9 @@
     align-items: flex-end;
     margin-bottom: 10px;
     padding: 15px;
-    background-color: var(--bg-white);
+    background-color: var(--reindalExtraLight);
     border-radius: 8px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--reindalGray);
     transition: all 0.3s ease;
 }
 
@@ -338,7 +338,7 @@
 .customRangeItem label {
     display: block;
     margin-bottom: 6px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-weight: 600;
     font-size: 13px;
 }
@@ -350,8 +350,8 @@
 .customRangeItem button,
 .removeFileBtn {
     padding: 10px 15px;
-    background-color: var(--danger-color);
-    color: var(--text-white);
+    background-color: var(--reindalRed);
+    color: var(--reindalExtraLight);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -364,14 +364,14 @@
 
 .customRangeItem button:hover,
 .removeFileBtn:hover {
-    background-color: var(--danger-dark);
+    background-color: var(--reindalDarkRed);
 }
 
 .addCustomRangeBtn {
     width: 100%;
     padding: 12px;
-    background-color: var(--bg-white);
-    color: var(--text-dark);
+    background-color: var(--reindalExtraLight);
+    color: var(--reindalDark);
     border: 2px dashed var(--reindalYellow);
     border-radius: 8px;
     cursor: pointer;
@@ -385,7 +385,7 @@
     border-style: solid;
     border-color: var(--reindalYellow);
     background-color: var(--reindalYellow);
-    color: var(--text-white);
+    color: var(--reindalExtraLight);
 }
 
 /* Size Mode Styles */
@@ -403,11 +403,11 @@
 .sizeInputGroup select {
     width: 100px !important;
     padding: 12px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--reindalGray);
     border-radius: 8px;
     font-family: var(--font-primary), serif;
     font-size: 14px;
-    background-color: var(--bg-white);
+    background-color: var(--reindalExtraLight);
     cursor: pointer;
     transition: border-color 0.3s ease;
 }
@@ -420,9 +420,9 @@
 .fileSizeInfo {
     display: none;
     padding: 12px 16px;
-    background-color: var(--bg-info);
+    background-color: var(--reindalGray);
     border-radius: 8px;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 15px;
@@ -436,7 +436,7 @@
     gap: 10px;
     cursor: pointer;
     font-family: var(--font-primary), serif;
-    color: var(--text-dark);
+    color: var(--reindalDark);
     font-size: 14px;
     font-weight: bold;
     margin-bottom: 0;
