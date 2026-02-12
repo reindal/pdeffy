@@ -1,11 +1,9 @@
-:root{
-    --primary-color: #ff9800;
-    --secondary-color: #f8ead4;
-    --hover-color: #f1ddbf;
-}
+@import url('variables.css');
 
 body{
-    background-color: white;
+    background-color: var(--reindalDark);
+    margin: 0;
+    padding: 0;
 }
 
 .optionCard>p{
@@ -14,8 +12,8 @@ body{
 }
 
 header {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--reindalDark);
+    color: var(--reindalYellow);
     padding: 10px;
     text-align: center;
     margin: 0;
@@ -23,13 +21,13 @@ header {
     width: 750px;
     align-items: center;
     display: flex;
-    font-family: 'Inter', sans-serif;
-    box-shadow: rgba(0, 0, 0, 0.36) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
-}
+    font-family: var(--font-primary), serif;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);}
 
 .headerContainer{
     display: flex;
     justify-content: center;
+    padding: 20px 0;
 }
 
 .headerIcon{
@@ -47,7 +45,7 @@ header {
 }
 
 .optionCard{
-    background-color: var(--secondary-color);
+    background-color: var(--reindalYellow);
     border-radius: 15px;
     padding: 15px;
     margin: 10px;
@@ -56,11 +54,11 @@ header {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-primary), serif;
     width: 250px;
     height: 250px;
     text-decoration: none;
-    color: black;
+    color: var(--reindalGray);
     border: none;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -69,7 +67,7 @@ header {
 .optionCard:hover{
     transform: translateY(-3px);
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
-    background-color: var(--hover-color);
+    background-color: var(--reindalYellowHover);
 }
 
 .optionIcon{
@@ -79,12 +77,12 @@ header {
 
 .optionCard h2{
     margin: 10px 0;
-    color: black;
+    color: #4a4a4a;
 }
 
 .optionCard p{
     margin: 0;
-    color: black;
+    color: #4a4a4a;
     text-align: center;
     font-size: 14px;
 }
@@ -93,7 +91,185 @@ header {
     margin-left: auto;
     padding: 5px;
     border-radius: 5px;
-    border: none;
+    border: 2px solid var(--reindalYellow);
+    background-color: var(--reindalDark);
+    color: white;
     font-size: 13px;
     cursor: pointer;
+}
+
+/* Checkbox styling */
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: var(--font-primary), serif;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.checkboxLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--reindalYellow);
+    margin: 0;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.checkboxLabel span {
+    line-height: 18px;
+    vertical-align: middle;
+}
+
+/* Settings icon */
+.settingsIcon {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--reindalYellow);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1000;
+}
+
+.settingsIcon:hover {
+    transform: scale(1.1);
+    box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
+    background-color: var(--reindalYellowHover);
+}
+
+.settingsIcon svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--reindalDark);
+}
+
+.settingsIcon:hover svg {
+    fill: var(--reindalDark);
+}
+
+/* Settings modal */
+.settingsModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.settingsModal.active {
+    display: flex;
+}
+
+.settingsContent {
+    background-color: var(--reindalLight);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
+    max-width: 450px;
+    width: 90%;
+    font-family: var(--font-primary), serif;
+}
+
+.settingsContent h2 {
+    margin-top: 0;
+    color: var(--reindalDark);
+    border-bottom: 2px solid var(--reindalYellow);
+    padding-bottom: 10px;
+}
+
+.settingsContent h3 {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.settingsFormGroup {
+    margin-bottom: 15px;
+}
+
+.settingsFormGroup label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.settingsFormGroup input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.settingsFormGroup input:focus {
+    outline: none;
+    border-color: var(--reindalYellow);
+}
+
+.settingsButtons {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.settingsBtn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.settingsBtn.save {
+    background-color: var(--reindalYellow);
+    color: var(--reindalDark);
+}
+
+.settingsBtn.save:hover {
+    background-color: var(--reindalYellowHover);
+}
+
+.settingsBtn.cancel {
+    background-color: var(--reindalGray);
+    color: var(--reindalYellow);
+}
+
+.settingsBtn.cancel:hover {
+    background-color: var(--reindalDark);
+}
+
+.settingsStatus {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    display: none;
+}
+
+.settingsStatus.success {
+    display: block;
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
 }

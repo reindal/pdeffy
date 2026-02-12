@@ -9,7 +9,7 @@
 <body>
 <div class="headerContainer">
     <header>
-        <img src="../../assets/logo-nobg.png" alt="PDF Icon" class="headerIcon">
+        <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon" style="cursor: pointer;">
         <h1 id="pdfToImageHeader" class="langText">PDF to Image</h1>
 
         <select id="languageSelector">
@@ -36,7 +36,13 @@
             </div>
 
             <div id="pagesPreview" class="pagesPreview" style="display: none;">
-                <h3 id="pagesPreviewTitle" class="langText">PDF Pages Preview</h3>
+                <div class="previewHeader">
+                    <h3 id="pagesPreviewTitle" class="langText">PDF Pages Preview</h3>
+                    <button type="button" id="togglePreviewBtn" class="togglePreviewBtn">
+                        <span id="togglePreviewText" class="langText">Hide preview</span>
+                        <span id="togglePreviewIcon">▲</span>
+                    </button>
+                </div>
                 <div id="pagesPreviewContainer"></div>
             </div>
 
@@ -63,9 +69,21 @@
     </div>
 </main>
 
+<script type="module">
+    // Load PDF.js from CDN and expose it globally
+    import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs';
+    window.pdfjsLib = pdfjsLib;
+</script>
+
 <script src="../../changeLang.js"></script>
 <script src="./pdfToImage.js"></script>
 </body>
 </html>
+
+
+
+
+
+
 
 

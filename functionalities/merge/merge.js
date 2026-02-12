@@ -120,20 +120,26 @@ form.addEventListener('submit', async function(e) {
     const outputNamePrefix = document.getElementById('outputName').value || 'merged_document';
 
     if (selectedFiles.length === 0) {
-        showStatus('Please select at least one PDF file', 'error');
+        showStatus(getMessage('pleaseSelectAtLeastOnePdf'), 'error');
         return;
     }
 
     if (selectedFiles.length === 1) {
-        showStatus('Please select at least two PDF files to merge', 'error');
+        showStatus(getMessage('pleaseSelectAtLeastTwoPdfs'), 'error');
         return;
     }
 
-    showStatus(`Processing ${selectedFiles.length} file(s)...`, 'success');
+    showStatus(getMessage('processingFiles', { count: selectedFiles.length }), 'success');
     submitBtn.disabled = true;
 
     try {
         const mergedPdf = await PDFDocument.create();
+
+        // Get metadata from environment variables
+        const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+        if (metadata.author) mergedPdf.setAuthor(metadata.author);
+        if (metadata.title) mergedPdf.setTitle(metadata.title);
+        if (metadata.subject) mergedPdf.setSubject(metadata.subject);
 
         for (let file of selectedFiles) {
             const fileBuffer = await file.arrayBuffer();
@@ -155,7 +161,17 @@ form.addEventListener('submit', async function(e) {
 
         await fs.writeFile(filePath, mergedPdfBytes);
 
-        showStatus(`✓ Successfully created merged PDF: ${outputFileName} in Downloads folder!`, 'success');
+        // Set read-only if checkbox is checked
+        const readOnlyCheckbox = document.getElementById('readOnlyCheckbox');
+        if (readOnlyCheckbox && readOnlyCheckbox.checked) {
+            try {
+                await ipcRenderer.invoke('set-file-readonly', filePath);
+            } catch (error) {
+                console.error('Error setting read-only:', error);
+            }
+        }
+
+        showStatus(getMessage('successMerged', { filename: outputFileName }), 'success');
         submitBtn.disabled = false;
 
         form.reset();
@@ -166,7 +182,7 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error merging PDFs:', error);
-        showStatus(`Error: ${error.message}`, 'error');
+        showStatus(getMessage('errorPrefix') + error.message, 'error');
         submitBtn.disabled = false;
     }
 });
@@ -175,3 +191,40 @@ function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + type;
 }
+
+// Helper function to get translated message
+function getMessage(key, params = {}) {
+    const lang = localStorage.getItem('language') || 'en';
+    const messages = {
+        en: {
+            pleaseSelectAtLeastOnePdf: "Please select at least one PDF file",
+            pleaseSelectAtLeastTwoPdfs: "Please select at least two PDF files to merge",
+            processingFiles: "Processing {count} file(s)...",
+            successMerged: "✓ Successfully created merged PDF: {filename} in Downloads folder!",
+            errorPrefix: "Error: "
+        },
+        it: {
+            pleaseSelectAtLeastOnePdf: "Seleziona almeno un file PDF",
+            pleaseSelectAtLeastTwoPdfs: "Seleziona almeno due file PDF da unire",
+            processingFiles: "Elaborazione di {count} file...",
+            successMerged: "✓ PDF unito creato con successo: {filename} nella cartella Download!",
+            errorPrefix: "Errore: "
+        },
+        pl: {
+            pleaseSelectAtLeastOnePdf: "Proszę wybrać co najmniej jeden plik PDF",
+            pleaseSelectAtLeastTwoPdfs: "Proszę wybrać co najmniej dwa pliki PDF do scalenia",
+            processingFiles: "Przetwarzanie {count} plik(ów)...",
+            successMerged: "✓ Pomyślnie utworzono scalony PDF: {filename} w folderze Pobrane!",
+            errorPrefix: "Błąd: "
+        }
+    };
+
+    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
+
+    Object.keys(params).forEach(param => {
+        message = message.replace(`{${param}}`, params[param]);
+    });
+
+    return message;
+}
+

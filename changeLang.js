@@ -58,6 +58,7 @@ const languages = {
         pdfToImageSelectLabel: "Select PDF file:",
         pdfToImageSelectButton: "Click to select PDF",
         pagesPreviewTitle: "PDF Pages Preview",
+        togglePreviewText: "Hide preview",
         pdfToImageFormatLabel: "Output image format:",
         pdfToImageOutputName: "Output file name prefix:",
         pdfToImageNamesExample: "Files will be named: prefix_1.png, prefix_2.png etc.",
@@ -85,7 +86,50 @@ const languages = {
         // Size mode
         maxFileSizeLabel: "Maximum file size per output:",
         sizeHelpText: "PDF will be split into files not exceeding this size",
-        currentFileSize: "Current file size: "
+        currentFileSize: "Current file size: ",
+
+        // Read-only checkbox
+        readOnlyLabel: "Make PDF read-only",
+
+        // Error and status messages
+        errorPrefix: "Error: ",
+        pleaseSelectFile: "Please select a PDF file",
+        pleaseSelectAtLeastOneImage: "Please select at least one image",
+        pleaseSelectAtLeastOnePdf: "Please select at least one PDF file",
+        pleaseSelectAtLeastTwoPdfs: "Please select at least two PDF files to merge",
+        processing: "Processing",
+        processingFiles: "Processing {count} file(s)...",
+        creatingPdf: "Creating PDF...",
+        loadingPdf: "Loading PDF...",
+        convertingPages: "Converting {count} page(s) to images...",
+        convertingPage: "Converting page {current} of {total}...",
+        successMerged: "✓ Successfully created merged PDF: {filename} in Downloads folder!",
+        successPdfCreated: "✓ PDF created successfully: {filename}",
+        successConverted: "✓ Successfully converted {count} page(s) to {format} images",
+        successSplitFiles: "✓ Successfully created {count} file(s) in Downloads folder!",
+        errorLoadingPdf: "Error loading PDF: {error}",
+        pleaseSelectPdfFirst: "Please select a PDF file first",
+        pageNumbersGreaterThanZero: "Page numbers must be greater than 0",
+        startPageCannotBeGreater: "Start page cannot be greater than end page",
+        pdfHasOnlyPages: "PDF has only {total} pages. Please select valid page range.",
+        pleaseAddAtLeastOneRange: "Please add at least one page range",
+        intervalAtLeastOne: "Interval must be at least 1",
+        pleaseAddAtLeastOneOutputFile: "Please add at least one output file",
+        pleaseEnterValidFileSize: "Please enter a valid file size",
+        cannotSplitMinSize: "Cannot split: minimum required size is {size} (smallest page size)",
+        atLeastOneRangeRequired: "You must have at least one range",
+        atLeastOneFileRequired: "You must have at least one output file",
+        eachFileMustHaveRange: "Each file must have at least one range",
+
+        // Settings
+        settingsTitle: "Settings",
+        metadataTitle: "PDF Metadata",
+        authorLabel: "Author:",
+        titleLabel: "Title:",
+        subjectLabel: "Subject:",
+        saveSettings: "Save Settings",
+        cancelSettings: "Cancel",
+        settingsSaved: "Settings saved!"
     },
     it: {
         languageText: "Lingua",
@@ -142,6 +186,7 @@ const languages = {
         pdfToImageSelectLabel: "Seleziona file PDF:",
         pdfToImageSelectButton: "Clicca per selezionare PDF",
         pagesPreviewTitle: "Anteprima Pagine PDF",
+        togglePreviewText: "Nascondi anteprima",
         pdfToImageFormatLabel: "Formato immagine di output:",
         pdfToImageOutputName: "Prefisso nome file di output:",
         pdfToImageNamesExample: "I file saranno denominati: prefisso_1.png, prefisso_2.png ecc.",
@@ -169,7 +214,50 @@ const languages = {
         // Size mode
         maxFileSizeLabel: "Dimensione massima per file:",
         sizeHelpText: "Il PDF sarà diviso in file che non superano questa dimensione",
-        currentFileSize: "Dimensione file attuale: "
+        currentFileSize: "Dimensione file attuale: ",
+
+        // Read-only checkbox
+        readOnlyLabel: "Rendi PDF di sola lettura",
+
+        // Error and status messages
+        errorPrefix: "Errore: ",
+        pleaseSelectFile: "Seleziona un file PDF",
+        pleaseSelectAtLeastOneImage: "Seleziona almeno un'immagine",
+        pleaseSelectAtLeastOnePdf: "Seleziona almeno un file PDF",
+        pleaseSelectAtLeastTwoPdfs: "Seleziona almeno due file PDF da unire",
+        processing: "Elaborazione",
+        processingFiles: "Elaborazione di {count} file...",
+        creatingPdf: "Creazione PDF...",
+        loadingPdf: "Caricamento PDF...",
+        convertingPages: "Conversione di {count} pagina/e in immagini...",
+        convertingPage: "Conversione pagina {current} di {total}...",
+        successMerged: "✓ PDF unito creato con successo: {filename} nella cartella Download!",
+        successPdfCreated: "✓ PDF creato con successo: {filename}",
+        successConverted: "✓ Convertite con successo {count} pagina/e in immagini {format}",
+        successSplitFiles: "✓ Creati con successo {count} file nella cartella Download!",
+        errorLoadingPdf: "Errore nel caricamento del PDF: {error}",
+        pleaseSelectPdfFirst: "Seleziona prima un file PDF",
+        pageNumbersGreaterThanZero: "I numeri di pagina devono essere maggiori di 0",
+        startPageCannotBeGreater: "La pagina iniziale non può essere maggiore della pagina finale",
+        pdfHasOnlyPages: "Il PDF ha solo {total} pagine. Seleziona un intervallo di pagine valido.",
+        pleaseAddAtLeastOneRange: "Aggiungi almeno un intervallo di pagine",
+        intervalAtLeastOne: "L'intervallo deve essere almeno 1",
+        pleaseAddAtLeastOneOutputFile: "Aggiungi almeno un file di output",
+        pleaseEnterValidFileSize: "Inserisci una dimensione file valida",
+        cannotSplitMinSize: "Impossibile dividere: la dimensione minima richiesta è {size} (dimensione pagina più piccola)",
+        atLeastOneRangeRequired: "Devi avere almeno un intervallo",
+        atLeastOneFileRequired: "Devi avere almeno un file di output",
+        eachFileMustHaveRange: "Ogni file deve avere almeno un intervallo",
+
+        // Settings
+        settingsTitle: "Impostazioni",
+        metadataTitle: "Metadati PDF",
+        authorLabel: "Autore:",
+        titleLabel: "Titolo:",
+        subjectLabel: "Argomento:",
+        saveSettings: "Salva Impostazioni",
+        cancelSettings: "Annulla",
+        settingsSaved: "Impostazioni salvate!"
     },
     pl: {
         languageText: "Język",
@@ -225,6 +313,7 @@ const languages = {
         pdfToImageSelectLabel: "Wybierz plik PDF:",
         pdfToImageSelectButton: "Kliknij, aby wybrać PDF",
         pagesPreviewTitle: "Podgląd Stron PDF",
+        togglePreviewText: "Ukryj podgląd",
         pdfToImageFormatLabel: "Format obrazu wyjściowego:",
         pdfToImageOutputName: "Prefiks nazwy pliku wynikowego:",
         pdfToImageNamesExample: "Pliki będą nazwane: prefiks_1.png, prefiks_2.png itd.",
@@ -252,6 +341,50 @@ const languages = {
         // Size mode
         maxFileSizeLabel: "Maksymalny rozmiar pliku:",
         sizeHelpText: "PDF zostanie podzielony na pliki nieprzekraczające tego rozmiaru",
+        currentFileSize: "Aktualny rozmiar pliku: ",
+
+        // Read-only checkbox
+        readOnlyLabel: "Ustaw PDF jako tylko do odczytu",
+
+        // Error and status messages
+        errorPrefix: "Błąd: ",
+        pleaseSelectFile: "Proszę wybrać plik PDF",
+        pleaseSelectAtLeastOneImage: "Proszę wybrać co najmniej jeden obraz",
+        pleaseSelectAtLeastOnePdf: "Proszę wybrać co najmniej jeden plik PDF",
+        pleaseSelectAtLeastTwoPdfs: "Proszę wybrać co najmniej dwa pliki PDF do scalenia",
+        processing: "Przetwarzanie",
+        processingFiles: "Przetwarzanie {count} plik(ów)...",
+        creatingPdf: "Tworzenie PDF...",
+        loadingPdf: "Ładowanie PDF...",
+        convertingPages: "Konwersja {count} stron(y) na obrazy...",
+        convertingPage: "Konwersja strony {current} z {total}...",
+        successMerged: "✓ Pomyślnie utworzono scalony PDF: {filename} w folderze Pobrane!",
+        successPdfCreated: "✓ PDF utworzony pomyślnie: {filename}",
+        successConverted: "✓ Pomyślnie przekonwertowano {count} stron(y) na obrazy {format}",
+        successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów) w folderze Pobrane!",
+        errorLoadingPdf: "Błąd ładowania PDF: {error}",
+        pleaseSelectPdfFirst: "Najpierw wybierz plik PDF",
+        pageNumbersGreaterThanZero: "Numery stron muszą być większe niż 0",
+        startPageCannotBeGreater: "Strona początkowa nie może być większa niż strona końcowa",
+        pdfHasOnlyPages: "PDF ma tylko {total} stron. Proszę wybrać prawidłowy zakres stron.",
+        pleaseAddAtLeastOneRange: "Dodaj co najmniej jeden zakres stron",
+        intervalAtLeastOne: "Interwał musi wynosić co najmniej 1",
+        pleaseAddAtLeastOneOutputFile: "Dodaj co najmniej jeden plik wyjściowy",
+        pleaseEnterValidFileSize: "Wprowadź prawidłowy rozmiar pliku",
+        cannotSplitMinSize: "Nie można podzielić: minimalny wymagany rozmiar to {size} (rozmiar najmniejszej strony)",
+        atLeastOneRangeRequired: "Musisz mieć co najmniej jeden zakres",
+        atLeastOneFileRequired: "Musisz mieć co najmniej jeden plik wyjściowy",
+        eachFileMustHaveRange: "Każdy plik musi mieć co najmniej jeden zakres",
+
+        // Settings
+        settingsTitle: "Ustawienia",
+        metadataTitle: "Metadane PDF",
+        authorLabel: "Autor:",
+        titleLabel: "Tytuł:",
+        subjectLabel: "Temat:",
+        saveSettings: "Zapisz ustawienia",
+        cancelSettings: "Anuluj",
+        settingsSaved: "Ustawienia zapisane!",
         currentFileSize: "Aktualny rozmiar pliku: "
     },
     es: {
@@ -338,7 +471,6 @@ const languages = {
         sizeHelpText: "El PDF se dividirá en archivos que no excedan este tamaño",
         currentFileSize: "Tamaño del archivo actual: "
     }
-}
 
 function changeLanguage(lang) {
     let objects = document.getElementsByClassName('langText');
@@ -353,6 +485,19 @@ function changeLanguage(lang) {
     }
 }
 
+// Helper function to get translated message with parameter substitution
+function getMessage(key, params = {}) {
+    const lang = localStorage.getItem('language') || 'en';
+    let message = languages[lang][key] || languages['en'][key] || key;
+
+    // Replace parameters in the message
+    Object.keys(params).forEach(param => {
+        message = message.replace(`{${param}}`, params[param]);
+    });
+
+    return message;
+}
+
 document.getElementById('languageSelector').addEventListener('change', (event) => {
     localStorage.setItem('language', event.target.value);
 
@@ -363,5 +508,17 @@ document.getElementById('languageSelector').addEventListener('change', (event) =
 document.getElementById('languageSelector').value = language;
 
 changeLanguage(language);
+
+// Add click handler to logo to navigate back to main page
+const headerIcon = document.querySelector('.headerIcon');
+if (headerIcon) {
+    headerIcon.addEventListener('click', function() {
+        // Check if we're not on the main page already
+        const currentPath = window.location.pathname;
+        if (!currentPath.endsWith('index.html') && currentPath !== '/') {
+            window.location.href = '../../index.html';
+        }
+    });
+}
 
 console.log(language);
