@@ -253,6 +253,90 @@ const languages = {
         maxFileSizeLabel: "Maksymalny rozmiar pliku:",
         sizeHelpText: "PDF zostanie podzielony na pliki nieprzekraczające tego rozmiaru",
         currentFileSize: "Aktualny rozmiar pliku: "
+    },
+    es: {
+        languageText: "Idioma",
+        welcomeText: "Bienvenido al conversor de PDFs",
+        splitPdfText: "Dividir PDF",
+        splitPdfDesc: "Dividir tu documento PDF en múltiples archivos.",
+        mergePdfText: "Unir PDF",
+        mergePdfDesc: "Unir tus documentos PDF en un solo archivo.",
+        imageToPdfText: "Imagen a PDF",
+        imageToPdfDesc: "Convertir uno o mas imágenes en un documento PDF.",
+        pdfToImageText: "PDF to Image",
+        pdfToImageDesc: "Convertir páginas PDF en imágenes.",
+        removeBtn: "Eliminar",
+        backLink: "← Ir a la página principal",
+        selectedFile: "✓ Archivo seleccionado: ",
+
+        mergeHeader: "Unir PDF",
+        mergeHeader2: "Unir documentos PDF",
+        mergeSelectLabel: "Selecciona los archivos PDF (Puedes seleccionar varios):",
+        mergeSelectButton: "Haz clic para seleccionar los archivos",
+        filesOrderTitle: "Orden de archivos",
+        mergeHelpText: "Arrastra para reordenar los archivos (De arriba a abajo = del primero al último para combinar en PDF)",
+        mergeOutputName: "Nombre del archivo:",
+        mergeSubmitBtn: "Unir PDF",
+        outputName: "documento_unido",
+
+        splitHeader: "Dividir PDF",
+        splitHeader2: "Dividir documento PDF",
+        splitSelectBtnLabel: "Seleccionar el PDF para dividir",
+        splitSelectButton: "Selecciona el PDF",
+        splitPageRangesLabel: "Selecciona el rango de páginas para extraer:",
+        addRangeBtn: "+ Añadir otro rango",
+        outputSplitName: "Nombre del archivo:",
+        namesSplitExamples:"Los archivos se llamrán: nombre_1.pdf, nombre_2.pdf etc.",
+        splitSubmitBtn: "Dividir PDF",
+        startPageLabel: "Página de inicio:",
+        endPageLabel: "Página final:",
+        rangeError: "Se requiere al menos un rango",
+        createdSuccesful: '✓ Creado correctamente ${successCount} archivo(s) en la carpeta de descargas',
+
+        // Image to PDF
+        imageToPdfHeader: "Imagen a PDF",
+        imageToPdfHeader2: "Convertir imágenes a PDF",
+        imageToPdfSelectLabel: "Selecciona las imágenes (puedes seleccionar múltiples):",
+        imageToPdfSelectButton: "Haz clic para seleccionar las imágenes",
+        imagesOrderTitle: "Orden de imágenes",
+        imageToPdfHelpText: "Arrastra para reordenar las imágenes (De arriba a abajo = del primero al último para combinar en PDF)",
+        imageToPdfOutputName: "Nombre del archivo:",
+        imageToPdfSubmitBtn: "Crear PDF",
+
+        // PDF to Image
+        pdfToImageHeader: "PDF a imagen",
+        pdfToImageHeader2: "Convertir PDF a Imágenes",
+        pdfToImageSelectLabel: "Seleccionar archivo PDF:",
+        pdfToImageSelectButton: "Haz clic para seleccionar el PDF",
+        pagesPreviewTitle: "Vista previa de páginas pdf",
+        pdfToImageFormatLabel: "Formato de salida de la imagen:",
+        pdfToImageOutputName: "Prefijo del nombre del archivo de salida:",
+        pdfToImageNamesExample: "Las páginas se llamarán: prefijo_1.png, prefijo_2.png etc.",
+        pdfToImageSubmitBtn: "Convertir a Images",
+
+        // Split mode labels
+        splitModeLabel: "Modo de divisón:",
+        modeRange: "Personaliza los rangos de las páginas",
+        modeEvery: "Divide cada X páginas",
+        modeCustom: "Personaliza los múltiples rangos de los archivos",
+        modeSize: "Divide por tamaño de archivo",
+
+        // Range mode
+        rangeSelectLabel: "Selecciona el rango de páginas para extraer:",
+
+        // Every mode
+        everyPagesLabel: "Divide cada X páginas:",
+        everyPagesHelpText: "El PDF se dividirá en documentos de esta cantidad de páginas cada uno",
+
+        // Custom mode
+        customRangesLabel: "Definir archivos de salida con múltiples rangos de páginas:",
+        addCustomFileBtn: "+ Añadir otro archivo de salida",
+        customHelpText: "Cada archivo de salida puede contener múltiples rangos de páginas (ejemplo: paginas 1-4 y 6-12 en in archivo)",
+
+        // Size mode
+        maxFileSizeLabel: "Tamaño máximo de salida por archivo:",
+        sizeHelpText: "El PDF se dividirá en archivos que no excedan este tamaño",
+        currentFileSize: "Tamaño del archivo actual: "
     }
 }
 
