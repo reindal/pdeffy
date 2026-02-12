@@ -77,6 +77,9 @@ const languages = {
         everyPagesHelpText: "PDF will be split into documents of this many pages each",
 
         // Custom mode
+        outputFileLabel: "Output file",
+        removeFileBtn: "Remove File",
+        addRangeToFileBtn: "+ Add Range to This File",
         customRangesLabel: "Define output files with multiple page ranges:",
         addCustomFileBtn: "+ Add Another Output File",
         customHelpText: "Each output file can contain multiple page ranges (e.g., pages 1-4 and 6-12 in one file)",
@@ -127,7 +130,10 @@ const languages = {
         subjectLabel: "Subject:",
         saveSettings: "Save Settings",
         cancelSettings: "Cancel",
-        settingsSaved: "Settings saved!"
+        settingsSaved: "Settings saved!",
+        metaAuthor: "Enter author name",
+        metaTitle: "Enter document title",
+        metaSubject: "Enter document subject"
     },
     it: {
         languageText: "Lingua",
@@ -205,6 +211,9 @@ const languages = {
         everyPagesHelpText: "Il PDF sarà diviso in documenti con questo numero di pagine ciascuno",
 
         // Custom mode
+        outputFileLabel: "File di output",
+        removeFileBtn: "Rimuovi file",
+        addRangeToFileBtn: "+ Aggiungi intervallo a questo file",
         customRangesLabel: "Definisci file di output con più intervalli di pagine:",
         addCustomFileBtn: "+ Aggiungi un altro file di output",
         customHelpText: "Ogni file di output può contenere più intervalli di pagine (es. pagine 1-4 e 6-12 in un file)",
@@ -255,7 +264,10 @@ const languages = {
         subjectLabel: "Argomento:",
         saveSettings: "Salva Impostazioni",
         cancelSettings: "Annulla",
-        settingsSaved: "Impostazioni salvate!"
+        settingsSaved: "Impostazioni salvate!",
+        metaAuthor: "Inserisci il nome dell'autore",
+        metaTitle: "Inserisci il titolo del documento",
+        metaSubject: "Inserisci l'oggetto del documento"
     },
     pl: {
         languageText: "Język",
@@ -332,6 +344,9 @@ const languages = {
         everyPagesHelpText: "PDF zostanie podzielony na dokumenty zawierające tyle stron każdy",
 
         // Custom mode
+        outputFileLabel: "Plik wyjściowy",
+        removeFileBtn: "Usuń plik",
+        addRangeToFileBtn: "+ Dodaj zakres do tego pliku",
         customRangesLabel: "Zdefiniuj pliki wyjściowe z wieloma zakresami stron:",
         addCustomFileBtn: "+ Dodaj kolejny plik wyjściowy",
         customHelpText: "Każdy plik wyjściowy może zawierać wiele zakresów stron (np. strony 1-4 i 6-12 w jednym pliku)",
@@ -383,7 +398,10 @@ const languages = {
         saveSettings: "Zapisz ustawienia",
         cancelSettings: "Anuluj",
         settingsSaved: "Ustawienia zapisane!",
-        currentFileSize: "Aktualny rozmiar pliku: "
+        currentFileSize: "Aktualny rozmiar pliku: ",
+        metaAuthor: "Wpisz nazwisko autora",
+        metaTitle: "Wprowadź tytuł dokumentu",
+        metaSubject: "Wprowadź temat dokumentu"
     },
     es: {
         languageText: "Idioma",
@@ -460,6 +478,9 @@ const languages = {
         everyPagesHelpText: "El PDF se dividirá en documentos de esta cantidad de páginas cada uno",
 
         // Custom mode
+        outputFileLabel: "Archivo de salida",
+        removeFileBtn: "Eliminar archivo",
+        addRangeToFileBtn: "+ Añadir rango al archivo",
         customRangesLabel: "Definir archivos de salida con múltiples rangos de páginas:",
         addCustomFileBtn: "+ Añadir otro archivo de salida",
         customHelpText: "Cada archivo de salida puede contener múltiples rangos de páginas (ejemplo: paginas 1-4 y 6-12 en in archivo)",
@@ -467,20 +488,68 @@ const languages = {
         // Size mode
         maxFileSizeLabel: "Tamaño máximo de salida por archivo:",
         sizeHelpText: "El PDF se dividirá en archivos que no excedan este tamaño",
-        currentFileSize: "Tamaño del archivo actual: "
-    },
+        currentFileSize: "Tamaño del archivo actual: ",
+
+        // Read-only checkbox
+        readOnlyLabel: "Hacer PDF de solo lectura",
+
+        // Error and status messages
+        errorPrefix: "Error: ",
+        pleaseSelectFile: "Por favor, selecciona un archivo PDF",
+        pleaseSelectAtLeastOneImage: "Por favor, selecciona al menos una imagen",
+        pleaseSelectAtLeastOnePdf: "Por favor, selecciona al menos un archivo PDF",
+        pleaseSelectAtLeastTwoPdfs: "Por favor, selecciona al menos dos archivos PDF para combinar",
+        processing: "Procesando",
+        processingFiles: "Procesando {count} archivo(s)...",
+        creatingPdf: "Creando PDF...",
+        loadingPdf: "Cargando PDF...",
+        convertingPages: "Convirtiendo {count} página(s) a imágenes...",
+        convertingPage: "Convirtiendo página {current} de {total}...",
+        successMerged: "✓ PDF combinado creado correctamente: {filename} en la carpeta Descargas",
+        successPdfCreated: "✓ PDF creado correctamente: {filename}",
+        successConverted: "✓ {count} página(s) convertida(s) correctamente a imágenes en formato {format}",
+        successSplitFiles: "✓ {count} archivo(s) creado(s) correctamente en la carpeta Descargas",
+        errorLoadingPdf: "Error al cargar el PDF: {error}",
+        pleaseSelectPdfFirst: "Por favor, selecciona primero un archivo PDF",
+        pageNumbersGreaterThanZero: "Los números de página deben ser mayores que 0",
+        startPageCannotBeGreater: "La página inicial no puede ser mayor que la página final",
+        pdfHasOnlyPages: "El PDF solo tiene {total} páginas. Por favor, selecciona un rango válido.",
+        pleaseAddAtLeastOneRange: "Por favor, añade al menos un rango de páginas",
+        intervalAtLeastOne: "El intervalo debe ser al menos 1",
+        pleaseAddAtLeastOneOutputFile: "Por favor, añade al menos un archivo de salida",
+        pleaseEnterValidFileSize: "Por favor, introduce un tamaño de archivo válido",
+        cannotSplitMinSize: "No se puede dividir: el tamaño mínimo requerido es {size} (tamaño de la página más pequeña)",
+        atLeastOneRangeRequired: "Debe haber al menos un rango",
+        atLeastOneFileRequired: "Debe haber al menos un archivo de salida",
+        eachFileMustHaveRange: "Cada archivo debe tener al menos un rango",
+
+        // Settings
+        settingsTitle: "Configuración",
+        metadataTitle: "Metadatos del PDF",
+        authorLabel: "Autor:",
+        titleLabel: "Título:",
+        subjectLabel: "Asunto:",
+        saveSettings: "Guardar configuración",
+        cancelSettings: "Cancelar",
+        settingsSaved: "¡Configuración guardada!",
+        metaAuthor: "Introduzca el nombre del autor",
+        metaTitle: "Introduzca el título del documento",
+        metaSubject: "Introduzca el asunto del documento"
+    }
 };
 
-function changeLanguage(lang){
+function changeLanguage(lang) {
     let objects = document.getElementsByClassName('langText');
     let objectsP = document.getElementsByClassName('langTextPlaceholder');
 
     for (let i = 0; i < objects.length; i++) {
-        objects[i].innerHTML = languages[lang][objects[i].id];
+        const key = objects[i].dataset.i18n || objects[i].id;
+        objects[i].innerHTML = languages[lang][key];
     }
 
     for (let i = 0; i < objectsP.length; i++) {
-        objectsP[i].placeholder = languages[lang][objectsP[i].id];
+        const key = objects[i].dataset.i18n || objectsP[i].id;
+        objectsP[i].placeholder = languages[lang][key];
     }
 }
 
@@ -511,7 +580,7 @@ changeLanguage(language);
 // Add click handler to logo to navigate back to main page
 const headerIcon = document.querySelector('.headerIcon');
 if (headerIcon) {
-    headerIcon.addEventListener('click', function() {
+    headerIcon.addEventListener('click', function () {
         // Check if we're not on the main page already
         const currentPath = window.location.pathname;
         if (!currentPath.endsWith('index.html') && currentPath !== '/') {
