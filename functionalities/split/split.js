@@ -1,7 +1,7 @@
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
-const { ipcRenderer } = require('electron');
+var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('splitForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -24,6 +24,7 @@ let customFileCount = 1;
 
 addRange();
 addCustomFile();
+updateLanguage();
 
 document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
     radio.addEventListener('change', function() {
@@ -48,6 +49,7 @@ document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
 addRangeBtn.addEventListener('click', function(e) {
     e.preventDefault();
     addRange();
+    updateLanguage();
 });
 
 addCustomFileBtn.addEventListener('click', function(e) {
@@ -423,14 +425,14 @@ function addRange() {
     rangeDiv.className = 'rangeItem';
     rangeDiv.innerHTML = `
         <div>
-            <label>Start page:</label>
+            <label class="langText" data-i18n="startPageLabel">Start page:</label>
             <input type="number" class="startPage" min="1" value="${rangeCount}" required>
         </div>
         <div>
-            <label>End page:</label>
+            <label class="langText" data-i18n="endPageLabel">End page:</label>
             <input type="number" class="endPage" min="1" value="${rangeCount}" required>
         </div>
-        <button type="button" class="removeRangeBtn">Remove</button>
+        <button type="button" class="removeRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
 
     const removeBtn = rangeDiv.querySelector('.removeRangeBtn');
@@ -452,21 +454,25 @@ function addCustomFile() {
     fileDiv.className = 'customFileItem';
     fileDiv.innerHTML = `
         <div class="customFileHeader">
-            <h4>Output File #${customFileCount}</h4>
-            <button type="button" class="removeFileBtn">Remove File</button>
+            <h4>
+                <span class="langText" data-i18n="outputFileLabel">Output File</span>
+                <span class="outputFileNumber">#${customFileCount}</span>
+            </h4>
+            <button type="button" class="removeFileBtn langText" data-i18n="removeFileBtn">Remove File</button>
         </div>
         <div class="customFileRanges"></div>
-        <button type="button" class="addCustomRangeBtn">+ Add Range to This File</button>
+        <button type="button" class="addCustomRangeBtn langText" data-i18n="addRangeToFileBtn">+ Add Range to This File</button>
     `;
 
     const rangesDiv = fileDiv.querySelector('.customFileRanges');
 
     addCustomRange(rangesDiv);
-
+    
     const addRangeButton = fileDiv.querySelector('.addCustomRangeBtn');
     addRangeButton.addEventListener('click', function(e) {
         e.preventDefault();
         addCustomRange(rangesDiv);
+        updateLanguage();
     });
 
     const removeFileButton = fileDiv.querySelector('.removeFileBtn');
@@ -488,14 +494,15 @@ function addCustomRange(container) {
     rangeDiv.className = 'customRangeItem';
     rangeDiv.innerHTML = `
         <div>
-            <label>Start page:</label>
+            <label class="langText" data-i18n="startPageLabel">Start page:</label>
             <input type="number" class="customStartPage" min="1" value="1" required>
         </div>
         <div>
-            <label>End page:</label>
+            <label class="langText" data-i18n="endPageLabel">End page:</label>
             <input type="number" class="customEndPage" min="1" value="1" required>
         </div>
-        <button type="button" class="removeCustomRangeBtn">Remove</button>`;
+        <button type="button" class="removeCustomRangeBtn langText" data-i18n="removeBtn">Remove</button>
+    `;
 
     const removeBtn = rangeDiv.querySelector('.removeCustomRangeBtn');
     removeBtn.addEventListener('click', function(e) {
@@ -578,6 +585,23 @@ function getMessage(key, params = {}) {
             atLeastOneRangeRequired: "Musisz mieć co najmniej jeden zakres",
             atLeastOneFileRequired: "Musisz mieć co najmniej jeden plik wyjściowy",
             eachFileMustHaveRange: "Każdy plik musi mieć co najmniej jeden zakres"
+        },
+        es: {
+            pleaseSelectFile: "Por favor, selecciona un archivo PDF",
+            processing: "Procesando",
+            pageNumbersGreaterThanZero: "Los números de página deben ser mayores que 0",
+            startPageCannotBeGreater: "La página inicial no puede ser mayor que la página final",
+            pdfHasOnlyPages: "El PDF solo tiene {total} páginas. Por favor, selecciona un rango válido.",
+            pleaseAddAtLeastOneRange: "Por favor, añade al menos un rango de páginas",
+            intervalAtLeastOne: "El intervalo debe ser al menos 1",
+            pleaseAddAtLeastOneOutputFile: "Por favor, añade al menos un archivo de salida",
+            pleaseEnterValidFileSize: "Por favor, introduce un tamaño de archivo válido",
+            cannotSplitMinSize: "No se puede dividir: el tamaño mínimo requerido es {size} (tamaño de la página más pequeña)",
+            successSplitFiles: "✓ {count} archivo(s) creado(s) correctamente en la carpeta Descargas",
+            errorPrefix: "Error: ",
+            atLeastOneRangeRequired: "Debe haber al menos un rango",
+            atLeastOneFileRequired: "Debe haber al menos un archivo de salida",
+            eachFileMustHaveRange: "Cada archivo debe tener al menos un rango",
         }
     };
 
@@ -622,3 +646,7 @@ function formatFileSize(bytes) {
     }
 }
 
+function updateLanguage() {
+    const lang = localStorage.getItem('language') || 'en';
+    changeLanguage(lang);
+}

@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { ipcRenderer } = require('electron');
+var { ipcRenderer } = require('electron');
 
 // Wait for PDF.js to load from CDN
 let pdfjsLib = null;
