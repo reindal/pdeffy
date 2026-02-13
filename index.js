@@ -2,7 +2,16 @@ const electron = require("electron");
 const path = require("path");
 const url = require("url");
 const fs = require("fs");
-const { BrowserWindow, app, ipcMain, dialog } = electron;
+const { BrowserWindow, app , ipcMain} = electron;
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+
+//updating app
+updateElectronApp({
+  updateSource: {
+    type: UpdateSourceType.StaticStorage,
+    baseUrl: `https://update.reindal.cloud/argo-tools/`
+  }
+})
 
 // Path to store settings
 const userDataPath = app.getPath('userData');
