@@ -5,7 +5,6 @@ const { ipcRenderer } = require('electron');
 
 const form = document.getElementById('mergeForm');
 const pdfFiles = document.getElementById('pdfFiles');
-const filesList = document.getElementById('filesList');
 const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
 const filesOrderContainer = document.getElementById('filesOrderContainer');
@@ -14,25 +13,9 @@ let selectedFiles = [];
 
 pdfFiles.addEventListener('change', function(e) {
     selectedFiles = Array.from(e.target.files);
-    updateFilesList();
     updateFilesOrder();
 });
 
-function updateFilesList() {
-    filesList.innerHTML = '';
-
-    if (selectedFiles.length > 0) {
-        filesList.classList.add('active');
-        selectedFiles.forEach((file, index) => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'fileItem';
-            fileItem.textContent = `${index + 1}. ${file.name}`;
-            filesList.appendChild(fileItem);
-        });
-    } else {
-        filesList.classList.remove('active');
-    }
-}
 
 function updateFilesOrder() {
     filesOrderContainer.innerHTML = '';
@@ -53,7 +36,6 @@ function updateFilesOrder() {
         removeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             selectedFiles.splice(index, 1);
-            updateFilesList();
             updateFilesOrder();
             pdfFiles.value = '';
         });
@@ -176,7 +158,6 @@ form.addEventListener('submit', async function(e) {
 
         form.reset();
         selectedFiles = [];
-        updateFilesList();
         updateFilesOrder();
         pdfFiles.value = '';
 

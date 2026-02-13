@@ -32,7 +32,6 @@
                     <input type="file" id="pdfFiles" accept=".pdf" multiple required>
                     <label for="pdfFiles" class="fileInputLabel langText" id="mergeSelectButton">Click to select files</label>
                 </div>
-                <div id="filesList" class="filesList"></div>
             </div>
 
             <div id="filesOrder" class="filesOrder">
@@ -41,17 +40,6 @@
                 <p class="helpText langText" id="mergeHelpText">Drag to reorder files (top to bottom = first to last in merged PDF)</p>
             </div>
 
-            <div class="formGroup">
-                <label for="outputName" id="mergeOutputName" class="langText">Output file name:</label>
-                <input type="text" id="outputName" name="outputName" placeholder="merged_document" class="langTextPlaceholder">
-            </div>
-
-            <div class="formGroup">
-                <label class="checkboxLabel">
-                    <input type="checkbox" id="readOnlyCheckbox" name="readOnly">
-                    <span class="langText" id="readOnlyLabel">Make PDF read-only</span>
-                </label>
-            </div>
 
             <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="mergeSubmitBtn">Merge PDF</span></button>
         </form>

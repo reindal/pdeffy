@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
 :root {
     /* Colors */
     --reindalYellow: #f0d818;
@@ -19,6 +21,5 @@
     --reindalPink: #f5c6cb;
 
     /* Fonts */
-    --font-primary: 'POPPINS';
+    --font-primary: 'Poppins';
 }
-

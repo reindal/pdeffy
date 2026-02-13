@@ -12,6 +12,8 @@ const languages = {
         imageToPdfDesc: "Convert one or more images into a PDF document.",
         pdfToImageText: "PDF to Image",
         pdfToImageDesc: "Convert PDF pages into image files.",
+        watermarkText: "Add Watermark",
+        watermarkDesc: "Add a watermark to your PDF document.",
         removeBtn: "Remove",
         backLink: "← Back to main page",
         selectedFile: "✓ Selected file: ",
@@ -62,6 +64,20 @@ const languages = {
         pdfToImageNamesExample: "Files will be named: prefix_1.png, prefix_2.png etc.",
         pdfToImageSubmitBtn: "Convert to Images",
 
+        // Watermark
+        watermarkHeader: "Add Watermark",
+        watermarkHeader2: "Add Watermark to PDF",
+        watermarkSelectLabel: "Select PDF file:",
+        watermarkSelectButton: "Click to select file",
+        watermarkTextLabel: "Watermark text:",
+        fontSizeLabel: "Font size:",
+        opacityLabel: "Opacity (0-100%):",
+        rotationLabel: "Rotation angle:",
+        colorLabel: "Text color:",
+        positionLabel: "Position:",
+        outputNameLabel: "Output file name:",
+        watermarkSubmitBtn: "Add Watermark",
+
         // Split mode labels
         splitModeLabel: "Split mode:",
         modeRange: "Custom Page Ranges",
@@ -88,6 +104,9 @@ const languages = {
 
         // Read-only checkbox
         readOnlyLabel: "Make PDF read-only",
+
+        // Save as ZIP checkbox
+        saveAsZipLabel: "Save as ZIP",
 
         // Error and status messages
         errorPrefix: "Error: ",
@@ -140,6 +159,8 @@ const languages = {
         imageToPdfDesc: "Converti una o più immagini in un documento PDF.",
         pdfToImageText: "PDF a Immagine",
         pdfToImageDesc: "Converti le pagine PDF in file immagine.",
+        watermarkText: "Aggiungi Filigrana",
+        watermarkDesc: "Aggiungi una filigrana al tuo documento PDF.",
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
         selectedFile: "✓ File selezionato: ",
@@ -190,6 +211,20 @@ const languages = {
         pdfToImageNamesExample: "I file saranno denominati: prefisso_1.png, prefisso_2.png ecc.",
         pdfToImageSubmitBtn: "Converti in Immagini",
 
+        // Watermark
+        watermarkHeader: "Aggiungi Filigrana",
+        watermarkHeader2: "Aggiungi Filigrana al PDF",
+        watermarkSelectLabel: "Seleziona file PDF:",
+        watermarkSelectButton: "Clicca per selezionare file",
+        watermarkTextLabel: "Testo della filigrana:",
+        fontSizeLabel: "Dimensione carattere:",
+        opacityLabel: "Opacità (0-100%):",
+        rotationLabel: "Angolo di rotazione:",
+        colorLabel: "Colore del testo:",
+        positionLabel: "Posizione:",
+        outputNameLabel: "Nome file di output:",
+        watermarkSubmitBtn: "Aggiungi Filigrana",
+
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
         modeRange: "Intervalli di pagine personalizzati",
@@ -216,6 +251,9 @@ const languages = {
 
         // Read-only checkbox
         readOnlyLabel: "Rendi PDF di sola lettura",
+
+        // Save as ZIP checkbox
+        saveAsZipLabel: "Salva come ZIP",
 
         // Error and status messages
         errorPrefix: "Errore: ",
@@ -268,6 +306,8 @@ const languages = {
         imageToPdfDesc: "Konwertuj jeden lub więcej obrazów na dokument PDF.",
         pdfToImageText: "PDF do Obrazów",
         pdfToImageDesc: "Konwertuj strony PDF na pliki obrazów.",
+        watermarkText: "Dodaj Znak Wodny",
+        watermarkDesc: "Dodaj znak wodny do swojego dokumentu PDF.",
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
@@ -317,6 +357,20 @@ const languages = {
         pdfToImageNamesExample: "Pliki będą nazwane: prefiks_1.png, prefiks_2.png itd.",
         pdfToImageSubmitBtn: "Konwertuj na Obrazy",
 
+        // Watermark
+        watermarkHeader: "Dodaj Znak Wodny",
+        watermarkHeader2: "Dodaj Znak Wodny do PDF",
+        watermarkSelectLabel: "Wybierz plik PDF:",
+        watermarkSelectButton: "Kliknij, aby wybrać plik",
+        watermarkTextLabel: "Tekst znaku wodnego:",
+        fontSizeLabel: "Rozmiar czcionki:",
+        opacityLabel: "Przezroczystość (0-100%):",
+        rotationLabel: "Kąt obrotu:",
+        colorLabel: "Kolor tekstu:",
+        positionLabel: "Pozycja:",
+        outputNameLabel: "Nazwa pliku wynikowego:",
+        watermarkSubmitBtn: "Dodaj Znak Wodny",
+
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
         modeRange: "Własne zakresy stron",
@@ -343,6 +397,9 @@ const languages = {
 
         // Read-only checkbox
         readOnlyLabel: "Ustaw PDF jako tylko do odczytu",
+
+        // Save as ZIP checkbox
+        saveAsZipLabel: "Zapisz jako ZIP",
 
         // Error and status messages
         errorPrefix: "Błąd: ",
@@ -382,8 +439,7 @@ const languages = {
         subjectLabel: "Temat:",
         saveSettings: "Zapisz ustawienia",
         cancelSettings: "Anuluj",
-        settingsSaved: "Ustawienia zapisane!",
-        currentFileSize: "Aktualny rozmiar pliku: "
+        settingsSaved: "Ustawienia zapisane!"
     },
     es: {
         languageText: "Idioma",
@@ -396,6 +452,8 @@ const languages = {
         imageToPdfDesc: "Convertir uno o mas imágenes en un documento PDF.",
         pdfToImageText: "PDF to Image",
         pdfToImageDesc: "Convertir páginas PDF en imágenes.",
+        watermarkText: "Añadir Marca de Agua",
+        watermarkDesc: "Añadir una marca de agua a tu documento PDF.",
         removeBtn: "Eliminar",
         backLink: "← Ir a la página principal",
         selectedFile: "✓ Archivo seleccionado: ",
@@ -445,6 +503,20 @@ const languages = {
         pdfToImageNamesExample: "Las páginas se llamarán: prefijo_1.png, prefijo_2.png etc.",
         pdfToImageSubmitBtn: "Convertir a Images",
 
+        // Watermark
+        watermarkHeader: "Añadir Marca de Agua",
+        watermarkHeader2: "Añadir Marca de Agua al PDF",
+        watermarkSelectLabel: "Seleccionar archivo PDF:",
+        watermarkSelectButton: "Haz clic para seleccionar el archivo",
+        watermarkTextLabel: "Texto de la marca de agua:",
+        fontSizeLabel: "Tamaño de fuente:",
+        opacityLabel: "Opacidad (0-100%):",
+        rotationLabel: "Ángulo de rotación:",
+        colorLabel: "Color del texto:",
+        positionLabel: "Posición:",
+        outputNameLabel: "Nombre del archivo de salida:",
+        watermarkSubmitBtn: "Añadir Marca de Agua",
+
         // Split mode labels
         splitModeLabel: "Modo de divisón:",
         modeRange: "Personaliza los rangos de las páginas",
@@ -467,7 +539,10 @@ const languages = {
         // Size mode
         maxFileSizeLabel: "Tamaño máximo de salida por archivo:",
         sizeHelpText: "El PDF se dividirá en archivos que no excedan este tamaño",
-        currentFileSize: "Tamaño del archivo actual: "
+        currentFileSize: "Tamaño del archivo actual: ",
+
+        // Save as ZIP checkbox
+        saveAsZipLabel: "Guardar como ZIP"
     },
 };
 

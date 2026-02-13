@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Watermark</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./watermark.css">
+</head>
+<body>
+<div class="headerContainer">
+    <header>
+        <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon">
+        <h1 id="watermarkHeader" class="langText">Add Watermark</h1>
+
+        <select id="languageSelector">
+            <option value="en">🇬🇧 English</option>
+            <option value="it">🇮🇹 Italiano</option>
+            <option value="pl">🇵🇱 Polski</option>
+            <option value="es">🇪🇸 Español</option>
+        </select>
+    </header>
+</div>
+
+<main>
+    <div class="watermarkContainer">
+        <h1 id="watermarkHeader2" class="langText">Add Watermark to PDF</h1>
+
+        <form id="watermarkForm">
+            <div class="formGroup">
+                <label for="pdfFile" id="watermarkSelectLabel" class="langText">Select PDF file:</label>
+                <div class="fileInputWrapper">
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                    <label for="pdfFile" class="fileInputLabel langText" id="watermarkSelectButton">Click to select file</label>
+                </div>
+                <div id="fileName" class="fileName"></div>
+            </div>
+
+            <div class="formGroup">
+                <label for="watermarkText" id="watermarkTextLabel" class="langText">Watermark text:</label>
+                <input type="text" id="watermarkText" placeholder="CONFIDENTIAL" required>
+            </div>
+
+            <div class="formGroup">
+                <label for="fontSize" id="fontSizeLabel" class="langText">Font size:</label>
+                <input type="number" id="fontSize" min="10" max="200" value="50">
+            </div>
+
+            <div class="formGroup">
+                <label for="opacity" id="opacityLabel" class="langText">Opacity (0-100%):</label>
+                <input type="range" id="opacity" min="0" max="100" value="30">
+                <span id="opacityValue" class="opacityValue">30%</span>
+            </div>
+
+            <div class="formGroup">
+                <label for="rotation" id="rotationLabel" class="langText">Rotation angle:</label>
+                <select id="rotation">
+                    <option value="0">0° (Horizontal)</option>
+                    <option value="15">15°</option>
+                    <option value="30">30°</option>
+                    <option value="45" selected>45° (Diagonal)</option>
+                    <option value="60">60°</option>
+                    <option value="90">90° (Vertical)</option>
+                    <option value="-15">-15°</option>
+                    <option value="-30">-30°</option>
+                    <option value="-45">-45°</option>
+                    <option value="custom">Custom angle...</option>
+                </select>
+                <input type="number" id="customRotation" min="-360" max="360" value="0" step="1" style="display: none; margin-top: 10px;" placeholder="Enter custom angle">
+            </div>
+
+            <div class="formGroup">
+                <label for="color" id="colorLabel" class="langText">Text color:</label>
+                <select id="color">
+                    <option value="gray">Gray</option>
+                    <option value="red">Red</option>
+                    <option value="black" selected>Black</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                    <option value="custom">Custom color...</option>
+                </select>
+                <div id="customColorWrapper" style="display: none; margin-top: 10px;">
+                    <div class="colorInputRow">
+                        <input type="text" id="customColorHex" placeholder="#000000" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$">
+                        <input type="color" id="colorPicker" class="colorPicker" value="#000000" title="Click to open color picker">
+                    </div>
+                    <span id="colorError" class="colorError"></span>
+                </div>
+            </div>
+
+            <div class="formGroup">
+                <label for="position" id="positionLabel" class="langText">Position:</label>
+                <select id="position">
+                    <option value="center" selected>Center</option>
+                    <option value="diagonal">Diagonal</option>
+                    <option value="top">Top</option>
+                    <option value="bottom">Bottom</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="watermarkSubmitBtn">Add Watermark</span></button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+    </div>
+</main>
+
+<script src="../../changeLang.js"></script>
+<script src="./watermark.js"></script>
+</body>
+</html>
+
+
+
+
