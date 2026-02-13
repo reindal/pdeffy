@@ -26,6 +26,8 @@
     "electron-squirrel-startup": "^1.0.1",
     "fs-extra": "^11.2.0",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^5.4.624"
+    "pdfjs-dist": "^5.4.624",
+    "signtool": "^1.0.0",
+    "update-electron-app": "^3.1.2"
   }
 }

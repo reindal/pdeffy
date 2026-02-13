@@ -9,7 +9,10 @@ module.exports = {
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        certificateFile: './electronDemoPdf.pfx',
+        certificatePassword: process.env.CERTIFICATE_PASSWORD
+      },
     },
     {
       name: '@electron-forge/maker-zip',
@@ -23,13 +26,13 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {},
     },
-    {
+    /*{
       name: '@electron-forge/maker-wix',
       config: {
-        certificateFile: './electron-pdf-cert.pfx',
+        certificateFile: './electronDemoPdft.pfx',
         certificatePassword: process.env.CERTIFICATE_PASSWORD
       },
-    }
+    }*/
   ],
   plugins: [
     {
