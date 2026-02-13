@@ -75,7 +75,7 @@
                 setTimeout(() => {
                     settingsModal.classList.remove('active');
                     settingsStatus.style.display = 'none';
-                }, 5000);
+                }, 1200);
             } catch (error) {
                 console.error('Error saving settings:', error);
             }
@@ -99,6 +99,12 @@
                     <div class="settingsModal" id="settingsModal">
                         <div class="settingsContent">
                             <h2 id="settingsTitle" class="langText">Settings</h2>
+                            <select id="languageSelector">
+                                <option value="en">🇬🇧 English</option>
+                                <option value="it">🇮🇹 Italiano</option>
+                                <option value="pl">🇵🇱 Polski</option>
+                                <option value="es">🇪🇸 Español</option>
+                            </select>
                             <h3 id="metadataTitle" class="langText">PDF Metadata</h3>
                             <div class="settingsFormGroup">
                                 <label for="metaAuthor" id="authorLabel" class="langText">Author:</label>
@@ -121,6 +127,7 @@
                     </div>
                 `);
             }
+            window.dispatchEvent(new Event('settingsUIReady'));
         }
     });
 })();

@@ -566,14 +566,14 @@ function getMessage(key, params = {}) {
     return message;
 }
 
-document.getElementById('languageSelector').addEventListener('change', (event) => {
-    localStorage.setItem('language', event.target.value);
-
-    changeLanguage(event.target.value);
+window.addEventListener('settingsUIReady', () => {
+    document.getElementById('languageSelector').addEventListener('change', (event) => {
+        localStorage.setItem('language', event.target.value);
+        changeLanguage(event.target.value);
+    });
+    // Set the selector to the saved language
+    document.getElementById('languageSelector').value = language;
 });
-
-// Set the selector to the saved language
-document.getElementById('languageSelector').value = language;
 
 changeLanguage(language);
 
