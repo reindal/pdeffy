@@ -149,6 +149,7 @@ const languages = {
 
         // Settings
         settingsTitle: "Settings",
+        changeLanguageTitle: "Change Language:",
         metadataTitle: "PDF Metadata",
         authorLabel: "Author:",
         titleLabel: "Title:",
@@ -307,6 +308,7 @@ const languages = {
 
         // Settings
         settingsTitle: "Impostazioni",
+        changeLanguageTitle: "Cambiare Lingua:",
         metadataTitle: "Metadati PDF",
         authorLabel: "Autore:",
         titleLabel: "Titolo:",
@@ -464,6 +466,7 @@ const languages = {
 
         // Settings
         settingsTitle: "Ustawienia",
+        changeLanguageTitle: "Zmienić Język:",
         metadataTitle: "Metadane PDF",
         authorLabel: "Autor:",
         titleLabel: "Tytuł:",
@@ -615,6 +618,7 @@ const languages = {
 
         // Settings
         settingsTitle: "Configuración",
+        changeLanguageTitle: "Cambiar Idioma:",
         metadataTitle: "Metadatos del PDF",
         authorLabel: "Autor:",
         titleLabel: "Título:",
@@ -624,8 +628,7 @@ const languages = {
         settingsSaved: "¡Configuración guardada!",
         metaAuthor: "Introduzca el nombre del autor",
         metaTitle: "Introduzca el título del documento",
-        metaSubject: "Introduzca el asunto del documento"
-    }
+        metaSubject: "Introduzca el asunto del documento",
         // Save as ZIP checkbox
         saveAsZipLabel: "Guardar como ZIP"
     },

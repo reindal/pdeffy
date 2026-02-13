@@ -2,7 +2,7 @@ const electron = require("electron");
 const path = require("path");
 const url = require("url");
 const fs = require("fs");
-const { BrowserWindow, app , ipcMain} = electron;
+const { BrowserWindow, app , ipcMain, dialog} = electron;
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 
 //updating app
@@ -126,8 +126,12 @@ app.on("ready", createWindow);
 // Handle IPC request to save the language selected to local file
 ipcMain.handle('get-language', async () => {
     try {
-        const data = fs.existsSync(languagePath) ? fs.readFileSync(languagePath, 'utf8') : { language: 'en' };
-        return data.language;
+        if (fs.existsSync(languagePath)) {
+            const fileContent = fs.readFileSync(languagePath, 'utf8');
+            const data = JSON.parse(fileContent);
+            return data.language || 'en'; 
+        }
+        return 'en';
     } catch (error) {
         console.error('Error reading language file:', error);
         return 'en';

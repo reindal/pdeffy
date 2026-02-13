@@ -1,7 +1,7 @@
 const { PDFDocument, rgb, degrees } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
-const { ipcRenderer } = require('electron');
+var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('watermarkForm');
 const pdfFileInput = document.getElementById('pdfFile');
