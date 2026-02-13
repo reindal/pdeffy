@@ -205,12 +205,15 @@ async function handleFormSubmit(e) {
 
     submitBtn.disabled = true;
     const numPages = pdfDocument.numPages;
+    const format = imageFormat.value;
+    const saveAsZipCheckbox = document.getElementById('saveAsZipCheckbox');
+    const saveAsZip = saveAsZipCheckbox ? saveAsZipCheckbox.checked : false;
+
     showStatus(getMessage('convertingPages', { count: numPages }), 'info');
 
     try {
-        const outputName = document.getElementById('outputName').value || 'page';
-        const format = imageFormat.value;
-        const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
+        // Collect all images first
+        const imageFiles = [];
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
             showStatus(getMessage('convertingPage', { current: pageNum, total: numPages }), 'info');
@@ -243,13 +246,76 @@ async function handleFormSubmit(e) {
             });
 
             const buffer = await blob.arrayBuffer();
-            const fileName = `${outputName}_${pageNum}.${format}`;
-            const outputPath = path.join(downloadsPath, fileName);
-
-            await fs.writeFile(outputPath, Buffer.from(buffer));
+            imageFiles.push(Buffer.from(buffer));
         }
 
-        showStatus(getMessage('successConverted', { count: numPages, format: format.toUpperCase() }), 'success');
+        // Show Save As dialog
+        const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
+        const originalFileName = selectedFile.name.replace('.pdf', '');
+
+        let outputPath;
+        let outputFolder;
+        let baseName;
+
+        if (saveAsZip) {
+            // Save as ZIP dialog
+            outputPath = await ipcRenderer.invoke('show-save-dialog', {
+                defaultPath: path.join(downloadsPath, `${originalFileName}.zip`),
+                filters: [
+                    { name: 'ZIP Files', extensions: ['zip'] }
+                ]
+            });
+
+            if (!outputPath) {
+                showStatus(getMessage('saveCancelled'), 'info');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // Create ZIP file
+            const JSZip = require('jszip');
+            const zip = new JSZip();
+
+            baseName = path.basename(outputPath, '.zip');
+
+            for (let i = 0; i < imageFiles.length; i++) {
+                const fileName = `${baseName}_${i + 1}.${format}`;
+                zip.file(fileName, imageFiles[i]);
+            }
+
+            const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+            await fs.writeFile(outputPath, zipContent);
+
+            outputFolder = path.dirname(outputPath);
+            showStatus(getMessage('successConvertedZip', { count: numPages, format: format.toUpperCase(), path: outputFolder }), 'success');
+
+        } else {
+            // Save as image dialog
+            outputPath = await ipcRenderer.invoke('show-save-dialog', {
+                defaultPath: path.join(downloadsPath, `${originalFileName}.${format}`),
+                filters: [
+                    { name: format.toUpperCase() + ' Files', extensions: [format] }
+                ]
+            });
+
+            if (!outputPath) {
+                showStatus(getMessage('saveCancelled'), 'info');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            outputFolder = path.dirname(outputPath);
+            baseName = path.basename(outputPath, `.${format}`);
+
+            // Save all image files
+            for (let i = 0; i < imageFiles.length; i++) {
+                const fileName = `${baseName}_${i + 1}.${format}`;
+                const filePath = path.join(outputFolder, fileName);
+                await fs.writeFile(filePath, imageFiles[i]);
+            }
+
+            showStatus(getMessage('successConvertedPath', { count: numPages, format: format.toUpperCase(), path: outputFolder }), 'success');
+        }
 
         // Reset form
         setTimeout(() => {
@@ -292,6 +358,9 @@ function getMessage(key, params = {}) {
             convertingPages: "Converting {count} page(s) to images...",
             convertingPage: "Converting page {current} of {total}...",
             successConverted: "✓ Successfully converted {count} page(s) to {format} images",
+            successConvertedPath: "✓ Saved {count} {format} image(s) in:\n{path}",
+            successConvertedZip: "✓ Saved {count} {format} image(s) as ZIP in:\n{path}",
+            saveCancelled: "Save cancelled",
             errorPrefix: "Error: "
         },
         it: {
@@ -301,6 +370,9 @@ function getMessage(key, params = {}) {
             convertingPages: "Conversione di {count} pagina/e in immagini...",
             convertingPage: "Conversione pagina {current} di {total}...",
             successConverted: "✓ Convertite con successo {count} pagina/e in immagini {format}",
+            successConvertedPath: "✓ Salvate {count} immagini {format} in:\n{path}",
+            successConvertedZip: "✓ Salvate {count} immagini {format} come ZIP in:\n{path}",
+            saveCancelled: "Salvataggio annullato",
             errorPrefix: "Errore: "
         },
         pl: {
@@ -310,6 +382,9 @@ function getMessage(key, params = {}) {
             convertingPages: "Konwersja {count} stron(y) na obrazy...",
             convertingPage: "Konwersja strony {current} z {total}...",
             successConverted: "✓ Pomyślnie przekonwertowano {count} stron(y) na obrazy {format}",
+            successConvertedPath: "✓ Zapisano {count} obraz(ów) {format} w:\n{path}",
+            successConvertedZip: "✓ Zapisano {count} obraz(ów) {format} jako ZIP w:\n{path}",
+            saveCancelled: "Zapisywanie anulowane",
             errorPrefix: "Błąd: "
         }
     };

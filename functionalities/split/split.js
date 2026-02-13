@@ -69,8 +69,9 @@ form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const file = pdfFile.files[0];
-    const outputNamePrefix = document.getElementById('outputName').value || 'split';
     const splitMode = document.querySelector('input[name="splitMode"]:checked').value;
+    const saveAsZipCheckbox = document.getElementById('saveAsZipCheckbox');
+    const saveAsZip = saveAsZipCheckbox ? saveAsZipCheckbox.checked : false;
 
     if (!file) {
         showStatus('Please select a PDF file', 'error');
@@ -85,9 +86,8 @@ form.addEventListener('submit', async function(e) {
         const pdfDoc = await PDFDocument.load(fileBuffer);
         const totalPages = pdfDoc.getPageCount();
 
-        const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
-
-        let successCount = 0;
+        // Collect all PDF files first
+        const pdfFiles = [];
 
         if (splitMode === 'range') {
             // Custom Page Ranges - each range = one file
@@ -131,7 +131,6 @@ form.addEventListener('submit', async function(e) {
                 const range = ranges[i];
                 const newPdf = await PDFDocument.create();
 
-                // Get metadata from environment variables
                 const metadata = await ipcRenderer.invoke('get-pdf-metadata');
                 if (metadata.author) newPdf.setAuthor(metadata.author);
                 if (metadata.title) newPdf.setTitle(metadata.title);
@@ -143,21 +142,7 @@ form.addEventListener('submit', async function(e) {
                 }
 
                 const newPdfBytes = await newPdf.save();
-                const outputFileName = `${outputNamePrefix}_${i + 1}.pdf`;
-                const filePath = path.join(downloadsPath, outputFileName);
-                await fs.writeFile(filePath, newPdfBytes);
-
-                // Set read-only if checkbox is checked
-                const readOnlyCheckbox = document.getElementById('readOnlyCheckbox');
-                if (readOnlyCheckbox && readOnlyCheckbox.checked) {
-                    try {
-                        await ipcRenderer.invoke('set-file-readonly', filePath);
-                    } catch (error) {
-                        console.error('Error setting read-only:', error);
-                    }
-                }
-
-                successCount++;
+                pdfFiles.push(newPdfBytes);
             }
 
         } else if (splitMode === 'every') {
@@ -170,12 +155,10 @@ form.addEventListener('submit', async function(e) {
             }
 
             let currentPage = 0;
-            let fileIndex = 1;
 
             while (currentPage < totalPages) {
                 const newPdf = await PDFDocument.create();
 
-                // Get metadata from environment variables
                 const metadata = await ipcRenderer.invoke('get-pdf-metadata');
                 if (metadata.author) newPdf.setAuthor(metadata.author);
                 if (metadata.title) newPdf.setTitle(metadata.title);
@@ -189,13 +172,9 @@ form.addEventListener('submit', async function(e) {
                 }
 
                 const newPdfBytes = await newPdf.save();
-                const outputFileName = `${outputNamePrefix}_${fileIndex}.pdf`;
-                const filePath = path.join(downloadsPath, outputFileName);
-                await fs.writeFile(filePath, newPdfBytes);
+                pdfFiles.push(newPdfBytes);
 
                 currentPage = endPage;
-                fileIndex++;
-                successCount++;
             }
 
         } else if (splitMode === 'custom') {
@@ -212,7 +191,6 @@ form.addEventListener('submit', async function(e) {
                 const rangeItems = fileItem.querySelectorAll('.customRangeItem');
                 const newPdf = await PDFDocument.create();
 
-                // Get metadata from environment variables
                 const metadata = await ipcRenderer.invoke('get-pdf-metadata');
                 if (metadata.author) newPdf.setAuthor(metadata.author);
                 if (metadata.title) newPdf.setTitle(metadata.title);
@@ -249,10 +227,7 @@ form.addEventListener('submit', async function(e) {
                 }
 
                 const newPdfBytes = await newPdf.save();
-                const outputFileName = `${outputNamePrefix}_${i + 1}.pdf`;
-                const filePath = path.join(downloadsPath, outputFileName);
-                await fs.writeFile(filePath, newPdfBytes);
-                successCount++;
+                pdfFiles.push(newPdfBytes);
             }
         } else if (splitMode === 'size') {
             const maxSize = parseFloat(document.getElementById('maxFileSize').value);
@@ -264,7 +239,6 @@ form.addEventListener('submit', async function(e) {
                 return;
             }
 
-            // Convert to bytes
             let maxBytes;
             switch (sizeUnit) {
                 case 'KB':
@@ -280,9 +254,7 @@ form.addEventListener('submit', async function(e) {
                     maxBytes = maxSize * 1024 * 1024;
             }
 
-            // Calculate minimum page size to check if split is possible
             let minPageSize = Infinity;
-            let maxPageSize = 0;
 
             for (let i = 0; i < totalPages; i++) {
                 const singlePagePdf = await PDFDocument.create();
@@ -293,12 +265,8 @@ form.addEventListener('submit', async function(e) {
                 if (singlePageBytes.length < minPageSize) {
                     minPageSize = singlePageBytes.length;
                 }
-                if (singlePageBytes.length > maxPageSize) {
-                    maxPageSize = singlePageBytes.length;
-                }
             }
 
-            // Check if the requested size is too small
             if (maxBytes < minPageSize) {
                 const minSizeFormatted = formatFileSize(minPageSize);
                 showStatus(getMessage('cannotSplitMinSize', { size: minSizeFormatted }), 'error');
@@ -307,25 +275,20 @@ form.addEventListener('submit', async function(e) {
             }
 
             let currentPage = 0;
-            let fileIndex = 1;
 
             while (currentPage < totalPages) {
                 let newPdf = await PDFDocument.create();
 
-                // Get metadata from environment variables
                 const metadata = await ipcRenderer.invoke('get-pdf-metadata');
                 if (metadata.author) newPdf.setAuthor(metadata.author);
                 if (metadata.title) newPdf.setTitle(metadata.title);
                 if (metadata.subject) newPdf.setSubject(metadata.subject);
 
-                let currentSize = 0;
                 let pagesInCurrentFile = 0;
 
                 while (currentPage < totalPages) {
-                    // Create a temporary PDF with current pages + next page
                     const tempPdf = await PDFDocument.create();
 
-                    // Copy all pages we already have
                     if (pagesInCurrentFile > 0) {
                         const existingBytes = await newPdf.save();
                         const existingPdf = await PDFDocument.load(existingBytes);
@@ -333,19 +296,15 @@ form.addEventListener('submit', async function(e) {
                         existingPages.forEach(page => tempPdf.addPage(page));
                     }
 
-                    // Add the next page
                     const [nextPage] = await tempPdf.copyPages(pdfDoc, [currentPage]);
                     tempPdf.addPage(nextPage);
 
                     const tempBytes = await tempPdf.save();
 
-                    // Check if adding this page would exceed the limit
                     if (pagesInCurrentFile > 0 && tempBytes.length > maxBytes) {
-                        // Don't add this page, save current file and start new one
                         break;
                     }
 
-                    // If even a single page exceeds the limit, we still need to save it
                     if (pagesInCurrentFile === 0 && tempBytes.length > maxBytes) {
                         const [copiedPage] = await newPdf.copyPages(pdfDoc, [currentPage]);
                         newPdf.addPage(copiedPage);
@@ -354,26 +313,87 @@ form.addEventListener('submit', async function(e) {
                         break;
                     }
 
-                    // Add the page to our actual PDF
                     const [copiedPage] = await newPdf.copyPages(pdfDoc, [currentPage]);
                     newPdf.addPage(copiedPage);
                     currentPage++;
                     pagesInCurrentFile++;
-                    currentSize = tempBytes.length;
                 }
 
                 if (pagesInCurrentFile > 0) {
                     const newPdfBytes = await newPdf.save();
-                    const outputFileName = `${outputNamePrefix}_${fileIndex}.pdf`;
-                    const filePath = path.join(downloadsPath, outputFileName);
-                    await fs.writeFile(filePath, newPdfBytes);
-                    fileIndex++;
-                    successCount++;
+                    pdfFiles.push(newPdfBytes);
                 }
             }
         }
 
-        showStatus(`✓ Successfully created ${successCount} file(s) in Downloads folder!`, 'success');
+        // Now show Save As dialog
+        const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
+        const originalFileName = file.name.replace('.pdf', '');
+
+        let outputPath;
+        let outputFolder;
+        let baseName;
+
+        if (saveAsZip) {
+            // Save as ZIP dialog
+            outputPath = await ipcRenderer.invoke('show-save-dialog', {
+                defaultPath: path.join(downloadsPath, `${originalFileName}.zip`),
+                filters: [
+                    { name: 'ZIP Files', extensions: ['zip'] }
+                ]
+            });
+
+            if (!outputPath) {
+                showStatus(getMessage('saveCancelled'), 'info');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // Create ZIP file
+            const JSZip = require('jszip');
+            const zip = new JSZip();
+
+            baseName = path.basename(outputPath, '.zip');
+
+            for (let i = 0; i < pdfFiles.length; i++) {
+                const fileName = `${baseName}_${i + 1}.pdf`;
+                zip.file(fileName, pdfFiles[i]);
+            }
+
+            const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+            await fs.writeFile(outputPath, zipContent);
+
+            outputFolder = path.dirname(outputPath);
+            showStatus(getMessage('successSplitFilesZip', { count: pdfFiles.length, path: outputFolder }), 'success');
+
+        } else {
+            // Save as PDF dialog
+            outputPath = await ipcRenderer.invoke('show-save-dialog', {
+                defaultPath: path.join(downloadsPath, `${originalFileName}.pdf`),
+                filters: [
+                    { name: 'PDF Files', extensions: ['pdf'] }
+                ]
+            });
+
+            if (!outputPath) {
+                showStatus(getMessage('saveCancelled'), 'info');
+                submitBtn.disabled = false;
+                return;
+            }
+
+            outputFolder = path.dirname(outputPath);
+            baseName = path.basename(outputPath, '.pdf');
+
+            // Save all PDF files
+            for (let i = 0; i < pdfFiles.length; i++) {
+                const fileName = `${baseName}_${i + 1}.pdf`;
+                const filePath = path.join(outputFolder, fileName);
+                await fs.writeFile(filePath, pdfFiles[i]);
+            }
+
+            showStatus(getMessage('successSplitFilesPath', { count: pdfFiles.length, path: outputFolder }), 'success');
+        }
+
         submitBtn.disabled = false;
 
         form.reset();
@@ -518,6 +538,9 @@ function getMessage(key, params = {}) {
             pleaseEnterValidFileSize: "Please enter a valid file size",
             cannotSplitMinSize: "Cannot split: minimum required size is {size} (smallest page size)",
             successSplitFiles: "✓ Successfully created {count} file(s) in Downloads folder!",
+            successSplitFilesPath: "✓ Saved {count} file(s) in:\n{path}",
+            successSplitFilesZip: "✓ Saved {count} file(s) as ZIP in:\n{path}",
+            saveCancelled: "Save cancelled",
             errorPrefix: "Error: ",
             atLeastOneRangeRequired: "You must have at least one range",
             atLeastOneFileRequired: "You must have at least one output file",
@@ -535,6 +558,9 @@ function getMessage(key, params = {}) {
             pleaseEnterValidFileSize: "Inserisci una dimensione file valida",
             cannotSplitMinSize: "Impossibile dividere: la dimensione minima richiesta è {size} (dimensione pagina più piccola)",
             successSplitFiles: "✓ Creati con successo {count} file nella cartella Download!",
+            successSplitFilesPath: "✓ Salvati {count} file in:\n{path}",
+            successSplitFilesZip: "✓ Salvati {count} file come ZIP in:\n{path}",
+            saveCancelled: "Salvataggio annullato",
             errorPrefix: "Errore: ",
             atLeastOneRangeRequired: "Devi avere almeno un intervallo",
             atLeastOneFileRequired: "Devi avere almeno un file di output",
@@ -552,6 +578,9 @@ function getMessage(key, params = {}) {
             pleaseEnterValidFileSize: "Wprowadź prawidłowy rozmiar pliku",
             cannotSplitMinSize: "Nie można podzielić: minimalny wymagany rozmiar to {size} (rozmiar najmniejszej strony)",
             successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów) w folderze Pobrane!",
+            successSplitFilesPath: "✓ Zapisano {count} plik(ów) w:\n{path}",
+            successSplitFilesZip: "✓ Zapisano {count} plik(ów) jako ZIP w:\n{path}",
+            saveCancelled: "Zapisywanie anulowane",
             errorPrefix: "Błąd: ",
             atLeastOneRangeRequired: "Musisz mieć co najmniej jeden zakres",
             atLeastOneFileRequired: "Musisz mieć co najmniej jeden plik wyjściowy",

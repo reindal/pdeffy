@@ -5,7 +5,6 @@ var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('imageToPdfForm');
 const imageFiles = document.getElementById('imageFiles');
-const imagesList = document.getElementById('imagesList');
 const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
 const imagesOrderContainer = document.getElementById('imagesOrderContainer');
@@ -14,25 +13,8 @@ let selectedImages = [];
 
 imageFiles.addEventListener('change', function(e) {
     selectedImages = Array.from(e.target.files);
-    updateImagesList();
     updateImagesOrder();
 });
-
-function updateImagesList() {
-    imagesList.innerHTML = '';
-
-    if (selectedImages.length > 0) {
-        imagesList.classList.add('active');
-        selectedImages.forEach((image, index) => {
-            const imageItem = document.createElement('div');
-            imageItem.className = 'imageItem';
-            imageItem.textContent = `${index + 1}. ${image.name}`;
-            imagesList.appendChild(imageItem);
-        });
-    } else {
-        imagesList.classList.remove('active');
-    }
-}
 
 function updateImagesOrder() {
     imagesOrderContainer.innerHTML = '';
@@ -64,7 +46,6 @@ function updateImagesOrder() {
         removeBtn.addEventListener('click', function(e) {
             e.preventDefault();
             selectedImages.splice(index, 1);
-            updateImagesList();
             updateImagesOrder();
             imageFiles.value = '';
         });
@@ -112,7 +93,6 @@ function handleDrop(e) {
         const [draggedImage] = selectedImages.splice(draggedIndex, 1);
         selectedImages.splice(targetIndex, 0, draggedImage);
 
-        updateImagesList();
         updateImagesOrder();
     }
 }
@@ -196,31 +176,35 @@ form.addEventListener('submit', async function(e) {
 
         const pdfBytes = await pdfDoc.save();
 
-        const outputName = document.getElementById('outputName').value || 'images_document';
-        const fileName = outputName.endsWith('.pdf') ? outputName : `${outputName}.pdf`;
-
+        // Show Save As dialog with default path in Downloads
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
-        const outputPath = path.join(downloadsPath, fileName);
+        const defaultFileName = 'images_document.pdf';
+        const defaultPath = path.join(downloadsPath, defaultFileName);
+
+        const outputPath = await ipcRenderer.invoke('show-save-dialog', {
+            defaultPath: defaultPath,
+            filters: [
+                { name: 'PDF Files', extensions: ['pdf'] }
+            ]
+        });
+
+        if (!outputPath) {
+            // User cancelled the save dialog
+            showStatus(getMessage('saveCancelled'), 'info');
+            submitBtn.disabled = false;
+            return;
+        }
 
         await fs.writeFile(outputPath, pdfBytes);
 
-        // Set read-only if checkbox is checked
-        const readOnlyCheckbox = document.getElementById('readOnlyCheckbox');
-        if (readOnlyCheckbox && readOnlyCheckbox.checked) {
-            try {
-                await ipcRenderer.invoke('set-file-readonly', outputPath);
-            } catch (error) {
-                console.error('Error setting read-only:', error);
-            }
-        }
-
-        showStatus(getMessage('successPdfCreated', { filename: fileName }), 'success');
+        const fileName = path.basename(outputPath);
+        const outputFolder = path.dirname(outputPath);
+        showStatus(getMessage('successPdfCreatedPath', { filename: fileName, path: outputFolder }), 'success');
 
         // Reset form
         setTimeout(() => {
             form.reset();
             selectedImages = [];
-            updateImagesList();
             updateImagesOrder();
         }, 2000);
 
@@ -252,18 +236,24 @@ function getMessage(key, params = {}) {
             pleaseSelectAtLeastOneImage: "Please select at least one image",
             creatingPdf: "Creating PDF...",
             successPdfCreated: "✓ PDF created successfully: {filename}",
+            successPdfCreatedPath: "✓ Saved PDF: {filename}\nin: {path}",
+            saveCancelled: "Save cancelled",
             errorPrefix: "Error: "
         },
         it: {
             pleaseSelectAtLeastOneImage: "Seleziona almeno un'immagine",
             creatingPdf: "Creazione PDF...",
             successPdfCreated: "✓ PDF creato con successo: {filename}",
+            successPdfCreatedPath: "✓ PDF salvato: {filename}\nin: {path}",
+            saveCancelled: "Salvataggio annullato",
             errorPrefix: "Errore: "
         },
         pl: {
             pleaseSelectAtLeastOneImage: "Proszę wybrać co najmniej jeden obraz",
             creatingPdf: "Tworzenie PDF...",
             successPdfCreated: "✓ PDF utworzony pomyślnie: {filename}",
+            successPdfCreatedPath: "✓ Zapisano PDF: {filename}\nw: {path}",
+            saveCancelled: "Zapisywanie anulowane",
             errorPrefix: "Błąd: "
         }
     };
