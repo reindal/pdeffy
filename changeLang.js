@@ -76,7 +76,12 @@ const languages = {
         colorLabel: "Text color:",
         positionLabel: "Position:",
         outputNameLabel: "Output file name:",
-        watermarkSubmitBtn: "Add Watermark",
+        watermarkSubmitBtn: "Apply Watermarks to PDF",
+        previewTitle: "Watermark Preview",
+        previewHint: "Preview shows how watermark(s) will appear on your PDF",
+        layersTitle: "Watermark Layers",
+        watermarkSettingsTitle: "Watermark Settings",
+        addLayerBtnText: "+ Add Watermark Layer",
 
         // Split mode labels
         splitModeLabel: "Split mode:",
@@ -223,7 +228,12 @@ const languages = {
         colorLabel: "Colore del testo:",
         positionLabel: "Posizione:",
         outputNameLabel: "Nome file di output:",
-        watermarkSubmitBtn: "Aggiungi Filigrana",
+        watermarkSubmitBtn: "Applica Filigrane al PDF",
+        previewTitle: "Anteprima Filigrana",
+        previewHint: "L'anteprima mostra come appariranno le filigrane sul tuo PDF",
+        layersTitle: "Livelli Filigrana",
+        watermarkSettingsTitle: "Impostazioni Filigrana",
+        addLayerBtnText: "+ Aggiungi Livello Filigrana",
 
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
@@ -369,7 +379,12 @@ const languages = {
         colorLabel: "Kolor tekstu:",
         positionLabel: "Pozycja:",
         outputNameLabel: "Nazwa pliku wynikowego:",
-        watermarkSubmitBtn: "Dodaj Znak Wodny",
+        watermarkSubmitBtn: "Zastosuj Znaki Wodne do PDF",
+        previewTitle: "Podgląd Znaku Wodnego",
+        previewHint: "Podgląd pokazuje jak znaki wodne będą wyglądać na PDF",
+        layersTitle: "Warstwy Znaków Wodnych",
+        watermarkSettingsTitle: "Ustawienia Znaku Wodnego",
+        addLayerBtnText: "+ Dodaj Warstwę Znaku Wodnego",
 
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
@@ -515,7 +530,12 @@ const languages = {
         colorLabel: "Color del texto:",
         positionLabel: "Posición:",
         outputNameLabel: "Nombre del archivo de salida:",
-        watermarkSubmitBtn: "Añadir Marca de Agua",
+        watermarkSubmitBtn: "Aplicar Marcas de Agua al PDF",
+        previewTitle: "Vista Previa de Marca de Agua",
+        previewHint: "La vista previa muestra cómo aparecerán las marcas de agua en tu PDF",
+        layersTitle: "Capas de Marcas de Agua",
+        watermarkSettingsTitle: "Configuración de Marca de Agua",
+        addLayerBtnText: "+ Agregar Capa de Marca de Agua",
 
         // Split mode labels
         splitModeLabel: "Modo de divisón:",

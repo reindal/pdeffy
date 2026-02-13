@@ -35,9 +35,26 @@
                 <div id="fileName" class="fileName"></div>
             </div>
 
+            <!-- Watermark Preview -->
+            <div class="previewSection" id="previewSection" style="display: none;">
+                <h3 class="langText" id="previewTitle">Watermark Preview</h3>
+                <div class="previewCanvas">
+                    <canvas id="watermarkPreview" width="400" height="300"></canvas>
+                </div>
+                <p class="previewHint langText" id="previewHint">Preview shows how watermark(s) will appear on your PDF</p>
+            </div>
+
+            <!-- Watermark Layers List -->
+            <div class="watermarkLayers" id="watermarkLayersContainer" style="display: none;">
+                <h3 class="langText" id="layersTitle">Watermark Layers</h3>
+                <div id="layersList"></div>
+            </div>
+
+            <h3 class="langText" id="watermarkSettingsTitle">Watermark Settings</h3>
+
             <div class="formGroup">
                 <label for="watermarkText" id="watermarkTextLabel" class="langText">Watermark text:</label>
-                <input type="text" id="watermarkText" placeholder="CONFIDENTIAL" required>
+                <input type="text" id="watermarkText" placeholder="CONFIDENTIAL">
             </div>
 
             <div class="formGroup">
@@ -94,10 +111,17 @@
                     <option value="diagonal">Diagonal</option>
                     <option value="top">Top</option>
                     <option value="bottom">Bottom</option>
+                    <option value="top-left">Top Left</option>
+                    <option value="top-right">Top Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="bottom-right">Bottom Right</option>
                 </select>
             </div>
 
-            <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="watermarkSubmitBtn">Add Watermark</span></button>
+            <div class="buttonGroup">
+                <button type="button" class="addLayerBtn" id="addLayerBtn"><span class="langText" id="addLayerBtnText">+ Add Watermark Layer</span></button>
+                <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="watermarkSubmitBtn">Apply Watermarks to PDF</span></button>
+            </div>
         </form>
 
         <div id="status" class="status"></div>
