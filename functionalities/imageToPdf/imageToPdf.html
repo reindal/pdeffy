@@ -32,7 +32,6 @@
                     <input type="file" id="imageFiles" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp" multiple required>
                     <label for="imageFiles" class="fileInputLabel langText" id="imageToPdfSelectButton">Click to select images</label>
                 </div>
-                <div id="imagesList" class="imagesList"></div>
             </div>
 
             <div id="imagesOrder" class="imagesOrder">
@@ -41,17 +40,6 @@
                 <p class="helpText langText" id="imageToPdfHelpText">Drag to reorder images (top to bottom = first to last page in PDF)</p>
             </div>
 
-            <div class="formGroup">
-                <label for="outputName" id="imageToPdfOutputName" class="langText">Output file name:</label>
-                <input type="text" id="outputName" name="outputName" placeholder="images_document" class="langTextPlaceholder">
-            </div>
-
-            <div class="formGroup">
-                <label class="checkboxLabel">
-                    <input type="checkbox" id="readOnlyCheckbox" name="readOnly">
-                    <span class="langText" id="readOnlyLabel">Make PDF read-only</span>
-                </label>
-            </div>
 
             <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="imageToPdfSubmitBtn">Create PDF</span></button>
         </form>
