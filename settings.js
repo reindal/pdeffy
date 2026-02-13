@@ -65,7 +65,8 @@
                 const messages = {
                     en: 'Settings saved successfully!',
                     it: 'Impostazioni salvate con successo!',
-                    pl: 'Ustawienia zapisane pomyślnie!'
+                    pl: 'Ustawienia zapisane pomyślnie!',
+                    es: '¡Configuración guardada correctamente!'
                 };
 
                 settingsStatus.textContent = messages[lang] || messages.en;
@@ -75,7 +76,7 @@
                 setTimeout(() => {
                     settingsModal.classList.remove('active');
                     settingsStatus.style.display = 'none';
-                }, 1200);
+                }, 2000);
             } catch (error) {
                 console.error('Error saving settings:', error);
             }
