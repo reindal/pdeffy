@@ -7,6 +7,7 @@ const { BrowserWindow, app , ipcMain} = electron;
 // Path to store settings
 const userDataPath = app.getPath('userData');
 const settingsPath = path.join(userDataPath, 'pdf-settings.json');
+const languagePath = path.join(userDataPath, 'language-settings.json');
 
 let mainWindow;
 
@@ -92,3 +93,29 @@ ipcMain.handle('get-pdf-metadata', async () => {
 });
 
 app.on("ready", createWindow);
+
+// Handle IPC request to save the language selected to local file
+ipcMain.handle('get-language', async () => {
+    try {
+        const data = fs.existsSync(languagePath) ? fs.readFileSync(languagePath, 'utf8') : { language: 'en' };
+        return data.language;
+    } catch (error) {
+        console.error('Error reading language file:', error);
+        return 'en';
+    }
+});
+
+// Handle IPC request to get the language selected from local file
+ipcMain.handle('save-language', async (event, language) => {
+    try {
+        fs.writeFileSync(
+            languagePath,
+            JSON.stringify({ language }, null, 2),
+            'utf8'
+        );
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving language file:', error);
+        throw error;
+    }
+});

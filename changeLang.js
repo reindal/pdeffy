@@ -1,4 +1,5 @@
-let language = localStorage.getItem('language') || 'en';
+var { ipcRenderer } = require('electron');
+let language = 'en';
 
 const languages = {
     en: {
@@ -555,7 +556,7 @@ function changeLanguage(lang) {
 
 // Helper function to get translated message with parameter substitution
 function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'en';
+    const lang = language;
     let message = languages[lang][key] || languages['en'][key] || key;
 
     // Replace parameters in the message
@@ -566,16 +567,23 @@ function getMessage(key, params = {}) {
     return message;
 }
 
-window.addEventListener('settingsUIReady', () => {
-    document.getElementById('languageSelector').addEventListener('change', (event) => {
-        localStorage.setItem('language', event.target.value);
-        changeLanguage(event.target.value);
-    });
-    // Set the selector to the saved language
-    document.getElementById('languageSelector').value = language;
-});
+window.addEventListener('settingsUIReady', async () => {
+    const selector = document.getElementById('languageSelector');
 
-changeLanguage(language);
+    const savedLang = await ipcRenderer.invoke('get-language');
+    language = savedLang;
+    selector.value = savedLang;
+    changeLanguage(savedLang);
+
+    selector.addEventListener('change', async (event) => {
+        const selectedLang = event.target.value;
+
+        await ipcRenderer.invoke('save-language', selectedLang);
+
+        language = selectedLang;
+        changeLanguage(selectedLang);
+    });
+});
 
 // Add click handler to logo to navigate back to main page
 const headerIcon = document.querySelector('.headerIcon');
@@ -588,5 +596,3 @@ if (headerIcon) {
         }
     });
 }
-
-console.log(language);

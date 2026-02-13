@@ -1,94 +1,91 @@
-// The IIFE is used so that the ipcRenderer constant does not have a global scope
-// and does not conflict with other ipcRenderers from other JS files like merge.js, split.js, etc.
-(() => {
-    const { ipcRenderer } = require('electron');
-    window.addEventListener('load', () => {
-        injectSettingsUI();
+var { ipcRenderer } = require('electron');
+window.addEventListener('load', () => {
+    injectSettingsUI();
 
-        const settingsIcon = document.getElementById('settingsIcon');
-        const settingsModal = document.getElementById('settingsModal');
-        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-        const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
-        const settingsStatus = document.getElementById('settingsStatus');
+    const settingsIcon = document.getElementById('settingsIcon');
+    const settingsModal = document.getElementById('settingsModal');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+    const settingsStatus = document.getElementById('settingsStatus');
 
-        const metaAuthor = document.getElementById('metaAuthor');
-        const metaTitle = document.getElementById('metaTitle');
-        const metaSubject = document.getElementById('metaSubject');
+    const metaAuthor = document.getElementById('metaAuthor');
+    const metaTitle = document.getElementById('metaTitle');
+    const metaSubject = document.getElementById('metaSubject');
 
-        // Load saved settings on page load
-        async function loadSettings() {
-            try {
-                const settings = await ipcRenderer.invoke('get-pdf-metadata');
-                if (settings) {
-                    metaAuthor.value = settings.author || '';
-                    metaTitle.value = settings.title || '';
-                    metaSubject.value = settings.subject || '';
-                }
-            } catch (error) {
-                console.error('Error loading settings:', error);
+    // Load saved settings on page load
+    async function loadSettings() {
+        try {
+            const settings = await ipcRenderer.invoke('get-pdf-metadata');
+            if (settings) {
+                metaAuthor.value = settings.author || '';
+                metaTitle.value = settings.title || '';
+                metaSubject.value = settings.subject || '';
             }
+        } catch (error) {
+            console.error('Error loading settings:', error);
         }
+    }
 
-        // Open settings modal
-        settingsIcon.addEventListener('click', async () => {
-            await loadSettings();
-            settingsModal.classList.add('active');
-        });
+    // Open settings modal
+    settingsIcon.addEventListener('click', async () => {
+        await loadSettings();
+        settingsModal.classList.add('active');
+    });
 
-        // Close settings modal
-        cancelSettingsBtn.addEventListener('click', () => {
+    // Close settings modal
+    cancelSettingsBtn.addEventListener('click', () => {
+        settingsModal.classList.remove('active');
+        settingsStatus.style.display = 'none';
+    });
+
+    // Close modal when clicking outside
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
             settingsModal.classList.remove('active');
             settingsStatus.style.display = 'none';
-        });
+        }
+    });
 
-        // Close modal when clicking outside
-        settingsModal.addEventListener('click', (e) => {
-            if (e.target === settingsModal) {
-                settingsModal.classList.remove('active');
-                settingsStatus.style.display = 'none';
-            }
-        });
+    // Save settings
+    saveSettingsBtn.addEventListener('click', async () => {
+        const metadata = {
+            author: metaAuthor.value.trim(),
+            title: metaTitle.value.trim(),
+            subject: metaSubject.value.trim()
+        };
 
-        // Save settings
-        saveSettingsBtn.addEventListener('click', async () => {
-            const metadata = {
-                author: metaAuthor.value.trim(),
-                title: metaTitle.value.trim(),
-                subject: metaSubject.value.trim()
+        try {
+            await ipcRenderer.invoke('save-pdf-metadata', metadata);
+
+            // Show success message
+            const lang = await ipcRenderer.invoke('get-language');
+            const messages = {
+                en: 'Settings saved successfully!',
+                it: 'Impostazioni salvate con successo!',
+                pl: 'Ustawienia zapisane pomyślnie!',
+                es: '¡Configuración guardada correctamente!'
             };
 
-            try {
-                await ipcRenderer.invoke('save-pdf-metadata', metadata);
+            settingsStatus.textContent = messages[lang] || messages.en;
+            settingsStatus.className = 'settingsStatus success';
+            settingsStatus.style.display = 'block';
 
-                // Show success message
-                const lang = localStorage.getItem('language') || 'en';
-                const messages = {
-                    en: 'Settings saved successfully!',
-                    it: 'Impostazioni salvate con successo!',
-                    pl: 'Ustawienia zapisane pomyślnie!',
-                    es: '¡Configuración guardada correctamente!'
-                };
+            setTimeout(() => {
+                settingsModal.classList.remove('active');
+                settingsStatus.style.display = 'none';
+            }, 2000);
+        } catch (error) {
+            console.error('Error saving settings:', error);
+        }
+    });
 
-                settingsStatus.textContent = messages[lang] || messages.en;
-                settingsStatus.className = 'settingsStatus success';
-                settingsStatus.style.display = 'block';
+    // Load settings when page loads
+    loadSettings();
 
-                setTimeout(() => {
-                    settingsModal.classList.remove('active');
-                    settingsStatus.style.display = 'none';
-                }, 2000);
-            } catch (error) {
-                console.error('Error saving settings:', error);
-            }
-        });
-
-        // Load settings when page loads
-        loadSettings();
-
-        function injectSettingsUI() {
-            // Avoid duplicates of HTML.
-            if (!document.getElementById('settingsModal')) {
-                document.body.insertAdjacentHTML('beforeend', `
+    function injectSettingsUI() {
+        // Avoid duplicates of HTML.
+        if (!document.getElementById('settingsModal')) {
+            document.body.insertAdjacentHTML('beforeend', `
                     <!-- Settings Icon -->
                     <div class="settingsIcon" id="settingsIcon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -128,9 +125,9 @@
                         </div>
                     </div>
                 `);
-            }
-            window.dispatchEvent(new Event('settingsUIReady'));
         }
-    });
-})();
+        window.dispatchEvent(new Event('settingsUIReady'));
+    }
+});
+
 
