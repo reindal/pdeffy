@@ -2,7 +2,7 @@
 
 .imageToPdfContainer {
     max-width: 600px;
-    margin: 40px auto;
+    margin: 5px auto 40px;
     padding: 30px;
     background-color: var(--reindalLight);
     border-radius: 15px;
@@ -85,6 +85,8 @@
     background-color: var(--reindalExtraLight);
     border-radius: 8px;
     display: none;
+    max-height: 150px;
+    overflow-y: auto;
 }
 
 .imagesList.active {
@@ -94,7 +96,7 @@
 .imageItem {
     padding: 8px;
     margin-bottom: 5px;
-    background-color: var(--reindalGray);
+    background-color: var(--reindalTab);
     border-radius: 4px;
     font-size: 14px;
     color: var(--reindalDark);
@@ -109,6 +111,8 @@
 
 .imagesOrderContainer {
     min-height: 100px;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .imageOrderItem {
