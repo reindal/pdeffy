@@ -13,7 +13,6 @@ updateElectronApp({
   }
 })
 
-
 // Path to store settings
 const userDataPath = app.getPath('userData');
 const settingsPath = path.join(userDataPath, 'pdf-settings.json');
@@ -27,7 +26,7 @@ function createWindow() {
             contextIsolation: false
         },
         show: false,
-        icon: path.join(__dirname, "assets", "navbarLogo.png")
+        icon: path.join(__dirname, "assets", "icon.png")
     });
     mainWindow.maximize();
     mainWindow.loadURL(url.format({
@@ -47,11 +46,31 @@ function createWindow() {
 }
 
 // Handle IPC request for downloads path
+//TODO: OUTDATED WILL BE REMOVED
 ipcMain.handle('get-downloads-path', async () => {
     return app.getPath('downloads');
 });
 
+// Handle IPC request to show save dialog
+ipcMain.handle('show-save-dialog', async (event, options) => {
+    const result = await dialog.showSaveDialog(mainWindow, options);
+    if (result.canceled) {
+        return null;
+    }
+    return result.filePath;
+});
+
+// Handle IPC request to show open dialog (for folder selection)
+ipcMain.handle('show-open-dialog', async (event, options) => {
+    const result = await dialog.showOpenDialog(mainWindow, options);
+    if (result.canceled || result.filePaths.length === 0) {
+        return null;
+    }
+    return result.filePaths[0];
+});
+
 // Handle IPC request to set file as read-only
+//TODO: OUTDATED WILL BE REMOVED
 ipcMain.handle('set-file-readonly', async (event, filePath) => {
     try {
         // Set file to read-only (remove write permissions)

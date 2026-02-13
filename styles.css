@@ -22,7 +22,9 @@ header {
     align-items: center;
     display: flex;
     font-family: var(--font-primary), serif;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);}
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+    font-size: 90%;
+}
 
 .headerContainer{
     display: flex;
@@ -98,31 +100,6 @@ header {
     cursor: pointer;
 }
 
-/* Checkbox styling */
-.checkboxLabel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-family: var(--font-primary), serif;
-    font-size: 14px;
-    margin: 10px 0;
-}
-
-.checkboxLabel input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--reindalYellow);
-    margin: 0;
-    flex-shrink: 0;
-    vertical-align: middle;
-}
-
-.checkboxLabel span {
-    line-height: 18px;
-    vertical-align: middle;
-}
 
 /* Settings icon */
 .settingsIcon {

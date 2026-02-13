@@ -55,9 +55,10 @@
             </div>
 
             <div class="formGroup">
-                <label for="outputName" id="pdfToImageOutputName" class="langText">Output file name prefix:</label>
-                <input type="text" id="outputName" name="outputName" placeholder="page" class="langTextPlaceholder">
-                <p class="helpText langText" id="pdfToImageNamesExample">Files will be named: prefix_1.png, prefix_2.png etc.</p>
+                <label class="checkboxLabel">
+                    <input type="checkbox" id="saveAsZipCheckbox" name="saveAsZip">
+                    <span class="langText" id="saveAsZipLabel">Save as ZIP</span>
+                </label>
             </div>
 
             <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="pdfToImageSubmitBtn">Convert to Images</span></button>

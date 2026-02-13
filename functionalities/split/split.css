@@ -209,6 +209,7 @@
     text-decoration: none;
     font-weight: 600;
     transition: color 0.3s ease;
+    font-family: var(--font-primary), serif;
 }
 
 .backLink:hover {
@@ -305,13 +306,6 @@
     margin-bottom: 15px;
     padding-bottom: 12px;
     border-bottom: 2px solid var(--reindalGray);
-}
-
-.customFileHeader h4 {
-    margin: 0;
-    color: var(--reindalDark);
-    font-size: 16px;
-    font-weight: 700;
 }
 
 .customFileRanges {
