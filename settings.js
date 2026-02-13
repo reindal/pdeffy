@@ -99,6 +99,7 @@
                     <div class="settingsModal" id="settingsModal">
                         <div class="settingsContent">
                             <h2 id="settingsTitle" class="langText">Settings</h2>
+                            <h3 id="metadataTitle" class="langText">Change Language</h3>
                             <select id="languageSelector">
                                 <option value="en">🇬🇧 English</option>
                                 <option value="it">🇮🇹 Italiano</option>
