@@ -386,6 +386,18 @@ function getMessage(key, params = {}) {
             successConvertedZip: "✓ Zapisano {count} obraz(ów) {format} jako ZIP w:\n{path}",
             saveCancelled: "Zapisywanie anulowane",
             errorPrefix: "Błąd: "
+        },
+        es: {
+            loadingPdf: "Cargando PDF...",
+            errorLoadingPdf: "Error al cargar el PDF: {error}",
+            pleaseSelectPdfFirst: "Por favor, selecciona primero un archivo PDF",
+            convertingPages: "Convirtiendo {count} página(s) a imágenes...",
+            convertingPage: "Convirtiendo página {current} de {total}...",
+            successConverted: "✓ Se han convertido con éxito {count} página(s) a imágenes {format}",
+            successConvertedPath: "✓ Guardadas {count} imágene(s) {format} en:\n{path}",
+            successConvertedZip: "✓ Guardadas {count} imágene(s) {format} como ZIP en:\n{path}",
+            saveCancelled: "Guardado cancelado",
+            errorPrefix: "Error: "
         }
     };
 
