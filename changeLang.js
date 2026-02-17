@@ -1,4 +1,4 @@
-var { ipcRenderer } = require('electron');
+﻿var { ipcRenderer } = require('electron');
 let language = 'en';
 
 const languages = {
@@ -86,6 +86,14 @@ const languages = {
         watermarkSettingsTitle: "Watermark Settings",
         addLayerBtnText: "+ Add Watermark Layer",
 
+        // Delete pages
+        deletePagesText: "Delete Pages",
+        deletePagesDesc: "Delete Pages from PDF",
+        deleteSelectLabel: "Select a PDF file:",
+        deleteSelectButton: "Click to select file",
+        deletePreviewTitle: "Click the pages you want to delete",
+        deleteHelpText: "Pages marked with X will be deleted.",
+        deleteSubmitBtn: "Generate PDF without selected pages",
         // PDF to DOCX
         pdfToDocxHeader: "PDF to DOCX",
         pdfToDocxHeader2: "Convert PDF to DOCX",
@@ -256,6 +264,14 @@ const languages = {
         watermarkSettingsTitle: "Impostazioni Filigrana",
         addLayerBtnText: "+ Aggiungi Livello Filigrana",
 
+        // Delete pages
+        deleteHeader: "Elimina Pagine",
+        deleteHeader2: "Elimina pagine dal PDF",
+        deleteSelectLabel: "Seleziona un file PDF:",
+        deleteSelectButton: "Clicca per selezionare il file",
+        deletePreviewTitle: "Clicca sulle pagine che vuoi eliminare",
+        deleteHelpText: "Le pagine segnate con X verranno eliminate.",
+        deleteSubmitBtn: "Genera PDF senza le pagine selezionate",
         // PDF to DOCX
         pdfToDocxHeader: "PDF a DOCX",
         pdfToDocxHeader2: "Converti PDF in DOCX",
@@ -425,6 +441,14 @@ const languages = {
         watermarkSettingsTitle: "Ustawienia Znaku Wodnego",
         addLayerBtnText: "+ Dodaj Warstwę Znaku Wodnego",
 
+        // Delete pages
+        deleteHeader: "Usun Strony",
+        deleteHeader2: "Usun strony z PDF",
+        deleteSelectLabel: "Wybierz plik PDF:",
+        deleteSelectButton: "Kliknij, aby wybrac plik",
+        deletePreviewTitle: "Kliknij strony, ktore chcesz usunac",
+        deleteHelpText: "Strony oznaczone X zostana usuniete.",
+        deleteSubmitBtn: "Utworz PDF bez zaznaczonych stron",
         // PDF to DOCX
         pdfToDocxHeader: "PDF do DOCX",
         pdfToDocxHeader2: "Konwertuj PDF na DOCX",
@@ -591,6 +615,14 @@ const languages = {
         watermarkSettingsTitle: "Configuración de Marca de Agua",
         addLayerBtnText: "+ Agregar Capa de Marca de Agua",
 
+        // Delete pages
+        deleteHeader: "Eliminar Paginas",
+        deleteHeader2: "Eliminar paginas del PDF",
+        deleteSelectLabel: "Selecciona un archivo PDF:",
+        deleteSelectButton: "Haz clic para seleccionar archivo",
+        deletePreviewTitle: "Haz clic en las paginas que quieras eliminar",
+        deleteHelpText: "Las paginas marcadas con X seran eliminadas.",
+        deleteSubmitBtn: "Generar PDF sin paginas seleccionadas",
         // PDF to DOCX
         pdfToDocxHeader: "PDF a DOCX",
         pdfToDocxHeader2: "Convertir PDF a DOCX",
