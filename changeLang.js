@@ -15,6 +15,8 @@ const languages = {
         pdfToImageDesc: "Convert PDF pages into image files.",
         watermarkText: "Add Watermark",
         watermarkDesc: "Add a watermark to your PDF document.",
+        pdfToDocxText: "PDF to DOCX",
+        pdfToDocxDesc: "Convert PDF document to DOCX format.",
         removeBtn: "Remove",
         backLink: "← Back to main page",
         selectedFile: "✓ Selected file: ",
@@ -84,6 +86,14 @@ const languages = {
         watermarkSettingsTitle: "Watermark Settings",
         addLayerBtnText: "+ Add Watermark Layer",
 
+        // PDF to DOCX
+        pdfToDocxHeader: "PDF to DOCX",
+        pdfToDocxHeader2: "Convert PDF to DOCX",
+        pdfToDocxSelectLabel: "Select PDF file:",
+        pdfToDocxSelectButton: "Click to select file",
+        pdfToDocxOutputLabel: "Output file name:",
+        pdfToDocxSubmitBtn: "Convert to DOCX",
+
         // Split mode labels
         splitModeLabel: "Split mode:",
         modeRange: "Custom Page Ranges",
@@ -130,6 +140,7 @@ const languages = {
         convertingPages: "Converting {count} page(s) to images...",
         convertingPage: "Converting page {current} of {total}...",
         successMerged: "✓ Successfully created merged PDF: {filename} in Downloads folder!",
+        successPdfConverted: "✓ Successfully converted PDF to DOCX: {filename} in Downloads folder!",
         successPdfCreated: "✓ PDF created successfully: {filename}",
         successConverted: "✓ Successfully converted {count} page(s) to {format} images",
         successSplitFiles: "✓ Successfully created {count} file(s) in Downloads folder!",
@@ -174,6 +185,8 @@ const languages = {
         pdfToImageDesc: "Converti le pagine PDF in file immagine.",
         watermarkText: "Aggiungi Filigrana",
         watermarkDesc: "Aggiungi una filigrana al tuo documento PDF.",
+        pdfToDocxText: "PDF a DOCX",
+        pdfToDocxDesc: "Converti documento PDF in formato DOCX.",
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
         selectedFile: "✓ File selezionato: ",
@@ -243,6 +256,14 @@ const languages = {
         watermarkSettingsTitle: "Impostazioni Filigrana",
         addLayerBtnText: "+ Aggiungi Livello Filigrana",
 
+        // PDF to DOCX
+        pdfToDocxHeader: "PDF a DOCX",
+        pdfToDocxHeader2: "Converti PDF in DOCX",
+        pdfToDocxSelectLabel: "Seleziona file PDF:",
+        pdfToDocxSelectButton: "Clicca per selezionare file",
+        pdfToDocxOutputLabel: "Nome file di output:",
+        pdfToDocxSubmitBtn: "Converti in DOCX",
+
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
         modeRange: "Intervalli di pagine personalizzati",
@@ -289,6 +310,7 @@ const languages = {
         convertingPages: "Conversione di {count} pagina/e in immagini...",
         convertingPage: "Conversione pagina {current} di {total}...",
         successMerged: "✓ PDF unito creato con successo: {filename} nella cartella Download!",
+        successPdfConverted: "✓ PDF convertito in DOCX con successo: {filename} nella cartella Download!",
         successPdfCreated: "✓ PDF creato con successo: {filename}",
         successConverted: "✓ Convertite con successo {count} pagina/e in immagini {format}",
         successSplitFiles: "✓ Creati con successo {count} file nella cartella Download!",
@@ -333,6 +355,8 @@ const languages = {
         pdfToImageDesc: "Konwertuj strony PDF na pliki obrazów.",
         watermarkText: "Dodaj Znak Wodny",
         watermarkDesc: "Dodaj znak wodny do swojego dokumentu PDF.",
+        pdfToDocxText: "PDF do DOCX",
+        pdfToDocxDesc: "Konwertuj dokument PDF na format DOCX.",
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
@@ -401,6 +425,14 @@ const languages = {
         watermarkSettingsTitle: "Ustawienia Znaku Wodnego",
         addLayerBtnText: "+ Dodaj Warstwę Znaku Wodnego",
 
+        // PDF to DOCX
+        pdfToDocxHeader: "PDF do DOCX",
+        pdfToDocxHeader2: "Konwertuj PDF na DOCX",
+        pdfToDocxSelectLabel: "Wybierz plik PDF:",
+        pdfToDocxSelectButton: "Kliknij, aby wybrać plik",
+        pdfToDocxOutputLabel: "Nazwa pliku wynikowego:",
+        pdfToDocxSubmitBtn: "Konwertuj do DOCX",
+
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
         modeRange: "Własne zakresy stron",
@@ -447,6 +479,7 @@ const languages = {
         convertingPages: "Konwersja {count} stron(y) na obrazy...",
         convertingPage: "Konwersja strony {current} z {total}...",
         successMerged: "✓ Pomyślnie utworzono scalony PDF: {filename} w folderze Pobrane!",
+        successPdfConverted: "✓ Pomyślnie konwertowano PDF na DOCX: {filename} w folderze Pobrane!",
         successPdfCreated: "✓ PDF utworzony pomyślnie: {filename}",
         successConverted: "✓ Pomyślnie przekonwertowano {count} stron(y) na obrazy {format}",
         successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów) w folderze Pobrane!",
@@ -488,6 +521,8 @@ const languages = {
         pdfToImageDesc: "Convertir páginas PDF en imágenes.",
         watermarkText: "Añadir Marca de Agua",
         watermarkDesc: "Añadir una marca de agua a tu documento PDF.",
+        pdfToDocxText: "PDF a DOCX",
+        pdfToDocxDesc: "Convertir documento PDF a formato DOCX.",
         removeBtn: "Eliminar",
         backLink: "← Ir a la página principal",
         selectedFile: "✓ Archivo seleccionado: ",
@@ -556,6 +591,14 @@ const languages = {
         watermarkSettingsTitle: "Configuración de Marca de Agua",
         addLayerBtnText: "+ Agregar Capa de Marca de Agua",
 
+        // PDF to DOCX
+        pdfToDocxHeader: "PDF a DOCX",
+        pdfToDocxHeader2: "Convertir PDF a DOCX",
+        pdfToDocxSelectLabel: "Seleccionar archivo PDF:",
+        pdfToDocxSelectButton: "Haz clic para seleccionar el archivo",
+        pdfToDocxOutputLabel: "Nombre del archivo de salida:",
+        pdfToDocxSubmitBtn: "Convertir a DOCX",
+
         // Split mode labels
         splitModeLabel: "Modo de divisón:",
         modeRange: "Personaliza los rangos de las páginas",
@@ -599,6 +642,7 @@ const languages = {
         convertingPages: "Convirtiendo {count} página(s) a imágenes...",
         convertingPage: "Convirtiendo página {current} de {total}...",
         successMerged: "✓ PDF combinado creado correctamente: {filename} en la carpeta Descargas",
+        successPdfConverted: "✓ PDF convertido a DOCX correctamente: {filename} en la carpeta Descargas",
         successPdfCreated: "✓ PDF creado correctamente: {filename}",
         successConverted: "✓ {count} página(s) convertida(s) correctamente a imágenes en formato {format}",
         successSplitFiles: "✓ {count} archivo(s) creado(s) correctamente en la carpeta Descargas",
