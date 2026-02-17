@@ -85,8 +85,8 @@ const languages = {
         addLayerBtnText: "+ Add Watermark Layer",
 
         // Delete pages
-        deleteHeader: "Delete Pages",
-        deleteHeader2: "Delete Pages from PDF",
+        deletePagesText: "Delete Pages",
+        deletePagesDesc: "Delete Pages from PDF",
         deleteSelectLabel: "Select a PDF file:",
         deleteSelectButton: "Click to select file",
         deletePreviewTitle: "Click the pages you want to delete",

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Eliminar Páginas PDF</title>
+    <title>Delete PDF Pages</title>
     <link rel="stylesheet" href="../../styles.css">
     <link rel="stylesheet" href="./deletePages.css">
 </head>
@@ -12,40 +12,40 @@
     <div class="headerContainer">
         <header>
             <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon">
-            <h1 id="deleteHeader" class="langText">Eliminar Páginas</h1>
+            <h1 id="deletePagesText" class="langText">Delete Pages</h1>
         </header>
     </div>
 
     <main>
         <div class="deleteContainer">
-            <h1 id="deleteHeader2" class="langText">Eliminar páginas del PDF</h1>
+            <h1 id="deletePagesDesc" class="langText">Delete pages from PDF</h1>
             <form id="deleteForm">
                 <div class="formGroup">
-                    <label for="pdfFile" id="deleteSelectLabel" class="langText">Selecciona el archivo PDF:</label>
+                    <label for="pdfFile" id="deleteSelectLabel" class="langText">Select PDF file:</label>
                     <div class="fileInputWrapper">
                         <input type="file" id="pdfFile" accept=".pdf" required>
-                        <label for="pdfFile" class="fileInputLabel langText" id="deleteSelectButton">Click para
-                            seleccionar archivo</label>
+                        <label for="pdfFile" class="fileInputLabel langText" id="deleteSelectButton">Click to
+                            select file</label>
                     </div>
                 </div>
 
                 <div id="pagesPreview" class="pagesPreview">
                     <h3 id="pagesPreviewTitle" class="langText">Pages</h3>
                     <div id="pagesPreviewSection" class="pagesPreviewSection" style="display: none;">
-                        <h3 id="deletePreviewTitle" class="langText">Haz click en las páginas que quieras eliminar</h3>
+                        <h3 id="deletePreviewTitle" class="langText">Click on the pages you want to delete</h3>
                         <div id="pagesGrid" class="pagesGrid"></div>
-                        <p class="helpText langText" id="deleteHelpText">Las páginas marcadas con X serán eliminadas.
+                        <p class="helpText langText" id="deleteHelpText">Pages marked with X will be deleted.
                         </p>
                     </div>
                 </div>
 
                 <button type="submit" class="submitBtn" id="submitBtn" disabled>
-                    <span class="langText" id="deleteSubmitBtn">Generar PDF sin páginas seleccionadas</span>
+                    <span class="langText" id="deleteSubmitBtn">Generate PDF without selected pages</span>
                 </button>
             </form>
 
             <div id="status" class="status"></div>
-            <a href="../../index.html" class="backLink langText" id="backLink">← Volver al inicio</a>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to home</a>
         </div>
     </main>
 
