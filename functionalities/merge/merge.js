@@ -197,6 +197,13 @@ function getMessage(key, params = {}) {
             processingFiles: "Przetwarzanie {count} plik(ów)...",
             successMerged: "✓ Pomyślnie utworzono scalony PDF: {filename} w folderze Pobrane!",
             errorPrefix: "Błąd: "
+        },
+        es: {
+            pleaseSelectAtLeastOnePdf: "Por favor, selecciona al menos un archivo PDF",
+            pleaseSelectAtLeastTwoPdfs: "Por favor, selecciona al menos dos archivos PDF para unir",
+            processingFiles: "Procesando {count} archivo(s)...",
+            successMerged: "✓ ¡PDF unido creado con éxito: {filename} en la carpeta de Descargas!",
+            errorPrefix: "Error: "
         }
     };
 

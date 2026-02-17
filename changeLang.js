@@ -86,6 +86,18 @@ const languages = {
         watermarkSettingsTitle: "Watermark Settings",
         addLayerBtnText: "+ Add Watermark Layer",
 
+        // Docx to PDF
+        docxToPdfText: "DOCX to PDF",
+        docxToPdfDesc: "Convert DOCX documents into a PDF file.",
+        docxToPdfHeader: "Docx to PDF",
+        docxToPdfHeader2: "Convert Word to PDF",
+        docxToPdfSelectLabel: "Select Word file (.docx):",
+        docxToPdfSelectButton: "Click to select file",
+        docxToPdfSubmitBtn: "Convert to PDF",
+        convertingDocx: "Converting Word document...",
+        successDocxCreated: "✓ PDF created successfully",
+        pleaseSelectDocx: "Please select a .docx file",
+        errorDocx: "Error: ",
         // Delete pages
         deletePagesText: "Delete Pages",
         deletePagesDesc: "Delete Pages from PDF",
@@ -264,6 +276,18 @@ const languages = {
         watermarkSettingsTitle: "Impostazioni Filigrana",
         addLayerBtnText: "+ Aggiungi Livello Filigrana",
 
+        // Docx to PDF
+        docxToPdfText: "DOCX a PDF",
+        docxToPdfDesc: "Convertire documenti DOCX in un file PDF.",
+        docxToPdfHeader: "Docx in PDF",
+        docxToPdfHeader2: "Converti Word in PDF",
+        docxToPdfSelectLabel: "Seleziona il file Word (.docx):",
+        docxToPdfSelectButton: "Clicca per selezionare il file",
+        docxToPdfSubmitBtn: "Converti in PDF",
+        convertingDocx: "Conversione in corso...",
+        successDocxCreated: "✓ PDF creato con successo",
+        pleaseSelectDocx: "Seleziona un file .docx",
+        errorDocx: "Errore: ",
         // Delete pages
         deleteHeader: "Elimina Pagine",
         deleteHeader2: "Elimina pagine dal PDF",
@@ -441,6 +465,18 @@ const languages = {
         watermarkSettingsTitle: "Ustawienia Znaku Wodnego",
         addLayerBtnText: "+ Dodaj Warstwę Znaku Wodnego",
 
+        // Docx to PDF
+        docxToPdfText: "DOCX do PDF",
+        docxToPdfDesc: "Konwertuj dokumenty DOCX do pliku PDF.",
+        docxToPdfHeader: "Docx na PDF",
+        docxToPdfHeader2: "Konwertuj Word na PDF",
+        docxToPdfSelectLabel: "Wybierz plik Word (.docx):",
+        docxToPdfSelectButton: "Kliknij, aby wybrać plik",
+        docxToPdfSubmitBtn: "Konwertuj na PDF",
+        convertingDocx: "Konwertowanie...",
+        successDocxCreated: "✓ PDF został utworzony",
+        pleaseSelectDocx: "Proszę wybrać plik .docx",
+        errorDocx: "Błąd: ",
         // Delete pages
         deleteHeader: "Usun Strony",
         deleteHeader2: "Usun strony z PDF",
@@ -615,6 +651,18 @@ const languages = {
         watermarkSettingsTitle: "Configuración de Marca de Agua",
         addLayerBtnText: "+ Agregar Capa de Marca de Agua",
 
+        // Docx to PDF
+        docxToPdfText: "DOCX a PDF",
+        docxToPdfDesc: "Convertir documentos DOCX en un archivo PDF.",
+        docxToPdfHeader: "Docx a PDF",
+        docxToPdfHeader2: "Convertir Word a PDF",
+        docxToPdfSelectLabel: "Selecciona el archivo Word (.docx):",
+        docxToPdfSelectButton: "Haz clic para seleccionar el archivo",
+        docxToPdfSubmitBtn: "Convertir a PDF",
+        convertingDocx: "Convirtiendo documento Word...",
+        successDocxCreated: "✓ PDF generado correctamente",
+        pleaseSelectDocx: "Por favor, selecciona un archivo .docx",
+        errorDocx: "Error: ",
         // Delete pages
         deleteHeader: "Eliminar Paginas",
         deleteHeader2: "Eliminar paginas del PDF",

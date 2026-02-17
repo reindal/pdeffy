@@ -255,6 +255,14 @@ function getMessage(key, params = {}) {
             successPdfCreatedPath: "✓ Zapisano PDF: {filename}\nw: {path}",
             saveCancelled: "Zapisywanie anulowane",
             errorPrefix: "Błąd: "
+        },
+        es: {
+            pleaseSelectAtLeastOneImage: "Por favor, selecciona al menos una imagen",
+            creatingPdf: "Creando PDF...",
+            successPdfCreated: "✓ PDF creado con éxito: {filename}",
+            successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
+            saveCancelled: "Guardado cancelado",
+            errorPrefix: "Error: "
         }
     };
 
