@@ -624,8 +624,7 @@ const languages = {
         settingsSaved: "¡Configuración guardada!",
         metaAuthor: "Introduzca el nombre del autor",
         metaTitle: "Introduzca el título del documento",
-        metaSubject: "Introduzca el asunto del documento"
-    }
+        metaSubject: "Introduzca el asunto del documento",
         // Save as ZIP checkbox
         saveAsZipLabel: "Guardar como ZIP"
     },
