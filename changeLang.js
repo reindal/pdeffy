@@ -106,6 +106,7 @@ const languages = {
         deletePreviewTitle: "Click the pages you want to delete",
         deleteHelpText: "Pages marked with X will be deleted.",
         deleteSubmitBtn: "Generate PDF without selected pages",
+
         // PDF to DOCX
         pdfToDocxHeader: "PDF to DOCX",
         pdfToDocxHeader2: "Convert PDF to DOCX",
@@ -113,6 +114,15 @@ const languages = {
         pdfToDocxSelectButton: "Click to select file",
         pdfToDocxOutputLabel: "Output file name:",
         pdfToDocxSubmitBtn: "Convert to DOCX",
+
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint to PDF",
+        powerPointToPdfDesc: "Convert one PowerPoint file into a PDF document.",
+        pptxToPdfHeader: "PowerPoint to PDF",
+        pptxToPdfHeader2: "Convert PPTX to PDF",
+        pptxToPdfSelectLabel: "Select PowerPoint file (.pptx):",
+        pptxToPdfSelectButton: "Click to select file",
+        pptxToPdfSubmitBtn: "Convert to PDF",
 
         // Split mode labels
         splitModeLabel: "Split mode:",
@@ -296,6 +306,7 @@ const languages = {
         deletePreviewTitle: "Clicca sulle pagine che vuoi eliminare",
         deleteHelpText: "Le pagine segnate con X verranno eliminate.",
         deleteSubmitBtn: "Genera PDF senza le pagine selezionate",
+        
         // PDF to DOCX
         pdfToDocxHeader: "PDF a DOCX",
         pdfToDocxHeader2: "Converti PDF in DOCX",
@@ -303,6 +314,15 @@ const languages = {
         pdfToDocxSelectButton: "Clicca per selezionare file",
         pdfToDocxOutputLabel: "Nome file di output:",
         pdfToDocxSubmitBtn: "Converti in DOCX",
+
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint in PDF",
+        powerPointToPdfDesc: "Converti un file PowerPoint in un documento PDF.",
+        pptxToPdfHeader: "PowerPoint in PDF",
+        pptxToPdfHeader2: "Converti PPTX in PDF",
+        pptxToPdfSelectLabel: "Seleziona file PowerPoint (.pptx):",
+        pptxToPdfSelectButton: "Clicca per selezionare file",
+        pptxToPdfSubmitBtn: "Converti in PDF",
 
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
@@ -485,6 +505,7 @@ const languages = {
         deletePreviewTitle: "Kliknij strony, ktore chcesz usunac",
         deleteHelpText: "Strony oznaczone X zostana usuniete.",
         deleteSubmitBtn: "Utworz PDF bez zaznaczonych stron",
+
         // PDF to DOCX
         pdfToDocxHeader: "PDF do DOCX",
         pdfToDocxHeader2: "Konwertuj PDF na DOCX",
@@ -492,6 +513,15 @@ const languages = {
         pdfToDocxSelectButton: "Kliknij, aby wybrać plik",
         pdfToDocxOutputLabel: "Nazwa pliku wynikowego:",
         pdfToDocxSubmitBtn: "Konwertuj do DOCX",
+
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint do PDF",
+        powerPointToPdfDesc: "Konwertuj plik PowerPoint do dokumentu PDF.",
+        pptxToPdfHeader: "PowerPoint do PDF",
+        pptxToPdfHeader2: "Konwertuj PPTX do PDF",
+        pptxToPdfSelectLabel: "Wybierz plik PowerPoint (.pptx):",
+        pptxToPdfSelectButton: "Kliknij, aby wybrac plik",
+        pptxToPdfSubmitBtn: "Konwertuj do PDF",
 
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
@@ -671,6 +701,7 @@ const languages = {
         deletePreviewTitle: "Haz clic en las paginas que quieras eliminar",
         deleteHelpText: "Las paginas marcadas con X seran eliminadas.",
         deleteSubmitBtn: "Generar PDF sin paginas seleccionadas",
+
         // PDF to DOCX
         pdfToDocxHeader: "PDF a DOCX",
         pdfToDocxHeader2: "Convertir PDF a DOCX",
@@ -678,6 +709,15 @@ const languages = {
         pdfToDocxSelectButton: "Haz clic para seleccionar el archivo",
         pdfToDocxOutputLabel: "Nombre del archivo de salida:",
         pdfToDocxSubmitBtn: "Convertir a DOCX",
+
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint a PDF",
+        powerPointToPdfDesc: "Convierte un archivo PowerPoint en un documento PDF.",
+        pptxToPdfHeader: "PowerPoint a PDF",
+        pptxToPdfHeader2: "Convertir PPTX a PDF",
+        pptxToPdfSelectLabel: "Selecciona archivo PowerPoint (.pptx):",
+        pptxToPdfSelectButton: "Haz clic para seleccionar archivo",
+        pptxToPdfSubmitBtn: "Convertir a PDF",
 
         // Split mode labels
         splitModeLabel: "Modo de divisón:",

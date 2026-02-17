@@ -1,20 +1,5 @@
 @import url('../../variables.css');
 
-.imageToPdfContainer {
-    max-width: 600px;
-    margin: 5px auto 40px;
-    padding: 30px;
-    background-color: var(--reindalLight);
-    border-radius: 15px;
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-}
-
-.imageToPdfContainer h1 {
-    text-align: center;
-    color: var(--reindalDark);
-    margin-bottom: 30px;
-}
-
 .formGroup {
     margin-bottom: 25px;
 }
@@ -107,4 +92,19 @@
     color: var(--reindalGray);
     text-decoration: none;
     font-weight: 600;
+}
+
+.status {
+    display: none;
+    background: #eee;
+    color: #333;
+}
+
+.container {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
