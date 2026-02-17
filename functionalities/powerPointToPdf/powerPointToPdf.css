@@ -1,0 +1,110 @@
+@import url('../../variables.css');
+
+.imageToPdfContainer {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.imageToPdfContainer h1 {
+    text-align: center;
+    color: var(--reindalDark);
+    margin-bottom: 30px;
+}
+
+.formGroup {
+    margin-bottom: 25px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--reindalDark);
+    font-weight: 600;
+    font-family: var(--font-primary), serif;
+}
+
+.fileInputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.fileInputWrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.fileInputLabel {
+    display: block;
+    padding: 14px;
+    background-color: var(--reindalYellow);
+    color: #2a2a2a;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.fileInputLabel:hover {
+    background-color: var(--reindalYellowHover);
+    transform: translateY(-2px);
+}
+
+#fileInfo {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-left: 4px solid var(--reindalYellow);
+    font-size: 0.9em;
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--reindalYellow);
+    color: var(--reindalDark);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submitBtn:disabled {
+    background-color: var(--reindalGray);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.status {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+    white-space: pre-wrap;
+}
+
+.status.success {
+    display: block;
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
+}
+
+.status.error {
+    display: block;
+    background-color: var(--reindalLightPink);
+    color: var(--reindalWineRed);
+}
+
+.backLink {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--reindalGray);
+    text-decoration: none;
+    font-weight: 600;
+}
