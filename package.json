@@ -7,7 +7,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "author": "Lukas and Mikolaj",
+  "author": "Lukas and Mikolaj and Adriano",
   "license": "ISC",
   "description": "Application for manipulating PDF files",
   "devDependencies": {
