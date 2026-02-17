@@ -8,7 +8,7 @@
     "make": "electron-forge make"
   },
   "author": "Lukas and Mikolaj and Adriano",
-  "license": "ISC",
+  "license": "MIT",
   "description": "Application for manipulating PDF files",
   "devDependencies": {
     "@electron-forge/cli": "^7.11.1",
@@ -30,6 +30,7 @@
     "mammoth": "^1.11.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^3.11.174",
+    "pptxgenjs": "^4.0.1",
     "signtool": "^1.0.0",
     "update-electron-app": "^3.1.2"
   }
