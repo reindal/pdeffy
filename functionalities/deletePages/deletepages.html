@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Eliminar Páginas PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./deletePages.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="deleteHeader" class="langText">Eliminar Páginas</h1>
+        </header>
+    </div>
+
+    <main>
+        <div class="deleteContainer">
+            <h1 id="deleteHeader2" class="langText">Eliminar páginas del PDF</h1>
+            <form id="deleteForm">
+                <div class="formGroup">
+                    <label for="pdfFile" id="deleteSelectLabel" class="langText">Selecciona el archivo PDF:</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="pdfFile" accept=".pdf" required>
+                        <label for="pdfFile" class="fileInputLabel langText" id="deleteSelectButton">Click para
+                            seleccionar archivo</label>
+                    </div>
+                </div>
+
+                <div id="pagesPreview" class="pagesPreview">
+                    <h3 id="pagesPreviewTitle" class="langText">Pages</h3>
+                    <div id="pagesPreviewSection" class="pagesPreviewSection" style="display: none;">
+                        <h3 id="deletePreviewTitle" class="langText">Haz click en las páginas que quieras eliminar</h3>
+                        <div id="pagesGrid" class="pagesGrid"></div>
+                        <p class="helpText langText" id="deleteHelpText">Las páginas marcadas con X serán eliminadas.
+                        </p>
+                    </div>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn" disabled>
+                    <span class="langText" id="deleteSubmitBtn">Generar PDF sin páginas seleccionadas</span>
+                </button>
+            </form>
+
+            <div id="status" class="status"></div>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Volver al inicio</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="./deletePages.js"></script>
+</body>
+
+</html>

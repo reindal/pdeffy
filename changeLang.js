@@ -1,4 +1,4 @@
-var { ipcRenderer } = require('electron');
+﻿var { ipcRenderer } = require('electron');
 let language = 'en';
 
 const languages = {
@@ -83,6 +83,15 @@ const languages = {
         layersTitle: "Watermark Layers",
         watermarkSettingsTitle: "Watermark Settings",
         addLayerBtnText: "+ Add Watermark Layer",
+
+        // Delete pages
+        deleteHeader: "Delete Pages",
+        deleteHeader2: "Delete Pages from PDF",
+        deleteSelectLabel: "Select a PDF file:",
+        deleteSelectButton: "Click to select file",
+        deletePreviewTitle: "Click the pages you want to delete",
+        deleteHelpText: "Pages marked with X will be deleted.",
+        deleteSubmitBtn: "Generate PDF without selected pages",
 
         // Split mode labels
         splitModeLabel: "Split mode:",
@@ -243,6 +252,15 @@ const languages = {
         watermarkSettingsTitle: "Impostazioni Filigrana",
         addLayerBtnText: "+ Aggiungi Livello Filigrana",
 
+        // Delete pages
+        deleteHeader: "Elimina Pagine",
+        deleteHeader2: "Elimina pagine dal PDF",
+        deleteSelectLabel: "Seleziona un file PDF:",
+        deleteSelectButton: "Clicca per selezionare il file",
+        deletePreviewTitle: "Clicca sulle pagine che vuoi eliminare",
+        deleteHelpText: "Le pagine segnate con X verranno eliminate.",
+        deleteSubmitBtn: "Genera PDF senza le pagine selezionate",
+
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
         modeRange: "Intervalli di pagine personalizzati",
@@ -401,6 +419,15 @@ const languages = {
         watermarkSettingsTitle: "Ustawienia Znaku Wodnego",
         addLayerBtnText: "+ Dodaj Warstwę Znaku Wodnego",
 
+        // Delete pages
+        deleteHeader: "Usun Strony",
+        deleteHeader2: "Usun strony z PDF",
+        deleteSelectLabel: "Wybierz plik PDF:",
+        deleteSelectButton: "Kliknij, aby wybrac plik",
+        deletePreviewTitle: "Kliknij strony, ktore chcesz usunac",
+        deleteHelpText: "Strony oznaczone X zostana usuniete.",
+        deleteSubmitBtn: "Utworz PDF bez zaznaczonych stron",
+
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
         modeRange: "Własne zakresy stron",
@@ -555,6 +582,15 @@ const languages = {
         layersTitle: "Capas de Marcas de Agua",
         watermarkSettingsTitle: "Configuración de Marca de Agua",
         addLayerBtnText: "+ Agregar Capa de Marca de Agua",
+
+        // Delete pages
+        deleteHeader: "Eliminar Paginas",
+        deleteHeader2: "Eliminar paginas del PDF",
+        deleteSelectLabel: "Selecciona un archivo PDF:",
+        deleteSelectButton: "Haz clic para seleccionar archivo",
+        deletePreviewTitle: "Haz clic en las paginas que quieras eliminar",
+        deleteHelpText: "Las paginas marcadas con X seran eliminadas.",
+        deleteSubmitBtn: "Generar PDF sin paginas seleccionadas",
 
         // Split mode labels
         splitModeLabel: "Modo de divisón:",
