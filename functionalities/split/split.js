@@ -74,11 +74,11 @@ form.addEventListener('submit', async function(e) {
     const saveAsZip = saveAsZipCheckbox ? saveAsZipCheckbox.checked : false;
 
     if (!file) {
-        showStatus('Please select a PDF file', 'error');
+        showStatus(getMessage('pleaseSelectFile'), 'error');
         return;
     }
 
-    showStatus('Processing...', 'success');
+    showStatus(getMessage('processing'), 'success');
     submitBtn.disabled = true;
 
     try {
@@ -101,19 +101,19 @@ form.addEventListener('submit', async function(e) {
                 const endPage = parseInt(endInput.value);
 
                 if (startPage < 1 || endPage < 1) {
-                    showStatus('Page numbers must be greater than 0', 'error');
+                    showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
                     submitBtn.disabled = false;
                     return;
                 }
 
                 if (startPage > endPage) {
-                    showStatus('Start page cannot be greater than end page', 'error');
+                    showStatus(getMessage('startPageCannotBeGreater'), 'error');
                     submitBtn.disabled = false;
                     return;
                 }
 
                 if (startPage > totalPages || endPage > totalPages) {
-                    showStatus(`PDF has only ${totalPages} pages. Please select valid page range.`, 'error');
+                    showStatus(getMessage('pdfHasOnlyPages'), 'error');
                     submitBtn.disabled = false;
                     return;
                 }
@@ -122,7 +122,7 @@ form.addEventListener('submit', async function(e) {
             }
 
             if (ranges.length === 0) {
-                showStatus('Please add at least one page range', 'error');
+                showStatus(getMessage('pleaseAddAtLeastOneRange'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
@@ -149,7 +149,7 @@ form.addEventListener('submit', async function(e) {
             const interval = parseInt(document.getElementById('pagesInterval').value);
 
             if (interval < 1) {
-                showStatus('Interval must be at least 1', 'error');
+                showStatus(getMessage('intervalAtLeastOne'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
@@ -181,7 +181,7 @@ form.addEventListener('submit', async function(e) {
             const customFileItems = document.querySelectorAll('.customFileItem');
 
             if (customFileItems.length === 0) {
-                showStatus('Please add at least one output file', 'error');
+                showStatus(getMessage('pleaseAddAtLeastOneOutputFile'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
@@ -203,19 +203,19 @@ form.addEventListener('submit', async function(e) {
                     const endPage = parseInt(endInput.value);
 
                     if (startPage < 1 || endPage < 1) {
-                        showStatus('Page numbers must be greater than 0', 'error');
+                        showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
                         submitBtn.disabled = false;
                         return;
                     }
 
                     if (startPage > endPage) {
-                        showStatus('Start page cannot be greater than end page', 'error');
+                        showStatus(getMessage('startPageCannotBeGreater'), 'error');
                         submitBtn.disabled = false;
                         return;
                     }
 
                     if (startPage > totalPages || endPage > totalPages) {
-                        showStatus(`PDF has only ${totalPages} pages. Please select valid page range.`, 'error');
+                        showStatus(getMessage('pdfHasOnlyPages'), 'error');
                         submitBtn.disabled = false;
                         return;
                     }
@@ -234,7 +234,7 @@ form.addEventListener('submit', async function(e) {
             const sizeUnit = document.getElementById('sizeUnit').value;
 
             if (maxSize <= 0 || isNaN(maxSize)) {
-                showStatus('Please enter a valid file size', 'error');
+                showStatus(getMessage('pleaseEnterValidFileSize'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
@@ -441,7 +441,7 @@ function addRange() {
         if (rangesContainer.querySelectorAll('.rangeItem').length > 1) {
             rangeDiv.remove();
         } else {
-            showStatus('You must have at least one range', 'error');
+            showStatus(getMessage('atLeastOneRangeRequired'), 'error');
         }
     });
 
@@ -522,98 +522,6 @@ function showStatus(message, type) {
     statusDiv.className = 'status ' + type;
 }
 
-// Helper function to get translated message
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            pleaseSelectFile: "Please select a PDF file",
-            processing: "Processing",
-            pageNumbersGreaterThanZero: "Page numbers must be greater than 0",
-            startPageCannotBeGreater: "Start page cannot be greater than end page",
-            pdfHasOnlyPages: "PDF has only {total} pages. Please select valid page range.",
-            pleaseAddAtLeastOneRange: "Please add at least one page range",
-            intervalAtLeastOne: "Interval must be at least 1",
-            pleaseAddAtLeastOneOutputFile: "Please add at least one output file",
-            pleaseEnterValidFileSize: "Please enter a valid file size",
-            cannotSplitMinSize: "Cannot split: minimum required size is {size} (smallest page size)",
-            successSplitFiles: "✓ Successfully created {count} file(s) in Downloads folder!",
-            successSplitFilesPath: "✓ Saved {count} file(s) in:\n{path}",
-            successSplitFilesZip: "✓ Saved {count} file(s) as ZIP in:\n{path}",
-            saveCancelled: "Save cancelled",
-            errorPrefix: "Error: ",
-            atLeastOneRangeRequired: "You must have at least one range",
-            atLeastOneFileRequired: "You must have at least one output file",
-            eachFileMustHaveRange: "Each file must have at least one range"
-        },
-        it: {
-            pleaseSelectFile: "Seleziona un file PDF",
-            processing: "Elaborazione",
-            pageNumbersGreaterThanZero: "I numeri di pagina devono essere maggiori di 0",
-            startPageCannotBeGreater: "La pagina iniziale non può essere maggiore della pagina finale",
-            pdfHasOnlyPages: "Il PDF ha solo {total} pagine. Seleziona un intervallo di pagine valido.",
-            pleaseAddAtLeastOneRange: "Aggiungi almeno un intervallo di pagine",
-            intervalAtLeastOne: "L'intervallo deve essere almeno 1",
-            pleaseAddAtLeastOneOutputFile: "Aggiungi almeno un file di output",
-            pleaseEnterValidFileSize: "Inserisci una dimensione file valida",
-            cannotSplitMinSize: "Impossibile dividere: la dimensione minima richiesta è {size} (dimensione pagina più piccola)",
-            successSplitFiles: "✓ Creati con successo {count} file nella cartella Download!",
-            successSplitFilesPath: "✓ Salvati {count} file in:\n{path}",
-            successSplitFilesZip: "✓ Salvati {count} file come ZIP in:\n{path}",
-            saveCancelled: "Salvataggio annullato",
-            errorPrefix: "Errore: ",
-            atLeastOneRangeRequired: "Devi avere almeno un intervallo",
-            atLeastOneFileRequired: "Devi avere almeno un file di output",
-            eachFileMustHaveRange: "Ogni file deve avere almeno un intervallo"
-        },
-        pl: {
-            pleaseSelectFile: "Proszę wybrać plik PDF",
-            processing: "Przetwarzanie",
-            pageNumbersGreaterThanZero: "Numery stron muszą być większe niż 0",
-            startPageCannotBeGreater: "Strona początkowa nie może być większa niż strona końcowa",
-            pdfHasOnlyPages: "PDF ma tylko {total} stron. Proszę wybrać prawidłowy zakres stron.",
-            pleaseAddAtLeastOneRange: "Dodaj co najmniej jeden zakres stron",
-            intervalAtLeastOne: "Interwał musi wynosić co najmniej 1",
-            pleaseAddAtLeastOneOutputFile: "Dodaj co najmniej jeden plik wyjściowy",
-            pleaseEnterValidFileSize: "Wprowadź prawidłowy rozmiar pliku",
-            cannotSplitMinSize: "Nie można podzielić: minimalny wymagany rozmiar to {size} (rozmiar najmniejszej strony)",
-            successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów) w folderze Pobrane!",
-            successSplitFilesPath: "✓ Zapisano {count} plik(ów) w:\n{path}",
-            successSplitFilesZip: "✓ Zapisano {count} plik(ów) jako ZIP w:\n{path}",
-            saveCancelled: "Zapisywanie anulowane",
-            errorPrefix: "Błąd: ",
-            atLeastOneRangeRequired: "Musisz mieć co najmniej jeden zakres",
-            atLeastOneFileRequired: "Musisz mieć co najmniej jeden plik wyjściowy",
-            eachFileMustHaveRange: "Każdy plik musi mieć co najmniej jeden zakres"
-        },
-        es: {
-            pleaseSelectFile: "Por favor, selecciona un archivo PDF",
-            processing: "Procesando",
-            pageNumbersGreaterThanZero: "Los números de página deben ser mayores que 0",
-            startPageCannotBeGreater: "La página inicial no puede ser mayor que la página final",
-            pdfHasOnlyPages: "El PDF solo tiene {total} páginas. Por favor, selecciona un rango válido.",
-            pleaseAddAtLeastOneRange: "Por favor, añade al menos un rango de páginas",
-            intervalAtLeastOne: "El intervalo debe ser al menos 1",
-            pleaseAddAtLeastOneOutputFile: "Por favor, añade al menos un archivo de salida",
-            pleaseEnterValidFileSize: "Por favor, introduce un tamaño de archivo válido",
-            cannotSplitMinSize: "No se puede dividir: el tamaño mínimo requerido es {size} (tamaño de la página más pequeña)",
-            successSplitFiles: "✓ {count} archivo(s) creado(s) correctamente en la carpeta Descargas",
-            errorPrefix: "Error: ",
-            atLeastOneRangeRequired: "Debe haber al menos un rango",
-            atLeastOneFileRequired: "Debe haber al menos un archivo de salida",
-            eachFileMustHaveRange: "Cada archivo debe tener al menos un rango",
-        }
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
-}
-
 function updateFileSizeInfo() {
     const file = pdfFile.files[0];
     if (file && fileSizeInfo) {
@@ -624,7 +532,8 @@ function updateFileSizeInfo() {
         const fileSizeLabels = {
             en: 'Current file size: ',
             it: 'Dimensione file: ',
-            pl: 'Rozmiar pliku: '
+            pl: 'Rozmiar pliku: ',
+            es: 'Tamaño del archivo:'
         };
 
         fileSizeInfo.textContent = (fileSizeLabels[lang] || fileSizeLabels.en) + sizeText;
