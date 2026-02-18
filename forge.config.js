@@ -4,8 +4,13 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    ignore: [
+      /node_modules[/\\](canvas|sqlite3|better-sqlite3|node-gyp)/,
+    ],
   },
-  rebuildConfig: {},
+  rebuildConfig: {
+    enabled: false,
+  },
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
