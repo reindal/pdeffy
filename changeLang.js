@@ -1,5 +1,5 @@
 ﻿var { ipcRenderer } = require('electron');
-let language = 'en';
+window.currentLanguage = 'en';
 
 const languages = {
     en: {
@@ -106,6 +106,15 @@ const languages = {
         deletePreviewTitle: "Click the pages you want to delete",
         deleteHelpText: "Pages marked with X will be deleted.",
         deleteSubmitBtn: "Generate PDF without selected pages",
+
+        // Delete pages messages
+        loadingPreview: 'Loading preview...',
+        mustLeaveAtLeastOnePage: 'You must leave at least one page unselected.',
+        processing: 'Processing...',
+        successDeleted: 'Successfully created PDF: {filename}',
+        saveCancelled: 'Save cancelled',
+        errorPrefix: 'Error: ',
+
         // PDF to DOCX
         pdfToDocxHeader: "PDF to DOCX",
         pdfToDocxHeader2: "Convert PDF to DOCX",
@@ -289,13 +298,22 @@ const languages = {
         pleaseSelectDocx: "Seleziona un file .docx",
         errorDocx: "Errore: ",
         // Delete pages
-        deleteHeader: "Elimina Pagine",
-        deleteHeader2: "Elimina pagine dal PDF",
+        deletePagesText: "Elimina Pagine",
+        deletePagesDesc: "Elimina pagine dal PDF",
         deleteSelectLabel: "Seleziona un file PDF:",
         deleteSelectButton: "Clicca per selezionare il file",
         deletePreviewTitle: "Clicca sulle pagine che vuoi eliminare",
         deleteHelpText: "Le pagine segnate con X verranno eliminate.",
         deleteSubmitBtn: "Genera PDF senza le pagine selezionate",
+
+        // Delete pages messages
+        loadingPreview: 'Caricamento anteprima...',
+        mustLeaveAtLeastOnePage: 'Devi lasciare almeno una pagina non selezionata.',
+        processing: 'Elaborazione...',
+        successDeleted: 'PDF creato con successo: {filename}',
+        saveCancelled: 'Salvataggio annullato',
+        errorPrefix: 'Errore: ',
+
         // PDF to DOCX
         pdfToDocxHeader: "PDF a DOCX",
         pdfToDocxHeader2: "Converti PDF in DOCX",
@@ -478,13 +496,22 @@ const languages = {
         pleaseSelectDocx: "Proszę wybrać plik .docx",
         errorDocx: "Błąd: ",
         // Delete pages
-        deleteHeader: "Usun Strony",
-        deleteHeader2: "Usun strony z PDF",
+        deletePagesText: "Usun Strony",
+        deletePagesDesc: "Usun strony z PDF",
         deleteSelectLabel: "Wybierz plik PDF:",
         deleteSelectButton: "Kliknij, aby wybrac plik",
         deletePreviewTitle: "Kliknij strony, ktore chcesz usunac",
         deleteHelpText: "Strony oznaczone X zostana usuniete.",
         deleteSubmitBtn: "Utworz PDF bez zaznaczonych stron",
+
+        // Delete pages messages
+        loadingPreview: 'Ladowanie podgladu...',
+        mustLeaveAtLeastOnePage: 'Musisz pozostawic co najmniej jedna strone niezaznaczona.',
+        processing: 'Przetwarzanie...',
+        successDeleted: 'Pomyslnie utworzono PDF: {filename}',
+        saveCancelled: 'Zapisywanie anulowane',
+        errorPrefix: 'Blad: ',
+
         // PDF to DOCX
         pdfToDocxHeader: "PDF do DOCX",
         pdfToDocxHeader2: "Konwertuj PDF na DOCX",
@@ -664,13 +691,22 @@ const languages = {
         pleaseSelectDocx: "Por favor, selecciona un archivo .docx",
         errorDocx: "Error: ",
         // Delete pages
-        deleteHeader: "Eliminar Paginas",
-        deleteHeader2: "Eliminar paginas del PDF",
+        deletePagesText: "Eliminar Paginas",
+        deletePagesDesc: "Eliminar paginas del PDF",
         deleteSelectLabel: "Selecciona un archivo PDF:",
         deleteSelectButton: "Haz clic para seleccionar archivo",
         deletePreviewTitle: "Haz clic en las paginas que quieras eliminar",
         deleteHelpText: "Las paginas marcadas con X seran eliminadas.",
         deleteSubmitBtn: "Generar PDF sin paginas seleccionadas",
+
+        // Delete pages messages
+        loadingPreview: 'Cargando vista previa...',
+        mustLeaveAtLeastOnePage: 'Debes dejar al menos una pagina sin seleccionar.',
+        processing: 'Procesando...',
+        successDeleted: 'PDF creado correctamente: {filename}',
+        saveCancelled: 'Guardado cancelado',
+        errorPrefix: 'Error: ',
+
         // PDF to DOCX
         pdfToDocxHeader: "PDF a DOCX",
         pdfToDocxHeader2: "Convertir PDF a DOCX",
@@ -775,7 +811,7 @@ function changeLanguage(lang) {
 
 // Helper function to get translated message with parameter substitution
 function getMessage(key, params = {}) {
-    const lang = language;
+    const lang = window.currentLanguage;
     let message = languages[lang][key] || languages['en'][key] || key;
 
     // Replace parameters in the message
@@ -790,7 +826,7 @@ window.addEventListener('settingsUIReady', async () => {
     const selector = document.getElementById('languageSelector');
 
     const savedLang = await ipcRenderer.invoke('get-language');
-    language = savedLang;
+    window.currentLanguage = savedLang;
     selector.value = savedLang;
     changeLanguage(savedLang);
 
@@ -799,7 +835,7 @@ window.addEventListener('settingsUIReady', async () => {
 
         await ipcRenderer.invoke('save-language', selectedLang);
 
-        language = selectedLang;
+        window.currentLanguage = selectedLang;
         changeLanguage(selectedLang);
     });
 });
@@ -815,3 +851,5 @@ if (headerIcon) {
         }
     });
 }
+
+window.getMessage = getMessage;
