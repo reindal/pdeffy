@@ -17,6 +17,8 @@ const languages = {
         watermarkDesc: "Add a watermark to your PDF document.",
         pdfToDocxText: "PDF to DOCX",
         pdfToDocxDesc: "Convert PDF document to DOCX format.",
+        pdfToPptxText: "PDF to PPTX",
+        pdfToPptxDesc: "Convert PDF document to PowerPoint format.",
         removeBtn: "Remove",
         backLink: "← Back to main page",
         selectedFile: "✓ Selected file: ",
@@ -114,6 +116,14 @@ const languages = {
         pdfToDocxOutputLabel: "Output file name:",
         pdfToDocxSubmitBtn: "Convert to DOCX",
 
+        // PDF to PPTX
+        pdfToPptxHeader: "PDF to PowerPoint",
+        pdfToPptxHeader2: "Convert PDF to PowerPoint",
+        pdfToPptxSelectLabel: "Select PDF file:",
+        pdfToPptxSelectButton: "Click to select file",
+        pdfToPptxSubmitBtn: "Convert to PowerPoint",
+        successPdfConvertedToPptx: "✓ Successfully converted PDF to PowerPoint: {filename}",
+
         // Split mode labels
         splitModeLabel: "Split mode:",
         modeRange: "Custom Page Ranges",
@@ -207,6 +217,8 @@ const languages = {
         watermarkDesc: "Aggiungi una filigrana al tuo documento PDF.",
         pdfToDocxText: "PDF a DOCX",
         pdfToDocxDesc: "Converti documento PDF in formato DOCX.",
+        pdfToPptxText: "PDF a PPTX",
+        pdfToPptxDesc: "Converti documento PDF in formato PowerPoint.",
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
         selectedFile: "✓ File selezionato: ",
@@ -304,6 +316,14 @@ const languages = {
         pdfToDocxOutputLabel: "Nome file di output:",
         pdfToDocxSubmitBtn: "Converti in DOCX",
 
+        // PDF to PPTX
+        pdfToPptxHeader: "PDF a PowerPoint",
+        pdfToPptxHeader2: "Converti PDF in PowerPoint",
+        pdfToPptxSelectLabel: "Seleziona file PDF:",
+        pdfToPptxSelectButton: "Clicca per selezionare file",
+        pdfToPptxSubmitBtn: "Converti in PowerPoint",
+        successPdfConvertedToPptx: "✓ PDF convertito con successo in PowerPoint: {filename}",
+
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
         modeRange: "Intervalli di pagine personalizzati",
@@ -397,6 +417,8 @@ const languages = {
         watermarkDesc: "Dodaj znak wodny do swojego dokumentu PDF.",
         pdfToDocxText: "PDF do DOCX",
         pdfToDocxDesc: "Konwertuj dokument PDF na format DOCX.",
+        pdfToPptxText: "PDF do PPTX",
+        pdfToPptxDesc: "Konwertuj dokument PDF na format PowerPoint.",
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
@@ -492,6 +514,14 @@ const languages = {
         pdfToDocxSelectButton: "Kliknij, aby wybrać plik",
         pdfToDocxOutputLabel: "Nazwa pliku wynikowego:",
         pdfToDocxSubmitBtn: "Konwertuj do DOCX",
+
+        // PDF to PPTX
+        pdfToPptxHeader: "PDF do PowerPoint",
+        pdfToPptxHeader2: "Konwertuj PDF na PowerPoint",
+        pdfToPptxSelectLabel: "Wybierz plik PDF:",
+        pdfToPptxSelectButton: "Kliknij, aby wybrać plik",
+        pdfToPptxSubmitBtn: "Konwertuj do PowerPoint",
+        successPdfConvertedToPptx: "✓ Pomyślnie przekonwertowano PDF na PowerPoint: {filename}",
 
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
