@@ -1,0 +1,143 @@
+@import url('../../variables.css');
+
+.pdfToPptxContainer {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.pdfToPptxContainer h1 {
+    text-align: center;
+    color: var(--reindalDark);
+    margin-bottom: 30px;
+    font-family: var(--font-primary), serif;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--reindalDark);
+    font-weight: 600;
+    font-family: var(--font-primary), serif;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--reindalGray);
+    border-radius: 8px;
+    font-family: var(--font-primary), serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: var(--reindalYellow);
+}
+
+.fileInputWrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+
+.fileInputWrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.fileInputLabel {
+    display: block;
+    padding: 12px;
+    background-color: var(--reindalYellow);
+    color: #2a2a2a;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.fileInputLabel:hover {
+    background-color: var(--reindalYellowHover);
+}
+
+.fileName {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--reindalGray);
+    font-weight: 500;
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--reindalYellow);
+    color: var(--reindalDark);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--font-primary), serif;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background-color: var(--reindalYellowHover);
+}
+
+.submitBtn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.status {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    display: none;
+    word-break: break-word;
+}
+
+.status.success {
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
+    border-color: var(--reindalGreen);
+    display: block;
+}
+
+.status.error {
+    background-color: var(--reindalLightPink);
+    color: var(--reindalWineRed);
+    border-color: var(--reindalPink);
+    display: block;
+}
+
+.backLink {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--reindalGray);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+    font-family: var(--font-primary), serif;
+}
+
+.backLink:hover {
+    color: var(--reindalDark);
+    text-decoration: underline;
+}
+
