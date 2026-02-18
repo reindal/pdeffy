@@ -1,11 +1,10 @@
 const pptxgen = require('pptxgenjs');
-const fs = require('fs').promises;
 const path = require('path');
 const pdfjsLib = require('pdfjs-dist');
 var { ipcRenderer } = require('electron');
 
 // Set up the worker for pdfjs
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.min.mjs');
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.min.js');
 
 const form = document.getElementById('pdfToPptxForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -50,64 +49,110 @@ form.addEventListener('submit', async function(e) {
             const page = await pdf.getPage(i);
             const viewport = page.getViewport({ scale: 2.0 });
 
-            // Create canvas for rendering
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
+            // Extract text content with formatting
+            const textContent = await page.getTextContent();
 
-            // Render PDF page to canvas
-            await page.render({
-                canvasContext: context,
-                viewport: viewport
-            }).promise;
-
-            // Convert canvas to base64 image
-            const imageData = canvas.toDataURL('image/png');
-
-            // Add slide with the image
+            // Create slide
             const slide = pptx.addSlide();
 
-            // Calculate image size to fit slide (16:9 aspect ratio)
-            const slideWidth = 10; // inches
-            const slideHeight = 5.625; // inches (16:9 ratio)
-
-            const imgWidth = viewport.width;
-            const imgHeight = viewport.height;
-            const imgRatio = imgWidth / imgHeight;
-            const slideRatio = slideWidth / slideHeight;
-
-            let w, h, x, y;
-
-            if (imgRatio > slideRatio) {
-                // Image is wider than slide
-                w = slideWidth;
-                h = slideWidth / imgRatio;
-                x = 0;
-                y = (slideHeight - h) / 2;
-            } else {
-                // Image is taller than slide
-                h = slideHeight;
-                w = slideHeight * imgRatio;
-                x = (slideWidth - w) / 2;
-                y = 0;
-            }
-
-            slide.addImage({
-                data: imageData,
-                x: x,
-                y: y,
-                w: w,
-                h: h
+            // Group text by Y coordinate (lines)
+            const lineGroups = {};
+            textContent.items.forEach(item => {
+                const y = Math.round(item.transform[5]);
+                if (!lineGroups[y]) {
+                    lineGroups[y] = [];
+                }
+                lineGroups[y].push(item);
             });
 
-            // Extract text for accessibility
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(' ');
+            // Sort by Y position (top to bottom)
+            const sortedYs = Object.keys(lineGroups).sort((a, b) => b - a);
 
-            // Add text as notes if available
-            if (pageText.trim()) {
-                slide.addNotes(pageText.substring(0, 500)); // Limit to 500 chars
+            // Add text to slide with formatting
+            let textY = 0.5;
+            sortedYs.slice(0, 15).forEach((y, index) => { // Limit to 15 lines per slide
+                const lineItems = lineGroups[y].sort((a, b) => a.transform[4] - b.transform[4]);
+
+                lineItems.forEach(item => {
+                    const fontName = item.fontName || 'Helvetica';
+                    const fontSize = Math.max(10, Math.round(item.height * 0.75));
+                    const isBold = fontName.toLowerCase().includes('bold');
+                    const isItalic = fontName.toLowerCase().includes('italic');
+
+                    const text = item.str.trim();
+                    if (text) {
+                        slide.addText(text, {
+                            x: (item.transform[4] / viewport.width) * 10, // Convert to inches
+                            y: textY,
+                            w: 9,
+                            h: 0.4,
+                            fontSize: fontSize,
+                            bold: isBold,
+                            italic: isItalic,
+                            fontFace: fontName.includes('Times') ? 'Times New Roman' :
+                                     fontName.includes('Courier') ? 'Courier New' : 'Arial',
+                            color: '000000',
+                            valign: 'top',
+                            wrap: false
+                        });
+                    }
+                });
+
+                textY += 0.35;
+            });
+
+            // Try to extract and add images
+            try {
+                // Create canvas for rendering page as image (fallback)
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page to canvas
+                await page.render({
+                    canvasContext: context,
+                    viewport: viewport
+                }).promise;
+
+                // Convert canvas to base64 image
+                const imageData = canvas.toDataURL('image/png');
+
+                // Calculate image size to fit slide background (16:9 aspect ratio)
+                const slideWidth = 10; // inches
+                const slideHeight = 5.625; // inches (16:9 ratio)
+
+                const imgWidth = viewport.width;
+                const imgHeight = viewport.height;
+                const imgRatio = imgWidth / imgHeight;
+                const slideRatio = slideWidth / slideHeight;
+
+                let w, h, x, y;
+
+                if (imgRatio > slideRatio) {
+                    w = slideWidth;
+                    h = slideWidth / imgRatio;
+                    x = 0;
+                    y = (slideHeight - h) / 2;
+                } else {
+                    h = slideHeight;
+                    w = slideHeight * imgRatio;
+                    x = (slideWidth - w) / 2;
+                    y = 0;
+                }
+
+                // Add as background with low opacity if there's text
+                if (sortedYs.length === 0) {
+                    slide.addImage({
+                        data: imageData,
+                        x: x,
+                        y: y,
+                        w: w,
+                        h: h
+                    });
+                }
+            } catch (imgErr) {
+                console.warn('Could not render page as image:', imgErr);
             }
         }
 

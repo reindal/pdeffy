@@ -30,54 +30,134 @@ form.addEventListener('submit', async function(e) {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        // Extract raw text from DOCX and clean incompatible characters (like tabs)
-        const result = await mammoth.extractRawText({ buffer: buffer });
-        const text = result.value;
-        const cleanText = text.replace(/\t/g, "    ");
+        // Extract HTML with styling from DOCX (preserves formatting better)
+        const result = await mammoth.convertToHtml({
+            buffer: buffer,
+            includeDefaultStyleMap: true,
+            styleMap: [
+                "p[style-name='Heading 1'] => h1:fresh",
+                "p[style-name='Heading 2'] => h2:fresh",
+                "p[style-name='Heading 3'] => h3:fresh",
+                "b => b",
+                "i => i",
+                "u => u"
+            ]
+        });
 
+        const html = result.value;
         const pdfDoc = await PDFDocument.create();
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const fontSize = 11;
-        const margin = 50;
-        
+
+        // Embed multiple fonts for better formatting
+        const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+        const timesBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+
         let page = pdfDoc.addPage();
         let { width, height } = page.getSize();
+        const margin = 50;
         let cursorY = height - margin;
         const maxWidth = width - (margin * 2);
 
-        // Calculate text wrapping to prevent text from overflowing the page width
-        const wrapText = (cleanText, maxWidth, font, fontSize) => {
-            const words = cleanText.split(' ');
+        // Parse HTML and extract text with formatting
+        const parseHtml = (html) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const elements = [];
+
+            const traverse = (node, inheritedStyle = {}) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent.trim();
+                    if (text) {
+                        elements.push({
+                            text: text,
+                            ...inheritedStyle
+                        });
+                    }
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    let style = { ...inheritedStyle };
+
+                    switch (node.tagName.toLowerCase()) {
+                        case 'h1':
+                            style = { ...style, fontSize: 24, bold: true };
+                            break;
+                        case 'h2':
+                            style = { ...style, fontSize: 20, bold: true };
+                            break;
+                        case 'h3':
+                            style = { ...style, fontSize: 16, bold: true };
+                            break;
+                        case 'strong':
+                        case 'b':
+                            style = { ...style, bold: true };
+                            break;
+                        case 'em':
+                        case 'i':
+                            style = { ...style, italic: true };
+                            break;
+                        case 'u':
+                            style = { ...style, underline: true };
+                            break;
+                        case 'p':
+                            style = { ...style, paragraph: true };
+                            break;
+                    }
+
+                    node.childNodes.forEach(child => traverse(child, style));
+
+                    if (node.tagName.toLowerCase() === 'p' || node.tagName.toLowerCase() === 'br') {
+                        elements.push({ text: '\n', ...style });
+                    }
+                }
+            };
+
+            traverse(doc.body);
+            return elements;
+        };
+
+        const elements = parseHtml(html);
+
+        // Helper function to get appropriate font
+        const getFont = (bold, italic) => {
+            if (bold && italic) return timesBold; // Closest approximation
+            if (bold) return helveticaBold;
+            if (italic) return helveticaOblique;
+            return helvetica;
+        };
+
+        // Helper function to wrap text
+        const wrapText = (text, maxWidth, font, fontSize) => {
+            const words = text.split(' ');
             const lines = [];
             let currentLine = '';
 
             words.forEach(word => {
                 const testLine = currentLine ? currentLine + ' ' + word : word;
                 const testWidth = font.widthOfTextAtSize(testLine, fontSize);
-                if (testWidth > maxWidth) {
+                if (testWidth > maxWidth && currentLine) {
                     lines.push(currentLine);
                     currentLine = word;
                 } else {
                     currentLine = testLine;
                 }
             });
-            lines.push(currentLine);
+            if (currentLine) lines.push(currentLine);
             return lines;
         };
 
-        const paragraphs = cleanText.split(/\r?\n/);
-
-        // Iterate through paragraphs and draw them line by line, creating new pages if needed
-        for (const para of paragraphs) {
-            if (para.trim() === '') {
-                cursorY -= fontSize;
+        // Render text with formatting
+        for (const element of elements) {
+            if (element.text === '\n') {
+                cursorY -= 12;
                 continue;
             }
 
-            const wrappedLines = wrapText(para, maxWidth, font, fontSize);
+            const fontSize = element.fontSize || 11;
+            const font = getFont(element.bold, element.italic);
+            const wrappedLines = wrapText(element.text, maxWidth, font, fontSize);
 
             for (const line of wrappedLines) {
-                if (cursorY < margin) {
+                if (cursorY < margin + fontSize) {
                     page = pdfDoc.addPage();
                     cursorY = height - margin;
                 }
@@ -90,9 +170,12 @@ form.addEventListener('submit', async function(e) {
                     color: rgb(0, 0, 0),
                 });
 
-                cursorY -= fontSize + 5; // Move cursor down for next line
+                cursorY -= fontSize + 4;
             }
-            cursorY -= 7; // Add extra space between paragraphs
+
+            if (element.paragraph) {
+                cursorY -= 6; // Extra space after paragraph
+            }
         }
 
         // Finalize PDF and trigger the "Save As" dialog via Electron IPC
