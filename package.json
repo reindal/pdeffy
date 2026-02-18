@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "pdfapp",
   "version": "1.0.0",
   "main": "index.js",
@@ -26,12 +26,17 @@
     "docx": "^8.5.0",
     "electron-squirrel-startup": "^1.0.1",
     "fs-extra": "^11.2.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.1.0",
     "jszip": "^3.10.1",
     "mammoth": "^1.11.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^3.11.174",
+    "pptx2html": "^0.3.4",
     "pptxgenjs": "^4.0.1",
     "signtool": "^1.0.0",
-    "update-electron-app": "^3.1.2"
+    "update-electron-app": "^3.1.2",
+    "xml2js": "^0.6.2",
+    "jszip2": "npm:jszip@2.6.1"
   }
 }
