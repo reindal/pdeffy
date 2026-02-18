@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PPTX to PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./powerPointToPdf.css"> 
+</head>
+<body>
+<div class="headerContainer">
+    <header>
+        <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon">
+        <h1 id="pptxToPdfHeader" class="langText">PowerPoint to PDF</h1>
+    </header>
+</div>
+
+<main>
+    <div class="container"> 
+        <h1 id="pptxToPdfHeader2" class="langText">Convert PPTX to PDF</h1>
+
+        <form id="pptxToPdfForm">
+            <div class="formGroup">
+                <label for="pptxFile" id="pptxToPdfSelectLabel" class="langText">Select PowerPoint file (.pptx):</label>
+                <div class="fileInputWrapper">
+                    <input type="file" id="pptxFile" accept=".pptx" required>
+                    <label for="pptxFile" class="fileInputLabel langText" id="pptxToPdfSelectButton">Click to select file</label>
+                </div>
+            </div>
+
+            <div id="fileInfo" class="status">
+                <span id="fileNameDisplay"></span>
+            </div>
+
+            <button type="submit" class="submitBtn" id="submitBtn">
+                <span class="langText" id="pptxToPdfSubmitBtn">Convert to PDF</span>
+            </button>
+        </form>
+
+        <div id="status" class="status"></div>
+        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+    </div>
+</main>
+
+<script src="../../changeLang.js"></script>
+<script src="./../../settings.js"></script>
+<script src="./powerPointToPdf.js"></script>
+</body>
+</html>
