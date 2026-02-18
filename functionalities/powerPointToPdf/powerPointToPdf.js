@@ -23,7 +23,7 @@ form.addEventListener('submit', async function (e) {
     if (!pptxFileInput.files[0]) return;
 
     submitBtn.disabled = true;
-    showStatus(getMessage('convertingPptx'), 'info');
+    showStatus( await getMessage('convertingPptx'), 'info');
 
     try {
         const file = pptxFileInput.files[0];
@@ -91,12 +91,12 @@ form.addEventListener('submit', async function (e) {
 
         if (outputPath) {
             await fs.writeFile(outputPath, pdfBytes);
-            showStatus(getMessage('successPptxCreated'), 'success');
+            showStatus( await getMessage('successPptxCreated'), 'success');
         }
 
     } catch (error) {
         console.error(error);
-        showStatus(getMessage('errorPptx') + error.message, 'error');
+        showStatus( await getMessage('errorPptx') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -109,8 +109,15 @@ function showStatus(message, type) {
     statusDiv.style.display = 'block';
 }
 
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'es';
+async function getMessage(key, params = {}) {
+    let lang = 'en';
+
+    try {
+        lang = await ipcRenderer.invoke('get-language');
+    } catch (err) {
+        lang = 'en';
+    }
+
     const messages = {
         en: {
             convertingPptx: "Converting PowerPoint to PDF...",
