@@ -1,5 +1,5 @@
 @import url('../../variables.css');
-@import url('../../funcionalities.css');
+@import url('../funcionalities.css');
 
 .pdfToDocxContainer {
     max-width: 600px;
