@@ -1,4 +1,5 @@
 @import url('../../variables.css');
+@import url('../../funcionalities.css');
 
 .pdfToImageContainer {
     max-width: 600px;
@@ -19,64 +20,6 @@
     color: var(--reindalDark);
     margin-bottom: 15px;
     font-size: 16px;
-}
-
-.formGroup {
-    margin-bottom: 20px;
-}
-
-.formGroup label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--reindalDark);
-    font-weight: 600;
-    font-family: var(--font-primary), serif;
-}
-
-.formGroup input,
-.formGroup select {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid var(--reindalGray);
-    border-radius: 8px;
-    font-family: var(--font-primary), serif;
-    font-size: 14px;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
-}
-
-.formGroup input:focus,
-.formGroup select:focus {
-    outline: none;
-    border-color: var(--reindalYellow);
-}
-
-.fileInputWrapper {
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-    width: 100%;
-}
-
-.fileInputWrapper input[type="file"] {
-    position: absolute;
-    left: -9999px;
-}
-
-.fileInputLabel {
-    display: block;
-    padding: 12px;
-    background-color: var(--reindalYellow);
-    color: #2a2a2a;
-    text-align: center;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-.fileInputLabel:hover {
-    background-color: var(--reindalYellowHover);
 }
 
 .fileInfo {
@@ -191,93 +134,4 @@
     font-size: 13px;
     margin-top: 10px;
     font-style: italic;
-}
-
-.submitBtn {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--reindalYellow);
-    color: var(--reindalDark);
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-family: var(--font-primary), serif;
-}
-
-.submitBtn:hover {
-    background-color: var(--reindalYellowHover);
-}
-
-.submitBtn:disabled {
-    background-color: var(--reindalLight);
-    cursor: not-allowed;
-}
-
-.status {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    display: none;
-}
-
-.status.success {
-    display: block;
-    background-color: var(--reindalMint);
-    color: var(--reindalDarkGreen);
-    border: 1px solid var(--reindalGreen);
-}
-
-.status.error {
-    display: block;
-    background-color: var(--reindalLightPink);
-    color: var(--reindalWineRed);
-    border: 1px solid var(--reindalPink);
-}
-
-.status.info {
-    display: block;
-    background-color: var(--reindalGray);
-    color: var(--reindalDark);
-    border: 1px solid var(--reindalGray);
-}
-
-.backLink {
-    display: inline-block;
-    margin-top: 20px;
-    color: var(--reindalGray);
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
-    font-family: var(--font-primary), serif;
-}
-
-.backLink:hover {
-    color: var(--reindalDark);
-    text-decoration: underline;
-}
-
-/* Checkbox styling */
-.formGroup .checkboxLabel {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    font-family: var(--font-primary), serif;
-    color: var(--reindalDark);
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 0;
-}
-
-.formGroup .checkboxLabel input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    accent-color: var(--reindalYellow);
-    margin: 0;
-    padding: 0;
 }
