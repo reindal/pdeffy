@@ -2,6 +2,7 @@
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
+const { pathToFileURL } = require('url');
 var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('deleteForm');
@@ -26,8 +27,9 @@ async function refreshLanguage() {
 }
 
 // PDF.js configuration for thumbnails
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-    require('pdfjs-dist/build/pdf.worker.js');
+pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(
+    require.resolve('pdfjs-dist/build/pdf.worker.js')
+).toString();
 
 let originalFileBuffer = null;
 let pagesToDelete = new Set();
@@ -143,6 +145,14 @@ form.addEventListener('submit', async function (e) {
 function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + type;
+    statusDiv.style.display = 'block';
+
+    // Auto-hide success messages after 5 seconds
+    if (type === 'success') {
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    }
 }
 
 window.addEventListener('languageChanged', () => {
