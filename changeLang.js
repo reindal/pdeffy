@@ -17,6 +17,8 @@ const languages = {
         watermarkDesc: "Add a watermark to your PDF document.",
         pdfToDocxText: "PDF to DOCX",
         pdfToDocxDesc: "Convert PDF document to DOCX format.",
+        pdfToPptxText: "PDF to PPTX",
+        pdfToPptxDesc: "Convert PDF document to PowerPoint format.",
         removeBtn: "Remove",
         backLink: "← Back to main page",
         selectedFile: "✓ Selected file: ",
@@ -186,6 +188,22 @@ const languages = {
         processing: "Processing",
         saveCancelled: "Save cancelled",
 
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint to PDF",
+        powerPointToPdfDesc: "Convert one PowerPoint file into a PDF document.",
+        pptxToPdfHeader: "PowerPoint to PDF",
+        pptxToPdfHeader2: "Convert PPTX to PDF",
+        pptxToPdfSelectLabel: "Select PowerPoint file (.pptx):",
+        pptxToPdfSelectButton: "Click to select file",
+        pptxToPdfSubmitBtn: "Convert to PDF",
+        // PDF to PPTX
+        pdfToPptxHeader: "PDF to PowerPoint",
+        pdfToPptxHeader2: "Convert PDF to PowerPoint",
+        pdfToPptxSelectLabel: "Select PDF file:",
+        pdfToPptxSelectButton: "Click to select file",
+        pdfToPptxSubmitBtn: "Convert to PowerPoint",
+        successPdfConvertedToPptx: "✓ Successfully converted PDF to PowerPoint: {filename}",
+
         // Split mode labels
         splitModeLabel: "Split mode:",
         modeRange: "Custom Page Ranges",
@@ -248,6 +266,8 @@ const languages = {
         watermarkDesc: "Aggiungi una filigrana al tuo documento PDF.",
         pdfToDocxText: "PDF a DOCX",
         pdfToDocxDesc: "Converti documento PDF in formato DOCX.",
+        pdfToPptxText: "PDF a PPTX",
+        pdfToPptxDesc: "Converti documento PDF in formato PowerPoint.",
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
         selectedFile: "✓ File selezionato: ",
@@ -417,6 +437,22 @@ const languages = {
         processing: "Elaborazione",
         saveCancelled: "Salvataggio annullato",
 
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint in PDF",
+        powerPointToPdfDesc: "Converti un file PowerPoint in un documento PDF.",
+        pptxToPdfHeader: "PowerPoint in PDF",
+        pptxToPdfHeader2: "Converti PPTX in PDF",
+        pptxToPdfSelectLabel: "Seleziona file PowerPoint (.pptx):",
+        pptxToPdfSelectButton: "Clicca per selezionare file",
+        pptxToPdfSubmitBtn: "Converti in PDF",
+        // PDF to PPTX
+        pdfToPptxHeader: "PDF a PowerPoint",
+        pdfToPptxHeader2: "Converti PDF in PowerPoint",
+        pdfToPptxSelectLabel: "Seleziona file PDF:",
+        pdfToPptxSelectButton: "Clicca per selezionare file",
+        pdfToPptxSubmitBtn: "Converti in PowerPoint",
+        successPdfConvertedToPptx: "✓ PDF convertito con successo in PowerPoint: {filename}",
+
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
         modeRange: "Intervalli di pagine personalizzati",
@@ -479,6 +515,8 @@ const languages = {
         watermarkDesc: "Dodaj znak wodny do swojego dokumentu PDF.",
         pdfToDocxText: "PDF do DOCX",
         pdfToDocxDesc: "Konwertuj dokument PDF na format DOCX.",
+        pdfToPptxText: "PDF do PPTX",
+        pdfToPptxDesc: "Konwertuj dokument PDF na format PowerPoint.",
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
@@ -646,6 +684,22 @@ const languages = {
         errorPrefix: "Błąd: ",
         processing: "Przetwarzanie",
         saveCancelled: "Zapisywanie anulowane",
+
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint do PDF",
+        powerPointToPdfDesc: "Konwertuj plik PowerPoint do dokumentu PDF.",
+        pptxToPdfHeader: "PowerPoint do PDF",
+        pptxToPdfHeader2: "Konwertuj PPTX do PDF",
+        pptxToPdfSelectLabel: "Wybierz plik PowerPoint (.pptx):",
+        pptxToPdfSelectButton: "Kliknij, aby wybrac plik",
+        pptxToPdfSubmitBtn: "Konwertuj do PDF",
+        // PDF to PPTX
+        pdfToPptxHeader: "PDF do PowerPoint",
+        pdfToPptxHeader2: "Konwertuj PDF na PowerPoint",
+        pdfToPptxSelectLabel: "Wybierz plik PDF:",
+        pdfToPptxSelectButton: "Kliknij, aby wybrać plik",
+        pdfToPptxSubmitBtn: "Konwertuj do PowerPoint",
+        successPdfConvertedToPptx: "✓ Pomyślnie przekonwertowano PDF na PowerPoint: {filename}",
 
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
@@ -871,6 +925,15 @@ const languages = {
         errorPrefix: "Error: ",
         processing: "Procesando",
         saveCancelled: "Guardado cancelado",
+
+        // PowerPoint to PDF
+        powerPointToPdfText: "PowerPoint a PDF",
+        powerPointToPdfDesc: "Convierte un archivo PowerPoint en un documento PDF.",
+        pptxToPdfHeader: "PowerPoint a PDF",
+        pptxToPdfHeader2: "Convertir PPTX a PDF",
+        pptxToPdfSelectLabel: "Selecciona archivo PowerPoint (.pptx):",
+        pptxToPdfSelectButton: "Haz clic para seleccionar archivo",
+        pptxToPdfSubmitBtn: "Convertir a PDF",
 
         // Split mode labels
         splitModeLabel: "Modo de divisón:",
