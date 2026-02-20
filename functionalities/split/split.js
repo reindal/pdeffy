@@ -24,7 +24,6 @@ let customFileCount = 1;
 
 addRange();
 addCustomFile();
-updateLanguage();
 
 document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
     radio.addEventListener('change', function() {
@@ -49,17 +48,18 @@ document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
 addRangeBtn.addEventListener('click', function(e) {
     e.preventDefault();
     addRange();
-    updateLanguage();
+    if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
 });
 
 addCustomFileBtn.addEventListener('click', function(e) {
     e.preventDefault();
     addCustomFile();
+    if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
 });
 
 pdfFile.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
-        fileNameDisplay.textContent = '✓ Selected file: ' + e.target.files[0].name;
+        fileNameDisplay.textContent = getMessage('selectedFile') + e.target.files[0].name;
         fileNameDisplay.classList.add('active');
         updateFileSizeInfo();
     }
@@ -95,10 +95,8 @@ form.addEventListener('submit', async function(e) {
             const ranges = [];
 
             for (let item of rangeItems) {
-                const startInput = item.querySelector('.startPage');
-                const endInput = item.querySelector('.endPage');
-                const startPage = parseInt(startInput.value);
-                const endPage = parseInt(endInput.value);
+                const startPage = parseInt(item.querySelector('.startPage').value);
+                const endPage = parseInt(item.querySelector('.endPage').value);
 
                 if (startPage < 1 || endPage < 1) {
                     showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
@@ -113,7 +111,7 @@ form.addEventListener('submit', async function(e) {
                 }
 
                 if (startPage > totalPages || endPage > totalPages) {
-                    showStatus(getMessage('pdfHasOnlyPages'), 'error');
+                    showStatus(getMessage('pdfHasOnlyPages', { total: totalPages }), 'error');
                     submitBtn.disabled = false;
                     return;
                 }
@@ -127,8 +125,7 @@ form.addEventListener('submit', async function(e) {
                 return;
             }
 
-            for (let i = 0; i < ranges.length; i++) {
-                const range = ranges[i];
+            for (let range of ranges) {
                 const newPdf = await PDFDocument.create();
 
                 const metadata = await ipcRenderer.invoke('get-pdf-metadata');
@@ -140,9 +137,7 @@ form.addEventListener('submit', async function(e) {
                     const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
                     newPdf.addPage(copiedPage);
                 }
-
-                const newPdfBytes = await newPdf.save();
-                pdfFiles.push(newPdfBytes);
+                pdfFiles.push(await newPdf.save());
             }
 
         } else if (splitMode === 'every') {
@@ -170,10 +165,7 @@ form.addEventListener('submit', async function(e) {
                     const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
                     newPdf.addPage(copiedPage);
                 }
-
-                const newPdfBytes = await newPdf.save();
-                pdfFiles.push(newPdfBytes);
-
+                pdfFiles.push(await newPdf.save());
                 currentPage = endPage;
             }
 
@@ -186,36 +178,16 @@ form.addEventListener('submit', async function(e) {
                 return;
             }
 
-            for (let i = 0; i < customFileItems.length; i++) {
-                const fileItem = customFileItems[i];
+            for (let fileItem of customFileItems) {
                 const rangeItems = fileItem.querySelectorAll('.customRangeItem');
                 const newPdf = await PDFDocument.create();
 
-                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-                if (metadata.author) newPdf.setAuthor(metadata.author);
-                if (metadata.title) newPdf.setTitle(metadata.title);
-                if (metadata.subject) newPdf.setSubject(metadata.subject);
-
                 for (let rangeItem of rangeItems) {
-                    const startInput = rangeItem.querySelector('.customStartPage');
-                    const endInput = rangeItem.querySelector('.customEndPage');
-                    const startPage = parseInt(startInput.value);
-                    const endPage = parseInt(endInput.value);
+                    const startPage = parseInt(rangeItem.querySelector('.customStartPage').value);
+                    const endPage = parseInt(rangeItem.querySelector('.customEndPage').value);
 
-                    if (startPage < 1 || endPage < 1) {
-                        showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
-                        submitBtn.disabled = false;
-                        return;
-                    }
-
-                    if (startPage > endPage) {
-                        showStatus(getMessage('startPageCannotBeGreater'), 'error');
-                        submitBtn.disabled = false;
-                        return;
-                    }
-
-                    if (startPage > totalPages || endPage > totalPages) {
-                        showStatus(getMessage('pdfHasOnlyPages'), 'error');
+                    if (startPage < 1 || endPage < 1 || startPage > endPage || startPage > totalPages || endPage > totalPages) {
+                        showStatus(getMessage('pageNumbersGreaterThanZero'), 'error'); // O el error específico correspondiente
                         submitBtn.disabled = false;
                         return;
                     }
@@ -225,9 +197,7 @@ form.addEventListener('submit', async function(e) {
                         newPdf.addPage(copiedPage);
                     }
                 }
-
-                const newPdfBytes = await newPdf.save();
-                pdfFiles.push(newPdfBytes);
+                pdfFiles.push(await newPdf.save());
             }
         } else if (splitMode === 'size') {
             const maxSize = parseFloat(document.getElementById('maxFileSize').value);
@@ -329,66 +299,34 @@ form.addEventListener('submit', async function(e) {
         // Now show Save As dialog
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const originalFileName = file.name.replace('.pdf', '');
+        // Save as ZIP dialog
+        let outputPath = await ipcRenderer.invoke('show-save-dialog', {
+            defaultPath: path.join(downloadsPath, saveAsZip ? `${originalFileName}.zip` : `${originalFileName}.pdf`),
+            filters: saveAsZip ? [{ name: 'ZIP Files', extensions: ['zip'] }] : [{ name: 'PDF Files', extensions: ['pdf'] }]
+        });
 
-        let outputPath;
-        let outputFolder;
-        let baseName;
+        if (!outputPath) {
+            showStatus(getMessage('saveCancelled'), 'info');
+            submitBtn.disabled = false;
+            return;
+        }
+
+        // Create ZIP file
+        const outputFolder = path.dirname(outputPath);
+        const baseName = path.basename(outputPath, saveAsZip ? '.zip' : '.pdf');
 
         if (saveAsZip) {
-            // Save as ZIP dialog
-            outputPath = await ipcRenderer.invoke('show-save-dialog', {
-                defaultPath: path.join(downloadsPath, `${originalFileName}.zip`),
-                filters: [
-                    { name: 'ZIP Files', extensions: ['zip'] }
-                ]
-            });
-
-            if (!outputPath) {
-                showStatus(getMessage('saveCancelled'), 'info');
-                submitBtn.disabled = false;
-                return;
-            }
-
-            // Create ZIP file
             const JSZip = require('jszip');
             const zip = new JSZip();
-
-            baseName = path.basename(outputPath, '.zip');
-
             for (let i = 0; i < pdfFiles.length; i++) {
-                const fileName = `${baseName}_${i + 1}.pdf`;
-                zip.file(fileName, pdfFiles[i]);
+                zip.file(`${baseName}_${i + 1}.pdf`, pdfFiles[i]);
             }
-
             const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
             await fs.writeFile(outputPath, zipContent);
-
-            outputFolder = path.dirname(outputPath);
             showStatus(getMessage('successSplitFilesZip', { count: pdfFiles.length, path: outputFolder }), 'success');
-
         } else {
-            // Save as PDF dialog
-            outputPath = await ipcRenderer.invoke('show-save-dialog', {
-                defaultPath: path.join(downloadsPath, `${originalFileName}.pdf`),
-                filters: [
-                    { name: 'PDF Files', extensions: ['pdf'] }
-                ]
-            });
-
-            if (!outputPath) {
-                showStatus(getMessage('saveCancelled'), 'info');
-                submitBtn.disabled = false;
-                return;
-            }
-
-            outputFolder = path.dirname(outputPath);
-            baseName = path.basename(outputPath, '.pdf');
-
-            // Save all PDF files
             for (let i = 0; i < pdfFiles.length; i++) {
-                const fileName = `${baseName}_${i + 1}.pdf`;
-                const filePath = path.join(outputFolder, fileName);
-                await fs.writeFile(filePath, pdfFiles[i]);
+                await fs.writeFile(path.join(outputFolder, `${baseName}_${i + 1}.pdf`), pdfFiles[i]);
             }
 
             showStatus(getMessage('successSplitFilesPath', { count: pdfFiles.length, path: outputFolder }), 'success');
@@ -398,23 +336,12 @@ form.addEventListener('submit', async function(e) {
 
         form.reset();
         fileNameDisplay.classList.remove('active');
-
-        // Reset range mode
-        rangesContainer.innerHTML = '';
-        rangeCount = 1;
-        addRange();
-
-        customFilesContainer.innerHTML = '';
-        customFileCount = 1;
-        addCustomFile();
-
-        rangeModeContainer.style.display = 'block';
-        everyModeContainer.style.display = 'none';
-        customModeContainer.style.display = 'none';
-        sizeModeContainer.style.display = 'none';
+        // Reset containers
+        rangesContainer.innerHTML = ''; rangeCount = 1; addRange();
+        customFilesContainer.innerHTML = ''; customFileCount = 1; addCustomFile();
+        if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
 
     } catch (error) {
-        console.error('Error splitting PDF:', error);
         showStatus(getMessage('errorPrefix') + error.message, 'error');
         submitBtn.disabled = false;
     }
@@ -435,9 +362,7 @@ function addRange() {
         <button type="button" class="removeRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
 
-    const removeBtn = rangeDiv.querySelector('.removeRangeBtn');
-    removeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
+    rangeDiv.querySelector('.removeRangeBtn').addEventListener('click', function() {
         if (rangesContainer.querySelectorAll('.rangeItem').length > 1) {
             rangeDiv.remove();
         } else {
@@ -465,19 +390,14 @@ function addCustomFile() {
     `;
 
     const rangesDiv = fileDiv.querySelector('.customFileRanges');
-
     addCustomRange(rangesDiv);
     
-    const addRangeButton = fileDiv.querySelector('.addCustomRangeBtn');
-    addRangeButton.addEventListener('click', function(e) {
-        e.preventDefault();
+    fileDiv.querySelector('.addCustomRangeBtn').addEventListener('click', function() {
         addCustomRange(rangesDiv);
-        updateLanguage();
+        if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
     });
 
-    const removeFileButton = fileDiv.querySelector('.removeFileBtn');
-    removeFileButton.addEventListener('click', function(e) {
-        e.preventDefault();
+    fileDiv.querySelector('.removeFileBtn').addEventListener('click', function() {
         if (customFilesContainer.querySelectorAll('.customFileItem').length > 1) {
             fileDiv.remove();
         } else {
@@ -504,16 +424,13 @@ function addCustomRange(container) {
         <button type="button" class="removeCustomRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
 
-    const removeBtn = rangeDiv.querySelector('.removeCustomRangeBtn');
-    removeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
+    rangeDiv.querySelector('.removeCustomRangeBtn').addEventListener('click', function() {
         if (container.querySelectorAll('.customRangeItem').length > 1) {
             rangeDiv.remove();
         } else {
             showStatus(getMessage('eachFileMustHaveRange'), 'error');
         }
     });
-
     container.appendChild(rangeDiv);
 }
 
@@ -525,18 +442,7 @@ function showStatus(message, type) {
 function updateFileSizeInfo() {
     const file = pdfFile.files[0];
     if (file && fileSizeInfo) {
-        const sizeInBytes = file.size;
-        let sizeText = formatFileSize(sizeInBytes);
-
-        const lang = localStorage.getItem('language') || 'en';
-        const fileSizeLabels = {
-            en: 'Current file size: ',
-            it: 'Dimensione file: ',
-            pl: 'Rozmiar pliku: ',
-            es: 'Tamaño del archivo:'
-        };
-
-        fileSizeInfo.textContent = (fileSizeLabels[lang] || fileSizeLabels.en) + sizeText;
+        fileSizeInfo.textContent = getMessage('currentFileSize') + formatFileSize(file.size);
         fileSizeInfo.style.display = 'block';
     } else if (fileSizeInfo) {
         fileSizeInfo.style.display = 'none';
@@ -544,18 +450,8 @@ function updateFileSizeInfo() {
 }
 
 function formatFileSize(bytes) {
-    if (bytes >= 1024 * 1024 * 1024) {
-        return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
-    } else if (bytes >= 1024 * 1024) {
-        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-    } else if (bytes >= 1024) {
-        return (bytes / 1024).toFixed(2) + ' KB';
-    } else {
-        return bytes + ' B';
-    }
-}
-
-function updateLanguage() {
-    const lang = localStorage.getItem('language') || 'en';
-    changeLanguage(lang);
+    if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + ' GB';
+    if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+    if (bytes >= 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return bytes + ' B';
 }

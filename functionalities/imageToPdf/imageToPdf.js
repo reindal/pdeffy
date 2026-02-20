@@ -11,9 +11,11 @@ const imagesOrderContainer = document.getElementById('imagesOrderContainer');
 
 let selectedImages = [];
 
-imageFiles.addEventListener('change', function(e) {
-    selectedImages = Array.from(e.target.files);
+imageFiles.addEventListener('change', function (e) {
+    const newFiles = Array.from(e.target.files);
+    selectedImages = [...selectedImages, ...newFiles];
     updateImagesOrder();
+    imageFiles.value = '';
 });
 
 function updateImagesOrder() {

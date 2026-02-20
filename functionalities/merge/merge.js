@@ -11,9 +11,11 @@ const filesOrderContainer = document.getElementById('filesOrderContainer');
 
 let selectedFiles = [];
 
-pdfFiles.addEventListener('change', function(e) {
-    selectedFiles = Array.from(e.target.files);
+pdfFiles.addEventListener('change', function (e) {
+    const newFiles = Array.from(e.target.files);
+    selectedFiles = [...selectedFiles, ...newFiles];
     updateFilesOrder();
+    pdfFiles.value = '';
 });
 
 
@@ -29,11 +31,11 @@ function updateFilesOrder() {
         fileOrderItem.innerHTML = `
             <div class="fileOrderIndex">${index + 1}</div>
             <div class="fileOrderName">${file.name}</div>
-            <button type="button" class="fileOrderRemove" data-index="${index}">Remove</button>
+            <button type="button" class="fileOrderRemove" data-i18n="removeBtn" data-index="${index}">Remove</button>
         `;
 
         const removeBtn = fileOrderItem.querySelector('.fileOrderRemove');
-        removeBtn.addEventListener('click', function(e) {
+        removeBtn.addEventListener('click', function (e) {
             e.preventDefault();
             selectedFiles.splice(index, 1);
             updateFilesOrder();
@@ -96,10 +98,8 @@ function handleDragEnd(e) {
     });
 }
 
-form.addEventListener('submit', async function(e) {
+form.addEventListener('submit', async function (e) {
     e.preventDefault();
-
-    const outputNamePrefix = document.getElementById('outputName').value || 'merged_document';
 
     if (selectedFiles.length === 0) {
         showStatus(getMessage('pleaseSelectAtLeastOnePdf'), 'error');
@@ -137,9 +137,21 @@ form.addEventListener('submit', async function(e) {
 
         // Use Electron API to get downloads path
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
+        const defaultFileName = 'merged_document.pdf';
+        const defaultPath = path.join(downloadsPath, defaultFileName);
 
-        const outputFileName = `${outputNamePrefix}.pdf`;
-        const filePath = path.join(downloadsPath, outputFileName);
+        const filePath = await ipcRenderer.invoke('show-save-dialog', {
+            defaultPath: defaultPath,
+            filters: [
+                { name: 'PDF Files', extensions: ['pdf'] }
+            ]
+        });
+
+        if (!filePath) {
+            showStatus('saveCancelled', 'error');
+            submitBtn.disabled = false;
+            return;
+        }
 
         await fs.writeFile(filePath, mergedPdfBytes);
 
@@ -153,7 +165,7 @@ form.addEventListener('submit', async function(e) {
             }
         }
 
-        showStatus(getMessage('successMerged', { filename: outputFileName }), 'success');
+        showStatus(getMessage('successMerged', { filename: path.basename(filePath) }), 'success');
         submitBtn.disabled = false;
 
         form.reset();

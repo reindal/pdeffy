@@ -170,7 +170,6 @@ const languages = {
         mustLeaveAtLeastOnePage: 'You must leave at least one page unselected.',
         processing: 'Processing...',
         successDeleted: 'Successfully created PDF: {filename}',
-        saveCancelled: 'Save cancelled',
         errorPrefix: 'Error: ',
 
         // PDF to DOCX
