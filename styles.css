@@ -4,6 +4,7 @@ body{
     background-color: var(--reindalDark);
     margin: 0;
     padding: 0;
+    font-family: var(--font-primary), serif;
 }
 
 .optionCard>p{
@@ -18,7 +19,7 @@ header {
     text-align: center;
     margin: 0;
     border-radius: 20px;
-    width: 750px;
+    width: min(900px, calc(100% - 40px));
     align-items: center;
     display: flex;
     font-family: var(--font-primary), serif;
@@ -38,27 +39,85 @@ header {
     float: left;
 }
 
-.optionContainer{
+.homeLayout {
+    width: min(1200px, calc(100% - 40px));
+    margin: 0 auto 40px;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.toolSection {
+    background-color: var(--reindalExtraLight);
+    border: 2px solid var(--reindalGrayLight);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.sectionTitle {
+    margin: 0 0 14px;
+    color: var(--reindalDark);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.collapsibleSection summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.collapsibleSection summary::-webkit-details-marker {
+    display: none;
+}
+
+.collapsibleSection summary::after {
+    content: "\25BE";
+    float: right;
+    transition: transform 0.2s ease;
+}
+
+.collapsibleSection:not([open]) summary {
+    margin-bottom: 0;
+}
+
+.collapsibleSection:not([open]) summary::after {
+    transform: rotate(-90deg);
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.collapsibleContent {
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    transition: height 0.45s ease, opacity 0.3s ease, margin-top 0.45s ease;
+}
+
+.collapsibleContent > .cardsGrid {
+    min-height: 0;
+}
+
+.collapsibleSection[open] > .collapsibleContent {
+    margin-top: 12px;
 }
 
 .optionCard{
     background-color: var(--reindalYellow);
     border-radius: 15px;
     padding: 15px;
-    margin: 10px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-primary), serif;
-    width: 250px;
-    height: 250px;
+    width: auto;
+    min-height: 220px;
     text-decoration: none;
     color: var(--reindalGray);
     border: none;
@@ -87,6 +146,32 @@ header {
     color: #4a4a4a;
     text-align: center;
     font-size: 14px;
+}
+
+@media (max-width: 1100px) {
+    .cardsGrid {
+        grid-template-columns: repeat(3, minmax(210px, 1fr));
+    }
+}
+
+@media (max-width: 860px) {
+    .cardsGrid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+
+    .headerIcon {
+        width: 110px;
+    }
+}
+
+@media (max-width: 560px) {
+    .cardsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        font-size: 80%;
+    }
 }
 
 #languageSelector{
@@ -250,3 +335,5 @@ header {
     background-color: var(--reindalMint);
     color: var(--reindalDarkGreen);
 }
+
+
