@@ -1,19 +1,25 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const path = require('path');
 
 module.exports = {
   packagerConfig: {
     asar: true,
+    ignore: [
+      /node_modules[/\\](canvas|sqlite3|better-sqlite3|node-gyp)/,
+    ],
   },
-  rebuildConfig: {},
+  rebuildConfig: {
+    enabled: false,
+  },
   makers: [
-    {
+    /*{
       name: '@electron-forge/maker-squirrel',
       config: {
         certificateFile: './electronDemoPdf.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD
+        certificatePassword: process.env.CERTIFICATE_PASSWORD,
       },
-    },
+    },*/
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
@@ -26,13 +32,21 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {},
     },
-    /*{
+    {
       name: '@electron-forge/maker-wix',
       config: {
-        certificateFile: './electronDemoPdft.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD
+        /*certificateFile: './electronDemoPdft.pfx',
+        certificatePassword: process.env.CERTIFICATE_PASSWORD,*/
+        icon: "assets/icon.ico",
+        ui: {
+          chooseDirectory: true,
+          images: {
+            background: path.join(__dirname, "assets", "installerBackground.jpg"),
+            banner: path.join(__dirname, "assets", "installerBanner.jpg"),
+          },
       },
-    }*/
+      },
+    }
   ],
   plugins: [
     {
