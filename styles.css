@@ -33,6 +33,55 @@ header {
     padding: 20px 0;
 }
 
+.categoryTilesContainer {
+    width: min(1200px, calc(100% - 40px));
+    margin: 20px auto 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.categoryTile {
+    background: var(--reindalLight);
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 12px;
+    border: 2px solid transparent;
+}
+
+.categoryTile:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
+    border-color: var(--reindalDark);
+}
+
+.categoryTile.active {
+    border-color: var(--reindalDark);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
+}
+
+.categoryIcon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.categoryTile h3 {
+    margin: 8px 0;
+    color: var(--reindalDark);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.categoryTile p {
+    margin: 0;
+    color: var(--reindalGray);
+    font-size: 14px;
+    font-weight: 500;
+}
+
 .headerIcon{
     width: 150px;
     margin-right: 10px;
@@ -48,8 +97,7 @@ header {
 }
 
 .toolSection {
-    background-color: var(--reindalExtraLight);
-    border: 2px solid var(--reindalGrayLight);
+    background-color: var(--reindalLight);
     border-radius: 16px;
     padding: 16px;
 }
@@ -77,12 +125,26 @@ header {
     transition: transform 0.2s ease;
 }
 
+.collapsibleSection[open] summary::after {
+    display: block;
+}
+
+.toolSection[open]{
+    display: block;
+}
+
+.toolSection:not([open]) {
+    display: none;
+}
+
 .collapsibleSection:not([open]) summary {
     margin-bottom: 0;
+    display: none;
 }
 
 .collapsibleSection:not([open]) summary::after {
     transform: rotate(-90deg);
+    display: none;
 }
 
 .cardsGrid {
@@ -162,6 +224,23 @@ header {
     .headerIcon {
         width: 110px;
     }
+
+    .categoryTilesContainer {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .categoryTile {
+        padding: 25px 15px;
+    }
+
+    .categoryIcon {
+        font-size: 40px;
+    }
+
+    .categoryTile h3 {
+        font-size: 20px;
+    }
 }
 
 @media (max-width: 560px) {
@@ -171,6 +250,14 @@ header {
 
     header {
         font-size: 80%;
+    }
+
+    .categoryIcon {
+        font-size: 36px;
+    }
+
+    .categoryTile h3 {
+        font-size: 18px;
     }
 }
 

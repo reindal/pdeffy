@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "pdfapp",
   "version": "1.0.0",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "author": "Lukas and Mikolaj and Adriano",
+  "author": "Lukas and Mikolaj and Adriano & Reindal",
   "license": "MIT",
   "description": "Application for manipulating PDF files",
   "devDependencies": {
@@ -30,14 +30,14 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^4.1.0",
     "jszip": "^3.10.1",
+    "jszip2": "npm:jszip@2.6.1",
     "mammoth": "^1.11.0",
     "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^3.11.174",
+    "pdfjs-dist": "^5.4.624",
     "pptx2html": "^0.3.4",
     "pptxgenjs": "^4.0.1",
     "signtool": "^1.0.0",
     "update-electron-app": "^3.1.2",
-    "xml2js": "^0.6.2",
-    "jszip2": "npm:jszip@2.6.1"
+    "xml2js": "^0.6.2"
   }
 }
