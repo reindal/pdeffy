@@ -108,3 +108,34 @@
     transition: color 0.3s ease;
     font-family: var(--font-primary), serif;
 }
+
+.status {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    font-family: var(--font-primary), serif;
+    display: none;
+}
+
+.status.success {
+    background-color: var(--reindalMint);
+    color: var(--reindalDarkGreen);
+    border: 2px solid var(--reindalGreen);
+    display: block;
+}
+
+.status.error {
+    background-color: var(--reindalLightPink);
+    color: var(--reindalWineRed);
+    border: 2px solid var(--reindalPink);
+    display: block;
+}
+
+.status.info {
+    background-color: var(--reindalLightYellow);
+    color: var(--reindalDark);
+    border: 2px solid var(--reindalYellow);
+    display: block;
+}

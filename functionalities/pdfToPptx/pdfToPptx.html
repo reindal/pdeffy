@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF to PPTX</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./pdfToPptx.css">
+</head>
+<body>
+<div class="headerContainer">
+    <header>
+        <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon">
+        <h1 id="pdfToPptxHeader" class="langText">PDF to PPTX</h1>
+    </header>
+</div>
+
+<main>
+    <div class="pdfToPptxContainer">
+        <h1 id="pdfToPptxHeader2" class="langText">Convert PDF to PowerPoint</h1>
+
+        <form id="pdfToPptxForm">
+            <div class="formGroup">
+                <label for="pdfFile" id="pdfToPptxSelectLabel" class="langText">Select PDF file:</label>
+                <div class="fileInputWrapper">
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                    <label for="pdfFile" class="fileInputLabel langText" id="pdfToPptxSelectButton">Click to select file</label>
+                </div>
+                <div id="fileName" class="fileName"></div>
+            </div>
+
+
+            <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="pdfToPptxSubmitBtn">Convert to PowerPoint</span></button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+    </div>
+</main>
+
+<script src="../../changeLang.js"></script>
+<script src="./../../settings.js"></script>
+<script src="./pdfToPptx.js"></script>
+</body>
+</html>
+

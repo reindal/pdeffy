@@ -11,9 +11,11 @@ const imagesOrderContainer = document.getElementById('imagesOrderContainer');
 
 let selectedImages = [];
 
-imageFiles.addEventListener('change', function(e) {
-    selectedImages = Array.from(e.target.files);
+imageFiles.addEventListener('change', function (e) {
+    const newFiles = Array.from(e.target.files);
+    selectedImages = [...selectedImages, ...newFiles];
     updateImagesOrder();
+    imageFiles.value = '';
 });
 
 function updateImagesOrder() {
@@ -226,51 +228,4 @@ function showStatus(message, type) {
             statusDiv.style.display = 'none';
         }, 5000);
     }
-}
-
-// Helper function to get translated message
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            pleaseSelectAtLeastOneImage: "Please select at least one image",
-            creatingPdf: "Creating PDF...",
-            successPdfCreated: "✓ PDF created successfully: {filename}",
-            successPdfCreatedPath: "✓ Saved PDF: {filename}\nin: {path}",
-            saveCancelled: "Save cancelled",
-            errorPrefix: "Error: "
-        },
-        it: {
-            pleaseSelectAtLeastOneImage: "Seleziona almeno un'immagine",
-            creatingPdf: "Creazione PDF...",
-            successPdfCreated: "✓ PDF creato con successo: {filename}",
-            successPdfCreatedPath: "✓ PDF salvato: {filename}\nin: {path}",
-            saveCancelled: "Salvataggio annullato",
-            errorPrefix: "Errore: "
-        },
-        pl: {
-            pleaseSelectAtLeastOneImage: "Proszę wybrać co najmniej jeden obraz",
-            creatingPdf: "Tworzenie PDF...",
-            successPdfCreated: "✓ PDF utworzony pomyślnie: {filename}",
-            successPdfCreatedPath: "✓ Zapisano PDF: {filename}\nw: {path}",
-            saveCancelled: "Zapisywanie anulowane",
-            errorPrefix: "Błąd: "
-        },
-        es: {
-            pleaseSelectAtLeastOneImage: "Por favor, selecciona al menos una imagen",
-            creatingPdf: "Creando PDF...",
-            successPdfCreated: "✓ PDF creado con éxito: {filename}",
-            successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
-            saveCancelled: "Guardado cancelado",
-            errorPrefix: "Error: "
-        }
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
 }
