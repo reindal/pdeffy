@@ -10,6 +10,20 @@ const pagesGrid = document.getElementById('pagesGrid');
 const previewSection = document.getElementById('pagesPreviewSection');
 const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
+let currentLang = 'en';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await refreshLanguage();
+});
+
+
+async function refreshLanguage() {
+    try {
+        currentLang = await ipcRenderer.invoke('get-language');
+    } catch (err) {
+        currentLang = 'en';
+    }
+}
 
 // PDF.js configuration for thumbnails
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -131,48 +145,6 @@ function showStatus(message, type) {
     statusDiv.className = 'status ' + type;
 }
 
-function getMessage(key, params = {}) {
-    const lang = window.currentLanguage || localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            loadingPreview: 'Loading preview...',
-            mustLeaveAtLeastOnePage: 'You must leave at least one page unselected.',
-            processing: 'Processing...',
-            successDeleted: 'Successfully created PDF: {filename}',
-            saveCancelled: 'Save cancelled',
-            errorPrefix: 'Error: '
-        },
-        it: {
-            loadingPreview: 'Caricamento anteprima...',
-            mustLeaveAtLeastOnePage: 'Devi lasciare almeno una pagina non selezionata.',
-            processing: 'Elaborazione...',
-            successDeleted: 'PDF creato con successo: {filename}',
-            saveCancelled: 'Salvataggio annullato',
-            errorPrefix: 'Errore: '
-        },
-        pl: {
-            loadingPreview: 'Ladowanie podgladu...',
-            mustLeaveAtLeastOnePage: 'Musisz pozostawic co najmniej jedna strone niezaznaczona.',
-            processing: 'Przetwarzanie...',
-            successDeleted: 'Pomyslnie utworzono PDF: {filename}',
-            saveCancelled: 'Zapisywanie anulowane',
-            errorPrefix: 'Blad: '
-        },
-        es: {
-            loadingPreview: 'Cargando vista previa...',
-            mustLeaveAtLeastOnePage: 'Debes dejar al menos una pagina sin seleccionar.',
-            processing: 'Procesando...',
-            successDeleted: 'PDF creado correctamente: {filename}',
-            saveCancelled: 'Guardado cancelado',
-            errorPrefix: 'Error: '
-        }
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages.en[key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
-}
+window.addEventListener('languageChanged', () => {
+    showStatus(getMessage('processing'), 'info');
+});
