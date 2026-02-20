@@ -5,6 +5,20 @@ const languages = {
     en: {
         languageText: "Language",
         welcomeText: "Welcome to the PDF Converter",
+
+        // Category tiles
+        organizePdfTile: "Organize PDF",
+        organizePdfTileDesc: "Merge, split and organize",
+        convertPdfTile: "Convert PDF",
+        convertPdfTileDesc: "Convert to and from PDF",
+        editPdfTile: "Edit PDF",
+        editPdfTileDesc: "Watermark, delete pages",
+
+        // Section titles
+        organizePdfSection: "Organize PDF",
+        convertPdfSection: "Convert PDF",
+        editPdfSection: "Edit PDF",
+
         splitPdfText: "Split PDF",
         splitPdfDesc: "Split your PDF document into multiple files.",
         mergePdfText: "Merge PDF",
@@ -19,6 +33,8 @@ const languages = {
         pdfToDocxDesc: "Convert PDF document to DOCX format.",
         pdfToPptxText: "PDF to PPTX",
         pdfToPptxDesc: "Convert PDF document to PowerPoint format.",
+        pptxToPdfText: "PowerPoint to PDF",
+        pptxToPdfDesc: "Convert one PowerPoint file into a PDF document.",
         removeBtn: "Remove",
         backLink: "← Back to main page",
         selectedFile: "✓ Selected file: ",
@@ -157,6 +173,11 @@ const languages = {
         successPdfCreatedPath: "✓ Saved PDF: {filename}\nin: {path}",
         errorDocx: "Error converting Docx: ",
 
+        // PowerPoint to PDF messages
+        convertingPptx: "Converting PowerPoint to PDF...",
+        successPptxCreated: "✓ PDF created successfully",
+        errorPptx: "Error converting PPTX: ",
+
         // Delete pages
         deletePagesText: "Delete Pages",
         deletePagesDesc: "Delete Pages from PDF",
@@ -253,6 +274,20 @@ const languages = {
     it: {
         languageText: "Lingua",
         welcomeText: "Benvenuto al Convertitore PDF",
+
+        // Category tiles
+        organizePdfTile: "Organizza PDF",
+        organizePdfTileDesc: "Unisci, dividi e organizza",
+        convertPdfTile: "Converti PDF",
+        convertPdfTileDesc: "Converti da e verso PDF",
+        editPdfTile: "Modifica PDF",
+        editPdfTileDesc: "Filigrana, elimina pagine",
+
+        // Section titles
+        organizePdfSection: "Organizza PDF",
+        convertPdfSection: "Converti PDF",
+        editPdfSection: "Modifica PDF",
+
         splitPdfText: "Dividi PDF",
         splitPdfDesc: "Dividi il tuo documento PDF in più file.",
         mergePdfText: "Unisci PDF",
@@ -267,6 +302,8 @@ const languages = {
         pdfToDocxDesc: "Converti documento PDF in formato DOCX.",
         pdfToPptxText: "PDF a PPTX",
         pdfToPptxDesc: "Converti documento PDF in formato PowerPoint.",
+        pptxToPdfText: "PowerPoint a PDF",
+        pptxToPdfDesc: "Converti un file PowerPoint in un documento PDF.",
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
         selectedFile: "✓ File selezionato: ",
@@ -405,6 +442,11 @@ const languages = {
         successPdfCreatedPath: "✓ PDF salvato: {filename}\nin: {path}",
         errorDocx: "Errore durante la conversione del Docx: ",
 
+        // PowerPoint to PDF messages
+        convertingPptx: "Conversione di PowerPoint in PDF...",
+        successPptxCreated: "✓ PDF creato con successo",
+        errorPptx: "Errore durante la conversione di PPTX: ",
+
         // Delete pages
         deletePagesText: "Elimina Pagine",
         deletePagesDesc: "Elimina pagine dal PDF",
@@ -502,6 +544,20 @@ const languages = {
     pl: {
         languageText: "Język",
         welcomeText: "Witamy w Konwerterze PDF",
+
+        // Category tiles
+        organizePdfTile: "Organizuj PDF",
+        organizePdfTileDesc: "Scalaj, dziel i organizuj",
+        convertPdfTile: "Konwertuj PDF",
+        convertPdfTileDesc: "Konwertuj do i z PDF",
+        editPdfTile: "Edytuj PDF",
+        editPdfTileDesc: "Znak wodny, usuń strony",
+
+        // Section titles
+        organizePdfSection: "Organizuj PDF",
+        convertPdfSection: "Konwertuj PDF",
+        editPdfSection: "Edytuj PDF",
+
         splitPdfText: "Podziel PDF",
         splitPdfDesc: "Podziel swój dokument PDF na wiele plików.",
         mergePdfText: "Scal PDF",
@@ -516,6 +572,8 @@ const languages = {
         pdfToDocxDesc: "Konwertuj dokument PDF na format DOCX.",
         pdfToPptxText: "PDF do PPTX",
         pdfToPptxDesc: "Konwertuj dokument PDF na format PowerPoint.",
+        pptxToPdfText: "PowerPoint do PDF",
+        pptxToPdfDesc: "Konwertuj plik PowerPoint na dokument PDF.",
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
@@ -653,6 +711,11 @@ const languages = {
         successPdfCreatedPath: "✓ Zapisano PDF: {filename}\nw: {path}",
         errorDocx: "Błąd podczas konwersji Docx: ",
 
+        // PowerPoint to PDF messages
+        convertingPptx: "Trwa konwersja PowerPointa do PDF...",
+        successPptxCreated: "✓ PDF utworzony pomyślnie",
+        errorPptx: "Błąd podczas konwersji PPTX: ",
+
         // Delete pages
         deletePagesText: "Usun Strony",
         deletePagesDesc: "Usun strony z PDF",
@@ -747,6 +810,20 @@ const languages = {
     es: {
         languageText: "Idioma",
         welcomeText: "Bienvenido al conversor de PDFs",
+
+        // Category tiles
+        organizePdfTile: "Organizar PDF",
+        organizePdfTileDesc: "Fusionar, dividir y organizar",
+        convertPdfTile: "Convertir PDF",
+        convertPdfTileDesc: "Convertir desde y hacia PDF",
+        editPdfTile: "Editar PDF",
+        editPdfTileDesc: "Marca de agua, eliminar páginas",
+
+        // Section titles
+        organizePdfSection: "Organizar PDF",
+        convertPdfSection: "Convertir PDF",
+        editPdfSection: "Editar PDF",
+
         splitPdfText: "Dividir PDF",
         splitPdfDesc: "Dividir tu documento PDF en múltiples archivos.",
         mergePdfText: "Unir PDF",
@@ -759,6 +836,10 @@ const languages = {
         watermarkDesc: "Añadir una marca de agua a tu documento PDF.",
         pdfToDocxText: "PDF a DOCX",
         pdfToDocxDesc: "Convertir documento PDF a formato DOCX.",
+        pdfToPptxText: "PDF a PPTX",
+        pdfToPptxDesc: "Convertir documento PDF a formato PowerPoint.",
+        pptxToPdfText: "PowerPoint a PDF",
+        pptxToPdfDesc: "Convertir un archivo PowerPoint en un documento PDF.",
         removeBtn: "Eliminar",
         backLink: "← Ir a la página principal",
         selectedFile: "✓ Archivo seleccionado: ",
@@ -893,6 +974,11 @@ const languages = {
         successDocxCreated: "✓ PDF generado correctamente",
         successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
         errorDocx: "Error al convertir el Docx: ",
+
+        // PowerPoint to PDF messages
+        convertingPptx: "Convirtiendo PowerPoint a PDF...",
+        successPptxCreated: "✓ PDF creado correctamente",
+        errorPptx: "Error al convertir el PPTX: ",
 
         // Delete pages
         deletePagesText: "Eliminar Paginas",

@@ -4,8 +4,11 @@ const path = require('path');
 const pdfjsLib = require('pdfjs-dist');
 var { ipcRenderer } = require('electron');
 
-// Set up the worker for pdfjs
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.min.mjs');
+// Configure worker to use local copy
+if (typeof window !== 'undefined' && 'Worker' in window) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `${window.location.origin}/node_modules/pdfjs-dist/build/pdf.worker.min.mjs`;
+}
+
 
 const form = document.getElementById('pdfToDocxForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -37,8 +40,14 @@ form.addEventListener('submit', async function(e) {
         // Read PDF file
         const pdfBuffer = await selectedFile.arrayBuffer();
 
-        // Parse PDF using pdfjs-dist
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
+        // Parse PDF using pdfjs-dist (legacy build without worker)
+        const loadingTask = pdfjsLib.getDocument({
+            data: new Uint8Array(pdfBuffer),
+            useWorkerFetch: false,
+            isEvalSupported: false,
+            useSystemFonts: true
+        });
+        const pdf = await loadingTask.promise;
 
         let pdfText = '';
 

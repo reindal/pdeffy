@@ -81,7 +81,6 @@ window.addEventListener('load', () => {
 
     // Load settings when page loads
     loadSettings();
-
     function injectSettingsUI() {
         // Avoid duplicates of HTML.
         if (!document.getElementById('settingsModal')) {
@@ -127,7 +126,4 @@ window.addEventListener('load', () => {
                 `);
         }
         window.dispatchEvent(new Event('settingsUIReady'));
-    }
-});
-
-
+}});

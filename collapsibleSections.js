@@ -86,4 +86,30 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+    // Handle category tile clicks
+    const categoryTiles = document.querySelectorAll(".categoryTile");
+
+    categoryTiles.forEach((tile) => {
+        tile.addEventListener("click", () => {
+            const sectionName = tile.getAttribute("data-section");
+            const targetSection = document.getElementById(`${sectionName}Section`);
+
+            if (targetSection) {
+                const summary = targetSection.querySelector(":scope > summary");
+                if (summary) {
+                    // Toggle the section
+                    summary.click();
+
+                    // Scroll to section smoothly
+                    setTimeout(() => {
+                        targetSection.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                    }, 100);
+                }
+            }
+        });
+    });
 });

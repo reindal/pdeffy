@@ -23,7 +23,7 @@ form.addEventListener('submit', async function (e) {
     if (!pptxFileInput.files[0]) return;
 
     submitBtn.disabled = true;
-    showStatus( await getMessage('convertingPptx'), 'info');
+    showStatus(getMessage('convertingPptx'), 'info');
 
     try {
         const file = pptxFileInput.files[0];
@@ -91,12 +91,12 @@ form.addEventListener('submit', async function (e) {
 
         if (outputPath) {
             await fs.writeFile(outputPath, pdfBytes);
-            showStatus( await getMessage('successPptxCreated'), 'success');
+            showStatus(getMessage('successPptxCreated'), 'success');
         }
 
     } catch (error) {
         console.error(error);
-        showStatus( await getMessage('errorPptx') + error.message, 'error');
+        showStatus(getMessage('errorPptx') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -109,39 +109,3 @@ function showStatus(message, type) {
     statusDiv.style.display = 'block';
 }
 
-async function getMessage(key, params = {}) {
-    let lang = 'en';
-
-    try {
-        lang = await ipcRenderer.invoke('get-language');
-    } catch (err) {
-        lang = 'en';
-    }
-
-    const messages = {
-        en: {
-            convertingPptx: "Converting PowerPoint to PDF...",
-            successPptxCreated: "✓ PDF created successfully",
-            errorPptx: "Error converting PPTX: "
-        },
-        it: {
-            convertingPptx: "Sto convertendo la presentazione in PDF...",
-            successPptxCreated: "✓ PDF creato con successo!",
-            errorPptx: "Si è verificato un errore durante la conversione del PPTX: "
-        },
-        pl: {
-            convertingPptx: "Trwa konwersja prezentacji do PDF...",
-            successPptxCreated: "✓ PDF został pomyślnie utworzony!",
-            errorPptx: "Wystąpił błąd podczas konwersji pliku PPTX: "
-        },
-        es: {
-            convertingPptx: "Convirtiendo PowerPoint a PDF...",
-            successPptxCreated: "✓ PDF creado correctamente",
-            errorPptx: "Error al convertir el PPTX: "
-        }
-
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
-    return message;
-}
