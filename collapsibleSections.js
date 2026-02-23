@@ -82,7 +82,73 @@ window.addEventListener("DOMContentLoaded", () => {
             if (section.hasAttribute("open")) {
                 collapse();
             } else {
+                // Close all other open sections
+                sections.forEach((otherSection) => {
+                    if (otherSection !== section && otherSection.hasAttribute("open")) {
+                        const otherContent = otherSection.querySelector(":scope > .collapsibleContent");
+                        if (otherContent) {
+                            otherContent.style.height = `${otherContent.scrollHeight}px`;
+                            otherContent.style.opacity = "1";
+
+                            requestAnimationFrame(() => {
+                                otherContent.style.height = "0px";
+                                otherContent.style.opacity = "0";
+                            });
+
+                            const onTransitionEnd = (event) => {
+                                if (event.propertyName !== "height") {
+                                    return;
+                                }
+                                otherContent.removeEventListener("transitionend", onTransitionEnd);
+                                otherSection.removeAttribute("open");
+                            };
+
+                            otherContent.addEventListener("transitionend", onTransitionEnd);
+                        }
+                    }
+                });
+
                 expand();
+            }
+        });
+    });
+
+    // Handle category tile clicks
+    const categoryTiles = document.querySelectorAll(".categoryTile");
+
+    categoryTiles.forEach((tile) => {
+        tile.addEventListener("click", () => {
+            const sectionName = tile.getAttribute("data-section");
+            const targetSection = document.getElementById(`${sectionName}Section`);
+
+            if (targetSection) {
+                const isCurrentlyOpen = targetSection.hasAttribute("open");
+
+                // Close all sections first
+                sections.forEach((section) => {
+                    if (section.hasAttribute("open") && section !== targetSection) {
+                        const summary = section.querySelector(":scope > summary");
+                        if (summary) {
+                            summary.click();
+                        }
+                    }
+                });
+
+                // If the target section was closed, open it
+                if (!isCurrentlyOpen) {
+                    const summary = targetSection.querySelector(":scope > summary");
+                    if (summary) {
+                        summary.click();
+                    }
+                }
+
+                // Scroll to section smoothly
+                setTimeout(() => {
+                    targetSection.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+                }, 100);
             }
         });
     });

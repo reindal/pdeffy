@@ -7,6 +7,8 @@ window.addEventListener('load', () => {
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
     const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
     const settingsStatus = document.getElementById('settingsStatus');
+    const firstLaunchIntro = document.getElementById('firstLaunchIntro');
+    let firstLaunchIntroVisible = false;
 
     const metaAuthor = document.getElementById('metaAuthor');
     const metaTitle = document.getElementById('metaTitle');
@@ -29,11 +31,23 @@ window.addEventListener('load', () => {
     // Open settings modal
     settingsIcon.addEventListener('click', async () => {
         await loadSettings();
+        if (!firstLaunchIntroVisible) {
+            firstLaunchIntro.style.display = 'none';
+        }
         settingsModal.classList.add('active');
     });
 
+    function dismissFirstLaunchIntro() {
+        if (!firstLaunchIntroVisible) {
+            return;
+        }
+        firstLaunchIntroVisible = false;
+        firstLaunchIntro.style.display = 'none';
+    }
+
     // Close settings modal
     cancelSettingsBtn.addEventListener('click', () => {
+        dismissFirstLaunchIntro();
         settingsModal.classList.remove('active');
         settingsStatus.style.display = 'none';
     });
@@ -41,6 +55,7 @@ window.addEventListener('load', () => {
     // Close modal when clicking outside
     settingsModal.addEventListener('click', (e) => {
         if (e.target === settingsModal) {
+            dismissFirstLaunchIntro();
             settingsModal.classList.remove('active');
             settingsStatus.style.display = 'none';
         }
@@ -71,6 +86,7 @@ window.addEventListener('load', () => {
             settingsStatus.style.display = 'block';
 
             setTimeout(() => {
+                dismissFirstLaunchIntro();
                 settingsModal.classList.remove('active');
                 settingsStatus.style.display = 'none';
             }, 2000);
@@ -81,6 +97,26 @@ window.addEventListener('load', () => {
 
     // Load settings when page loads
     loadSettings();
+    showFirstLaunchExperience();
+
+    async function showFirstLaunchExperience() {
+        try {
+            const isFirstLaunch = await ipcRenderer.invoke('check-first-launch');
+            if (!isFirstLaunch) {
+                firstLaunchIntro.style.display = 'none';
+                return;
+            }
+
+            firstLaunchIntroVisible = true;
+            firstLaunchIntro.style.display = 'block';
+
+            // Open settings directly on first launch with intro message.
+            await loadSettings();
+            settingsModal.classList.add('active');
+        } catch (error) {
+            console.error('Error handling first-launch experience:', error);
+        }
+    }
 
     function injectSettingsUI() {
         // Avoid duplicates of HTML.
@@ -96,6 +132,10 @@ window.addEventListener('load', () => {
                     <!-- Settings Modal -->
                     <div class="settingsModal" id="settingsModal">
                         <div class="settingsContent">
+                            <div class="settingsIntro" id="firstLaunchIntro" style="display:none;">
+                                <h3 id="firstLaunchIntroTitle" class="langText">Welcome to PDF Converter</h3>
+                                <p id="firstLaunchIntroText" class="langText">Quick setup: choose your language and default PDF metadata.</p>
+                            </div>
                             <h2 id="settingsTitle" class="langText">Settings</h2>
                             <h3 id="changeLanguageTitle" class="langText">Change Language</h3>
                             <select id="languageSelector">
@@ -127,7 +167,4 @@ window.addEventListener('load', () => {
                 `);
         }
         window.dispatchEvent(new Event('settingsUIReady'));
-    }
-});
-
-
+}});

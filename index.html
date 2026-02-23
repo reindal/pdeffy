@@ -13,10 +13,29 @@
         <h1 id="welcomeText" class="langText">Welcome to the PDF Converter</h1>
     </header>
 </div>
+
+<div class="categoryTilesContainer">
+    <div class="categoryTile" data-section="organize">
+        <div class="categoryIcon">📁</div>
+        <h3 id="organizePdfTile" class="langText">Organize PDF</h3>
+        <p id="organizePdfTileDesc" class="langText">Merge, split and organize</p>
+    </div>
+    <div class="categoryTile" data-section="convert">
+        <div class="categoryIcon">🔄</div>
+        <h3 id="convertPdfTile" class="langText">Convert PDF</h3>
+        <p id="convertPdfTileDesc" class="langText">Convert to and from PDF</p>
+    </div>
+    <div class="categoryTile" data-section="edit">
+        <div class="categoryIcon">✏️</div>
+        <h3 id="editPdfTile" class="langText">Edit PDF</h3>
+        <p id="editPdfTileDesc" class="langText">Watermark, delete pages</p>
+    </div>
+</div>
+
 <main>
     <div class="homeLayout">
-        <details class="toolSection collapsibleSection" open>
-            <summary class="sectionTitle">Organize PDF</summary>
+        <details class="toolSection collapsibleSection" id="organizeSection">
+            <summary class="sectionTitle langText" id="organizePdfSection">Organize PDF</summary>
             <div class="collapsibleContent">
                 <div class="cardsGrid">
                     <a href="./functionalities/merge/merge.html" class="optionCard" id="mergePDF">
@@ -29,17 +48,12 @@
                         <h2 id="splitPdfText" class="langText">Split PDF</h2>
                         <p id="splitPdfDesc" class="langText">Split your PDF document into multiple files.</p>
                     </a>
-                    <a href="./functionalities/deletePages/deletepages.html" class="optionCard" id="deletePages">
-                        <img src="./assets/deletePages.png" alt="Delete Pages Icon" class="optionIcon">
-                        <h2 id="deletePagesText" class="langText">Delete Pages</h2>
-                        <p id="deletePagesDesc" class="langText">Delete Pages from PDF</p>
-                    </a>
                 </div>
             </div>
         </details>
 
-        <details class="toolSection collapsibleSection" open>
-            <summary class="sectionTitle">Convert PDF</summary>
+        <details class="toolSection collapsibleSection" id="convertSection">
+            <summary class="sectionTitle langText" id="convertPdfSection">Convert PDF</summary>
             <div class="collapsibleContent">
                 <div class="cardsGrid">
                     <a href="./functionalities/docxToPdf/docxToPdf.html" class="optionCard" id="docxToPDF">
@@ -57,17 +71,27 @@
                         <h2 id="imageToPdfText" class="langText">Image to PDF</h2>
                         <p id="imageToPdfDesc" class="langText">Convert one or more images into a PDF document.</p>
                     </a>
-                    <a href="./functionalities/pdfToImage/pdfToImage.html" class="optionCard" id="pdfToImage">
+                    <a href="./functionalities/pdfToImage" class="optionCard" id="pdfToImage">
                         <img src="./assets/new2_PdfToPic.png" alt="PDF to Image Icon" class="optionIcon">
                         <h2 id="pdfToImageText" class="langText">PDF to Image</h2>
-                        <p id="pdfToImageDesc" class="langText">Convert PDF pages into image files.</p>
+                        <p id="pdfToImageDesc" class="langText">Convert one or more images into a PDF document.</p>
+                    </a>
+                    <a href="./functionalities/powerPointToPdf/powerPointToPdf.html" class="optionCard" id="pptxToPDF">
+                        <img src="./assets/pptxToPdf.png" alt="PowerPoint to PDF Icon" class="optionIcon">
+                        <h2 id="pptxToPdfText" class="langText">PowerPoint to PDF</h2>
+                        <p id="pptxToPdfDesc" class="langText">Convert one PowerPoint file into a PDF document.</p>
+                    </a>
+                    <a href="./functionalities/pdfToPptx" class="optionCard" id="pdfToPptx">
+                        <img src="./assets/pdfToPptx.png" alt="PDF to PowerPoint icon" class="optionIcon">
+                        <h2 id="pdfToPptxText" class="langText">PDF to PowerPoint</h2>
+                        <p id="pdfToPptxDesc" class="langText">Convert PDF document into PowerPoint file</p>
                     </a>
                 </div>
             </div>
         </details>
 
-        <details class="toolSection collapsibleSection" open>
-            <summary class="sectionTitle">Edit PDF</summary>
+        <details class="toolSection collapsibleSection" id="editSection">
+            <summary class="sectionTitle langText" id="editPdfSection">Edit PDF</summary>
             <div class="collapsibleContent">
                 <div class="cardsGrid">
                     <a href="./functionalities/watermark/watermark.html" class="optionCard" id="addWatermark">
@@ -75,9 +99,21 @@
                         <h2 id="watermarkText" class="langText">Add Watermark</h2>
                         <p id="watermarkDesc" class="langText">Add a watermark to your PDF document.</p>
                     </a>
+                    <a href="./functionalities/deletePages/deletepages.html" class="optionCard" id="deletePages">
+                        <img src="./assets/deletePages.png" alt="Delete Pages Icon" class="optionIcon">
+                        <h2 id="deletePagesText" class="langText">Delete Pages</h2>
+                        <p id="deletePagesDesc" class="langText">Delete Pages from PDF</p>
+                    </a>
                 </div>
             </div>
         </details>
+    </div>
+    <div class="optionContainer">
+        <a href="./functionalities/deletePages/deletepages.html" class="optionCard" id="deletePages">
+            <img src="./assets/deletePages.png" alt="Delete pages icon" class="optionIcon">
+            <h2 id="deletePagesText" class="langText">Delete pages</h2>
+            <p id="deletePagesDesc" class="langText">Delete pages from pdf document</p>
+        </a>
     </div>
 </main>
     <script src="./collapsibleSections.js"></script>

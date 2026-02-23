@@ -1,6 +1,7 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 const path = require('path');
+//const packageJson = require('./package.json');
 
 module.exports = {
   packagerConfig: {
@@ -16,8 +17,9 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        certificateFile: './electronDemoPdf.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD,
+        //certificateFile: './electronDemoPdf.pfx',
+        //certificatePassword: process.env.CERTIFICATE_PASSWORD,
+        //remoteReleases:
       },
       config: (arch) => ({
         // Note that we must provide this S3 URL here
@@ -41,9 +43,13 @@ module.exports = {
     {
       name: '@electron-forge/maker-wix',
       config: {
-        /*certificateFile: './electronDemoPdft.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD,*/
+        name: `ElectronAppDemoV`,
+        exe: `pdfapp.exe`,
         icon: "assets/icon.ico",
+        features: {
+            autoUpdate: true,
+            autoLaunch: true,
+          },
         ui: {
           chooseDirectory: true,
           images: {
@@ -52,7 +58,7 @@ module.exports = {
           },
       },
       },
-    }
+    },
   ],
   plugins: [
     {

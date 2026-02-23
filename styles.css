@@ -13,14 +13,15 @@ body{
 }
 
 header {
-    background-color: var(--reindalDark);
-    color: var(--reindalYellow);
+    background: color-mix(in srgb, var(--reindalTab) 40%, transparent);
+    color: var(--reindalLight);
     padding: 10px;
     text-align: center;
     margin: 0;
     border-radius: 20px;
-    width: min(900px, calc(100% - 40px));
+    width: min(700px, calc(100% - 60px));
     align-items: center;
+    justify-content: center;
     display: flex;
     font-family: var(--font-primary), serif;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
@@ -33,10 +34,63 @@ header {
     padding: 20px 0;
 }
 
+.categoryTilesContainer {
+    width: min(1200px, calc(100% - 40px));
+    margin: 20px auto 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.categoryTile {
+    background: color-mix(in srgb, var(--reindalTab) 40%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: rgba(0, 0, 0, 0.15) 0 4px 12px;
+    border: 2px solid color-mix(in srgb, var(--reindalTab) 18%, transparent);
+}
+
+.categoryTile:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
+    border-color: var(--reindalDark);
+}
+
+.categoryTile.active {
+    border-color: var(--reindalDark);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
+}
+
+.categoryIcon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.categoryTile h3 {
+    margin: 8px 0;
+    color: var(--reindalLight);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.categoryTile p {
+    margin: 0;
+    color: var(--reindalLight);
+    font-size: 14px;
+    font-weight: 500;
+}
+
 .headerIcon{
     width: 150px;
-    margin-right: 10px;
     float: left;
+    justify-content: left;
+    margin-right: 10px;
+    margin-left: 10px;
 }
 
 .homeLayout {
@@ -48,15 +102,14 @@ header {
 }
 
 .toolSection {
-    background-color: var(--reindalExtraLight);
-    border: 2px solid var(--reindalGrayLight);
+    background: color-mix(in srgb, var(--reindalTab) 40%, transparent);
     border-radius: 16px;
     padding: 16px;
 }
 
 .sectionTitle {
     margin: 0 0 14px;
-    color: var(--reindalDark);
+    color: var(--reindalLight);
     font-size: 22px;
     font-weight: 700;
 }
@@ -77,12 +130,26 @@ header {
     transition: transform 0.2s ease;
 }
 
+.collapsibleSection[open] summary::after {
+    display: block;
+}
+
+.toolSection[open]{
+    display: block;
+}
+
+.toolSection:not([open]) {
+    display: none;
+}
+
 .collapsibleSection:not([open]) summary {
     margin-bottom: 0;
+    display: none;
 }
 
 .collapsibleSection:not([open]) summary::after {
     transform: rotate(-90deg);
+    display: none;
 }
 
 .cardsGrid {
@@ -94,9 +161,9 @@ header {
 .collapsibleContent {
     height: 0;
     opacity: 0;
-    overflow: hidden;
+    overflow: visible;
     margin-top: 0;
-    transition: height 0.45s ease, opacity 0.3s ease, margin-top 0.45s ease;
+    transition: height 0.25s ease, opacity 0.25s ease, margin-top 0.25s ease;
 }
 
 .collapsibleContent > .cardsGrid {
@@ -108,7 +175,7 @@ header {
 }
 
 .optionCard{
-    background-color: var(--reindalYellow);
+    background-color: rgba(255, 253, 245, 0.27);
     border-radius: 15px;
     padding: 15px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
@@ -119,7 +186,7 @@ header {
     width: auto;
     min-height: 220px;
     text-decoration: none;
-    color: var(--reindalGray);
+    color: var(--reindalLight);
     border: none;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -128,7 +195,8 @@ header {
 .optionCard:hover{
     transform: translateY(-3px);
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
-    background-color: var(--reindalYellowHover);
+    background-color: var(--reindalExtraLight);
+    color: var(--reindalDark)
 }
 
 .optionIcon{
@@ -138,12 +206,10 @@ header {
 
 .optionCard h2{
     margin: 10px 0;
-    color: #4a4a4a;
 }
 
 .optionCard p{
     margin: 0;
-    color: #4a4a4a;
     text-align: center;
     font-size: 14px;
 }
@@ -162,6 +228,23 @@ header {
     .headerIcon {
         width: 110px;
     }
+
+    .categoryTilesContainer {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .categoryTile {
+        padding: 25px 15px;
+    }
+
+    .categoryIcon {
+        font-size: 40px;
+    }
+
+    .categoryTile h3 {
+        font-size: 20px;
+    }
 }
 
 @media (max-width: 560px) {
@@ -171,6 +254,14 @@ header {
 
     header {
         font-size: 80%;
+    }
+
+    .categoryIcon {
+        font-size: 36px;
+    }
+
+    .categoryTile h3 {
+        font-size: 18px;
     }
 }
 
@@ -336,4 +427,24 @@ header {
     color: var(--reindalDarkGreen);
 }
 
+/* First-launch intro inside settings modal */
+.settingsIntro {
+    background: linear-gradient(145deg, #fffce8 0%, #fff7b8 100%);
+    border: 1px solid rgba(60, 60, 60, 0.14);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
 
+.settingsIntro h3 {
+    margin: 0 0 6px;
+    color: var(--reindalDark);
+    font-size: 16px;
+}
+
+.settingsIntro p {
+    margin: 0;
+    color: #3b3b3b;
+    font-size: 13px;
+    line-height: 1.4;
+}
