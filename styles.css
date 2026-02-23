@@ -161,7 +161,7 @@ header {
 .collapsibleContent {
     height: 0;
     opacity: 0;
-    overflow: hidden;
+    overflow: visible;
     margin-top: 0;
     transition: height 0.25s ease, opacity 0.25s ease, margin-top 0.25s ease;
 }
@@ -175,7 +175,7 @@ header {
 }
 
 .optionCard{
-    background-color: var(--reindalYellow);
+    background-color: rgba(255, 253, 245, 0.27);
     border-radius: 15px;
     padding: 15px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
@@ -186,16 +186,18 @@ header {
     width: auto;
     min-height: 220px;
     text-decoration: none;
-    color: var(--reindalGray);
+    color: var(--reindalLight);
     border: none;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: var(--reindalLight);
 }
 
 .optionCard:hover{
     transform: translateY(-3px);
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
-    background-color: var(--reindalYellowHover);
+    background-color: var(--reindalExtraLight);
+    color: var(--reindalDark)
 }
 
 .optionIcon{
@@ -205,12 +207,10 @@ header {
 
 .optionCard h2{
     margin: 10px 0;
-    color: #4a4a4a;
 }
 
 .optionCard p{
     margin: 0;
-    color: #4a4a4a;
     text-align: center;
     font-size: 14px;
 }
