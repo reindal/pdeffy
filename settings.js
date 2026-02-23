@@ -7,6 +7,7 @@ window.addEventListener('load', () => {
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
     const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
     const settingsStatus = document.getElementById('settingsStatus');
+    const firstLaunchIntro = document.getElementById('firstLaunchIntro');
 
     const metaAuthor = document.getElementById('metaAuthor');
     const metaTitle = document.getElementById('metaTitle');
@@ -81,6 +82,25 @@ window.addEventListener('load', () => {
 
     // Load settings when page loads
     loadSettings();
+    showFirstLaunchExperience();
+
+    async function showFirstLaunchExperience() {
+        try {
+            const isFirstLaunch = await ipcRenderer.invoke('check-first-launch');
+            if (!isFirstLaunch) {
+                firstLaunchIntro.style.display = 'none';
+                return;
+            }
+
+            firstLaunchIntro.style.display = 'block';
+
+            // Open settings directly on first launch with intro message.
+            await loadSettings();
+            settingsModal.classList.add('active');
+        } catch (error) {
+            console.error('Error handling first-launch experience:', error);
+        }
+    }
 
     function injectSettingsUI() {
         // Avoid duplicates of HTML.
@@ -96,6 +116,10 @@ window.addEventListener('load', () => {
                     <!-- Settings Modal -->
                     <div class="settingsModal" id="settingsModal">
                         <div class="settingsContent">
+                            <div class="settingsIntro" id="firstLaunchIntro" style="display:none;">
+                                <h3 id="firstLaunchIntroTitle" class="langText">Welcome to PDF Converter</h3>
+                                <p id="firstLaunchIntroText" class="langText">Quick setup: choose your language and default PDF metadata.</p>
+                            </div>
                             <h2 id="settingsTitle" class="langText">Settings</h2>
                             <h3 id="changeLanguageTitle" class="langText">Change Language</h3>
                             <select id="languageSelector">

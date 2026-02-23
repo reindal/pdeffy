@@ -250,3 +250,25 @@ header {
     background-color: var(--reindalMint);
     color: var(--reindalDarkGreen);
 }
+
+/* First-launch intro inside settings modal */
+.settingsIntro {
+    background: linear-gradient(145deg, #fffce8 0%, #fff7b8 100%);
+    border: 1px solid rgba(60, 60, 60, 0.14);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+
+.settingsIntro h3 {
+    margin: 0 0 6px;
+    color: var(--reindalDark);
+    font-size: 16px;
+}
+
+.settingsIntro p {
+    margin: 0;
+    color: #3b3b3b;
+    font-size: 13px;
+    line-height: 1.4;
+}
