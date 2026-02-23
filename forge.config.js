@@ -1,6 +1,7 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 const path = require('path');
+//const packageJson = require('./package.json');
 
 module.exports = {
   packagerConfig: {
@@ -35,9 +36,13 @@ module.exports = {
     {
       name: '@electron-forge/maker-wix',
       config: {
-        /*certificateFile: './electronDemoPdft.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD,*/
+        name: `ElectronAppDemo`,
+        exe: `ElectronPdfDemoV.exe`,
         icon: "assets/icon.ico",
+        features: {
+            autoUpdate: true,
+            autoLaunch: true,
+          },
         ui: {
           chooseDirectory: true,
           images: {
@@ -46,7 +51,7 @@ module.exports = {
           },
       },
       },
-    }
+    },
   ],
   plugins: [
     {
