@@ -134,6 +134,14 @@ form.addEventListener('submit', async function (e) {
 
         await fs.writeFile(savePath, pdfBytes);
         showStatus(getMessage('successDeleted', { filename: path.basename(savePath) }), 'success');
+
+        // Clear custom metadata fields
+        setTimeout(() => {
+            metadataTitleInput.value = '';
+            metadataDescriptionInput.value = '';
+            addMetadataCheckbox.checked = false;
+            metadataFieldsDiv.classList.remove('visible');
+        }, 2000);
     } catch (error) {
         console.error(error);
         showStatus(getMessage('errorPrefix') + error.message, 'error');

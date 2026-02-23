@@ -153,11 +153,7 @@ form.addEventListener('submit', async function(e) {
 
             while (currentPage < totalPages) {
                 const newPdf = await PDFDocument.create();
-
-                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-                if (metadata.author) newPdf.setAuthor(metadata.author);
-                if (metadata.title) newPdf.setTitle(metadata.title);
-                if (metadata.subject) newPdf.setSubject(metadata.subject);
+                await setMetadata(newPdf);
 
                 const endPage = Math.min(currentPage + interval, totalPages);
 
@@ -181,6 +177,7 @@ form.addEventListener('submit', async function(e) {
             for (let fileItem of customFileItems) {
                 const rangeItems = fileItem.querySelectorAll('.customRangeItem');
                 const newPdf = await PDFDocument.create();
+                await setMetadata(newPdf);
 
                 for (let rangeItem of rangeItems) {
                     const startPage = parseInt(rangeItem.querySelector('.customStartPage').value);
@@ -248,11 +245,7 @@ form.addEventListener('submit', async function(e) {
 
             while (currentPage < totalPages) {
                 let newPdf = await PDFDocument.create();
-
-                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-                if (metadata.author) newPdf.setAuthor(metadata.author);
-                if (metadata.title) newPdf.setTitle(metadata.title);
-                if (metadata.subject) newPdf.setSubject(metadata.subject);
+                await setMetadata(newPdf);
 
                 let pagesInCurrentFile = 0;
 
@@ -340,6 +333,11 @@ form.addEventListener('submit', async function(e) {
         rangesContainer.innerHTML = ''; rangeCount = 1; addRange();
         customFilesContainer.innerHTML = ''; customFileCount = 1; addCustomFile();
         if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
+        // Clear custom metadata fields
+        metadataTitleInput.value = '';
+        metadataDescriptionInput.value = '';
+        addMetadataCheckbox.checked = false;
+        metadataFieldsDiv.classList.remove('visible');
 
     } catch (error) {
         showStatus(getMessage('errorPrefix') + error.message, 'error');

@@ -32,6 +32,20 @@ let editingLayerIndex = null;
 const previewCtx = previewCanvas.getContext('2d');
 let pdfPageDimensions = { width: 595, height: 842 }; // Default A4 size in points
 
+// Custom metadata toggle
+const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
+const metadataFieldsDiv = document.getElementById('metadataFields');
+const metadataTitleInput = document.getElementById('metadataTitleInput');
+const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
+
+addMetadataCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        metadataFieldsDiv.classList.add('visible');
+    } else {
+        metadataFieldsDiv.classList.remove('visible');
+    }
+});
+
 // Initialize default color value
 customColorHex.value = '#000000';
 colorPicker.value = '#000000';
@@ -445,11 +459,23 @@ form.addEventListener('submit', async function(e) {
         const fileBuffer = await selectedFile.arrayBuffer();
         const pdfDoc = await PDFDocument.load(fileBuffer);
 
-        // Get metadata from environment variables
+        // Always get author from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
         if (metadata.author) pdfDoc.setAuthor(metadata.author);
-        if (metadata.title) pdfDoc.setTitle(metadata.title);
-        if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject
+            const customTitle = metadataTitleInput.value.trim();
+            const customDescription = metadataDescriptionInput.value.trim();
+
+            if (customTitle) pdfDoc.setTitle(customTitle);
+            if (customDescription) pdfDoc.setSubject(customDescription);
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) pdfDoc.setTitle(metadata.title);
+            if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+        }
 
         // Embed font
         const helveticaFont = await pdfDoc.embedFont('Helvetica-Bold');
@@ -606,6 +632,11 @@ form.addEventListener('submit', async function(e) {
         previewSection.style.display = 'none';
         layersContainer.style.display = 'none';
         updateLayersList();
+        // Clear custom metadata fields
+        metadataTitleInput.value = '';
+        metadataDescriptionInput.value = '';
+        addMetadataCheckbox.checked = false;
+        metadataFieldsDiv.classList.remove('visible');
 
     } catch (error) {
         console.error('Error adding watermark:', error);
