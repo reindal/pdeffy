@@ -2,6 +2,7 @@ const { PDFDocument, StandardFonts, rgb } = require('pdf-lib');
 const JSZip = require('jszip');
 const fs = require('fs').promises;
 const path = require('path');
+const xml2js = require('xml2js');
 var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('pptxToPdfForm');
@@ -46,6 +47,11 @@ form.addEventListener('submit', async function (e) {
         const zip = await JSZip.loadAsync(arrayBuffer);
         const pdfDoc = await PDFDocument.create();
 
+        // Embed multiple fonts for better formatting
+        const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+        const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman);
         // Always get author from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
         if (metadata.author) pdfDoc.setAuthor(metadata.author);
@@ -78,38 +84,138 @@ form.addEventListener('submit', async function (e) {
 
         if (slideFiles.length === 0) throw new Error("No slides found");
 
+        const parser = new xml2js.Parser();
+
         for (const slidePath of slideFiles) {
             const slideXml = await zip.file(slidePath).async("string");
 
-            // Extract text from <a:t> nodes (text tag in Office XML)
-            const textMatches = slideXml.match(/<a:t>([^<]+)<\/a:t>/g) || [];
-            const slideText = textMatches.map(m => m.replace(/<\/?a:t>/g, ''));
+            // Parse XML to extract text with more detail
+            let parsedXml;
+            try {
+                parsedXml = await parser.parseStringPromise(slideXml);
+            } catch (e) {
+                console.warn('XML parse error:', e);
+                parsedXml = null;
+            }
 
-            // Create one page per slide (typical PPT landscape format)
+            // Create one page per slide (landscape format)
             const page = pdfDoc.addPage([842, 595]); // A4 Landscape
             const { width, height } = page.getSize();
 
+            // Add slide number
             page.drawText(`Slide ${slideFiles.indexOf(slidePath) + 1}`, {
                 x: 50,
                 y: height - 40,
                 size: 10,
-                font: font,
+                font: helvetica,
                 color: rgb(0.5, 0.5, 0.5)
             });
 
             let cursorY = height - 80;
+            const margin = 70;
+            const maxWidth = width - (margin * 2);
 
-            for (const text of slideText) {
-                if (cursorY < 50) break; // Simple overflow prevention
+            // Extract text from parsed XML with better structure
+            const extractTextFromXml = (obj, texts = []) => {
+                if (!obj) return texts;
 
-                page.drawText(text, {
-                    x: 70,
-                    y: cursorY,
-                    size: 14,
-                    font: font,
-                    color: rgb(0, 0, 0)
+                if (typeof obj === 'string') {
+                    texts.push({ text: obj, fontSize: 14, bold: false, italic: false });
+                } else if (Array.isArray(obj)) {
+                    obj.forEach(item => extractTextFromXml(item, texts));
+                } else if (typeof obj === 'object') {
+                    // Look for text nodes
+                    if (obj['a:t']) {
+                        const textContent = Array.isArray(obj['a:t']) ? obj['a:t'].join(' ') : obj['a:t'];
+
+                        // Check for formatting
+                        let fontSize = 14;
+                        let bold = false;
+                        let italic = false;
+
+                        if (obj['a:rPr'] && obj['a:rPr'][0]) {
+                            const props = obj['a:rPr'][0];
+                            if (props['$'] && props['$']['sz']) {
+                                fontSize = Math.max(8, Math.min(24, parseInt(props['$']['sz']) / 100));
+                            }
+                            if (props['$'] && props['$']['b'] === '1') bold = true;
+                            if (props['$'] && props['$']['i'] === '1') italic = true;
+                        }
+
+                        texts.push({ text: textContent, fontSize, bold, italic });
+                    }
+
+                    // Recursively search all properties
+                    Object.keys(obj).forEach(key => {
+                        if (key !== '$' && key !== 'a:t') {
+                            extractTextFromXml(obj[key], texts);
+                        }
+                    });
+                }
+
+                return texts;
+            };
+
+            let textElements = [];
+            if (parsedXml) {
+                textElements = extractTextFromXml(parsedXml);
+            }
+
+            // Fallback: simple regex extraction if XML parsing fails
+            if (textElements.length === 0) {
+                const textMatches = slideXml.match(/<a:t>([^<]+)<\/a:t>/g) || [];
+                textElements = textMatches.map(m => ({
+                    text: m.replace(/<\/?a:t>/g, ''),
+                    fontSize: 14,
+                    bold: false,
+                    italic: false
+                }));
+            }
+
+            // Helper to wrap text
+            const wrapText = (text, maxWidth, font, fontSize) => {
+                const words = text.split(' ');
+                const lines = [];
+                let currentLine = '';
+
+                words.forEach(word => {
+                    const testLine = currentLine ? currentLine + ' ' + word : word;
+                    const testWidth = font.widthOfTextAtSize(testLine, fontSize);
+                    if (testWidth > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
                 });
-                cursorY -= 25;
+                if (currentLine) lines.push(currentLine);
+                return lines;
+            };
+
+            // Draw text with formatting
+            for (const element of textElements) {
+                if (cursorY < 50) break; // Prevent overflow
+
+                const font = element.bold ? helveticaBold :
+                           element.italic ? helveticaOblique :
+                           helvetica;
+
+                const wrappedLines = wrapText(element.text, maxWidth, font, element.fontSize);
+
+                for (const line of wrappedLines) {
+                    if (cursorY < 50) break;
+
+                    page.drawText(line, {
+                        x: margin,
+                        y: cursorY,
+                        size: element.fontSize,
+                        font: font,
+                        color: rgb(0, 0, 0)
+                    });
+                    cursorY -= element.fontSize + 8;
+                }
+
+                cursorY -= 5; // Extra space between text elements
             }
         }
 
@@ -148,3 +254,38 @@ function showStatus(message, type) {
     statusDiv.style.display = 'block';
 }
 
+async function getMessage(key) {
+    let lang;
+
+    try {
+        lang = await ipcRenderer.invoke('get-language');
+    } catch (err) {
+        lang = 'en';
+    }
+
+    const messages = {
+        en: {
+            convertingPptx: "Converting PowerPoint to PDF...",
+            successPptxCreated: "✓ PDF created successfully",
+            errorPptx: "Error converting PPTX: "
+        },
+        it: {
+            convertingPptx: "Sto convertendo la presentazione in PDF...",
+            successPptxCreated: "✓ PDF creato con successo!",
+            errorPptx: "Si è verificato un errore durante la conversione del PPTX: "
+        },
+        pl: {
+            convertingPptx: "Trwa konwersja prezentacji do PDF...",
+            successPptxCreated: "✓ PDF został pomyślnie utworzony!",
+            errorPptx: "Wystąpił błąd podczas konwersji pliku PPTX: "
+        },
+        es: {
+            convertingPptx: "Convirtiendo PowerPoint a PDF...",
+            successPptxCreated: "✓ PDF creado correctamente",
+            errorPptx: "Error al convertir el PPTX: "
+        }
+
+    };
+
+    return (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
+}

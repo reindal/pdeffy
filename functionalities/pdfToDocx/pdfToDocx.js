@@ -1,4 +1,4 @@
-const { Document, Packer, Paragraph } = require('docx');
+const { Document, Packer, Paragraph, TextRun, ImageRun } = require('docx');
 const fs = require('fs').promises;
 const path = require('path');
 const pdfjsLib = require('pdfjs-dist');
@@ -49,27 +49,136 @@ form.addEventListener('submit', async function(e) {
         });
         const pdf = await loadingTask.promise;
 
-        let pdfText = '';
+        const allParagraphs = [];
 
-        // Extract text from all pages
+        // Extract text from all pages with formatting
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(' ');
-            pdfText += pageText + '\n\n';
+            const viewport = page.getViewport({ scale: 1.5 });
+
+            // Group text items by vertical position (y coordinate)
+            const lineGroups = {};
+
+            textContent.items.forEach(item => {
+                const y = Math.round(item.transform[5]); // Y position
+                if (!lineGroups[y]) {
+                    lineGroups[y] = [];
+                }
+                lineGroups[y].push(item);
+            });
+
+            // Sort lines by Y position (top to bottom)
+            const sortedYs = Object.keys(lineGroups).sort((a, b) => b - a);
+
+            // Process each line
+            sortedYs.forEach(y => {
+                const lineItems = lineGroups[y].sort((a, b) => a.transform[4] - b.transform[4]); // Sort by X position
+
+                const textRuns = lineItems.map(item => {
+                    // Extract font properties
+                    const fontName = item.fontName || 'Helvetica';
+                    const fontSize = Math.round(item.height * 1.33); // Convert to points
+                    const isBold = fontName.toLowerCase().includes('bold');
+                    const isItalic = fontName.toLowerCase().includes('italic') || fontName.toLowerCase().includes('oblique');
+
+                    return new TextRun({
+                        text: item.str,
+                        size: fontSize > 0 ? fontSize : 11,
+                        bold: isBold,
+                        italics: isItalic,
+                        font: fontName.includes('Times') ? 'Times New Roman' :
+                              fontName.includes('Courier') ? 'Courier New' :
+                              fontName.includes('Helvetica') || fontName.includes('Arial') ? 'Arial' :
+                              'Calibri'
+                    });
+                });
+
+                if (textRuns.length > 0) {
+                    allParagraphs.push(new Paragraph({
+                        children: textRuns,
+                        spacing: {
+                            after: 100,
+                        }
+                    }));
+                }
+            });
+
+            // Add page break except for the last page
+            if (i < pdf.numPages) {
+                allParagraphs.push(new Paragraph({
+                    text: '',
+                    pageBreakBefore: true
+                }));
+            }
+        }
+
+        // Extract images from PDF
+        try {
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const ops = await page.getOperatorList();
+
+                for (let j = 0; j < ops.fnArray.length; j++) {
+                    if (ops.fnArray[j] === pdfjsLib.OPS.paintImageXObject ||
+                        ops.fnArray[j] === pdfjsLib.OPS.paintJpegXObject) {
+                        try {
+                            const imageName = ops.argsArray[j][0];
+                            const image = await page.objs.get(imageName);
+
+                            if (image && image.data) {
+                                // Create canvas to convert image
+                                const canvas = document.createElement('canvas');
+                                canvas.width = image.width;
+                                canvas.height = image.height;
+                                const ctx = canvas.getContext('2d');
+
+                                const imageData = ctx.createImageData(image.width, image.height);
+                                imageData.data.set(image.data);
+                                ctx.putImageData(imageData, 0, 0);
+
+                                // Convert to base64
+                                const base64 = canvas.toDataURL('image/png').split(',')[1];
+                                const buffer = Buffer.from(base64, 'base64');
+
+                                // Add image to document
+                                allParagraphs.push(new Paragraph({
+                                    children: [
+                                        new ImageRun({
+                                            data: buffer,
+                                            transformation: {
+                                                width: Math.min(600, image.width),
+                                                height: Math.min(800, image.height * (600 / image.width))
+                                            }
+                                        })
+                                    ],
+                                    spacing: { before: 200, after: 200 }
+                                }));
+                            }
+                        } catch (imgErr) {
+                            console.warn('Could not extract image:', imgErr);
+                        }
+                    }
+                }
+            }
+        } catch (imgError) {
+            console.warn('Image extraction not fully supported:', imgError);
         }
 
         // Create DOCX document
-        const paragraphs = pdfText.split('\n').filter(line => line.trim()).map(line => {
-            return new Paragraph({
-                text: line.trim().substring(0, 32767), // Word has character limit per paragraph
-                style: "Normal"
-            });
-        });
-
         const doc = new Document({
             sections: [{
-                children: paragraphs.length > 0 ? paragraphs : [new Paragraph('Document is empty')]
+                properties: {
+                    page: {
+                        margin: {
+                            top: 720,
+                            right: 720,
+                            bottom: 720,
+                            left: 720
+                        }
+                    }
+                },
+                children: allParagraphs.length > 0 ? allParagraphs : [new Paragraph('Document is empty')]
             }]
         });
 

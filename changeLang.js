@@ -276,7 +276,9 @@ const languages = {
         settingsSaved: "Settings saved!",
         metaAuthor: "Enter author name",
         metaTitle: "Enter document title",
-        metaSubject: "Enter document subject"
+        metaSubject: "Enter document subject",
+        firstLaunchIntroTitle: "Welcome to PDF Converter",
+        firstLaunchIntroText: "Quick setup: choose your language and default PDF metadata. These settings are reused when creating files."
     },
     it: {
         languageText: "Lingua",
@@ -553,7 +555,9 @@ const languages = {
         settingsSaved: "Impostazioni salvate!",
         metaAuthor: "Inserisci il nome dell'autore",
         metaTitle: "Inserisci il titolo del documento",
-        metaSubject: "Inserisci l'oggetto del documento"
+        metaSubject: "Inserisci l'oggetto del documento",
+        firstLaunchIntroTitle: "Benvenuto in PDF Converter",
+        firstLaunchIntroText: "Configurazione rapida: scegli lingua e metadati PDF predefiniti. Queste impostazioni verranno riutilizzate alla creazione dei file."
     },
     pl: {
         languageText: "Język",
@@ -826,7 +830,9 @@ const languages = {
         subjectLabel: "Temat:",
         saveSettings: "Zapisz ustawienia",
         cancelSettings: "Anuluj",
-        settingsSaved: "Ustawienia zapisane!"
+        settingsSaved: "Ustawienia zapisane!",
+        firstLaunchIntroTitle: "Witamy w PDF Converter",
+        firstLaunchIntroText: "Szybka konfiguracja: wybierz jezyk i domyslne metadane PDF. Te ustawienia beda ponownie uzywane przy tworzeniu plikow."
     },
     es: {
         languageText: "Idioma",
@@ -1093,8 +1099,12 @@ const languages = {
         settingsSaved: "¡Configuración guardada!",
         metaAuthor: "Introduzca el nombre del autor",
         metaTitle: "Introduzca el título del documento",
-        metaSubject: "Introduzca el asunto del documento"
-    }
+        metaSubject: "Introduzca el asunto del documento",
+        firstLaunchIntroTitle: "Bienvenido a PDF Converter",
+        firstLaunchIntroText: "Configuracion rapida: elige idioma y metadatos PDF por defecto. Estos ajustes se reutilizaran al crear archivos.",
+        // Save as ZIP checkbox
+        saveAsZipLabel: "Guardar como ZIP"
+    },
 };
 
 function changeLanguage(lang) {
