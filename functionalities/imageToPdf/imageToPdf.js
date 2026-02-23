@@ -122,11 +122,23 @@ form.addEventListener('submit', async function(e) {
     try {
         const pdfDoc = await PDFDocument.create();
 
-        // Get metadata from environment variables
+        // Always get author from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
         if (metadata.author) pdfDoc.setAuthor(metadata.author);
-        if (metadata.title) pdfDoc.setTitle(metadata.title);
-        if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject
+            const customTitle = metadataTitleInput.value.trim();
+            const customDescription = metadataDescriptionInput.value.trim();
+
+            if (customTitle) pdfDoc.setTitle(customTitle);
+            if (customDescription) pdfDoc.setSubject(customDescription);
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) pdfDoc.setTitle(metadata.title);
+            if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+        }
 
         for (const imageFile of selectedImages) {
             const imageBytes = await imageFile.arrayBuffer();

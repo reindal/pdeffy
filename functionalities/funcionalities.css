@@ -148,3 +148,82 @@
 .fileInputLabel:hover {
     background-color: var(--reindalYellowHover);
 }
+
+/* Custom Metadata Styles */
+.metadataCheckboxGroup {
+    margin-bottom: 20px;
+}
+
+.metadataCheckboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: var(--font-primary), serif;
+    color: var(--reindalDark);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.metadataCheckboxLabel input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--reindalYellow);
+    margin: 0;
+    padding: 0;
+}
+
+.metadataFields {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: var(--reindalExtraLight);
+    border: 2px solid var(--reindalLightYellow);
+    border-radius: 8px;
+    display: none;
+}
+
+.metadataFields.visible {
+    display: block;
+}
+
+.metadataFields .formGroup {
+    margin-bottom: 15px;
+}
+
+.metadataFields .formGroup:last-child {
+    margin-bottom: 0;
+}
+
+.metadataFields label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--reindalDark);
+    font-weight: 600;
+    font-family: var(--font-primary), serif;
+    font-size: 14px;
+}
+
+.metadataFields input,
+.metadataFields textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--reindalGrayLight);
+    border-radius: 6px;
+    font-family: var(--font-primary), serif;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.metadataFields input:focus,
+.metadataFields textarea:focus {
+    outline: none;
+    border-color: var(--reindalYellow);
+}
+
+.metadataFields textarea {
+    resize: vertical;
+    min-height: 80px;
+}

@@ -101,6 +101,13 @@ const languages = {
         successPdfCreated: "✓ PDF created successfully: {filename}",
         successPdfCreatedPath: "✓ Saved PDF: {filename}\nin: {path}",
 
+        // Custom Metadata
+        addCustomMetadata: "Add custom metadata properties",
+        metadataTitle: "Title:",
+        metadataDescription: "Description:",
+        metadataTitlePlaceholder: "Enter document title",
+        metadataDescriptionPlaceholder: "Enter document description",
+
         // PDF to Image
         pdfToImageHeader: "PDF to Image",
         pdfToImageHeader2: "Convert PDF to Images",
@@ -369,6 +376,13 @@ const languages = {
         creatingPdf: "Creazione PDF...",
         successPdfCreated: "✓ PDF creato con successo: {filename}",
         successPdfCreatedPath: "✓ PDF salvato: {filename}\nin: {path}",
+
+        // Custom Metadata
+        addCustomMetadata: "Aggiungi proprietà metadata personalizzate",
+        metadataTitle: "Titolo:",
+        metadataDescription: "Descrizione:",
+        metadataTitlePlaceholder: "Inserisci titolo documento",
+        metadataDescriptionPlaceholder: "Inserisci descrizione documento",
 
         // PDF to Image
         pdfToImageHeader: "PDF a Immagine",
@@ -639,6 +653,13 @@ const languages = {
         successPdfCreated: "✓ PDF utworzony pomyślnie: {filename}",
         successPdfCreatedPath: "✓ Zapisano PDF: {filename}\nw: {path}",
 
+        // Custom Metadata
+        addCustomMetadata: "Dodaj niestandardowe właściwości metadanych",
+        metadataTitle: "Tytuł:",
+        metadataDescription: "Opis:",
+        metadataTitlePlaceholder: "Wprowadź tytuł dokumentu",
+        metadataDescriptionPlaceholder: "Wprowadź opis dokumentu",
+
         // PDF to Image
         pdfToImageHeader: "PDF do Obrazów",
         pdfToImageHeader2: "Konwertuj PDF na Obrazy",
@@ -903,6 +924,13 @@ const languages = {
         creatingPdf: "Creando PDF...",
         successPdfCreated: "✓ PDF creado con éxito: {filename}",
         successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
+
+        // Custom Metadata
+        addCustomMetadata: "Agregar propiedades de metadatos personalizadas",
+        metadataTitle: "Título:",
+        metadataDescription: "Descripción:",
+        metadataTitlePlaceholder: "Ingrese el título del documento",
+        metadataDescriptionPlaceholder: "Ingrese la descripción del documento",
 
         // PDF to Image
         pdfToImageHeader: "PDF a imagen",

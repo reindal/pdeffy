@@ -117,11 +117,23 @@ form.addEventListener('submit', async function (e) {
     try {
         const mergedPdf = await PDFDocument.create();
 
-        // Get metadata from environment variables
+        // Always get author from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
         if (metadata.author) mergedPdf.setAuthor(metadata.author);
-        if (metadata.title) mergedPdf.setTitle(metadata.title);
-        if (metadata.subject) mergedPdf.setSubject(metadata.subject);
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject
+            const customTitle = metadataTitleInput.value.trim();
+            const customDescription = metadataDescriptionInput.value.trim();
+
+            if (customTitle) mergedPdf.setTitle(customTitle);
+            if (customDescription) mergedPdf.setSubject(customDescription);
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) mergedPdf.setTitle(metadata.title);
+            if (metadata.subject) mergedPdf.setSubject(metadata.subject);
+        }
 
         for (let file of selectedFiles) {
             const fileBuffer = await file.arrayBuffer();
