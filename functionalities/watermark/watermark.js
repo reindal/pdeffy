@@ -32,6 +32,20 @@ let editingLayerIndex = null;
 const previewCtx = previewCanvas.getContext('2d');
 let pdfPageDimensions = { width: 595, height: 842 }; // Default A4 size in points
 
+// Custom metadata toggle
+const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
+const metadataFieldsDiv = document.getElementById('metadataFields');
+const metadataTitleInput = document.getElementById('metadataTitleInput');
+const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
+
+addMetadataCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        metadataFieldsDiv.classList.add('visible');
+    } else {
+        metadataFieldsDiv.classList.remove('visible');
+    }
+});
+
 // Initialize default color value
 customColorHex.value = '#000000';
 colorPicker.value = '#000000';
@@ -445,11 +459,23 @@ form.addEventListener('submit', async function(e) {
         const fileBuffer = await selectedFile.arrayBuffer();
         const pdfDoc = await PDFDocument.load(fileBuffer);
 
-        // Get metadata from environment variables
+        // Always get author from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
         if (metadata.author) pdfDoc.setAuthor(metadata.author);
-        if (metadata.title) pdfDoc.setTitle(metadata.title);
-        if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject
+            const customTitle = metadataTitleInput.value.trim();
+            const customDescription = metadataDescriptionInput.value.trim();
+
+            if (customTitle) pdfDoc.setTitle(customTitle);
+            if (customDescription) pdfDoc.setSubject(customDescription);
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) pdfDoc.setTitle(metadata.title);
+            if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+        }
 
         // Embed font
         const helveticaFont = await pdfDoc.embedFont('Helvetica-Bold');
@@ -606,6 +632,11 @@ form.addEventListener('submit', async function(e) {
         previewSection.style.display = 'none';
         layersContainer.style.display = 'none';
         updateLayersList();
+        // Clear custom metadata fields
+        metadataTitleInput.value = '';
+        metadataDescriptionInput.value = '';
+        addMetadataCheckbox.checked = false;
+        metadataFieldsDiv.classList.remove('visible');
 
     } catch (error) {
         console.error('Error adding watermark:', error);
@@ -638,115 +669,6 @@ function showStatus(message, type) {
         }, 5000);
     }
 }
-
-// Helper function to get translated message
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            selectedFile: "Selected file: ",
-            pleaseSelectPdf: "Please select a PDF file",
-            pleaseEnterWatermark: "Please enter watermark text",
-            processingFile: "Adding watermarks...",
-            successWatermark: "✓ Successfully created watermarked PDF: {filename}!",
-            saveCancelled: "Save cancelled",
-            invalidHexColor: "Invalid color format. Use #RRGGBB (e.g., #FF0000)",
-            invalidRotation: "Rotation angle must be between -360 and 360 degrees",
-            pleaseEnterValidColor: "Please enter a valid HEX color",
-            pleaseAddAtLeastOneLayer: "Please add at least one watermark layer",
-            layerAdded: "✓ Watermark layer added successfully!",
-            layerRemoved: "✓ Watermark layer removed",
-            addLayerBtnText: "+ Add Watermark Layer",
-            updateLayerBtn: "✓ Update Layer",
-            editBtn: "Edit",
-            removeBtn: "Remove",
-            fontSize: "Size",
-            opacity: "Opacity",
-            rotation: "Rotation",
-            color: "Color",
-            errorPrefix: "Error: "
-        },
-        it: {
-            selectedFile: "File selezionato: ",
-            pleaseSelectPdf: "Seleziona un file PDF",
-            pleaseEnterWatermark: "Inserisci il testo della filigrana",
-            processingFile: "Aggiunta filigrane...",
-            successWatermark: "✓ PDF con filigrana creato con successo: {filename}!",
-            saveCancelled: "Salvataggio annullato",
-            invalidHexColor: "Formato colore non valido. Usa #RRGGBB (es. #FF0000)",
-            invalidRotation: "L'angolo di rotazione deve essere tra -360 e 360 gradi",
-            pleaseEnterValidColor: "Inserisci un colore HEX valido",
-            pleaseAddAtLeastOneLayer: "Aggiungi almeno un livello di filigrana",
-            layerAdded: "✓ Livello di filigrana aggiunto con successo!",
-            layerRemoved: "✓ Livello di filigrana rimosso",
-            addLayerBtnText: "+ Aggiungi Livello Filigrana",
-            updateLayerBtn: "✓ Aggiorna Livello",
-            editBtn: "Modifica",
-            removeBtn: "Rimuovi",
-            fontSize: "Dimensione",
-            opacity: "Opacità",
-            rotation: "Rotazione",
-            color: "Colore",
-            errorPrefix: "Errore: "
-        },
-        pl: {
-            selectedFile: "Wybrany plik: ",
-            pleaseSelectPdf: "Proszę wybrać plik PDF",
-            pleaseEnterWatermark: "Proszę wprowadzić tekst znaku wodnego",
-            processingFile: "Dodawanie znaków wodnych...",
-            successWatermark: "✓ Pomyślnie utworzono PDF ze znakiem wodnym: {filename}!",
-            saveCancelled: "Anulowano zapisywanie",
-            invalidHexColor: "Nieprawidłowy format koloru. Użyj #RRGGBB (np. #FF0000)",
-            invalidRotation: "Kąt obrotu musi być między -360 a 360 stopni",
-            pleaseEnterValidColor: "Proszę wprowadzić prawidłowy kolor HEX",
-            pleaseAddAtLeastOneLayer: "Proszę dodać co najmniej jedną warstwę znaku wodnego",
-            layerAdded: "✓ Warstwa znaku wodnego dodana pomyślnie!",
-            layerRemoved: "✓ Warstwa znaku wodnego usunięta",
-            addLayerBtnText: "+ Dodaj Warstwę Znaku Wodnego",
-            updateLayerBtn: "✓ Aktualizuj Warstwę",
-            editBtn: "Edytuj",
-            removeBtn: "Usuń",
-            fontSize: "Rozmiar",
-            opacity: "Przezroczystość",
-            rotation: "Obrót",
-            color: "Kolor",
-            errorPrefix: "Błąd: "
-        },
-        es: {
-            selectedFile: "Archivo seleccionado: ",
-            pleaseSelectPdf: "Por favor seleccione un archivo PDF",
-            pleaseEnterWatermark: "Por favor ingrese el texto de la marca de agua",
-            processingFile: "Agregando marcas de agua...",
-            successWatermark: "✓ PDF con marca de agua creado exitosamente: {filename}!",
-            saveCancelled: "Guardado cancelado",
-            invalidHexColor: "Formato de color no válido. Use #RRGGBB (ej. #FF0000)",
-            invalidRotation: "El ángulo de rotación debe estar entre -360 y 360 grados",
-            pleaseEnterValidColor: "Por favor ingrese un color HEX válido",
-            pleaseAddAtLeastOneLayer: "Por favor agregue al menos una capa de marca de agua",
-            layerAdded: "✓ Capa de marca de agua agregada exitosamente!",
-            layerRemoved: "✓ Capa de marca de agua eliminada",
-            addLayerBtnText: "+ Agregar Capa de Marca de Agua",
-            updateLayerBtn: "✓ Actualizar Capa",
-            editBtn: "Editar",
-            removeBtn: "Eliminar",
-            fontSize: "Tamaño",
-            opacity: "Opacidad",
-            rotation: "Rotación",
-            color: "Color",
-            errorPrefix: "Error: "
-        }
-    };
-
-    let message = messages[lang]?.[key] || messages.en[key] || key;
-
-    // Replace parameters
-    Object.keys(params).forEach(paramKey => {
-        message = message.replace(`{${paramKey}}`, params[paramKey]);
-    });
-
-    return message;
-}
-
 
 
 

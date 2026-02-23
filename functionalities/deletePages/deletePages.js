@@ -2,6 +2,7 @@
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
+const { pathToFileURL } = require('url');
 var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('deleteForm');
@@ -10,10 +11,25 @@ const pagesGrid = document.getElementById('pagesGrid');
 const previewSection = document.getElementById('pagesPreviewSection');
 const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
+let currentLang = 'en';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await refreshLanguage();
+});
+
+
+async function refreshLanguage() {
+    try {
+        currentLang = await ipcRenderer.invoke('get-language');
+    } catch (err) {
+        currentLang = 'en';
+    }
+}
 
 // PDF.js configuration for thumbnails
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-    require('pdfjs-dist/build/pdf.worker.js');
+pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(
+    require.resolve('pdfjs-dist/build/pdf.worker.js')
+).toString();
 
 let originalFileBuffer = null;
 let pagesToDelete = new Set();
@@ -118,6 +134,14 @@ form.addEventListener('submit', async function (e) {
 
         await fs.writeFile(savePath, pdfBytes);
         showStatus(getMessage('successDeleted', { filename: path.basename(savePath) }), 'success');
+
+        // Clear custom metadata fields
+        setTimeout(() => {
+            metadataTitleInput.value = '';
+            metadataDescriptionInput.value = '';
+            addMetadataCheckbox.checked = false;
+            metadataFieldsDiv.classList.remove('visible');
+        }, 2000);
     } catch (error) {
         console.error(error);
         showStatus(getMessage('errorPrefix') + error.message, 'error');
@@ -129,50 +153,16 @@ form.addEventListener('submit', async function (e) {
 function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + type;
+    statusDiv.style.display = 'block';
+
+    // Auto-hide success messages after 5 seconds
+    if (type === 'success') {
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    }
 }
 
-function getMessage(key, params = {}) {
-    const lang = window.currentLanguage || localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            loadingPreview: 'Loading preview...',
-            mustLeaveAtLeastOnePage: 'You must leave at least one page unselected.',
-            processing: 'Processing...',
-            successDeleted: 'Successfully created PDF: {filename}',
-            saveCancelled: 'Save cancelled',
-            errorPrefix: 'Error: '
-        },
-        it: {
-            loadingPreview: 'Caricamento anteprima...',
-            mustLeaveAtLeastOnePage: 'Devi lasciare almeno una pagina non selezionata.',
-            processing: 'Elaborazione...',
-            successDeleted: 'PDF creato con successo: {filename}',
-            saveCancelled: 'Salvataggio annullato',
-            errorPrefix: 'Errore: '
-        },
-        pl: {
-            loadingPreview: 'Ladowanie podgladu...',
-            mustLeaveAtLeastOnePage: 'Musisz pozostawic co najmniej jedna strone niezaznaczona.',
-            processing: 'Przetwarzanie...',
-            successDeleted: 'Pomyslnie utworzono PDF: {filename}',
-            saveCancelled: 'Zapisywanie anulowane',
-            errorPrefix: 'Blad: '
-        },
-        es: {
-            loadingPreview: 'Cargando vista previa...',
-            mustLeaveAtLeastOnePage: 'Debes dejar al menos una pagina sin seleccionar.',
-            processing: 'Procesando...',
-            successDeleted: 'PDF creado correctamente: {filename}',
-            saveCancelled: 'Guardado cancelado',
-            errorPrefix: 'Error: '
-        }
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages.en[key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
-}
+window.addEventListener('languageChanged', () => {
+    showStatus(getMessage('processing'), 'info');
+});

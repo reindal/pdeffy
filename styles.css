@@ -4,6 +4,7 @@ body{
     background-color: var(--reindalDark);
     margin: 0;
     padding: 0;
+    font-family: var(--font-primary), serif;
 }
 
 .optionCard>p{
@@ -12,14 +13,15 @@ body{
 }
 
 header {
-    background-color: var(--reindalDark);
-    color: var(--reindalYellow);
+    background: color-mix(in srgb, var(--reindalTab) 40%, transparent);
+    color: var(--reindalLight);
     padding: 10px;
     text-align: center;
     margin: 0;
     border-radius: 20px;
-    width: 750px;
+    width: min(700px, calc(100% - 60px));
     align-items: center;
+    justify-content: center;
     display: flex;
     font-family: var(--font-primary), serif;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
@@ -32,35 +34,159 @@ header {
     padding: 20px 0;
 }
 
-.headerIcon{
-    width: 150px;
-    margin-right: 10px;
-    float: left;
+.categoryTilesContainer {
+    width: min(1200px, calc(100% - 40px));
+    margin: 20px auto 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
-.optionContainer{
+.categoryTile {
+    background: color-mix(in srgb, var(--reindalTab) 40%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: rgba(0, 0, 0, 0.15) 0 4px 12px;
+    border: 2px solid color-mix(in srgb, var(--reindalTab) 18%, transparent);
+}
+
+.categoryTile:hover {
+    transform: translateY(-5px);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
+    border-color: var(--reindalDark);
+}
+
+.categoryTile.active {
+    border-color: var(--reindalDark);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
+}
+
+.categoryIcon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.categoryTile h3 {
+    margin: 8px 0;
+    color: var(--reindalLight);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.categoryTile p {
+    margin: 0;
+    color: var(--reindalLight);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.headerIcon{
+    width: 150px;
+    float: left;
+    justify-content: left;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.homeLayout {
+    width: min(1200px, calc(100% - 40px));
+    margin: 0 auto 40px;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.toolSection {
+    background: color-mix(in srgb, var(--reindalTab) 40%, transparent);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.sectionTitle {
+    margin: 0 0 14px;
+    color: var(--reindalLight);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.collapsibleSection summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.collapsibleSection summary::-webkit-details-marker {
+    display: none;
+}
+
+.collapsibleSection summary::after {
+    content: "\25BE";
+    float: right;
+    transition: transform 0.2s ease;
+}
+
+.collapsibleSection[open] summary::after {
+    display: block;
+}
+
+.toolSection[open]{
+    display: block;
+}
+
+.toolSection:not([open]) {
+    display: none;
+}
+
+.collapsibleSection:not([open]) summary {
+    margin-bottom: 0;
+    display: none;
+}
+
+.collapsibleSection:not([open]) summary::after {
+    transform: rotate(-90deg);
+    display: none;
+}
+
+.cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.collapsibleContent {
+    height: 0;
+    opacity: 0;
+    overflow: visible;
+    margin-top: 0;
+    transition: height 0.25s ease, opacity 0.25s ease, margin-top 0.25s ease;
+}
+
+.collapsibleContent > .cardsGrid {
+    min-height: 0;
+}
+
+.collapsibleSection[open] > .collapsibleContent {
+    margin-top: 12px;
 }
 
 .optionCard{
-    background-color: var(--reindalYellow);
+    background-color: rgba(255, 253, 245, 0.27);
     border-radius: 15px;
     padding: 15px;
-    margin: 10px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-primary), serif;
-    width: 250px;
-    height: 250px;
+    width: auto;
+    min-height: 220px;
     text-decoration: none;
-    color: var(--reindalGray);
+    color: var(--reindalLight);
     border: none;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -69,7 +195,8 @@ header {
 .optionCard:hover{
     transform: translateY(-3px);
     box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
-    background-color: var(--reindalYellowHover);
+    background-color: var(--reindalExtraLight);
+    color: var(--reindalDark)
 }
 
 .optionIcon{
@@ -79,14 +206,63 @@ header {
 
 .optionCard h2{
     margin: 10px 0;
-    color: #4a4a4a;
 }
 
 .optionCard p{
     margin: 0;
-    color: #4a4a4a;
     text-align: center;
     font-size: 14px;
+}
+
+@media (max-width: 1100px) {
+    .cardsGrid {
+        grid-template-columns: repeat(3, minmax(210px, 1fr));
+    }
+}
+
+@media (max-width: 860px) {
+    .cardsGrid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    }
+
+    .headerIcon {
+        width: 110px;
+    }
+
+    .categoryTilesContainer {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .categoryTile {
+        padding: 25px 15px;
+    }
+
+    .categoryIcon {
+        font-size: 40px;
+    }
+
+    .categoryTile h3 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 560px) {
+    .cardsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        font-size: 80%;
+    }
+
+    .categoryIcon {
+        font-size: 36px;
+    }
+
+    .categoryTile h3 {
+        font-size: 18px;
+    }
 }
 
 #languageSelector{

@@ -11,9 +11,11 @@ const filesOrderContainer = document.getElementById('filesOrderContainer');
 
 let selectedFiles = [];
 
-pdfFiles.addEventListener('change', function(e) {
-    selectedFiles = Array.from(e.target.files);
+pdfFiles.addEventListener('change', function (e) {
+    const newFiles = Array.from(e.target.files);
+    selectedFiles = [...selectedFiles, ...newFiles];
     updateFilesOrder();
+    pdfFiles.value = '';
 });
 
 
@@ -29,11 +31,11 @@ function updateFilesOrder() {
         fileOrderItem.innerHTML = `
             <div class="fileOrderIndex">${index + 1}</div>
             <div class="fileOrderName">${file.name}</div>
-            <button type="button" class="fileOrderRemove" data-index="${index}">Remove</button>
+            <button type="button" class="fileOrderRemove" data-i18n="removeBtn" data-index="${index}">Remove</button>
         `;
 
         const removeBtn = fileOrderItem.querySelector('.fileOrderRemove');
-        removeBtn.addEventListener('click', function(e) {
+        removeBtn.addEventListener('click', function (e) {
             e.preventDefault();
             selectedFiles.splice(index, 1);
             updateFilesOrder();
@@ -96,10 +98,8 @@ function handleDragEnd(e) {
     });
 }
 
-form.addEventListener('submit', async function(e) {
+form.addEventListener('submit', async function (e) {
     e.preventDefault();
-
-    const outputNamePrefix = document.getElementById('outputName').value || 'merged_document';
 
     if (selectedFiles.length === 0) {
         showStatus(getMessage('pleaseSelectAtLeastOnePdf'), 'error');
@@ -117,11 +117,23 @@ form.addEventListener('submit', async function(e) {
     try {
         const mergedPdf = await PDFDocument.create();
 
-        // Get metadata from environment variables
+        // Always get author from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
         if (metadata.author) mergedPdf.setAuthor(metadata.author);
-        if (metadata.title) mergedPdf.setTitle(metadata.title);
-        if (metadata.subject) mergedPdf.setSubject(metadata.subject);
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject
+            const customTitle = metadataTitleInput.value.trim();
+            const customDescription = metadataDescriptionInput.value.trim();
+
+            if (customTitle) mergedPdf.setTitle(customTitle);
+            if (customDescription) mergedPdf.setSubject(customDescription);
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) mergedPdf.setTitle(metadata.title);
+            if (metadata.subject) mergedPdf.setSubject(metadata.subject);
+        }
 
         for (let file of selectedFiles) {
             const fileBuffer = await file.arrayBuffer();
@@ -137,9 +149,21 @@ form.addEventListener('submit', async function(e) {
 
         // Use Electron API to get downloads path
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
+        const defaultFileName = 'merged_document.pdf';
+        const defaultPath = path.join(downloadsPath, defaultFileName);
 
-        const outputFileName = `${outputNamePrefix}.pdf`;
-        const filePath = path.join(downloadsPath, outputFileName);
+        const filePath = await ipcRenderer.invoke('show-save-dialog', {
+            defaultPath: defaultPath,
+            filters: [
+                { name: 'PDF Files', extensions: ['pdf'] }
+            ]
+        });
+
+        if (!filePath) {
+            showStatus('saveCancelled', 'error');
+            submitBtn.disabled = false;
+            return;
+        }
 
         await fs.writeFile(filePath, mergedPdfBytes);
 
@@ -153,7 +177,7 @@ form.addEventListener('submit', async function(e) {
             }
         }
 
-        showStatus(getMessage('successMerged', { filename: outputFileName }), 'success');
+        showStatus(getMessage('successMerged', { filename: path.basename(filePath) }), 'success');
         submitBtn.disabled = false;
 
         form.reset();
@@ -171,48 +195,5 @@ form.addEventListener('submit', async function(e) {
 function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + type;
-}
-
-// Helper function to get translated message
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            pleaseSelectAtLeastOnePdf: "Please select at least one PDF file",
-            pleaseSelectAtLeastTwoPdfs: "Please select at least two PDF files to merge",
-            processingFiles: "Processing {count} file(s)...",
-            successMerged: "✓ Successfully created merged PDF: {filename} in Downloads folder!",
-            errorPrefix: "Error: "
-        },
-        it: {
-            pleaseSelectAtLeastOnePdf: "Seleziona almeno un file PDF",
-            pleaseSelectAtLeastTwoPdfs: "Seleziona almeno due file PDF da unire",
-            processingFiles: "Elaborazione di {count} file...",
-            successMerged: "✓ PDF unito creato con successo: {filename} nella cartella Download!",
-            errorPrefix: "Errore: "
-        },
-        pl: {
-            pleaseSelectAtLeastOnePdf: "Proszę wybrać co najmniej jeden plik PDF",
-            pleaseSelectAtLeastTwoPdfs: "Proszę wybrać co najmniej dwa pliki PDF do scalenia",
-            processingFiles: "Przetwarzanie {count} plik(ów)...",
-            successMerged: "✓ Pomyślnie utworzono scalony PDF: {filename} w folderze Pobrane!",
-            errorPrefix: "Błąd: "
-        },
-        es: {
-            pleaseSelectAtLeastOnePdf: "Por favor, selecciona al menos un archivo PDF",
-            pleaseSelectAtLeastTwoPdfs: "Por favor, selecciona al menos dos archivos PDF para unir",
-            processingFiles: "Procesando {count} archivo(s)...",
-            successMerged: "✓ ¡PDF unido creado con éxito: {filename} en la carpeta de Descargas!",
-            errorPrefix: "Error: "
-        }
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
 }
 

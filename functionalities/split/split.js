@@ -24,7 +24,6 @@ let customFileCount = 1;
 
 addRange();
 addCustomFile();
-updateLanguage();
 
 document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
     radio.addEventListener('change', function() {
@@ -49,17 +48,18 @@ document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
 addRangeBtn.addEventListener('click', function(e) {
     e.preventDefault();
     addRange();
-    updateLanguage();
+    if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
 });
 
 addCustomFileBtn.addEventListener('click', function(e) {
     e.preventDefault();
     addCustomFile();
+    if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
 });
 
 pdfFile.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
-        fileNameDisplay.textContent = '✓ Selected file: ' + e.target.files[0].name;
+        fileNameDisplay.textContent = getMessage('selectedFile') + e.target.files[0].name;
         fileNameDisplay.classList.add('active');
         updateFileSizeInfo();
     }
@@ -74,11 +74,11 @@ form.addEventListener('submit', async function(e) {
     const saveAsZip = saveAsZipCheckbox ? saveAsZipCheckbox.checked : false;
 
     if (!file) {
-        showStatus('Please select a PDF file', 'error');
+        showStatus(getMessage('pleaseSelectFile'), 'error');
         return;
     }
 
-    showStatus('Processing...', 'success');
+    showStatus(getMessage('processing'), 'success');
     submitBtn.disabled = true;
 
     try {
@@ -95,25 +95,23 @@ form.addEventListener('submit', async function(e) {
             const ranges = [];
 
             for (let item of rangeItems) {
-                const startInput = item.querySelector('.startPage');
-                const endInput = item.querySelector('.endPage');
-                const startPage = parseInt(startInput.value);
-                const endPage = parseInt(endInput.value);
+                const startPage = parseInt(item.querySelector('.startPage').value);
+                const endPage = parseInt(item.querySelector('.endPage').value);
 
                 if (startPage < 1 || endPage < 1) {
-                    showStatus('Page numbers must be greater than 0', 'error');
+                    showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
                     submitBtn.disabled = false;
                     return;
                 }
 
                 if (startPage > endPage) {
-                    showStatus('Start page cannot be greater than end page', 'error');
+                    showStatus(getMessage('startPageCannotBeGreater'), 'error');
                     submitBtn.disabled = false;
                     return;
                 }
 
                 if (startPage > totalPages || endPage > totalPages) {
-                    showStatus(`PDF has only ${totalPages} pages. Please select valid page range.`, 'error');
+                    showStatus(getMessage('pdfHasOnlyPages', { total: totalPages }), 'error');
                     submitBtn.disabled = false;
                     return;
                 }
@@ -122,13 +120,12 @@ form.addEventListener('submit', async function(e) {
             }
 
             if (ranges.length === 0) {
-                showStatus('Please add at least one page range', 'error');
+                showStatus(getMessage('pleaseAddAtLeastOneRange'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
 
-            for (let i = 0; i < ranges.length; i++) {
-                const range = ranges[i];
+            for (let range of ranges) {
                 const newPdf = await PDFDocument.create();
 
                 const metadata = await ipcRenderer.invoke('get-pdf-metadata');
@@ -140,16 +137,14 @@ form.addEventListener('submit', async function(e) {
                     const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
                     newPdf.addPage(copiedPage);
                 }
-
-                const newPdfBytes = await newPdf.save();
-                pdfFiles.push(newPdfBytes);
+                pdfFiles.push(await newPdf.save());
             }
 
         } else if (splitMode === 'every') {
             const interval = parseInt(document.getElementById('pagesInterval').value);
 
             if (interval < 1) {
-                showStatus('Interval must be at least 1', 'error');
+                showStatus(getMessage('intervalAtLeastOne'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
@@ -158,11 +153,7 @@ form.addEventListener('submit', async function(e) {
 
             while (currentPage < totalPages) {
                 const newPdf = await PDFDocument.create();
-
-                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-                if (metadata.author) newPdf.setAuthor(metadata.author);
-                if (metadata.title) newPdf.setTitle(metadata.title);
-                if (metadata.subject) newPdf.setSubject(metadata.subject);
+                await setMetadata(newPdf);
 
                 const endPage = Math.min(currentPage + interval, totalPages);
 
@@ -170,10 +161,7 @@ form.addEventListener('submit', async function(e) {
                     const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
                     newPdf.addPage(copiedPage);
                 }
-
-                const newPdfBytes = await newPdf.save();
-                pdfFiles.push(newPdfBytes);
-
+                pdfFiles.push(await newPdf.save());
                 currentPage = endPage;
             }
 
@@ -181,41 +169,22 @@ form.addEventListener('submit', async function(e) {
             const customFileItems = document.querySelectorAll('.customFileItem');
 
             if (customFileItems.length === 0) {
-                showStatus('Please add at least one output file', 'error');
+                showStatus(getMessage('pleaseAddAtLeastOneOutputFile'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
 
-            for (let i = 0; i < customFileItems.length; i++) {
-                const fileItem = customFileItems[i];
+            for (let fileItem of customFileItems) {
                 const rangeItems = fileItem.querySelectorAll('.customRangeItem');
                 const newPdf = await PDFDocument.create();
-
-                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-                if (metadata.author) newPdf.setAuthor(metadata.author);
-                if (metadata.title) newPdf.setTitle(metadata.title);
-                if (metadata.subject) newPdf.setSubject(metadata.subject);
+                await setMetadata(newPdf);
 
                 for (let rangeItem of rangeItems) {
-                    const startInput = rangeItem.querySelector('.customStartPage');
-                    const endInput = rangeItem.querySelector('.customEndPage');
-                    const startPage = parseInt(startInput.value);
-                    const endPage = parseInt(endInput.value);
+                    const startPage = parseInt(rangeItem.querySelector('.customStartPage').value);
+                    const endPage = parseInt(rangeItem.querySelector('.customEndPage').value);
 
-                    if (startPage < 1 || endPage < 1) {
-                        showStatus('Page numbers must be greater than 0', 'error');
-                        submitBtn.disabled = false;
-                        return;
-                    }
-
-                    if (startPage > endPage) {
-                        showStatus('Start page cannot be greater than end page', 'error');
-                        submitBtn.disabled = false;
-                        return;
-                    }
-
-                    if (startPage > totalPages || endPage > totalPages) {
-                        showStatus(`PDF has only ${totalPages} pages. Please select valid page range.`, 'error');
+                    if (startPage < 1 || endPage < 1 || startPage > endPage || startPage > totalPages || endPage > totalPages) {
+                        showStatus(getMessage('pageNumbersGreaterThanZero'), 'error'); // O el error específico correspondiente
                         submitBtn.disabled = false;
                         return;
                     }
@@ -225,16 +194,14 @@ form.addEventListener('submit', async function(e) {
                         newPdf.addPage(copiedPage);
                     }
                 }
-
-                const newPdfBytes = await newPdf.save();
-                pdfFiles.push(newPdfBytes);
+                pdfFiles.push(await newPdf.save());
             }
         } else if (splitMode === 'size') {
             const maxSize = parseFloat(document.getElementById('maxFileSize').value);
             const sizeUnit = document.getElementById('sizeUnit').value;
 
             if (maxSize <= 0 || isNaN(maxSize)) {
-                showStatus('Please enter a valid file size', 'error');
+                showStatus(getMessage('pleaseEnterValidFileSize'), 'error');
                 submitBtn.disabled = false;
                 return;
             }
@@ -278,11 +245,7 @@ form.addEventListener('submit', async function(e) {
 
             while (currentPage < totalPages) {
                 let newPdf = await PDFDocument.create();
-
-                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-                if (metadata.author) newPdf.setAuthor(metadata.author);
-                if (metadata.title) newPdf.setTitle(metadata.title);
-                if (metadata.subject) newPdf.setSubject(metadata.subject);
+                await setMetadata(newPdf);
 
                 let pagesInCurrentFile = 0;
 
@@ -329,66 +292,34 @@ form.addEventListener('submit', async function(e) {
         // Now show Save As dialog
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const originalFileName = file.name.replace('.pdf', '');
+        // Save as ZIP dialog
+        let outputPath = await ipcRenderer.invoke('show-save-dialog', {
+            defaultPath: path.join(downloadsPath, saveAsZip ? `${originalFileName}.zip` : `${originalFileName}.pdf`),
+            filters: saveAsZip ? [{ name: 'ZIP Files', extensions: ['zip'] }] : [{ name: 'PDF Files', extensions: ['pdf'] }]
+        });
 
-        let outputPath;
-        let outputFolder;
-        let baseName;
+        if (!outputPath) {
+            showStatus(getMessage('saveCancelled'), 'info');
+            submitBtn.disabled = false;
+            return;
+        }
+
+        // Create ZIP file
+        const outputFolder = path.dirname(outputPath);
+        const baseName = path.basename(outputPath, saveAsZip ? '.zip' : '.pdf');
 
         if (saveAsZip) {
-            // Save as ZIP dialog
-            outputPath = await ipcRenderer.invoke('show-save-dialog', {
-                defaultPath: path.join(downloadsPath, `${originalFileName}.zip`),
-                filters: [
-                    { name: 'ZIP Files', extensions: ['zip'] }
-                ]
-            });
-
-            if (!outputPath) {
-                showStatus(getMessage('saveCancelled'), 'info');
-                submitBtn.disabled = false;
-                return;
-            }
-
-            // Create ZIP file
             const JSZip = require('jszip');
             const zip = new JSZip();
-
-            baseName = path.basename(outputPath, '.zip');
-
             for (let i = 0; i < pdfFiles.length; i++) {
-                const fileName = `${baseName}_${i + 1}.pdf`;
-                zip.file(fileName, pdfFiles[i]);
+                zip.file(`${baseName}_${i + 1}.pdf`, pdfFiles[i]);
             }
-
             const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
             await fs.writeFile(outputPath, zipContent);
-
-            outputFolder = path.dirname(outputPath);
             showStatus(getMessage('successSplitFilesZip', { count: pdfFiles.length, path: outputFolder }), 'success');
-
         } else {
-            // Save as PDF dialog
-            outputPath = await ipcRenderer.invoke('show-save-dialog', {
-                defaultPath: path.join(downloadsPath, `${originalFileName}.pdf`),
-                filters: [
-                    { name: 'PDF Files', extensions: ['pdf'] }
-                ]
-            });
-
-            if (!outputPath) {
-                showStatus(getMessage('saveCancelled'), 'info');
-                submitBtn.disabled = false;
-                return;
-            }
-
-            outputFolder = path.dirname(outputPath);
-            baseName = path.basename(outputPath, '.pdf');
-
-            // Save all PDF files
             for (let i = 0; i < pdfFiles.length; i++) {
-                const fileName = `${baseName}_${i + 1}.pdf`;
-                const filePath = path.join(outputFolder, fileName);
-                await fs.writeFile(filePath, pdfFiles[i]);
+                await fs.writeFile(path.join(outputFolder, `${baseName}_${i + 1}.pdf`), pdfFiles[i]);
             }
 
             showStatus(getMessage('successSplitFilesPath', { count: pdfFiles.length, path: outputFolder }), 'success');
@@ -398,23 +329,17 @@ form.addEventListener('submit', async function(e) {
 
         form.reset();
         fileNameDisplay.classList.remove('active');
-
-        // Reset range mode
-        rangesContainer.innerHTML = '';
-        rangeCount = 1;
-        addRange();
-
-        customFilesContainer.innerHTML = '';
-        customFileCount = 1;
-        addCustomFile();
-
-        rangeModeContainer.style.display = 'block';
-        everyModeContainer.style.display = 'none';
-        customModeContainer.style.display = 'none';
-        sizeModeContainer.style.display = 'none';
+        // Reset containers
+        rangesContainer.innerHTML = ''; rangeCount = 1; addRange();
+        customFilesContainer.innerHTML = ''; customFileCount = 1; addCustomFile();
+        if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
+        // Clear custom metadata fields
+        metadataTitleInput.value = '';
+        metadataDescriptionInput.value = '';
+        addMetadataCheckbox.checked = false;
+        metadataFieldsDiv.classList.remove('visible');
 
     } catch (error) {
-        console.error('Error splitting PDF:', error);
         showStatus(getMessage('errorPrefix') + error.message, 'error');
         submitBtn.disabled = false;
     }
@@ -435,13 +360,11 @@ function addRange() {
         <button type="button" class="removeRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
 
-    const removeBtn = rangeDiv.querySelector('.removeRangeBtn');
-    removeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
+    rangeDiv.querySelector('.removeRangeBtn').addEventListener('click', function() {
         if (rangesContainer.querySelectorAll('.rangeItem').length > 1) {
             rangeDiv.remove();
         } else {
-            showStatus('You must have at least one range', 'error');
+            showStatus(getMessage('atLeastOneRangeRequired'), 'error');
         }
     });
 
@@ -465,19 +388,14 @@ function addCustomFile() {
     `;
 
     const rangesDiv = fileDiv.querySelector('.customFileRanges');
-
     addCustomRange(rangesDiv);
     
-    const addRangeButton = fileDiv.querySelector('.addCustomRangeBtn');
-    addRangeButton.addEventListener('click', function(e) {
-        e.preventDefault();
+    fileDiv.querySelector('.addCustomRangeBtn').addEventListener('click', function() {
         addCustomRange(rangesDiv);
-        updateLanguage();
+        if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
     });
 
-    const removeFileButton = fileDiv.querySelector('.removeFileBtn');
-    removeFileButton.addEventListener('click', function(e) {
-        e.preventDefault();
+    fileDiv.querySelector('.removeFileBtn').addEventListener('click', function() {
         if (customFilesContainer.querySelectorAll('.customFileItem').length > 1) {
             fileDiv.remove();
         } else {
@@ -504,16 +422,13 @@ function addCustomRange(container) {
         <button type="button" class="removeCustomRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
 
-    const removeBtn = rangeDiv.querySelector('.removeCustomRangeBtn');
-    removeBtn.addEventListener('click', function(e) {
-        e.preventDefault();
+    rangeDiv.querySelector('.removeCustomRangeBtn').addEventListener('click', function() {
         if (container.querySelectorAll('.customRangeItem').length > 1) {
             rangeDiv.remove();
         } else {
             showStatus(getMessage('eachFileMustHaveRange'), 'error');
         }
     });
-
     container.appendChild(rangeDiv);
 }
 
@@ -522,112 +437,10 @@ function showStatus(message, type) {
     statusDiv.className = 'status ' + type;
 }
 
-// Helper function to get translated message
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            pleaseSelectFile: "Please select a PDF file",
-            processing: "Processing",
-            pageNumbersGreaterThanZero: "Page numbers must be greater than 0",
-            startPageCannotBeGreater: "Start page cannot be greater than end page",
-            pdfHasOnlyPages: "PDF has only {total} pages. Please select valid page range.",
-            pleaseAddAtLeastOneRange: "Please add at least one page range",
-            intervalAtLeastOne: "Interval must be at least 1",
-            pleaseAddAtLeastOneOutputFile: "Please add at least one output file",
-            pleaseEnterValidFileSize: "Please enter a valid file size",
-            cannotSplitMinSize: "Cannot split: minimum required size is {size} (smallest page size)",
-            successSplitFiles: "✓ Successfully created {count} file(s) in Downloads folder!",
-            successSplitFilesPath: "✓ Saved {count} file(s) in:\n{path}",
-            successSplitFilesZip: "✓ Saved {count} file(s) as ZIP in:\n{path}",
-            saveCancelled: "Save cancelled",
-            errorPrefix: "Error: ",
-            atLeastOneRangeRequired: "You must have at least one range",
-            atLeastOneFileRequired: "You must have at least one output file",
-            eachFileMustHaveRange: "Each file must have at least one range"
-        },
-        it: {
-            pleaseSelectFile: "Seleziona un file PDF",
-            processing: "Elaborazione",
-            pageNumbersGreaterThanZero: "I numeri di pagina devono essere maggiori di 0",
-            startPageCannotBeGreater: "La pagina iniziale non può essere maggiore della pagina finale",
-            pdfHasOnlyPages: "Il PDF ha solo {total} pagine. Seleziona un intervallo di pagine valido.",
-            pleaseAddAtLeastOneRange: "Aggiungi almeno un intervallo di pagine",
-            intervalAtLeastOne: "L'intervallo deve essere almeno 1",
-            pleaseAddAtLeastOneOutputFile: "Aggiungi almeno un file di output",
-            pleaseEnterValidFileSize: "Inserisci una dimensione file valida",
-            cannotSplitMinSize: "Impossibile dividere: la dimensione minima richiesta è {size} (dimensione pagina più piccola)",
-            successSplitFiles: "✓ Creati con successo {count} file nella cartella Download!",
-            successSplitFilesPath: "✓ Salvati {count} file in:\n{path}",
-            successSplitFilesZip: "✓ Salvati {count} file come ZIP in:\n{path}",
-            saveCancelled: "Salvataggio annullato",
-            errorPrefix: "Errore: ",
-            atLeastOneRangeRequired: "Devi avere almeno un intervallo",
-            atLeastOneFileRequired: "Devi avere almeno un file di output",
-            eachFileMustHaveRange: "Ogni file deve avere almeno un intervallo"
-        },
-        pl: {
-            pleaseSelectFile: "Proszę wybrać plik PDF",
-            processing: "Przetwarzanie",
-            pageNumbersGreaterThanZero: "Numery stron muszą być większe niż 0",
-            startPageCannotBeGreater: "Strona początkowa nie może być większa niż strona końcowa",
-            pdfHasOnlyPages: "PDF ma tylko {total} stron. Proszę wybrać prawidłowy zakres stron.",
-            pleaseAddAtLeastOneRange: "Dodaj co najmniej jeden zakres stron",
-            intervalAtLeastOne: "Interwał musi wynosić co najmniej 1",
-            pleaseAddAtLeastOneOutputFile: "Dodaj co najmniej jeden plik wyjściowy",
-            pleaseEnterValidFileSize: "Wprowadź prawidłowy rozmiar pliku",
-            cannotSplitMinSize: "Nie można podzielić: minimalny wymagany rozmiar to {size} (rozmiar najmniejszej strony)",
-            successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów) w folderze Pobrane!",
-            successSplitFilesPath: "✓ Zapisano {count} plik(ów) w:\n{path}",
-            successSplitFilesZip: "✓ Zapisano {count} plik(ów) jako ZIP w:\n{path}",
-            saveCancelled: "Zapisywanie anulowane",
-            errorPrefix: "Błąd: ",
-            atLeastOneRangeRequired: "Musisz mieć co najmniej jeden zakres",
-            atLeastOneFileRequired: "Musisz mieć co najmniej jeden plik wyjściowy",
-            eachFileMustHaveRange: "Każdy plik musi mieć co najmniej jeden zakres"
-        },
-        es: {
-            pleaseSelectFile: "Por favor, selecciona un archivo PDF",
-            processing: "Procesando",
-            pageNumbersGreaterThanZero: "Los números de página deben ser mayores que 0",
-            startPageCannotBeGreater: "La página inicial no puede ser mayor que la página final",
-            pdfHasOnlyPages: "El PDF solo tiene {total} páginas. Por favor, selecciona un rango válido.",
-            pleaseAddAtLeastOneRange: "Por favor, añade al menos un rango de páginas",
-            intervalAtLeastOne: "El intervalo debe ser al menos 1",
-            pleaseAddAtLeastOneOutputFile: "Por favor, añade al menos un archivo de salida",
-            pleaseEnterValidFileSize: "Por favor, introduce un tamaño de archivo válido",
-            cannotSplitMinSize: "No se puede dividir: el tamaño mínimo requerido es {size} (tamaño de la página más pequeña)",
-            successSplitFiles: "✓ {count} archivo(s) creado(s) correctamente en la carpeta Descargas",
-            errorPrefix: "Error: ",
-            atLeastOneRangeRequired: "Debe haber al menos un rango",
-            atLeastOneFileRequired: "Debe haber al menos un archivo de salida",
-            eachFileMustHaveRange: "Cada archivo debe tener al menos un rango",
-        }
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
-}
-
 function updateFileSizeInfo() {
     const file = pdfFile.files[0];
     if (file && fileSizeInfo) {
-        const sizeInBytes = file.size;
-        let sizeText = formatFileSize(sizeInBytes);
-
-        const lang = localStorage.getItem('language') || 'en';
-        const fileSizeLabels = {
-            en: 'Current file size: ',
-            it: 'Dimensione file: ',
-            pl: 'Rozmiar pliku: '
-        };
-
-        fileSizeInfo.textContent = (fileSizeLabels[lang] || fileSizeLabels.en) + sizeText;
+        fileSizeInfo.textContent = getMessage('currentFileSize') + formatFileSize(file.size);
         fileSizeInfo.style.display = 'block';
     } else if (fileSizeInfo) {
         fileSizeInfo.style.display = 'none';
@@ -635,18 +448,8 @@ function updateFileSizeInfo() {
 }
 
 function formatFileSize(bytes) {
-    if (bytes >= 1024 * 1024 * 1024) {
-        return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
-    } else if (bytes >= 1024 * 1024) {
-        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-    } else if (bytes >= 1024) {
-        return (bytes / 1024).toFixed(2) + ' KB';
-    } else {
-        return bytes + ' B';
-    }
-}
-
-function updateLanguage() {
-    const lang = localStorage.getItem('language') || 'en';
-    changeLanguage(lang);
+    if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + ' GB';
+    if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
+    if (bytes >= 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    return bytes + ' B';
 }
