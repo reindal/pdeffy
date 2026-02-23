@@ -8,6 +8,7 @@ window.addEventListener('load', () => {
     const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
     const settingsStatus = document.getElementById('settingsStatus');
     const firstLaunchIntro = document.getElementById('firstLaunchIntro');
+    let firstLaunchIntroVisible = false;
 
     const metaAuthor = document.getElementById('metaAuthor');
     const metaTitle = document.getElementById('metaTitle');
@@ -30,11 +31,23 @@ window.addEventListener('load', () => {
     // Open settings modal
     settingsIcon.addEventListener('click', async () => {
         await loadSettings();
+        if (!firstLaunchIntroVisible) {
+            firstLaunchIntro.style.display = 'none';
+        }
         settingsModal.classList.add('active');
     });
 
+    function dismissFirstLaunchIntro() {
+        if (!firstLaunchIntroVisible) {
+            return;
+        }
+        firstLaunchIntroVisible = false;
+        firstLaunchIntro.style.display = 'none';
+    }
+
     // Close settings modal
     cancelSettingsBtn.addEventListener('click', () => {
+        dismissFirstLaunchIntro();
         settingsModal.classList.remove('active');
         settingsStatus.style.display = 'none';
     });
@@ -42,6 +55,7 @@ window.addEventListener('load', () => {
     // Close modal when clicking outside
     settingsModal.addEventListener('click', (e) => {
         if (e.target === settingsModal) {
+            dismissFirstLaunchIntro();
             settingsModal.classList.remove('active');
             settingsStatus.style.display = 'none';
         }
@@ -72,6 +86,7 @@ window.addEventListener('load', () => {
             settingsStatus.style.display = 'block';
 
             setTimeout(() => {
+                dismissFirstLaunchIntro();
                 settingsModal.classList.remove('active');
                 settingsStatus.style.display = 'none';
             }, 2000);
@@ -92,6 +107,7 @@ window.addEventListener('load', () => {
                 return;
             }
 
+            firstLaunchIntroVisible = true;
             firstLaunchIntro.style.display = 'block';
 
             // Open settings directly on first launch with intro message.
