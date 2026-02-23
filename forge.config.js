@@ -14,13 +14,14 @@ module.exports = {
     enabled: false,
   },
   makers: [
-    /*{
+    {
       name: '@electron-forge/maker-squirrel',
       config: {
-        certificateFile: './electronDemoPdf.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD,
+        //certificateFile: './electronDemoPdf.pfx',
+        //certificatePassword: process.env.CERTIFICATE_PASSWORD,
+        //remoteReleases:
       },
-    },*/
+    },
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
@@ -36,8 +37,8 @@ module.exports = {
     {
       name: '@electron-forge/maker-wix',
       config: {
-        name: `ElectronAppDemo`,
-        exe: `ElectronPdfDemoV.exe`,
+        name: `ElectronAppDemoV`,
+        exe: `pdfapp.exe`,
         icon: "assets/icon.ico",
         features: {
             autoUpdate: true,
