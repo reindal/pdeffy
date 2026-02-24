@@ -16,15 +16,25 @@ header {
     background: color-mix(in srgb, var(--reindalTab) 40%, transparent);
     color: var(--reindalLight);
     padding: 10px;
-    text-align: center;
     margin: 0;
     border-radius: 20px;
     width: min(700px, calc(100% - 60px));
     align-items: center;
     display: flex;
+    justify-content: space-between;
+    position: relative;
     font-family: var(--font-primary), serif;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
     font-size: 90%;
+}
+
+header h1 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .headerContainer{
@@ -86,11 +96,8 @@ header {
 
 .headerIcon{
     width: 150px;
-    float: left;
-    justify-content: left;
-    margin-right: 10px;
-    margin-left: 10px;
     cursor: pointer;
+    z-index: 3;
 }
 
 .homeLayout {
