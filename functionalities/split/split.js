@@ -13,6 +13,12 @@ const addRangeBtn = document.getElementById('addRangeBtn');
 const customFilesContainer = document.getElementById('customFilesContainer');
 const addCustomFileBtn = document.getElementById('addCustomFileBtn');
 
+// Custom metadata toggle
+const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
+const metadataFieldsDiv = document.getElementById('metadataFields');
+const metadataTitleInput = document.getElementById('metadataTitleInput');
+const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
+
 const rangeModeContainer = document.getElementById('rangeModeContainer');
 const everyModeContainer = document.getElementById('everyModeContainer');
 const customModeContainer = document.getElementById('customModeContainer');
@@ -21,6 +27,14 @@ const fileSizeInfo = document.getElementById('fileSizeInfo');
 
 let rangeCount = 1;
 let customFileCount = 1;
+
+addMetadataCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        metadataFieldsDiv.classList.add('visible');
+    } else {
+        metadataFieldsDiv.classList.remove('visible');
+    }
+});
 
 addRange();
 addCustomFile();

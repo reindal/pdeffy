@@ -9,7 +9,21 @@ const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
 const imagesOrderContainer = document.getElementById('imagesOrderContainer');
 
+// Custom metadata toggle
+const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
+const metadataFieldsDiv = document.getElementById('metadataFields');
+const metadataTitleInput = document.getElementById('metadataTitleInput');
+const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
+
 let selectedImages = [];
+
+addMetadataCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        metadataFieldsDiv.classList.add('visible');
+    } else {
+        metadataFieldsDiv.classList.remove('visible');
+    }
+});
 
 imageFiles.addEventListener('change', function (e) {
     const newFiles = Array.from(e.target.files);
