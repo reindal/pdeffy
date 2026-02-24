@@ -1,4 +1,5 @@
 @import url('../../variables.css');
+@import url('../funcionalities.css');
 
 .formGroup {
     margin-bottom: 25px;

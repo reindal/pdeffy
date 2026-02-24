@@ -40,7 +40,7 @@ form.addEventListener('submit', async function (e) {
     if (!pptxFileInput.files[0]) return;
 
     submitBtn.disabled = true;
-    showStatus(getMessage('convertingPptx'), 'info');
+    showStatus(getLocalMessage('convertingPptx'), 'info');
 
     try {
         const file = pptxFileInput.files[0];
@@ -244,7 +244,7 @@ form.addEventListener('submit', async function (e) {
 
         if (outputPath) {
             await fs.writeFile(outputPath, pdfBytes);
-            showStatus(getMessage('successPptxCreated'), 'success');
+            showStatus(getLocalMessage('successPptxCreated'), 'success');
             // Clear custom metadata fields
             setTimeout(() => {
                 if (metadataTitleInput) metadataTitleInput.value = '';
@@ -256,7 +256,7 @@ form.addEventListener('submit', async function (e) {
 
     } catch (error) {
         console.error(error);
-        showStatus(getMessage('errorPptx') + error.message, 'error');
+        showStatus(getLocalMessage('errorPptx') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -270,8 +270,8 @@ function showStatus(message, type) {
 }
 
 // Helper function to get translated messages
-function getMessage(key, params = {}) {
-    if (typeof window.getMessage === 'function') {
+function getLocalMessage(key, params = {}) {
+    if (typeof window.getMessage === 'function' && window.getMessage !== getLocalMessage) {
         return window.getMessage(key, params);
     }
     // Fallback messages if getMessage is not loaded yet

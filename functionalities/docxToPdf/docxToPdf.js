@@ -39,7 +39,7 @@ form.addEventListener('submit', async function(e) {
     if (!docxFileInput.files[0]) return;
 
     submitBtn.disabled = true;
-    showStatus(getMessage('convertingDocx'), 'info');
+    showStatus(getLocalMessage('convertingDocx'), 'info');
 
     try {
         const file = docxFileInput.files[0];
@@ -99,8 +99,6 @@ form.addEventListener('submit', async function(e) {
             }
         }
 
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-        const fontSize = 11;
         const margin = 50;
         
         let page = pdfDoc.addPage();
@@ -238,7 +236,7 @@ form.addEventListener('submit', async function(e) {
 
         if (outputPath) {
             await fs.writeFile(outputPath, pdfBytes);
-            showStatus(getMessage('successDocxCreated'), 'success');
+            showStatus(getLocalMessage('successDocxCreated'), 'success');
             // Clear custom metadata fields
             setTimeout(() => {
                 if (metadataTitleInput) metadataTitleInput.value = '';
@@ -250,7 +248,7 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error(error);
-        showStatus(getMessage('errorDocx') + error.message, 'error');
+        showStatus(getLocalMessage('errorDocx') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -263,8 +261,9 @@ function showStatus(message, type) {
 }
 
 // Helper function to get translated messages
-function getMessage(key, params = {}) {
-    if (typeof window.getMessage === 'function') {
+function getLocalMessage(key, params = {}) {
+    // Check if window.getMessage exists AND is not this function (prevent infinite recursion)
+    if (typeof window.getMessage === 'function' && window.getMessage !== getLocalMessage) {
         return window.getMessage(key, params);
     }
     // Fallback messages if getMessage is not loaded yet
