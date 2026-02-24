@@ -17,16 +17,10 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        //certificateFile: './electronDemoPdf.pfx',
-        //certificatePassword: process.env.CERTIFICATE_PASSWORD,
-        //remoteReleases:
+          certificateFile: './electronDemoPdf.pfx',
+          certificatePassword: process.env.CERTIFICATE_PASSWORD,
+          remoteReleases: `https://update.reindal.cloud/argo-tools/`,
       },
-      config: (arch) => ({
-        // Note that we must provide this S3 URL here
-        // in order to generate delta updates
-        //remoteReleases: `https://my-bucket.s3.amazonaws.com/my-app-updates/win32/${arch}`,
-        remoteReleases: `https://update.reindal.cloud/argo-tools/`,
-      }),
     },
     {
       name: '@electron-forge/maker-zip',
