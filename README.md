@@ -19,6 +19,38 @@ The result is a modern, practical tool born from cross-cultural collaboration, i
 
 ---
 
+## 🏗️ Launch the Project
+
+### Development Mode
+
+To run the application in development mode:
+
+```bash
+npm start
+```
+
+Or using Electron Forge:
+
+```Bash
+npm run start
+```
+
+Build & Package
+To create a distributable installer:
+
+Package the application:
+
+```Bash
+npm run package
+```
+
+Create installer/executable:
+
+```Bash
+npm run make
+```
+The installer will be generated in the out/make directory.
+
 ## 🎯 Purpose
 
 pdeffy provides a secure and efficient way to manipulate PDF files directly on your local machine.  
