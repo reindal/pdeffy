@@ -32,7 +32,9 @@ jobs:
           sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
       - name: Install dependencies
-        run: npm install --omit=optional
+        run: npm install
+        env:
+          npm_config_build_from_source: false
 
       - name: Build Electron App
         run: npm run make
