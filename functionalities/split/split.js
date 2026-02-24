@@ -28,6 +28,39 @@ const fileSizeInfo = document.getElementById('fileSizeInfo');
 let rangeCount = 1;
 let customFileCount = 1;
 
+// Function to set metadata on a PDF document
+async function setMetadata(pdfDoc) {
+    // Get metadata from global settings
+    const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+
+    // Always set author from global settings
+    if (metadata.author) {
+        pdfDoc.setAuthor(metadata.author);
+    }
+
+    // Check if custom metadata is enabled
+    if (addMetadataCheckbox && addMetadataCheckbox.checked) {
+        // Use custom metadata from form fields for Title and Subject (only if not empty)
+        const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
+        const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
+
+        if (customTitle) {
+            pdfDoc.setTitle(customTitle);
+        }
+        if (customDescription) {
+            pdfDoc.setSubject(customDescription);
+        }
+    } else {
+        // Use global settings for Title and Subject
+        if (metadata.title) {
+            pdfDoc.setTitle(metadata.title);
+        }
+        if (metadata.subject) {
+            pdfDoc.setSubject(metadata.subject);
+        }
+    }
+}
+
 addMetadataCheckbox.addEventListener('change', function() {
     if (this.checked) {
         metadataFieldsDiv.classList.add('visible');
@@ -141,11 +174,7 @@ form.addEventListener('submit', async function(e) {
 
             for (let range of ranges) {
                 const newPdf = await PDFDocument.create();
-
-                const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-                if (metadata.author) newPdf.setAuthor(metadata.author);
-                if (metadata.title) newPdf.setTitle(metadata.title);
-                if (metadata.subject) newPdf.setSubject(metadata.subject);
+                await setMetadata(newPdf);
 
                 for (let pageIdx = range.startPage - 1; pageIdx < range.endPage; pageIdx++) {
                     const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);

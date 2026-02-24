@@ -69,22 +69,34 @@ form.addEventListener('submit', async function(e) {
         const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
         const timesBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
-        // Always get author from global settings
+        // Get metadata from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-        if (metadata.author) pdfDoc.setAuthor(metadata.author);
+
+        // Always set author from global settings
+        if (metadata.author) {
+            pdfDoc.setAuthor(metadata.author);
+        }
 
         // Check if custom metadata is enabled
         if (addMetadataCheckbox && addMetadataCheckbox.checked) {
-            // Use custom metadata from form fields for Title and Subject
+            // Use custom metadata from form fields for Title and Subject (only if not empty)
             const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
             const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
 
-            if (customTitle) pdfDoc.setTitle(customTitle);
-            if (customDescription) pdfDoc.setSubject(customDescription);
+            if (customTitle) {
+                pdfDoc.setTitle(customTitle);
+            }
+            if (customDescription) {
+                pdfDoc.setSubject(customDescription);
+            }
         } else {
             // Use global settings for Title and Subject
-            if (metadata.title) pdfDoc.setTitle(metadata.title);
-            if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+            if (metadata.title) {
+                pdfDoc.setTitle(metadata.title);
+            }
+            if (metadata.subject) {
+                pdfDoc.setSubject(metadata.subject);
+            }
         }
 
         const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
