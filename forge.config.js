@@ -37,8 +37,8 @@ module.exports = {
     {
       name: '@electron-forge/maker-wix',
       config: {
-        name: `ElectronAppDemoV`,
-        exe: `pdfapp.exe`,
+        name: `Pdeffy`,
+        exe: `pdeffy.exe`,
         icon: "assets/icon.ico",
         features: {
             autoUpdate: true,
