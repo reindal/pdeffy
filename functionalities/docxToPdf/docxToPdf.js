@@ -91,7 +91,6 @@ form.addEventListener('submit', async function(e) {
         
         let page = pdfDoc.addPage();
         let { width, height } = page.getSize();
-        const margin = 50;
         let cursorY = height - margin;
         const maxWidth = width - (margin * 2);
 

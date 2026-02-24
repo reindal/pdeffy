@@ -1,5 +1,33 @@
 window.addEventListener("DOMContentLoaded", () => {
     const sections = document.querySelectorAll(".collapsibleSection");
+    const LAST_OPEN_SECTION_KEY = "pdfConverter.lastOpenSection";
+
+    const saveLastOpenSection = (sectionId) => {
+        if (!sectionId) {
+            return;
+        }
+        try {
+            localStorage.setItem(LAST_OPEN_SECTION_KEY, sectionId);
+        } catch (_) {
+            // Ignore storage errors (private mode / disabled storage)
+        }
+    };
+
+    const clearLastOpenSection = () => {
+        try {
+            localStorage.removeItem(LAST_OPEN_SECTION_KEY);
+        } catch (_) {
+            // Ignore storage errors (private mode / disabled storage)
+        }
+    };
+
+    const getLastOpenSection = () => {
+        try {
+            return localStorage.getItem(LAST_OPEN_SECTION_KEY);
+        } catch (_) {
+            return null;
+        }
+    };
 
     sections.forEach((section) => {
         const summary = section.querySelector(":scope > summary");
@@ -10,6 +38,32 @@ window.addEventListener("DOMContentLoaded", () => {
         }
 
         let isAnimating = false;
+        let revealTimer = null;
+        const cards = section.querySelectorAll(":scope > .collapsibleContent .optionCard");
+
+        cards.forEach((card, index) => {
+            const delay = Math.min((index + 1) * 40, 280);
+            card.style.setProperty("--card-delay", `${delay}ms`);
+        });
+
+        const clearRevealTimer = () => {
+            if (revealTimer) {
+                clearTimeout(revealTimer);
+                revealTimer = null;
+            }
+        };
+
+        const hideCards = () => {
+            clearRevealTimer();
+            section.classList.remove("cardsVisible");
+        };
+
+        const showCardsDelayed = () => {
+            clearRevealTimer();
+            revealTimer = setTimeout(() => {
+                section.classList.add("cardsVisible");
+            }, 120);
+        };
 
         const setExpandedState = () => {
             content.style.height = "auto";
@@ -23,8 +77,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
         if (section.hasAttribute("open")) {
             setExpandedState();
+            section.classList.add("cardsVisible");
         } else {
             setCollapsedState();
+            section.classList.remove("cardsVisible");
         }
 
         const finishAnimation = (handler) => {
@@ -43,13 +99,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
         const expand = () => {
             section.setAttribute("open", "");
+            hideCards();
             content.style.height = "0px";
             content.style.opacity = "0";
+            saveLastOpenSection(section.id);
 
             requestAnimationFrame(() => {
                 content.style.height = `${content.scrollHeight}px`;
                 content.style.opacity = "1";
             });
+
+            showCardsDelayed();
 
             finishAnimation(() => {
                 content.style.height = "auto";
@@ -57,17 +117,23 @@ window.addEventListener("DOMContentLoaded", () => {
         };
 
         const collapse = () => {
-            content.style.height = `${content.scrollHeight}px`;
-            content.style.opacity = "1";
+            hideCards();
+            setCollapsedState();
+            section.removeAttribute("open");
+            clearLastOpenSection();
+            isAnimating = false;
+        };
 
-            requestAnimationFrame(() => {
-                content.style.height = "0px";
-                content.style.opacity = "0";
-            });
+        const collapseSectionInstant = (targetSection) => {
+            const targetContent = targetSection.querySelector(":scope > .collapsibleContent");
+            if (!targetContent) {
+                return;
+            }
 
-            finishAnimation(() => {
-                section.removeAttribute("open");
-            });
+            targetSection.classList.remove("cardsVisible");
+            targetContent.style.height = "0px";
+            targetContent.style.opacity = "0";
+            targetSection.removeAttribute("open");
         };
 
         summary.addEventListener("click", (event) => {
@@ -85,26 +151,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 // Close all other open sections
                 sections.forEach((otherSection) => {
                     if (otherSection !== section && otherSection.hasAttribute("open")) {
-                        const otherContent = otherSection.querySelector(":scope > .collapsibleContent");
-                        if (otherContent) {
-                            otherContent.style.height = `${otherContent.scrollHeight}px`;
-                            otherContent.style.opacity = "1";
-
-                            requestAnimationFrame(() => {
-                                otherContent.style.height = "0px";
-                                otherContent.style.opacity = "0";
-                            });
-
-                            const onTransitionEnd = (event) => {
-                                if (event.propertyName !== "height") {
-                                    return;
-                                }
-                                otherContent.removeEventListener("transitionend", onTransitionEnd);
-                                otherSection.removeAttribute("open");
-                            };
-
-                            otherContent.addEventListener("transitionend", onTransitionEnd);
-                        }
+                        collapseSectionInstant(otherSection);
                     }
                 });
 
@@ -152,4 +199,16 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+    const lastOpenSectionId = getLastOpenSection();
+    if (lastOpenSectionId) {
+        const lastSection = document.getElementById(lastOpenSectionId);
+        const lastSummary = lastSection?.querySelector(":scope > summary");
+
+        if (lastSection && lastSummary && !lastSection.hasAttribute("open")) {
+            lastSummary.click();
+        } else if (!lastSection) {
+            clearLastOpenSection();
+        }
+    }
 });
