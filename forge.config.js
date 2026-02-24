@@ -19,7 +19,7 @@ module.exports = {
       config: {
           certificateFile: './electronDemoPdf.pfx',
           certificatePassword: process.env.CERTIFICATE_PASSWORD,
-          remoteReleases: `https://update.reindal.cloud/argo-tools/`,
+         // remoteReleases: `https://update.reindal.cloud/argo-tools/`,
       },
     },
     {
