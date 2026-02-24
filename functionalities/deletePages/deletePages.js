@@ -1,8 +1,7 @@
-﻿const pdfjsLib = require('pdfjs-dist/build/pdf.js');
+const pdfjsLib = require('pdfjs-dist');
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
-const { pathToFileURL } = require('url');
 var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('deleteForm');
@@ -20,13 +19,15 @@ const metadataDescriptionInput = document.getElementById('metadataDescriptionInp
 
 let currentLang = 'en';
 
-addMetadataCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        metadataFieldsDiv.classList.add('visible');
-    } else {
-        metadataFieldsDiv.classList.remove('visible');
-    }
-});
+if (addMetadataCheckbox && metadataFieldsDiv) {
+    addMetadataCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            metadataFieldsDiv.classList.add('visible');
+        } else {
+            metadataFieldsDiv.classList.remove('visible');
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     await refreshLanguage();
@@ -41,19 +42,12 @@ async function refreshLanguage() {
     }
 }
 
-// Helper function to get translated messages
-function getMessage(key, params = {}) {
-    if (typeof window.getMessage === 'function') {
-        return window.getMessage(key, params);
-    }
-    // Fallback if getMessage is not loaded yet
-    return key;
-}
-
 // PDF.js configuration for thumbnails
-pdfjsLib.GlobalWorkerOptions.workerSrc = pathToFileURL(
-    require.resolve('pdfjs-dist/build/pdf.worker.js')
-).toString();
+pdfjsLib.GlobalWorkerOptions.workerSrc = require('path').join(
+    require.resolve('pdfjs-dist/package.json').replace('package.json', ''),
+    'build',
+    'pdf.worker.mjs'
+);
 
 let originalFileBuffer = null;
 let pagesToDelete = new Set();
@@ -74,7 +68,7 @@ fileInput.addEventListener('change', async function (e) {
 });
 
 async function renderPagePreviews(buffer) {
-    pagesGrid.innerHTML = `<p>${getMessage('loadingPreview')}</p>`;
+    pagesGrid.innerHTML = `<p>Loading preview...</p>`;
     previewSection.style.display = 'block';
 
     const loadingTask = pdfjsLib.getDocument({ data: buffer, disableWorker: true });
@@ -127,12 +121,12 @@ form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     if (pagesToDelete.size === 0 || pagesToDelete.size === totalPages) {
-        showStatus(getMessage('mustLeaveAtLeastOnePage'), 'error');
+        showStatus('You must leave at least one page in the document', 'error');
         return;
     }
 
     submitBtn.disabled = true;
-    showStatus(getMessage('processing'), 'info');
+    showStatus('Processing...', 'info');
 
     try {
         const pdfDoc = await PDFDocument.load(originalFileBuffer.slice(0));
@@ -169,13 +163,13 @@ form.addEventListener('submit', async function (e) {
         });
 
         if (!savePath) {
-            showStatus(getMessage('saveCancelled'), 'info');
+            showStatus('Save cancelled', 'info');
             submitBtn.disabled = false;
             return;
         }
 
         await fs.writeFile(savePath, pdfBytes);
-        showStatus(getMessage('successDeleted', { filename: path.basename(savePath) }), 'success');
+        showStatus(`PDF saved successfully: ${path.basename(savePath)}`, 'success');
 
         // Clear custom metadata fields
         setTimeout(() => {
@@ -186,7 +180,7 @@ form.addEventListener('submit', async function (e) {
         }, 2000);
     } catch (error) {
         console.error(error);
-        showStatus(getMessage('errorPrefix') + error.message, 'error');
+        showStatus('Error: ' + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -206,5 +200,5 @@ function showStatus(message, type) {
 }
 
 window.addEventListener('languageChanged', () => {
-    showStatus(getMessage('processing'), 'info');
+    // Refresh status message if visible
 });

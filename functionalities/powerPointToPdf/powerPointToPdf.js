@@ -18,13 +18,15 @@ const metadataFieldsDiv = document.getElementById('metadataFields');
 const metadataTitleInput = document.getElementById('metadataTitleInput');
 const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
 
-addMetadataCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        metadataFieldsDiv.classList.add('visible');
-    } else {
-        metadataFieldsDiv.classList.remove('visible');
-    }
-});
+if (addMetadataCheckbox && metadataFieldsDiv) {
+    addMetadataCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            metadataFieldsDiv.classList.add('visible');
+        } else {
+            metadataFieldsDiv.classList.remove('visible');
+        }
+    });
+}
 
 pptxFileInput.addEventListener('change', function (e) {
     if (e.target.files.length > 0) {
@@ -57,10 +59,10 @@ form.addEventListener('submit', async function (e) {
         if (metadata.author) pdfDoc.setAuthor(metadata.author);
 
         // Check if custom metadata is enabled
-        if (addMetadataCheckbox.checked) {
+        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
             // Use custom metadata from form fields for Title and Subject
-            const customTitle = metadataTitleInput.value.trim();
-            const customDescription = metadataDescriptionInput.value.trim();
+            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
+            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
 
             if (customTitle) pdfDoc.setTitle(customTitle);
             if (customDescription) pdfDoc.setSubject(customDescription);
@@ -232,10 +234,10 @@ form.addEventListener('submit', async function (e) {
             showStatus(getMessage('successPptxCreated'), 'success');
             // Clear custom metadata fields
             setTimeout(() => {
-                metadataTitleInput.value = '';
-                metadataDescriptionInput.value = '';
-                addMetadataCheckbox.checked = false;
-                metadataFieldsDiv.classList.remove('visible');
+                if (metadataTitleInput) metadataTitleInput.value = '';
+                if (metadataDescriptionInput) metadataDescriptionInput.value = '';
+                if (addMetadataCheckbox) addMetadataCheckbox.checked = false;
+                if (metadataFieldsDiv) metadataFieldsDiv.classList.remove('visible');
             }, 2000);
         }
 
@@ -254,38 +256,21 @@ function showStatus(message, type) {
     statusDiv.style.display = 'block';
 }
 
-async function getMessage(key) {
-    let lang;
-
-    try {
-        lang = await ipcRenderer.invoke('get-language');
-    } catch (err) {
-        lang = 'en';
+// Helper function to get translated messages
+function getMessage(key, params = {}) {
+    if (typeof window.getMessage === 'function') {
+        return window.getMessage(key, params);
     }
-
-    const messages = {
-        en: {
-            convertingPptx: "Converting PowerPoint to PDF...",
-            successPptxCreated: "✓ PDF created successfully",
-            errorPptx: "Error converting PPTX: "
-        },
-        it: {
-            convertingPptx: "Sto convertendo la presentazione in PDF...",
-            successPptxCreated: "✓ PDF creato con successo!",
-            errorPptx: "Si è verificato un errore durante la conversione del PPTX: "
-        },
-        pl: {
-            convertingPptx: "Trwa konwersja prezentacji do PDF...",
-            successPptxCreated: "✓ PDF został pomyślnie utworzony!",
-            errorPptx: "Wystąpił błąd podczas konwersji pliku PPTX: "
-        },
-        es: {
-            convertingPptx: "Convirtiendo PowerPoint a PDF...",
-            successPptxCreated: "✓ PDF creado correctamente",
-            errorPptx: "Error al convertir el PPTX: "
-        }
-
+    // Fallback messages if getMessage is not loaded yet
+    const fallbackMessages = {
+        convertingPptx: "Converting PowerPoint to PDF...",
+        successPptxCreated: "✓ PDF created successfully",
+        errorPptx: "Error converting PPTX: "
     };
-
-    return (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
+    return fallbackMessages[key] || key;
 }
+
+
+
+
+

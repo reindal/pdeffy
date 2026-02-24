@@ -17,13 +17,15 @@ const metadataFieldsDiv = document.getElementById('metadataFields');
 const metadataTitleInput = document.getElementById('metadataTitleInput');
 const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
 
-addMetadataCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        metadataFieldsDiv.classList.add('visible');
-    } else {
-        metadataFieldsDiv.classList.remove('visible');
-    }
-});
+if (addMetadataCheckbox && metadataFieldsDiv) {
+    addMetadataCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            metadataFieldsDiv.classList.add('visible');
+        } else {
+            metadataFieldsDiv.classList.remove('visible');
+        }
+    });
+}
 
 docxFileInput.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
@@ -72,10 +74,10 @@ form.addEventListener('submit', async function(e) {
         if (metadata.author) pdfDoc.setAuthor(metadata.author);
 
         // Check if custom metadata is enabled
-        if (addMetadataCheckbox.checked) {
+        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
             // Use custom metadata from form fields for Title and Subject
-            const customTitle = metadataTitleInput.value.trim();
-            const customDescription = metadataDescriptionInput.value.trim();
+            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
+            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
 
             if (customTitle) pdfDoc.setTitle(customTitle);
             if (customDescription) pdfDoc.setSubject(customDescription);
@@ -91,7 +93,6 @@ form.addEventListener('submit', async function(e) {
         
         let page = pdfDoc.addPage();
         let { width, height } = page.getSize();
-        const margin = 50;
         let cursorY = height - margin;
         const maxWidth = width - (margin * 2);
 
@@ -228,10 +229,10 @@ form.addEventListener('submit', async function(e) {
             showStatus(getMessage('successDocxCreated'), 'success');
             // Clear custom metadata fields
             setTimeout(() => {
-                metadataTitleInput.value = '';
-                metadataDescriptionInput.value = '';
-                addMetadataCheckbox.checked = false;
-                metadataFieldsDiv.classList.remove('visible');
+                if (metadataTitleInput) metadataTitleInput.value = '';
+                if (metadataDescriptionInput) metadataDescriptionInput.value = '';
+                if (addMetadataCheckbox) addMetadataCheckbox.checked = false;
+                if (metadataFieldsDiv) metadataFieldsDiv.classList.remove('visible');
             }, 2000);
         }
 
@@ -248,3 +249,18 @@ function showStatus(message, type) {
     statusDiv.className = `status ${type}`;
     statusDiv.style.display = 'block';
 }
+
+// Helper function to get translated messages
+function getMessage(key, params = {}) {
+    if (typeof window.getMessage === 'function') {
+        return window.getMessage(key, params);
+    }
+    // Fallback messages if getMessage is not loaded yet
+    const fallbackMessages = {
+        convertingDocx: "Converting DOCX to PDF...",
+        successDocxCreated: "✓ PDF created successfully",
+        errorDocx: "Error converting DOCX: "
+    };
+    return fallbackMessages[key] || key;
+}
+
