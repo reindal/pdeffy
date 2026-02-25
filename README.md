@@ -7,7 +7,7 @@ Built with performance, usability, and flexibility in mind, it empowers users to
 
 ## 🚀 About the Project
 
-pdeffy was developed by **Reindal S.r.l.**, a software house based in Reggio Emilia, Italy.
+pdeffy was developed by **Łukasz 🇵🇱, Mikołaj 🇵🇱 and Adriano 🇪🇸** with the help of **Reindal S.r.l.** team, a software house based in Reggio Emilia, Italy.
 
 Reindal actively supports international study-work programs, welcoming students from across Europe every year. This project was created in a dynamic, collaborative environment by a team composed of:
 
@@ -19,6 +19,24 @@ The result is a modern, practical tool born from cross-cultural collaboration, i
 
 ---
 
+## ⚙ Requirements
+
+To run this project, **Node.js and npm are required**.
+
+Make sure you have Node.js installed (npm is included with Node.js).
+
+You can verify installation with:
+
+```bash
+node -v
+npm -v
+```
+
+If not installed, download Node.js from:
+https://nodejs.org/
+
+---
+
 ## 🏗️ Launch the Project
 
 ### Development Mode
@@ -26,6 +44,7 @@ The result is a modern, practical tool born from cross-cultural collaboration, i
 To run the application in development mode:
 
 ```bash
+npm install
 npm start
 ```
 
@@ -167,6 +186,28 @@ To contribute:
 
 Reindal S.r.l. is a software house based in Reggio Emilia, Italy.  
 The company develops custom digital solutions and actively participates in international educational programs, fostering innovation through collaboration with young European talents.
+
+---
+
+## 📦 Third-Party Dependencies
+
+This project uses the following open-source libraries:
+
+- docx ^8.5.0 — MIT License
+- electron-squirrel-startup ^1.0.1 — MIT License
+- fs-extra ^11.2.0 — MIT License
+- html2canvas ^1.4.1 — MIT License
+- jspdf ^4.1.0 — MIT License
+- jszip ^3.10.1 — MIT License
+- jszip (alias: jszip2) 2.6.1 — MIT License
+- mammoth ^1.11.0 — BSD-2-Clause License
+- pdf-lib ^1.17.1 — MIT License
+- pdfjs-dist ^5.4.624 — Apache-2.0 License
+- pptx2html ^0.3.4 — MIT License
+- pptxgenjs ^4.0.1 — MIT License
+- signtool ^1.0.0 — MIT License
+- update-electron-app ^3.1.2 — MIT License
+- xml2js ^0.6.2 — MIT License
 
 ---
 
