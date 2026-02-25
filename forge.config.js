@@ -1,20 +1,25 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const path = require('path');
+//const packageJson = require('./package.json');
 
 module.exports = {
   packagerConfig: {
     asar: true,
     executableName: 'pdeffy',
     ignore: [
-      /(^|\/)node_modules\/canvas($|\/)/
-    ]
+      /node_modules[/\\](canvas|sqlite3|better-sqlite3|node-gyp)/,
+    ],
+  },
+  rebuildConfig: {
+    enabled: false,
   },
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-        certificateFile: './electronDemoPdf.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD
+          certificateFile: './electronDemoPdf.pfx',
+          certificatePassword: process.env.CERTIFICATE_PASSWORD,
       },
     },
     {
@@ -32,10 +37,22 @@ module.exports = {
     /*{
       name: '@electron-forge/maker-wix',
       config: {
-        certificateFile: './electronDemoPdft.pfx',
-        certificatePassword: process.env.CERTIFICATE_PASSWORD
+        name: `Pdeffy`,
+        exe: `pdeffy.exe`,
+        icon: "assets/icon.ico",
+        features: {
+            autoUpdate: true,
+            autoLaunch: true,
+          },
+        ui: {
+          chooseDirectory: true,
+          images: {
+            background: path.join(__dirname, "assets", "installerBackground.jpg"),
+            banner: path.join(__dirname, "assets", "installerBanner.jpg"),
+          },
       },
-    }*/
+      },
+    },*/
   ],
   plugins: [
     {

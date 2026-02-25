@@ -1,11 +1,11 @@
 const { Document, Packer, Paragraph, TextRun, ImageRun } = require('docx');
 const fs = require('fs').promises;
 const path = require('path');
-const pdfjsLib = require('pdfjs-dist');
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
 var { ipcRenderer } = require('electron');
 
-// Set up the worker for pdfjs
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.min.js');
+// Set worker source for legacy build
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
 
 const form = document.getElementById('pdfToDocxForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -37,8 +37,14 @@ form.addEventListener('submit', async function(e) {
         // Read PDF file
         const pdfBuffer = await selectedFile.arrayBuffer();
 
-        // Parse PDF using pdfjs-dist
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
+        // Parse PDF using pdfjs-dist (legacy build without worker)
+        const loadingTask = pdfjsLib.getDocument({
+            data: new Uint8Array(pdfBuffer),
+            useWorkerFetch: false,
+            isEvalSupported: false,
+            useSystemFonts: true
+        });
+        const pdf = await loadingTask.promise;
 
         const allParagraphs = [];
 

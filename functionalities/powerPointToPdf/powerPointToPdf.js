@@ -12,6 +12,22 @@ const statusDiv = document.getElementById('status');
 const fileNameDisplay = document.getElementById('fileNameDisplay');
 const fileInfo = document.getElementById('fileInfo');
 
+// Custom metadata toggle
+const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
+const metadataFieldsDiv = document.getElementById('metadataFields');
+const metadataTitleInput = document.getElementById('metadataTitleInput');
+const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
+
+if (addMetadataCheckbox && metadataFieldsDiv) {
+    addMetadataCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            metadataFieldsDiv.classList.add('visible');
+        } else {
+            metadataFieldsDiv.classList.remove('visible');
+        }
+    });
+}
+
 pptxFileInput.addEventListener('change', function (e) {
     if (e.target.files.length > 0) {
         fileInfo.style.display = 'block';
@@ -24,7 +40,7 @@ form.addEventListener('submit', async function (e) {
     if (!pptxFileInput.files[0]) return;
 
     submitBtn.disabled = true;
-    showStatus( await getMessage('convertingPptx'), 'info');
+    showStatus(getLocalMessage('convertingPptx'), 'info');
 
     try {
         const file = pptxFileInput.files[0];
@@ -38,6 +54,38 @@ form.addEventListener('submit', async function (e) {
         const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
         const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
         const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+
+        // Get metadata from global settings
+        const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+
+        // Always set author from global settings
+        if (metadata.author) {
+            pdfDoc.setAuthor(metadata.author);
+        }
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject (only if not empty)
+            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
+            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
+
+            if (customTitle) {
+                pdfDoc.setTitle(customTitle);
+            }
+            if (customDescription) {
+                pdfDoc.setSubject(customDescription);
+            }
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) {
+                pdfDoc.setTitle(metadata.title);
+            }
+            if (metadata.subject) {
+                pdfDoc.setSubject(metadata.subject);
+            }
+        }
+
+        const font = await pdfDoc.embedFont(StandardFonts.Helvetica || 'Helvetica');
 
         // Slide files are located in ppt/slides/slideN.xml
         const slideFiles = Object.keys(zip.files).filter(name => name.startsWith('ppt/slides/slide') && name.endsWith('.xml'));
@@ -196,12 +244,19 @@ form.addEventListener('submit', async function (e) {
 
         if (outputPath) {
             await fs.writeFile(outputPath, pdfBytes);
-            showStatus( await getMessage('successPptxCreated'), 'success');
+            showStatus(getLocalMessage('successPptxCreated'), 'success');
+            // Clear custom metadata fields
+            setTimeout(() => {
+                if (metadataTitleInput) metadataTitleInput.value = '';
+                if (metadataDescriptionInput) metadataDescriptionInput.value = '';
+                if (addMetadataCheckbox) addMetadataCheckbox.checked = false;
+                if (metadataFieldsDiv) metadataFieldsDiv.classList.remove('visible');
+            }, 2000);
         }
 
     } catch (error) {
         console.error(error);
-        showStatus( await getMessage('errorPptx') + error.message, 'error');
+        showStatus(getLocalMessage('errorPptx') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -214,38 +269,21 @@ function showStatus(message, type) {
     statusDiv.style.display = 'block';
 }
 
-async function getMessage(key) {
-    let lang;
-
-    try {
-        lang = await ipcRenderer.invoke('get-language');
-    } catch (err) {
-        lang = 'en';
+// Helper function to get translated messages
+function getLocalMessage(key, params = {}) {
+    if (typeof window.getMessage === 'function' && window.getMessage !== getLocalMessage) {
+        return window.getMessage(key, params);
     }
-
-    const messages = {
-        en: {
-            convertingPptx: "Converting PowerPoint to PDF...",
-            successPptxCreated: "✓ PDF created successfully",
-            errorPptx: "Error converting PPTX: "
-        },
-        it: {
-            convertingPptx: "Sto convertendo la presentazione in PDF...",
-            successPptxCreated: "✓ PDF creato con successo!",
-            errorPptx: "Si è verificato un errore durante la conversione del PPTX: "
-        },
-        pl: {
-            convertingPptx: "Trwa konwersja prezentacji do PDF...",
-            successPptxCreated: "✓ PDF został pomyślnie utworzony!",
-            errorPptx: "Wystąpił błąd podczas konwersji pliku PPTX: "
-        },
-        es: {
-            convertingPptx: "Convirtiendo PowerPoint a PDF...",
-            successPptxCreated: "✓ PDF creado correctamente",
-            errorPptx: "Error al convertir el PPTX: "
-        }
-
+    // Fallback messages if getMessage is not loaded yet
+    const fallbackMessages = {
+        convertingPptx: "Converting PowerPoint to PDF...",
+        successPptxCreated: "✓ PDF created successfully",
+        errorPptx: "Error converting PPTX: "
     };
-
-    return (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
+    return fallbackMessages[key] || key;
 }
+
+
+
+
+

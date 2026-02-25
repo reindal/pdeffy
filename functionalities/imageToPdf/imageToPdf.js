@@ -9,11 +9,27 @@ const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
 const imagesOrderContainer = document.getElementById('imagesOrderContainer');
 
+// Custom metadata toggle
+const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
+const metadataFieldsDiv = document.getElementById('metadataFields');
+const metadataTitleInput = document.getElementById('metadataTitleInput');
+const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
+
 let selectedImages = [];
 
-imageFiles.addEventListener('change', function(e) {
-    selectedImages = Array.from(e.target.files);
+addMetadataCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        metadataFieldsDiv.classList.add('visible');
+    } else {
+        metadataFieldsDiv.classList.remove('visible');
+    }
+});
+
+imageFiles.addEventListener('change', function (e) {
+    const newFiles = Array.from(e.target.files);
+    selectedImages = [...selectedImages, ...newFiles];
     updateImagesOrder();
+    imageFiles.value = '';
 });
 
 function updateImagesOrder() {
@@ -120,11 +136,35 @@ form.addEventListener('submit', async function(e) {
     try {
         const pdfDoc = await PDFDocument.create();
 
-        // Get metadata from environment variables
+        // Get metadata from global settings
         const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-        if (metadata.author) pdfDoc.setAuthor(metadata.author);
-        if (metadata.title) pdfDoc.setTitle(metadata.title);
-        if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+
+        // Always set author from global settings
+        if (metadata.author) {
+            pdfDoc.setAuthor(metadata.author);
+        }
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject (only if not empty)
+            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
+            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
+
+            if (customTitle) {
+                pdfDoc.setTitle(customTitle);
+            }
+            if (customDescription) {
+                pdfDoc.setSubject(customDescription);
+            }
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) {
+                pdfDoc.setTitle(metadata.title);
+            }
+            if (metadata.subject) {
+                pdfDoc.setSubject(metadata.subject);
+            }
+        }
 
         for (const imageFile of selectedImages) {
             const imageBytes = await imageFile.arrayBuffer();
@@ -226,51 +266,4 @@ function showStatus(message, type) {
             statusDiv.style.display = 'none';
         }, 5000);
     }
-}
-
-// Helper function to get translated message
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'en';
-    const messages = {
-        en: {
-            pleaseSelectAtLeastOneImage: "Please select at least one image",
-            creatingPdf: "Creating PDF...",
-            successPdfCreated: "✓ PDF created successfully: {filename}",
-            successPdfCreatedPath: "✓ Saved PDF: {filename}\nin: {path}",
-            saveCancelled: "Save cancelled",
-            errorPrefix: "Error: "
-        },
-        it: {
-            pleaseSelectAtLeastOneImage: "Seleziona almeno un'immagine",
-            creatingPdf: "Creazione PDF...",
-            successPdfCreated: "✓ PDF creato con successo: {filename}",
-            successPdfCreatedPath: "✓ PDF salvato: {filename}\nin: {path}",
-            saveCancelled: "Salvataggio annullato",
-            errorPrefix: "Errore: "
-        },
-        pl: {
-            pleaseSelectAtLeastOneImage: "Proszę wybrać co najmniej jeden obraz",
-            creatingPdf: "Tworzenie PDF...",
-            successPdfCreated: "✓ PDF utworzony pomyślnie: {filename}",
-            successPdfCreatedPath: "✓ Zapisano PDF: {filename}\nw: {path}",
-            saveCancelled: "Zapisywanie anulowane",
-            errorPrefix: "Błąd: "
-        },
-        es: {
-            pleaseSelectAtLeastOneImage: "Por favor, selecciona al menos una imagen",
-            creatingPdf: "Creando PDF...",
-            successPdfCreated: "✓ PDF creado con éxito: {filename}",
-            successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
-            saveCancelled: "Guardado cancelado",
-            errorPrefix: "Error: "
-        }
-    };
-
-    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
 }

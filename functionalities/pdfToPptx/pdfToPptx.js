@@ -1,10 +1,10 @@
 const pptxgen = require('pptxgenjs');
 const path = require('path');
-const pdfjsLib = require('pdfjs-dist');
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
 var { ipcRenderer } = require('electron');
 
-// Set up the worker for pdfjs
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/build/pdf.worker.min.js');
+// Set worker source for legacy build
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
 
 const form = document.getElementById('pdfToPptxForm');
 const pdfFile = document.getElementById('pdfFile');

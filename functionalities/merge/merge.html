@@ -9,8 +9,9 @@
 <body>
 <div class="headerContainer">
     <header>
-        <img src="../../assets/new_logo.png" alt="PDF Icon" class="headerIcon">
+        <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
         <h1 id="mergeHeader" class="langText">Merge PDF</h1>
+        <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
     </header>
 </div>
 
@@ -22,7 +23,7 @@
             <div class="formGroup">
                 <label for="pdfFiles" id="mergeSelectLabel" class="langText">Select PDF files (can select multiple):</label>
                 <div class="fileInputWrapper">
-                    <input type="file" id="pdfFiles" accept=".pdf" multiple required>
+                    <input type="file" id="pdfFiles" accept=".pdf" multiple>
                     <label for="pdfFiles" class="fileInputLabel langText" id="mergeSelectButton">Click to select files</label>
                 </div>
             </div>
@@ -33,6 +34,22 @@
                 <p class="helpText langText" id="mergeHelpText">Drag to reorder files (top to bottom = first to last in merged PDF)</p>
             </div>
 
+            <div class="metadataCheckboxGroup">
+                <label class="metadataCheckboxLabel">
+                    <input type="checkbox" id="addMetadataCheckbox">
+                    <span class="langText" id="addCustomMetadata">Add custom metadata properties</span>
+                </label>
+                <div id="metadataFields" class="metadataFields">
+                    <div class="formGroup">
+                        <label for="metadataTitleInput" class="langText" id="metadataTitle">Title:</label>
+                        <input type="text" id="metadataTitleInput" placeholder="Enter document title">
+                    </div>
+                    <div class="formGroup">
+                        <label for="metadataDescriptionInput" class="langText" id="metadataDescription">Description:</label>
+                        <textarea id="metadataDescriptionInput" placeholder="Enter document description"></textarea>
+                    </div>
+                </div>
+            </div>
 
             <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="mergeSubmitBtn">Merge PDF</span></button>
         </form>

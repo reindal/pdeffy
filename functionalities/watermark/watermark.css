@@ -1,4 +1,5 @@
 @import url('../../variables.css');
+@import url('../funcionalities.css');
 
 .watermarkContainer {
     max-width: 600px;
@@ -166,66 +167,6 @@
     color: #2a2a2a;
 }
 
-.formGroup {
-    margin-bottom: 20px;
-}
-
-.formGroup label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--reindalDark);
-    font-weight: 600;
-    font-family: var(--font-primary), serif;
-}
-
-.formGroup input[type="text"],
-.formGroup input[type="number"],
-.formGroup input[type="range"],
-.formGroup select {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid var(--reindalGray);
-    border-radius: 8px;
-    font-family: var(--font-primary), serif;
-    font-size: 14px;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
-}
-
-.formGroup input:focus,
-.formGroup select:focus {
-    outline: none;
-    border-color: var(--reindalYellow);
-}
-
-.fileInputWrapper {
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-    width: 100%;
-}
-
-.fileInputWrapper input[type="file"] {
-    position: absolute;
-    left: -9999px;
-}
-
-.fileInputLabel {
-    display: block;
-    padding: 12px;
-    background-color: var(--reindalYellow);
-    color: #2a2a2a;
-    text-align: center;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-.fileInputLabel:hover {
-    background-color: var(--reindalYellowHover);
-}
-
 .fileName {
     margin-top: 10px;
     font-size: 14px;
@@ -316,68 +257,5 @@
     font-size: 14px;
     box-sizing: border-box;
 }
-
-.submitBtn {
-    flex: 2;
-    padding: 14px;
-    background-color: var(--reindalYellow);
-    color: #2a2a2a;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    font-family: var(--font-primary), serif;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.submitBtn:hover {
-    background-color: var(--reindalYellowHover);
-}
-
-.submitBtn:disabled {
-    background-color: var(--reindalGrayLight);
-    color: var(--reindalGray);
-    cursor: not-allowed;
-}
-
-.status {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-align: center;
-    font-family: var(--font-primary), serif;
-    display: none;
-}
-
-.status.success {
-    background-color: var(--reindalMint);
-    color: var(--reindalDarkGreen);
-    border: 2px solid var(--reindalGreen);
-    display: block;
-}
-
-.status.error {
-    background-color: var(--reindalLightPink);
-    color: var(--reindalWineRed);
-    border: 2px solid var(--reindalPink);
-    display: block;
-}
-
-.backLink {
-    display: inline-block;
-    margin-top: 20px;
-    color: var(--reindalDark);
-    font-weight: 600;
-    text-decoration: none;
-    font-family: var(--font-primary), serif;
-    transition: color 0.3s ease;
-}
-
-.backLink:hover {
-    color: var(--reindalYellow);
-}
-
 
 

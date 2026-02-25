@@ -11,6 +11,22 @@ const statusDiv = document.getElementById('status');
 const fileNameDisplay = document.getElementById('fileNameDisplay');
 const fileInfo = document.getElementById('fileInfo');
 
+// Custom metadata toggle
+const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
+const metadataFieldsDiv = document.getElementById('metadataFields');
+const metadataTitleInput = document.getElementById('metadataTitleInput');
+const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
+
+if (addMetadataCheckbox && metadataFieldsDiv) {
+    addMetadataCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            metadataFieldsDiv.classList.add('visible');
+        } else {
+            metadataFieldsDiv.classList.remove('visible');
+        }
+    });
+}
+
 docxFileInput.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
         fileInfo.style.display = 'block';
@@ -23,7 +39,7 @@ form.addEventListener('submit', async function(e) {
     if (!docxFileInput.files[0]) return;
 
     submitBtn.disabled = true;
-    showStatus(getMessage('convertingDocx'), 'info');
+    showStatus(getLocalMessage('convertingDocx'), 'info');
 
     try {
         const file = docxFileInput.files[0];
@@ -53,9 +69,40 @@ form.addEventListener('submit', async function(e) {
         const helveticaOblique = await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
         const timesBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
+        // Get metadata from global settings
+        const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+
+        // Always set author from global settings
+        if (metadata.author) {
+            pdfDoc.setAuthor(metadata.author);
+        }
+
+        // Check if custom metadata is enabled
+        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
+            // Use custom metadata from form fields for Title and Subject (only if not empty)
+            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
+            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
+
+            if (customTitle) {
+                pdfDoc.setTitle(customTitle);
+            }
+            if (customDescription) {
+                pdfDoc.setSubject(customDescription);
+            }
+        } else {
+            // Use global settings for Title and Subject
+            if (metadata.title) {
+                pdfDoc.setTitle(metadata.title);
+            }
+            if (metadata.subject) {
+                pdfDoc.setSubject(metadata.subject);
+            }
+        }
+
+        const margin = 50;
+        
         let page = pdfDoc.addPage();
         let { width, height } = page.getSize();
-        const margin = 50;
         let cursorY = height - margin;
         const maxWidth = width - (margin * 2);
 
@@ -189,12 +236,19 @@ form.addEventListener('submit', async function(e) {
 
         if (outputPath) {
             await fs.writeFile(outputPath, pdfBytes);
-            showStatus(getMessage('successDocxCreated'), 'success');
+            showStatus(getLocalMessage('successDocxCreated'), 'success');
+            // Clear custom metadata fields
+            setTimeout(() => {
+                if (metadataTitleInput) metadataTitleInput.value = '';
+                if (metadataDescriptionInput) metadataDescriptionInput.value = '';
+                if (addMetadataCheckbox) addMetadataCheckbox.checked = false;
+                if (metadataFieldsDiv) metadataFieldsDiv.classList.remove('visible');
+            }, 2000);
         }
 
     } catch (error) {
         console.error(error);
-        showStatus(getMessage('errorDocx') + error.message, 'error');
+        showStatus(getLocalMessage('errorDocx') + error.message, 'error');
     } finally {
         submitBtn.disabled = false;
     }
@@ -206,53 +260,18 @@ function showStatus(message, type) {
     statusDiv.style.display = 'block';
 }
 
-function getMessage(key, params = {}) {
-    const lang = localStorage.getItem('language') || 'es'; 
-    
-    const messages = {
-        es: {
-            pleaseSelectDocx: "Por favor, selecciona un archivo .docx",
-            convertingDocx: "Convirtiendo documento Word...",
-            successDocxCreated: "✓ PDF creado correctamente",
-            successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
-            saveCancelled: "Guardado cancelado",
-            errorPrefix: "Error: ",
-            errorDocx: "Error al convertir el Docx: "
-        },
-        en: {
-            pleaseSelectDocx: "Please select a .docx file",
-            convertingDocx: "Converting Word document...",
-            successDocxCreated: "✓ PDF created successfully",
-            successPdfCreatedPath: "✓ Saved PDF: {filename}\nin: {path}",
-            saveCancelled: "Save cancelled",
-            errorPrefix: "Error: ",
-            errorDocx: "Error converting Docx: "
-        },
-        it: {
-            pleaseSelectDocx: "Per favore, seleziona un file .docx",
-            convertingDocx: "Conversione del documento Word...",
-            successDocxCreated: "✓ PDF creato con successo",
-            successPdfCreatedPath: "✓ PDF salvato: {filename}\nin: {path}",
-            saveCancelled: "Salvataggio annullato",
-            errorPrefix: "Errore: ",
-            errorDocx: "Errore durante la conversione del Docx: "
-        },
-        pl: {
-            pleaseSelectDocx: "Proszę wybrać plik .docx",
-            convertingDocx: "Konwertowanie dokumentu Word...",
-            successDocxCreated: "✓ PDF utworzony pomyślnie",
-            successPdfCreatedPath: "✓ Zapisano PDF: {filename}\nw: {path}",
-            saveCancelled: "Zapisywanie anulowane",
-            errorPrefix: "Błąd: ",
-            errorDocx: "Błąd podczas konwersji Docx: "
-        }
+// Helper function to get translated messages
+function getLocalMessage(key, params = {}) {
+    // Check if window.getMessage exists AND is not this function (prevent infinite recursion)
+    if (typeof window.getMessage === 'function' && window.getMessage !== getLocalMessage) {
+        return window.getMessage(key, params);
+    }
+    // Fallback messages if getMessage is not loaded yet
+    const fallbackMessages = {
+        convertingDocx: "Converting DOCX to PDF...",
+        successDocxCreated: "✓ PDF created successfully",
+        errorDocx: "Error converting DOCX: "
     };
-
-    let message = (messages[lang] && messages[lang][key]) || messages['en'][key] || key;
-
-    Object.keys(params).forEach(param => {
-        message = message.replace(`{${param}}`, params[param]);
-    });
-
-    return message;
+    return fallbackMessages[key] || key;
 }
+

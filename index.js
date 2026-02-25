@@ -17,17 +17,19 @@ updateElectronApp({
 const userDataPath = app.getPath('userData');
 const settingsPath = path.join(userDataPath, 'pdf-settings.json');
 const languagePath = path.join(userDataPath, 'language-settings.json');
+const firstLaunchMarkerPath = path.join(userDataPath, 'first-launch-complete.json');
 
 let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         },
         show: false,
-        icon: path.join(__dirname, "assets", "icon.png")
+        icon: path.join(__dirname, "assets", "ico.png")
     });
     mainWindow.maximize();
     mainWindow.loadURL(url.format({
@@ -119,6 +121,27 @@ ipcMain.handle('get-pdf-metadata', async () => {
         title: '',
         subject: ''
     };
+});
+
+// Handle IPC request to know if this is the first app launch.
+// The existence of a marker file as the source of truth.
+ipcMain.handle('check-first-launch', async () => {
+    try {
+        if (fs.existsSync(firstLaunchMarkerPath)) {
+            return false;
+        }
+
+        fs.writeFileSync(
+            firstLaunchMarkerPath,
+            JSON.stringify({ completedAt: new Date().toISOString() }, null, 2),
+            'utf8'
+        );
+
+        return true;
+    } catch (error) {
+        console.error('Error handling first-launch marker:', error);
+        return false;
+    }
 });
 
 app.on("ready", createWindow);
