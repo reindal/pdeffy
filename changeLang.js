@@ -1,10 +1,10 @@
-﻿var { ipcRenderer } = require('electron');
+﻿﻿var { ipcRenderer } = require('electron');
 window.currentLanguage = 'en';
 
 const languages = {
     en: {
         languageText: "Language",
-        welcomeText: "Welcome to the PDF Converter",
+        welcomeText: "Smart PDF tools",
 
         // Category tiles
         organizePdfTile: "Organize PDF",
@@ -282,7 +282,7 @@ const languages = {
     },
     it: {
         languageText: "Lingua",
-        welcomeText: "Benvenuto al Convertitore PDF",
+        welcomeText: "Smart PDF tools",
 
         // Category tiles
         organizePdfTile: "Organizza PDF",
@@ -561,7 +561,7 @@ const languages = {
     },
     pl: {
         languageText: "Język",
-        welcomeText: "Witamy w Konwerterze PDF",
+        welcomeText: "Smart PDF tools",
 
         // Category tiles
         organizePdfTile: "Organizuj PDF",
@@ -836,7 +836,7 @@ const languages = {
     },
     es: {
         languageText: "Idioma",
-        welcomeText: "Bienvenido al conversor de PDFs",
+        welcomeText: "Smart PDF tools",
 
         // Category tiles
         organizePdfTile: "Organizar PDF",
