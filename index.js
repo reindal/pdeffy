@@ -23,6 +23,7 @@ let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
