@@ -212,7 +212,7 @@ body {
 }
 
 .tool-card p {
-    color: var(--reindalTab);
+    color: var(--reindalDark);
     font-weight: 300;
     font-size: 0.95rem;
 }
