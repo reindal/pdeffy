@@ -51,4 +51,7 @@ module.exports = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
+  rebuildConfig: {
+    excludeModules: ['canvas']
+  }
 };

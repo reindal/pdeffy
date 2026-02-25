@@ -31,14 +31,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
-      - name: Install GTK+ for Canvas (Windows)
-        if: matrix.os == 'windows-latest'
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://github.com/Automattic/node-canvas/releases/download/v2.6.1/gtk-2.24.10-64.zip" -OutFile "gtk.zip"
-          Expand-Archive -Path "gtk.zip" -DestinationPath "C:\GTK"
-          echo "C:\GTK\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
       - name: Install dependencies
         run: npm install
         env:
