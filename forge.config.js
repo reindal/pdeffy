@@ -20,6 +20,8 @@ module.exports = {
       config: {
           certificateFile: './electronDemoPdf.pfx',
           certificatePassword: process.env.CERTIFICATE_PASSWORD,
+          setupExe: 'pdeffySetup-latest.exe',
+          setupIcon: 'assets/icon.ico',
       },
     },
     {
