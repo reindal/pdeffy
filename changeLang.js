@@ -1,4 +1,4 @@
-﻿﻿var { ipcRenderer } = require('electron');
+﻿var { ipcRenderer } = require('electron');
 window.currentLanguage = 'en';
 
 const languages = {

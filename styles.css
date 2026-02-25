@@ -209,7 +209,7 @@ header h1 {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
-    transition-delay: var(--card-delay, 0ms);
+    transition-delay: 0ms;
 }
 
 .optionCard{
