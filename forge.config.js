@@ -4,9 +4,9 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
-  },
-  rebuildConfig: {
-    excludeModules: ['canvas']
+    ignore: [
+      /(^|\/)node_modules\/canvas($|\/)/
+    ]
   },
   makers: [
     {
