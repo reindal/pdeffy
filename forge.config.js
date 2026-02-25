@@ -19,7 +19,6 @@ module.exports = {
       config: {
           certificateFile: './electronDemoPdf.pfx',
           certificatePassword: process.env.CERTIFICATE_PASSWORD,
-         // remoteReleases: `https://update.reindal.cloud/argo-tools/`,
       },
     },
     {
@@ -34,7 +33,7 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {},
     },
-    {
+    /*{
       name: '@electron-forge/maker-wix',
       config: {
         name: `Pdeffy`,
@@ -52,7 +51,7 @@ module.exports = {
           },
       },
       },
-    },
+    },*/
   ],
   plugins: [
     {
