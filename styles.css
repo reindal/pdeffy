@@ -37,6 +37,23 @@ header h1 {
     pointer-events: none;
 }
 
+.backArrow {
+    color: var(--reindalLight);
+    font-size: 32px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.2s ease;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+}
+
+.backArrow:hover {
+    transform: translateX(-3px);
+    color: var(--reindalDark);
+}
+
 .headerContainer{
     display: flex;
     justify-content: center;
@@ -75,9 +92,10 @@ header h1 {
     box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
 }
 
-.categoryIcon {
+.categoryIcon img{
     font-size: 48px;
     margin-bottom: 12px;
+    width: 80px;
 }
 
 .categoryTile h3 {
@@ -216,7 +234,7 @@ header h1 {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
-    transition-delay: var(--card-delay, 0ms);
+    transition-delay: 0ms;
 }
 
 .optionCard{
