@@ -4,6 +4,7 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    executableName: 'pdeffy',
     ignore: [
       /(^|\/)node_modules\/canvas($|\/)/
     ]
