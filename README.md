@@ -7,7 +7,7 @@ Built with performance, usability, and flexibility in mind, it empowers users to
 
 ## 🚀 About the Project
 
-pdeffy was developed by **Łukasz 🇵🇱, Mikołaj 🇵🇱 and Adriano 🇪🇸** with the help of **Reindal S.r.l.** team, a software house based in Reggio Emilia, Italy.
+pdeffy was developed by **Łukasz 🇵🇱, Mikołaj 🇵🇱 and Adrian 🇪🇸** with the help of **Reindal S.r.l.** team, a software house based in Reggio Emilia, Italy.
 
 Reindal actively supports international study-work programs, welcoming students from across Europe every year. This project was created in a dynamic, collaborative environment by a team composed of:
 
