@@ -1,4 +1,4 @@
-const pdfjsLib = require('pdfjs-dist');
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
@@ -42,12 +42,6 @@ async function refreshLanguage() {
     }
 }
 
-// PDF.js configuration for thumbnails
-pdfjsLib.GlobalWorkerOptions.workerSrc = require('path').join(
-    require.resolve('pdfjs-dist/package.json').replace('package.json', ''),
-    'build',
-    'pdf.worker.mjs'
-);
 
 let originalFileBuffer = null;
 let pagesToDelete = new Set();

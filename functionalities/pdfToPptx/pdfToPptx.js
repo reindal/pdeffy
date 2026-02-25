@@ -1,12 +1,8 @@
 const pptxgen = require('pptxgenjs');
 const path = require('path');
-const pdfjsLib = require('pdfjs-dist');
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
 var { ipcRenderer } = require('electron');
 
-// Configure worker to use local copy
-if (typeof window !== 'undefined' && 'Worker' in window) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `${window.location.origin}/node_modules/pdfjs-dist/build/pdf.worker.min.mjs`;
-}
 
 const form = document.getElementById('pdfToPptxForm');
 const pdfFile = document.getElementById('pdfFile');
