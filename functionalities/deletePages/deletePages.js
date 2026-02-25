@@ -1,8 +1,11 @@
-const pdfjsLib = require('pdfjs-dist');
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
+
+// Set worker source for legacy build
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
 
 const form = document.getElementById('deleteForm');
 const fileInput = document.getElementById('pdfFile');
@@ -42,12 +45,6 @@ async function refreshLanguage() {
     }
 }
 
-// PDF.js configuration for thumbnails
-pdfjsLib.GlobalWorkerOptions.workerSrc = require('path').join(
-    require.resolve('pdfjs-dist/package.json').replace('package.json', ''),
-    'build',
-    'pdf.worker.mjs'
-);
 
 let originalFileBuffer = null;
 let pagesToDelete = new Set();

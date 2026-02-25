@@ -382,6 +382,25 @@ form.addEventListener('submit', async function(e) {
         addMetadataCheckbox.checked = false;
         metadataFieldsDiv.classList.remove('visible');
 
+        // Reset mode containers to show only the checked mode
+        rangeModeContainer.style.display = 'none';
+        everyModeContainer.style.display = 'none';
+        customModeContainer.style.display = 'none';
+        sizeModeContainer.style.display = 'none';
+
+        const checkedMode = document.querySelector('input[name="splitMode"]:checked');
+        if (checkedMode) {
+            if (checkedMode.value === 'range') {
+                rangeModeContainer.style.display = 'block';
+            } else if (checkedMode.value === 'every') {
+                everyModeContainer.style.display = 'block';
+            } else if (checkedMode.value === 'custom') {
+                customModeContainer.style.display = 'block';
+            } else if (checkedMode.value === 'size') {
+                sizeModeContainer.style.display = 'block';
+            }
+        }
+
     } catch (error) {
         showStatus(getMessage('errorPrefix') + error.message, 'error');
         submitBtn.disabled = false;

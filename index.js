@@ -23,12 +23,13 @@ let mainWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
+        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         },
         show: false,
-        icon: path.join(__dirname, "assets", "icon.png")
+        icon: path.join(__dirname, "assets", "ico.png")
     });
     mainWindow.maximize();
     mainWindow.loadURL(url.format({

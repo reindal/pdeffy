@@ -75,9 +75,10 @@ header h1 {
     box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;
 }
 
-.categoryIcon {
+.categoryIcon img{
     font-size: 48px;
     margin-bottom: 12px;
+    width: 80px;
 }
 
 .categoryTile h3 {
