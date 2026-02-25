@@ -8,7 +8,6 @@ module.exports = {
   rebuildConfig: {
     excludeModules: ['canvas']
   },
-  rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
