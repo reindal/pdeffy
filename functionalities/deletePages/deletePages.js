@@ -4,6 +4,9 @@ const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
 
+// Set worker source for legacy build
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
+
 const form = document.getElementById('deleteForm');
 const fileInput = document.getElementById('pdfFile');
 const pagesGrid = document.getElementById('pagesGrid');

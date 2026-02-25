@@ -3,6 +3,8 @@ const path = require('path');
 const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
 var { ipcRenderer } = require('electron');
 
+// Set worker source for legacy build
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
 
 const form = document.getElementById('pdfToPptxForm');
 const pdfFile = document.getElementById('pdfFile');
