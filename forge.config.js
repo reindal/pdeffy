@@ -5,6 +5,9 @@ module.exports = {
   packagerConfig: {
     asar: true,
   },
+  rebuildConfig: {
+    excludeModules: ['canvas']
+  },
   rebuildConfig: {},
   makers: [
     {
@@ -51,7 +54,4 @@ module.exports = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
-  rebuildConfig: {
-    excludeModules: ['canvas']
-  }
 };
