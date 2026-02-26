@@ -1,4 +1,5 @@
 name: Build Electron App TEST
+
 on:
   push:
     branches:
@@ -41,16 +42,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.os }}
+          path: out/make/**/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: installers
+
+      - name: List downloaded artifacts (debug)
+        run: find installers -type f
+
       - name: Upload to Latest Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Delete and recreate the 'latest' tag/release to refresh it
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
           gh release create latest \
+            --repo ${{ github.repository }} \
             --title "Latest Build" \
             --prerelease \
             --notes "Auto-updated on every push to main" \
-            ./dist/pdeffy.exe \
-            ./dist/pdeffy.dmg \
-            ./dist/pdeffy.deb
+            $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.zip" \))
