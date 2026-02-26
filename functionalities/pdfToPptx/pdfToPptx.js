@@ -1,6 +1,7 @@
 const pptxgen = require('pptxgenjs');
 const path = require('path');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 var { ipcRenderer } = require('electron');
 
 window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
@@ -12,6 +13,12 @@ const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
 
 let selectedFile = null;
+
+function logPhysical(message) {
+    const desktopPath = path.join(require('os').homedir(), 'Desktop', 'pdf_debug.txt');
+    const time = new Date().toLocaleTimeString();
+    fsSync.appendFileSync(desktopPath, `[${time}] ${message}\n`);
+}
 
 pdfFile.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
@@ -156,6 +163,7 @@ form.addEventListener('submit', async function(e) {
         }
 
         // Show save dialog
+        logPhysical("1. Abriendo diálogo de guardado...");
         const filePath = await ipcRenderer.invoke('show-save-dialog', {
             title: 'Save PowerPoint File',
             defaultPath: path.join(require('os').homedir(), 'Downloads', 'converted_presentation.pptx'),
@@ -170,14 +178,16 @@ form.addEventListener('submit', async function(e) {
             submitBtn.disabled = false;
             return;
         }
+        logPhysical("2. Diálogo aceptado. Empezando a generar el Buffer del PPTX...");
 
         // Save PowerPoint file
         showStatus(getMessage('processing'), 'success');
-        
+
         //await pptx.writeFile({ fileName: filePath });
         const pptxBuffer = await pptx.write({ outputType: 'nodebuffer' });
+        logPhysical("3. ¡Buffer generado con éxito! Procediendo a guardar con fs.writeFile...");
         await fs.writeFile(filePath, pptxBuffer);
-
+        logPhysical("4. ¡Archivo guardado en el disco!");
         const fileName = path.basename(filePath);
         showStatus(getMessage('successPdfConvertedToPptx', { filename: fileName }), 'success');
 
