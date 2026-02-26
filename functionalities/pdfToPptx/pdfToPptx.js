@@ -20,14 +20,14 @@ function logPhysical(message) {
     fsSync.appendFileSync(desktopPath, `[${time}] ${message}\n`);
 }
 
-pdfFile.addEventListener('change', function(e) {
+pdfFile.addEventListener('change', function (e) {
     if (e.target.files.length > 0) {
         selectedFile = e.target.files[0];
         fileNameDisplay.textContent = getMessage('selectedFile') + selectedFile.name;
     }
 });
 
-form.addEventListener('submit', async function(e) {
+form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     if (!selectedFile) {
@@ -96,7 +96,7 @@ form.addEventListener('submit', async function(e) {
                             bold: isBold,
                             italic: isItalic,
                             fontFace: fontName.includes('Times') ? 'Times New Roman' :
-                                     fontName.includes('Courier') ? 'Courier New' : 'Arial',
+                                fontName.includes('Courier') ? 'Courier New' : 'Arial',
                             color: '000000',
                             valign: 'top',
                             wrap: false
@@ -122,7 +122,11 @@ form.addEventListener('submit', async function(e) {
                 }).promise;
 
                 // Convert canvas to base64 image
-                const imageData = canvas.toDataURL('image/png');
+                const imageData = canvas.toDataURL('image/jpeg', 0.7);
+
+                // ¡LIBERAMOS LA MEMORIA DEL CANVAS AL INSTANTE!
+                canvas.width = 0;
+                canvas.height = 0;
 
                 // Calculate image size to fit slide background (16:9 aspect ratio)
                 const slideWidth = 10; // inches
@@ -182,14 +186,14 @@ form.addEventListener('submit', async function(e) {
 
         // Save PowerPoint file
         showStatus(getMessage('processing'), 'success');
+
+        logPhysical("3. Generando ArrayBuffer (el formato más seguro en memoria)...");
+        // ArrayBuffer no requiere codificaciones raras que bloqueen la CPU
+        const arrayBufferData = await pptx.write({ outputType: 'arraybuffer' });
         
-        logPhysical("3. Generando PPTX en formato base64 (modo seguro para Electron)...");
-        // Le pedimos texto base64, que no bloquea el hilo de compresión en Electron
-        const base64Data = await pptx.write({ outputType: 'base64' });
-        
-        logPhysical("4. Base64 generado. Convirtiendo a archivo físico...");
-        // Convertimos el texto puro a un Buffer nativo de Node.js
-        const fileBuffer = Buffer.from(base64Data, 'base64');
+        logPhysical("4. ArrayBuffer generado con éxito. Convirtiendo a Buffer físico...");
+        // Convertimos el buffer del navegador a buffer de Node.js
+        const fileBuffer = Buffer.from(arrayBufferData);
 
         logPhysical("5. Escribiendo en el disco duro...");
         await fs.writeFile(filePath, fileBuffer);
