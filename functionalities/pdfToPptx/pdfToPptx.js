@@ -1,10 +1,8 @@
 const pptxgen = require('pptxgenjs');
 const path = require('path');
 var { ipcRenderer } = require('electron');
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 
-// Set worker source for legacy build
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.js');
+window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
 
 const form = document.getElementById('pdfToPptxForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -36,8 +34,8 @@ form.addEventListener('submit', async function(e) {
         // Read PDF file
         const pdfBuffer = await selectedFile.arrayBuffer();
 
-        // Parse PDF using pdfjs-dist
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
+        // Parse PDF using window.pdfjsLib
+        const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
 
         // Create PowerPoint presentation
         const pptx = new pptxgen();
@@ -191,4 +189,3 @@ function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = `status ${type}`;
 }
-

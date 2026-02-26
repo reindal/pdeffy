@@ -1,11 +1,10 @@
 var { ipcRenderer } = require('electron');
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-
-// Set worker source for legacy build
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.js');
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
+
+// Usamos la variable global del HTML
+window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
 
 const form = document.getElementById('deleteForm');
 const fileInput = document.getElementById('pdfFile');
@@ -68,7 +67,8 @@ async function renderPagePreviews(buffer) {
     pagesGrid.innerHTML = `<p>Loading preview...</p>`;
     previewSection.style.display = 'block';
 
-    const loadingTask = pdfjsLib.getDocument({ data: buffer, disableWorker: true });
+    // Usamos window.pdfjsLib aquí
+    const loadingTask = window.pdfjsLib.getDocument({ data: buffer, disableWorker: true });
     const pdf = await loadingTask.promise;
     totalPages = pdf.numPages;
 
