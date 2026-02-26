@@ -182,17 +182,26 @@ form.addEventListener('submit', async function(e) {
 
         // Save PowerPoint file
         showStatus(getMessage('processing'), 'success');
+        
+        logPhysical("3. Generando PPTX en formato base64 (modo seguro para Electron)...");
+        // Le pedimos texto base64, que no bloquea el hilo de compresión en Electron
+        const base64Data = await pptx.write({ outputType: 'base64' });
+        
+        logPhysical("4. Base64 generado. Convirtiendo a archivo físico...");
+        // Convertimos el texto puro a un Buffer nativo de Node.js
+        const fileBuffer = Buffer.from(base64Data, 'base64');
 
-        //await pptx.writeFile({ fileName: filePath });
-        const pptxBuffer = await pptx.write({ outputType: 'nodebuffer' });
-        logPhysical("3. ¡Buffer generado con éxito! Procediendo a guardar con fs.writeFile...");
-        await fs.writeFile(filePath, pptxBuffer);
-        logPhysical("4. ¡Archivo guardado en el disco!");
+        logPhysical("5. Escribiendo en el disco duro...");
+        await fs.writeFile(filePath, fileBuffer);
+
+        logPhysical("6. ¡Éxito total! Archivo guardado.");
+
         const fileName = path.basename(filePath);
         showStatus(getMessage('successPdfConvertedToPptx', { filename: fileName }), 'success');
 
     } catch (error) {
         console.error('Error converting PDF to PPTX:', error);
+        logPhysical("ERROR FATAL: " + error.message);
         showStatus(getMessage('errorLoadingPdf', { error: error.message }), 'error');
     } finally {
         submitBtn.disabled = false;
