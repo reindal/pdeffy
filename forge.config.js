@@ -5,6 +5,7 @@ const path = require('path');
 
 module.exports = {
   packagerConfig: {
+    icon: 'assets/bruh',
     asar: true,
     executableName: 'pdeffy',
     ignore: [
@@ -22,6 +23,8 @@ module.exports = {
           certificatePassword: process.env.CERTIFICATE_PASSWORD,
           setupExe: 'pdeffySetup-latest.exe',
           setupIcon: 'assets/icon.ico',
+          loadingGif: 'assets/loadingInstaller.gif',
+          iconUrl: 'https://github.com/reindal/pdeffy/blob/dev/icon2.ico',
       },
     },
     {
