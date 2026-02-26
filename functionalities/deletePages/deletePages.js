@@ -1,15 +1,11 @@
-let pdfjsLib;
+var { ipcRenderer } = require('electron');
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 
-import('pdfjs-dist/legacy/build/pdf.min.mjs').then(module => {
-  pdfjsLib = module;
-});
+// Set worker source for legacy build
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.js');
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
-var { ipcRenderer } = require('electron');
-
-// Set worker source for legacy build
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
 
 const form = document.getElementById('deleteForm');
 const fileInput = document.getElementById('pdfFile');

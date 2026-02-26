@@ -1,15 +1,11 @@
 const { Document, Packer, Paragraph, TextRun, ImageRun } = require('docx');
 const fs = require('fs').promises;
 const path = require('path');
-let pdfjsLib;
-
-import('pdfjs-dist/legacy/build/pdf.min.mjs').then(module => {
-  pdfjsLib = module;
-});
 var { ipcRenderer } = require('electron');
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 
 // Set worker source for legacy build
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
+pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.js');
 
 const form = document.getElementById('pdfToDocxForm');
 const pdfFile = document.getElementById('pdfFile');
