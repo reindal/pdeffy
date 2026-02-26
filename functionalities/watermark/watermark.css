@@ -258,4 +258,6 @@
     box-sizing: border-box;
 }
 
-
+#submitBtn{
+    width: 50%;
+}

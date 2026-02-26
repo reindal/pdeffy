@@ -7,7 +7,7 @@ Built with performance, usability, and flexibility in mind, it empowers users to
 
 ## 🚀 About the Project
 
-pdeffy was developed by **Reindal S.r.l.**, a software house based in Reggio Emilia, Italy.
+pdeffy was developed by **Łukasz 🇵🇱, Mikołaj 🇵🇱 and Adrian 🇪🇸** with the help of **Reindal S.r.l.** team, a software house based in Reggio Emilia, Italy.
 
 Reindal actively supports international study-work programs, welcoming students from across Europe every year. This project was created in a dynamic, collaborative environment by a team composed of:
 
@@ -18,6 +18,57 @@ Reindal actively supports international study-work programs, welcoming students 
 The result is a modern, practical tool born from cross-cultural collaboration, innovation, and hands-on learning.
 
 ---
+
+## ⚙ Requirements
+
+To run this project, **Node.js and npm are required**.
+
+Make sure you have Node.js installed (npm is included with Node.js).
+
+You can verify installation with:
+
+```bash
+node -v
+npm -v
+```
+
+If not installed, download Node.js from:
+https://nodejs.org/
+
+---
+
+## 🏗️ Launch the Project
+
+### Development Mode
+
+To run the application in development mode:
+
+```bash
+npm install
+npm start
+```
+
+Or using Electron Forge:
+
+```Bash
+npm run start
+```
+
+Build & Package
+To create a distributable installer:
+
+Package the application:
+
+```Bash
+npm run package
+```
+
+Create installer/executable:
+
+```Bash
+npm run make
+```
+The installer will be generated in the out/make directory.
 
 ## 🎯 Purpose
 
@@ -39,17 +90,6 @@ It is ideal for professionals, students, and organizations that need reliable PD
 - Reorder pages
 - Delete selected pages
 
-### 🖼 Image Extraction
-- Extract embedded images from PDF files
-- Preserve original image quality and format when possible
-
-### 📝 Text Extraction
-- Extract textual content from PDF documents
-- Export extracted text to:
-  - `.txt`
-  - `.docx` (if supported)
-  - Other compatible formats
-
 ### 🔄 File Conversion
 - Convert PDF to:
   - Image formats (e.g., PNG, JPG)
@@ -69,8 +109,7 @@ It is ideal for professionals, students, and organizations that need reliable PD
 pdeffy is designed to be installed locally on desktop environments.
 
 ### Requirements
-- Supported operating system: (specify Windows / macOS / Linux)
-- Minimum hardware requirements: (specify if applicable)
+- Supported operating system: Windows 10 or Windows 11
 
 ### Installation Steps
 1. Download the installer from the official repository or release section.
@@ -150,9 +189,31 @@ The company develops custom digital solutions and actively participates in inter
 
 ---
 
+## 📦 Third-Party Dependencies
+
+This project uses the following open-source libraries:
+
+- docx ^8.5.0 — MIT License
+- electron-squirrel-startup ^1.0.1 — MIT License
+- fs-extra ^11.2.0 — MIT License
+- html2canvas ^1.4.1 — MIT License
+- jspdf ^4.1.0 — MIT License
+- jszip ^3.10.1 — MIT License
+- jszip (alias: jszip2) 2.6.1 — MIT License
+- mammoth ^1.11.0 — BSD-2-Clause License
+- pdf-lib ^1.17.1 — MIT License
+- pdfjs-dist ^5.4.624 — Apache-2.0 License
+- pptx2html ^0.3.4 — MIT License
+- pptxgenjs ^4.0.1 — MIT License
+- signtool ^1.0.0 — MIT License
+- update-electron-app ^3.1.2 — MIT License
+- xml2js ^0.6.2 — MIT License
+
+---
+
 ## 📄 License
 
-Specify the license here (e.g., MIT, GPL, Proprietary).
+MIT License
 
 ---
 

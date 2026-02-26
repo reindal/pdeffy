@@ -1,7 +1,11 @@
 const { Document, Packer, Paragraph, TextRun, ImageRun } = require('docx');
 const fs = require('fs').promises;
 const path = require('path');
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
+let pdfjsLib;
+
+import('pdfjs-dist/legacy/build/pdf.min.mjs').then(module => {
+  pdfjsLib = module;
+});
 var { ipcRenderer } = require('electron');
 
 // Set worker source for legacy build

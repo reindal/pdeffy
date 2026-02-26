@@ -1,4 +1,8 @@
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.min.mjs');
+let pdfjsLib;
+
+import('pdfjs-dist/legacy/build/pdf.min.mjs').then(module => {
+  pdfjsLib = module;
+});
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
