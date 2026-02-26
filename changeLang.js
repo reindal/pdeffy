@@ -1053,6 +1053,13 @@ const languages = {
         pptxToPdfSelectLabel: "Selecciona archivo PowerPoint (.pptx):",
         pptxToPdfSelectButton: "Haz clic para seleccionar archivo",
         pptxToPdfSubmitBtn: "Convertir a PDF",
+        // PDF to PPTX
+        pdfToPptxHeader: "PDF a PowerPoint",
+        pdfToPptxHeader2: "Convertir PDF a PowerPoint",
+        pdfToPptxSelectLabel: "Seleccionar archivo PDF:",
+        pdfToPptxSelectButton: "Haz clic para seleccionar el archivo",
+        pdfToPptxSubmitBtn: "Convertir a PowerPoint",
+        successPdfConvertedToPptx: "✓ PDF convertido a PowerPoint con éxito: {filename}",
 
         // Split mode labels
         splitModeLabel: "Modo de divisón:",
