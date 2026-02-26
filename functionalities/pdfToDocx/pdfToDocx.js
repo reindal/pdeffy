@@ -2,10 +2,7 @@ const { Document, Packer, Paragraph, TextRun, ImageRun } = require('docx');
 const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-
-// Set worker source for legacy build
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.js');
+let pdfjsLib; 
 
 const form = document.getElementById('pdfToDocxForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -34,6 +31,11 @@ form.addEventListener('submit', async function(e) {
     submitBtn.disabled = true;
 
     try {
+        if (!pdfjsLib) {
+            pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.min.mjs');
+            pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
+        }
+
         // Read PDF file
         const pdfBuffer = await selectedFile.arrayBuffer();
 
