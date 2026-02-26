@@ -1,5 +1,6 @@
 const pptxgen = require('pptxgenjs');
 const path = require('path');
+const fs = require('fs').promises;
 var { ipcRenderer } = require('electron');
 
 window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
@@ -172,7 +173,10 @@ form.addEventListener('submit', async function(e) {
 
         // Save PowerPoint file
         showStatus(getMessage('processing'), 'success');
-        await pptx.writeFile({ fileName: filePath });
+        
+        //await pptx.writeFile({ fileName: filePath });
+        const pptxBuffer = await pptx.write({ outputType: 'nodebuffer' });
+        await fs.writeFile(filePath, pptxBuffer);
 
         const fileName = path.basename(filePath);
         showStatus(getMessage('successPdfConvertedToPptx', { filename: fileName }), 'success');
