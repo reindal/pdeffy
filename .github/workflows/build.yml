@@ -1,4 +1,4 @@
-name: Build Electron App TEST
+name: Build Electron App
 
 on:
   push:
@@ -32,16 +32,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
 
-      - name: Install appdmg (macOS)
-        if: matrix.os == 'macos-latest'
-        run: npm install --save-dev appdmg
-
       - name: Install dependencies
         run: npm install
         env:
           npm_config_build_from_source: false
 
-      - name: Build Electron App
+      - name: Build Electron App (macOS)
+        if: matrix.os == 'macos-latest'
+        run: npm run make
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Build Electron App (Windows/Linux)
+        if: matrix.os != 'macos-latest'
         run: npm run make
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
