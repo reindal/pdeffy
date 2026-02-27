@@ -1,14 +1,10 @@
 const pptxgen = require('pptxgenjs');
 const path = require('path');
-let pdfjsLib;
-
-import('pdfjs-dist/legacy/build/pdf.min.mjs').then(module => {
-  pdfjsLib = module;
-});
+const fs = require('fs').promises;
+const fsSync = require('fs');
 var { ipcRenderer } = require('electron');
 
-// Set worker source for legacy build
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
+window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
 
 const form = document.getElementById('pdfToPptxForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -18,14 +14,20 @@ const statusDiv = document.getElementById('status');
 
 let selectedFile = null;
 
-pdfFile.addEventListener('change', function(e) {
+function logPhysical(message) {
+    const desktopPath = path.join(require('os').homedir(), 'Desktop', 'pdf_debug.txt');
+    const time = new Date().toLocaleTimeString();
+    fsSync.appendFileSync(desktopPath, `[${time}] ${message}\n`);
+}
+
+pdfFile.addEventListener('change', function (e) {
     if (e.target.files.length > 0) {
         selectedFile = e.target.files[0];
         fileNameDisplay.textContent = getMessage('selectedFile') + selectedFile.name;
     }
 });
 
-form.addEventListener('submit', async function(e) {
+form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     if (!selectedFile) {
@@ -40,8 +42,8 @@ form.addEventListener('submit', async function(e) {
         // Read PDF file
         const pdfBuffer = await selectedFile.arrayBuffer();
 
-        // Parse PDF using pdfjs-dist
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
+        // Parse PDF using window.pdfjsLib
+        const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(pdfBuffer) }).promise;
 
         // Create PowerPoint presentation
         const pptx = new pptxgen();
@@ -94,7 +96,7 @@ form.addEventListener('submit', async function(e) {
                             bold: isBold,
                             italic: isItalic,
                             fontFace: fontName.includes('Times') ? 'Times New Roman' :
-                                     fontName.includes('Courier') ? 'Courier New' : 'Arial',
+                                fontName.includes('Courier') ? 'Courier New' : 'Arial',
                             color: '000000',
                             valign: 'top',
                             wrap: false
@@ -120,7 +122,11 @@ form.addEventListener('submit', async function(e) {
                 }).promise;
 
                 // Convert canvas to base64 image
-                const imageData = canvas.toDataURL('image/png');
+                const imageData = canvas.toDataURL('image/jpeg', 0.7);
+
+                // ¡LIBERAMOS LA MEMORIA DEL CANVAS AL INSTANTE!
+                canvas.width = 0;
+                canvas.height = 0;
 
                 // Calculate image size to fit slide background (16:9 aspect ratio)
                 const slideWidth = 10; // inches
@@ -161,6 +167,7 @@ form.addEventListener('submit', async function(e) {
         }
 
         // Show save dialog
+        logPhysical("1. Abriendo diálogo de guardado...");
         const filePath = await ipcRenderer.invoke('show-save-dialog', {
             title: 'Save PowerPoint File',
             defaultPath: path.join(require('os').homedir(), 'Downloads', 'converted_presentation.pptx'),
@@ -175,16 +182,30 @@ form.addEventListener('submit', async function(e) {
             submitBtn.disabled = false;
             return;
         }
+        logPhysical("2. Diálogo aceptado. Empezando a generar el Buffer del PPTX...");
 
         // Save PowerPoint file
         showStatus(getMessage('processing'), 'success');
-        await pptx.writeFile({ fileName: filePath });
+
+        logPhysical("3. Generando ArrayBuffer (el formato más seguro en memoria)...");
+        // ArrayBuffer no requiere codificaciones raras que bloqueen la CPU
+        const arrayBufferData = await pptx.write({ outputType: 'arraybuffer' });
+        
+        logPhysical("4. ArrayBuffer generado con éxito. Convirtiendo a Buffer físico...");
+        // Convertimos el buffer del navegador a buffer de Node.js
+        const fileBuffer = Buffer.from(arrayBufferData);
+
+        logPhysical("5. Escribiendo en el disco duro...");
+        await fs.writeFile(filePath, fileBuffer);
+
+        logPhysical("6. ¡Éxito total! Archivo guardado.");
 
         const fileName = path.basename(filePath);
         showStatus(getMessage('successPdfConvertedToPptx', { filename: fileName }), 'success');
 
     } catch (error) {
         console.error('Error converting PDF to PPTX:', error);
+        logPhysical("ERROR FATAL: " + error.message);
         showStatus(getMessage('errorLoadingPdf', { error: error.message }), 'error');
     } finally {
         submitBtn.disabled = false;
@@ -195,4 +216,3 @@ function showStatus(message, type) {
     statusDiv.textContent = message;
     statusDiv.className = `status ${type}`;
 }
-

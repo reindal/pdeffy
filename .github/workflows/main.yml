@@ -1,0 +1,75 @@
+name: Build Electron App TEST
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+
+      - name: Install dependencies
+        run: npm install
+        env:
+          npm_config_build_from_source: false
+
+      - name: Build Electron App
+        run: npm run make
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.os }}
+          path: out/make/**/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: installers
+
+      - name: List downloaded artifacts (debug)
+        run: find installers -type f
+
+      - name: Upload to Latest Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete latest --yes --cleanup-tag 2>/dev/null || true
+          gh release create latest \
+            --repo ${{ github.repository }} \
+            --title "Latest Build" \
+            --prerelease \
+            --notes "Auto-updated on every push to main" \
+            $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.zip" \))

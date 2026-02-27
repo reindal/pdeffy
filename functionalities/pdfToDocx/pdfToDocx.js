@@ -1,15 +1,8 @@
 const { Document, Packer, Paragraph, TextRun, ImageRun } = require('docx');
 const fs = require('fs').promises;
 const path = require('path');
-let pdfjsLib;
-
-import('pdfjs-dist/legacy/build/pdf.min.mjs').then(module => {
-  pdfjsLib = module;
-});
 var { ipcRenderer } = require('electron');
-
-// Set worker source for legacy build
-pdfjsLib.GlobalWorkerOptions.workerSrc = require.resolve('pdfjs-dist/legacy/build/pdf.worker.min.mjs');
+window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
 
 const form = document.getElementById('pdfToDocxForm');
 const pdfFile = document.getElementById('pdfFile');
@@ -41,8 +34,8 @@ form.addEventListener('submit', async function(e) {
         // Read PDF file
         const pdfBuffer = await selectedFile.arrayBuffer();
 
-        // Parse PDF using pdfjs-dist (legacy build without worker)
-        const loadingTask = pdfjsLib.getDocument({
+        // Parse PDF using pdfjsLib (ya cargado nativamente)
+        const loadingTask = window.pdfjsLib.getDocument({
             data: new Uint8Array(pdfBuffer),
             useWorkerFetch: false,
             isEvalSupported: false,
@@ -121,8 +114,8 @@ form.addEventListener('submit', async function(e) {
                 const ops = await page.getOperatorList();
 
                 for (let j = 0; j < ops.fnArray.length; j++) {
-                    if (ops.fnArray[j] === pdfjsLib.OPS.paintImageXObject ||
-                        ops.fnArray[j] === pdfjsLib.OPS.paintJpegXObject) {
+                    if (ops.fnArray[j] === window.pdfjsLib.OPS.paintImageXObject ||
+                        ops.fnArray[j] === window.pdfjsLib.OPS.paintJpegXObject) {
                         try {
                             const imageName = ops.argsArray[j][0];
                             const image = await page.objs.get(imageName);
