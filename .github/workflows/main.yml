@@ -62,6 +62,12 @@ jobs:
       - name: List downloaded artifacts (debug)
         run: find installers -type f
 
+      - name: Rename artifacts
+        run: |
+          mv $(find installers -name "*.exe") installers/pdeffy.exe
+          mv $(find installers -name "*.deb") installers/pdeffy.deb
+          mv $(find installers -name "*.dmg") installers/pdeffy.dmg
+
       - name: Upload to Latest Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,4 +78,4 @@ jobs:
             --title "Latest Build" \
             --prerelease \
             --notes "Auto-updated on every push to main" \
-            $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.zip" \))
+            $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" \))
