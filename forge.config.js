@@ -5,7 +5,7 @@ const path = require('path');
 
 module.exports = {
   packagerConfig: {
-    icon: 'assets/bruh',
+    icon: 'assets/icon',
     asar: true,
     executableName: 'pdeffy',
     ignore: [
@@ -19,17 +19,17 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-          certificateFile: './electronDemoPdf.pfx',
-          certificatePassword: process.env.CERTIFICATE_PASSWORD,
           setupExe: 'pdeffySetup-latest.exe',
           setupIcon: 'assets/icon.ico',
           loadingGif: 'assets/loadingInstaller.gif',
-          iconUrl: 'https://github.com/reindal/pdeffy/blob/dev/icon2.ico',
+          iconUrl: 'https://raw.githubusercontent.com/reindal/pdeffy/refs/heads/main/assets/icon.ico',
       },
     },
     {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      name: '@electron-forge/maker-dmg',
+      config: {
+        format: 'ULFO'
+      }
     },
     {
       name: '@electron-forge/maker-deb',

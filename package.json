@@ -8,12 +8,13 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "author": "pdeffy",
+  "author": "Reindal",
   "license": "MIT",
   "description": "Application for manipulating PDF files",
   "devDependencies": {
     "@electron-forge/cli": "^7.11.1",
     "@electron-forge/maker-deb": "^7.11.1",
+    "@electron-forge/maker-dmg": "^7.11.1",
     "@electron-forge/maker-rpm": "^7.11.1",
     "@electron-forge/maker-squirrel": "^7.11.1",
     "@electron-forge/maker-wix": "^7.11.1",
