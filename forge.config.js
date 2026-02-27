@@ -9,10 +9,6 @@ module.exports = {
     icon: 'assets/icon',
     asar: true,
     executableName: 'pdeffy',
-    osxSign: {
-      identity: '-',  // '-' means ad-hoc signing
-      hardenedRuntime: false,
-    },
     ignore: [
       /node_modules[/\\](canvas|sqlite3|better-sqlite3|node-gyp)/,
     ],
