@@ -5,9 +5,14 @@ const path = require('path');
 
 module.exports = {
   packagerConfig: {
+    name: 'Pdeffy',
     icon: 'assets/icon',
     asar: true,
     executableName: 'pdeffy',
+    osxSign: {
+      identity: '-',  // '-' means ad-hoc signing
+      hardenedRuntime: false,
+    },
     ignore: [
       /node_modules[/\\](canvas|sqlite3|better-sqlite3|node-gyp)/,
     ],
@@ -28,7 +33,8 @@ module.exports = {
     {
       name: '@electron-forge/maker-dmg',
       config: {
-        format: 'ULFO'
+        format: 'ULFO',
+        icon: 'assets/icon.icns',
       }
     },
     {
