@@ -6,6 +6,7 @@ const path = require('path');
 module.exports = {
   packagerConfig: {
     asar: true,
+    executableName: 'pdeffy',
     ignore: [
       /node_modules[/\\](canvas|sqlite3|better-sqlite3|node-gyp)/,
     ],
