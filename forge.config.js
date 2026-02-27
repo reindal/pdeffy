@@ -39,25 +39,6 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {},
     },
-    /*{
-      name: '@electron-forge/maker-wix',
-      config: {
-        name: `Pdeffy`,
-        exe: `pdeffy.exe`,
-        icon: "assets/icon.ico",
-        features: {
-            autoUpdate: true,
-            autoLaunch: true,
-          },
-        ui: {
-          chooseDirectory: true,
-          images: {
-            background: path.join(__dirname, "assets", "installerBackground.jpg"),
-            banner: path.join(__dirname, "assets", "installerBanner.jpg"),
-          },
-      },
-      },
-    },*/
   ],
   plugins: [
     {
