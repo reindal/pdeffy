@@ -73,10 +73,3 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete latest --yes --cleanup-tag 2>/dev/null
-          sleep 2
-          gh release create latest \
-            --repo ${{ github.repository }} \
-            --title "Latest Build" \
-            --prerelease \
-            --notes "Auto-updated on every push to main" \
-            $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" \))
