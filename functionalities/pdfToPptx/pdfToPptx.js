@@ -2,7 +2,7 @@ const pptxgen = require('pptxgenjs');
 const fs = require('fs').promises;
 var { ipcRenderer } = require('electron');
 // main.js (o tu archivo principal)
-const { app, BrowserWindow, crashReporter } = require('electron');
+const { app } = require('electron');
 const path = require('path');
 const fsSync = require('fs');
 
@@ -16,10 +16,6 @@ function logMainCrash(message) {
 }
 
 // Iniciar Crash Reporter (opcional, pero ayuda)
-crashReporter.start({
-  submitURL: '',
-  uploadToServer: false,
-});
 console.log('Crash dumps guardados en:', app.getPath('crashDumps'));
 
 // Escuchar cuando la ventana (renderer) muere
