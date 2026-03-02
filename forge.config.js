@@ -21,9 +21,9 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
           setupExe: 'pdeffySetup-latest.exe',
-          setupIcon: 'assets/icon.ico',
+          setupIcon: 'assets/logo/ico/256x256.ico',
           loadingGif: 'assets/loadingInstaller.gif',
-          iconUrl: 'https://raw.githubusercontent.com/reindal/pdeffy/refs/heads/main/assets/icon.ico',
+          iconUrl: 'https://raw.githubusercontent.com/reindal/pdeffy/refs/heads/main/assets/logo/ico/256x256.ico',
       },
     },
     {

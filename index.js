@@ -31,7 +31,7 @@ function createWindow() {
             contextIsolation: false
         },
         show: false,
-        icon: path.join(__dirname, "assets", "ico.png")
+        icon: path.join(__dirname, "assets", "logo", "png", "256x256.png")
     });
     mainWindow.maximize();
     mainWindow.loadURL(url.format({

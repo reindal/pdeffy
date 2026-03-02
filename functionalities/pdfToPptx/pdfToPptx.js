@@ -1,8 +1,40 @@
 const pptxgen = require('pptxgenjs');
-const path = require('path');
 const fs = require('fs').promises;
-const fsSync = require('fs');
 var { ipcRenderer } = require('electron');
+// main.js (o tu archivo principal)
+const { app, BrowserWindow, crashReporter } = require('electron');
+const path = require('path');
+const fsSync = require('fs');
+
+// --- PEGA EL CÓDIGO DE DEPURACIÓN AQUÍ ---
+
+// Función de log para el proceso Main
+function logMainCrash(message) {
+    const desktopPath = path.join(require('os').homedir(), 'Desktop', 'pdf_debug_MAIN.txt');
+    const time = new Date().toLocaleTimeString();
+    fsSync.appendFileSync(desktopPath, `[${time}] ${message}\n`);
+}
+
+// Iniciar Crash Reporter (opcional, pero ayuda)
+crashReporter.start({
+  submitURL: '',
+  uploadToServer: false,
+});
+console.log('Crash dumps guardados en:', app.getPath('crashDumps'));
+
+// Escuchar cuando la ventana (renderer) muere
+app.on('render-process-gone', (event, webContents, details) => {
+    const reason = details.reason; 
+    const exitCode = details.exitCode;
+    logMainCrash(`💥 CRASH DETECTADO: El renderer murió. Razón: ${reason}, Código: ${exitCode}`);
+});
+
+process.on('uncaughtException', (error) => {
+    logMainCrash(`🔥 EXCEPCIÓN NO CAPTURADA EN MAIN: ${error.message}`);
+});
+
+// --- FIN DEL CÓDIGO DE DEPURACIÓN ---
+console.log('Crash dumps guardados en:', app.getPath('crashDumps'));
 
 window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
 
@@ -182,23 +214,17 @@ form.addEventListener('submit', async function (e) {
             submitBtn.disabled = false;
             return;
         }
-        logPhysical("2. Diálogo aceptado. Empezando a generar el Buffer del PPTX...");
+        logPhysical("2. Diálogo aceptado. Empezando a generar el PPTX...");
 
-        // Save PowerPoint file
         showStatus(getMessage('processing'), 'success');
 
-        logPhysical("3. Generando ArrayBuffer (el formato más seguro en memoria)...");
-        // ArrayBuffer no requiere codificaciones raras que bloqueen la CPU
-        const arrayBufferData = await pptx.write({ outputType: 'arraybuffer' });
+        logPhysical("3. Usando el método nativo writeFile de pptxgen...");
         
-        logPhysical("4. ArrayBuffer generado con éxito. Convirtiendo a Buffer físico...");
-        // Convertimos el buffer del navegador a buffer de Node.js
-        const fileBuffer = Buffer.from(arrayBufferData);
+        // pptxgenjs tiene un método writeFile que maneja mucho mejor la memoria
+        // ya que evita crear un ArrayBuffer gigante en la RAM del Renderer.
+        await pptx.writeFile({ fileName: filePath });
 
-        logPhysical("5. Escribiendo en el disco duro...");
-        await fs.writeFile(filePath, fileBuffer);
-
-        logPhysical("6. ¡Éxito total! Archivo guardado.");
+        logPhysical("4. ¡Éxito total! Archivo escrito en el disco.");
 
         const fileName = path.basename(filePath);
         showStatus(getMessage('successPdfConvertedToPptx', { filename: fileName }), 'success');
