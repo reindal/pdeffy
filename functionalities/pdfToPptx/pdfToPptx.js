@@ -14,12 +14,6 @@ const statusDiv = document.getElementById('status');
 
 let selectedFile = null;
 
-function logPhysical(message) {
-    const desktopPath = path.join(require('os').homedir(), 'Desktop', 'pdf_debug.txt');
-    const time = new Date().toLocaleTimeString();
-    fsSync.appendFileSync(desktopPath, `[${time}] ${message}\n`);
-}
-
 pdfFile.addEventListener('change', function (e) {
     if (e.target.files.length > 0) {
         selectedFile = e.target.files[0];
@@ -129,7 +123,6 @@ form.addEventListener('submit', async function (e) {
             presentationData.push(currentSlideData);
         }
 
-        logPhysical("1. Abriendo diálogo de guardado...");
         const filePath = await ipcRenderer.invoke('show-save-dialog', {
             title: 'Save PowerPoint File',
             defaultPath: path.join(require('os').homedir(), 'Downloads', 'converted_presentation.pptx'),
@@ -147,22 +140,17 @@ form.addEventListener('submit', async function (e) {
 
         showStatus(getMessage('processing'), 'success');
         
-        logPhysical("2. Diálogo aceptado. Enviando datos al MAIN PROCESS...");
-        
         // Dispatch the master data array to the Main Process for PPTX generation
         await ipcRenderer.invoke('generate-pptx', { 
             slides: presentationData, 
             filePath: filePath 
         });
 
-        logPhysical("3. ¡Éxito total! El Main Process guardó el archivo.");
-
         const fileName = path.basename(filePath);
         showStatus(getMessage('successPdfConvertedToPptx', { filename: fileName }), 'success');
 
     } catch (error) {
         console.error('Error converting PDF to PPTX:', error);
-        logPhysical("ERROR FATAL: " + error.message);
         showStatus(getMessage('errorLoadingPdf', { error: error.message }), 'error');
     } finally {
         submitBtn.disabled = false;
