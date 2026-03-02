@@ -6,7 +6,7 @@ const { app, BrowserWindow, crashReporter } = require('electron');
 const path = require('path');
 const fsSync = require('fs');
 
-// --- PEGA EL CÓDIGO DE DEPURACIÓN AQUÍ ---
+// --- Debugging code ---
 
 // Función de log para el proceso Main
 function logMainCrash(message) {
@@ -33,7 +33,7 @@ process.on('uncaughtException', (error) => {
     logMainCrash(`🔥 EXCEPCIÓN NO CAPTURADA EN MAIN: ${error.message}`);
 });
 
-// --- FIN DEL CÓDIGO DE DEPURACIÓN ---
+// --- End of Debugging Code ---
 console.log('Crash dumps guardados en:', app.getPath('crashDumps'));
 
 window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
