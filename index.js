@@ -4,6 +4,7 @@ const url = require("url");
 const fs = require("fs");
 const { BrowserWindow, app , ipcMain, dialog} = electron;
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+const pptxgen = require('pptxgenjs');
 
 if (require('electron-squirrel-startup')) return;
 
@@ -174,6 +175,37 @@ ipcMain.handle('save-language', async (event, language) => {
         return { success: true };
     } catch (error) {
         console.error('Error saving language file:', error);
+        throw error;
+    }
+});
+
+ipcMain.handle('generate-pptx', async (event, { slides, filePath }) => {
+    try {
+        const pptx = new pptxgen();
+
+        // Iterate through the structured data received from the renderer to build slides
+        for (const slideData of slides) {
+            const slide = pptx.addSlide();
+
+            if (slideData.images && slideData.images.length > 0) {
+                for (const img of slideData.images) {
+                    slide.addImage(img);
+                }
+            }
+
+            if (slideData.texts && slideData.texts.length > 0) {
+                for (const textItem of slideData.texts) {
+                    slide.addText(textItem.text, textItem.options);
+                }
+            }
+        }
+
+        // Securely write the file to the disk directly from the Node.js environment
+        await pptx.writeFile({ fileName: filePath });
+        return { success: true };
+
+    } catch (error) {
+        console.error("Error in Main process generating PPTX:", error);
         throw error;
     }
 });
