@@ -1,0 +1,118 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+.generatorContainer {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.generatorContainer h1 {
+    text-align: center;
+    color: var(--reindalDark);
+    margin-bottom: 30px;
+}
+
+.step-margin {
+    margin-top: 20px;
+}
+
+.textInput {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed var(--reindalGrayLight);
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.textInput:focus {
+    border-color: var(--reindalYellow);
+    border-style: solid;
+}
+
+.file-status-text {
+    margin-top: 5px;
+    font-size: 0.85em;
+    color: var(--reindalGray);
+    font-weight: bold;
+}
+
+.infoBox {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: var(--reindalExtraLight);
+    border-left: 4px solid var(--reindalYellow);
+    border-radius: 4px 8px 8px 4px;
+    font-size: 0.9em;
+}
+
+.infoTitle {
+    margin: 0 0 5px 0;
+    font-weight: bold;
+    color: var(--reindalDark);
+}
+
+.infoText {
+    margin: 0 0 10px 0;
+    color: var(--reindalGray);
+    line-height: 1.4;
+}
+
+.exampleTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--reindalBody);
+    font-size: 0.85em;
+    text-align: left;
+}
+
+.exampleTable th {
+    background-color: var(--reindalGrayLight);
+    padding: 6px 10px;
+    border: 1px solid var(--reindalGrayLight);
+    color: var(--reindalDark);
+}
+
+.exampleTable td {
+    padding: 6px 10px;
+    border: 1px solid var(--reindalGrayLight);
+    color: var(--reindalGray);
+}
+
+/* --- Progress bar --- */
+
+.progress-wrapper {
+    margin-top: 15px;
+}
+
+.progress-wrapper.hidden {
+    display: none;
+}
+
+.progress-track {
+    width: 100%;
+    background-color: var(--reindalGrayLight);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 20px;
+    background-color: var(--reindalYellow);
+    border-radius: 8px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: var(--reindalGray);
+}

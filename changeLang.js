@@ -231,6 +231,30 @@ const languages = {
         pdfToPptxSubmitBtn: "Convert to PowerPoint",
         successPdfConvertedToPptx: "✓ Successfully converted PDF to PowerPoint: {filename}",
 
+        // PDF by template
+        pdfByTemplateText: "PDF by Template",
+        pdfByTemplateDesc: "Generate PDF using a template.",
+
+        pdfByTemplateHeader: "PDF Generator",
+        pdfByTemplateHeader2: "Generate PDFs from Template",
+        pdfByTemplateDocxLabel: "1. Select the template (.docx):",
+        pdfByTemplateDocxBtn: "Click to select Word file",
+        pdfByTemplateExcelLabel: "2. Select data (.xlsx, .csv):",
+        pdfByTemplateExcelBtn: "Click to select Excel file",
+        pdfByTemplateNameLabel: "Base name for PDFs:",
+        pdfByTemplateSubmitBtn: "Generate PDFs in ZIP",
+        pdfByTemplateInfoTitle: "Required format for Excel/CSV",
+        pdfByTemplateInfoText: "The first row must contain exactly the same names you placed in brackets in the Word document (e.g., [COMPANY]). Each row below will generate a new PDF.",
+        pdfByTemplateCompany: "Company",
+        pdfByTemplateAgent: "Agent",
+
+        // PDF by template messages:
+        readingExcel: "Reading Excel data...",
+        errorEmptyExcel: "The Excel file is empty or could not be read.",
+        generatingItem: "Generating PDF {current} of {total}...",
+        savingZip: "Compressing all PDFs into a ZIP file...",
+        successGeneration: "✓ PDF batch generated and saved successfully!",
+
         // Split mode labels
         splitModeLabel: "Split mode:",
         modeRange: "Custom Page Ranges",
@@ -510,6 +534,30 @@ const languages = {
         pdfToPptxSubmitBtn: "Converti in PowerPoint",
         successPdfConvertedToPptx: "✓ PDF convertito con successo in PowerPoint: {filename}",
 
+        // PDF by template
+        pdfByTemplateText: "PDF da Modello",
+        pdfByTemplateDesc: "Genera PDF tramite un modello.",
+
+        pdfByTemplateHeader: "Generatore PDF",
+        pdfByTemplateHeader2: "Genera PDF da Modello",
+        pdfByTemplateDocxLabel: "1. Seleziona il modello (.docx):",
+        pdfByTemplateDocxBtn: "Clicca per selezionare Word",
+        pdfByTemplateExcelLabel: "2. Seleziona i dati (.xlsx, .csv):",
+        pdfByTemplateExcelBtn: "Clicca per selezionare Excel",
+        pdfByTemplateNameLabel: "Nome base per i PDF:",
+        pdfByTemplateSubmitBtn: "Genera PDF in ZIP",
+        pdfByTemplateInfoTitle: "Formato richiesto per Excel/CSV",
+        pdfByTemplateInfoText: "La prima riga deve contenere esattamente gli stessi nomi inseriti tra parentesi quadre nel documento Word (es. [AZIENDA]). Ogni riga successiva genererà un nuovo PDF.",
+        pdfByTemplateCompany: "Azienda",
+        pdfByTemplateAgent: "Agente",
+
+        // PDF by template messages:
+        readingExcel: "Lettura dati Excel in corso...",
+        errorEmptyExcel: "Il file Excel è vuoto o non può essere letto.",
+        generatingItem: "Generazione PDF {current} di {total}...",
+        savingZip: "Compressione di tutti i PDF in un file ZIP...",
+        successGeneration: "✓ Lotto di PDF generato e salvato correttamente!",
+
         // Split mode labels
         splitModeLabel: "Modalità di divisione:",
         modeRange: "Intervalli di pagine personalizzati",
@@ -788,6 +836,30 @@ const languages = {
         pdfToPptxSubmitBtn: "Konwertuj do PowerPoint",
         successPdfConvertedToPptx: "✓ Pomyślnie przekonwertowano PDF na PowerPoint: {filename}",
 
+        // PDF by template
+        pdfByTemplateText: "PDF z szablonu",
+        pdfByTemplateDesc: "Generuj pliki PDF za pomocą szablonu.",
+
+        pdfByTemplateHeader: "PDF z szablonu",
+        pdfByTemplateHeader2: "Generuj pliki PDF z szablonu",
+        pdfByTemplateDocxLabel: "1. Wybierz szablon (.docx):",
+        pdfByTemplateDocxBtn: "Kliknij, aby wybrać plik Word",
+        pdfByTemplateExcelLabel: "2. Wybierz dane (.xlsx, .csv):",
+        pdfByTemplateExcelBtn: "Kliknij, aby wybrać plik Excel",
+        pdfByTemplateNameLabel: "Nazwa bazowa dla plików PDF:",
+        pdfByTemplateSubmitBtn: "Generuj pliki PDF w formacie ZIP",
+        pdfByTemplateInfoTitle: "Wymagany format pliku Excel/CSV",
+        pdfByTemplateInfoText: "Pierwszy wiersz musi zawierać dokładnie te same nazwy, które zostały umieszczone w nawiasach kwadratowych w dokumencie Word (np. [FIRMA]). Każdy kolejny wiersz wygeneruje nowy plik PDF.",
+        pdfByTemplateCompany: "Firma",
+        pdfByTemplateAgent: "Agent",
+
+        // PDF by template messages:
+        readingExcel: "Odczytywanie danych z pliku Excel...",
+        errorEmptyExcel: "Plik Excel jest pusty lub nie można go odczytać.",
+        generatingItem: "Generowanie PDF {current} z {total}...",
+        savingZip: "Kompresowanie wszystkich plików PDF do archiwum ZIP...",
+        successGeneration: "✓ Seria plików PDF została pomyślnie wygenerowana i zapisana!",
+
         // Split mode labels
         splitModeLabel: "Tryb podziału:",
         modeRange: "Własne zakresy stron",
@@ -1060,6 +1132,30 @@ const languages = {
         pdfToPptxSelectButton: "Haz clic para seleccionar el archivo",
         pdfToPptxSubmitBtn: "Convertir a PowerPoint",
         successPdfConvertedToPptx: "✓ PDF convertido a PowerPoint con éxito: {filename}",
+
+        // PDF by template
+        pdfByTemplateText: "PDF por Plantilla",
+        pdfByTemplateDesc: "Generar pdf a través de una plantilla.",
+
+        pdfByTemplateHeader: "Generador de PDF",
+        pdfByTemplateHeader2: "Generar PDFs desde Plantilla",
+        pdfByTemplateDocxLabel: "1. Selecciona la plantilla (.docx):",
+        pdfByTemplateDocxBtn: "Haz clic para seleccionar Word",
+        pdfByTemplateExcelLabel: "2. Selecciona los datos (.xlsx, .csv):",
+        pdfByTemplateExcelBtn: "Haz clic para seleccionar Excel",
+        pdfByTemplateNameLabel: "Nombre base para los PDFs:",
+        pdfByTemplateSubmitBtn: "Generar PDFs en ZIP",
+        pdfByTemplateInfoTitle: "Formato requerido para el Excel/CSV",
+        pdfByTemplateInfoText: "La primera fila debe contener exactamente los mismos nombres que pusiste entre corchetes en el Word (ej. [EMPRESA]). Cada fila debajo generará un PDF nuevo.",
+        pdfByTemplateCompany: "Empresa",
+        pdfByTemplateAgent: "Agente",
+
+        // PDF by template messages:
+        readingExcel: "Leyendo datos del Excel...",
+        errorEmptyExcel: "El Excel está vacío o no se pudo leer.",
+        generatingItem: "Generando PDF {current} de {total}...",
+        savingZip: "Comprimiendo todos los PDFs en un ZIP...",
+        successGeneration: "✓ ¡Lote de PDFs generado y guardado correctamente!",
 
         // Split mode labels
         splitModeLabel: "Modo de divisón:",

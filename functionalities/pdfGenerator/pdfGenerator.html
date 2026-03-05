@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Generator</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./pdfGenerator.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="pdfByTemplateHeader" class="langText">PDF Generator</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="generatorContainer">
+            <h1 id="pdfByTemplateHeader2" class="langText">Generate PDFs from Template</h1>
+
+            <form id="pdfGeneratorForm">
+                <div class="formGroup">
+                    <label for="docxTemplate" id="pdfByTemplateDocxLabel" class="langText">1. Select the template (.docx):</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="docxTemplate" accept=".docx" required>
+                        <label for="docxTemplate" class="fileInputLabel langText" id="pdfByTemplateDocxBtn">Click to select Word file</label>
+                    </div>
+                    <div id="docxInfo" class="file-status-text"></div>
+                </div>
+
+                <div class="formGroup step-margin">
+                    <label for="excelData" id="pdfByTemplateExcelLabel" class="langText">2. Select the data (.xlsx, .csv):</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="excelData" accept=".xlsx, .xls, .csv" required>
+                        <label for="excelData" class="fileInputLabel langText" id="pdfByTemplateExcelBtn">Click to select Excel file</label>
+                    </div>
+                    <div id="excelInfo" class="file-status-text"></div>
+
+                    <div class="infoBox">
+                        <p class="infoTitle langText" id="pdfByTemplateInfoTitle">Required format for Excel/CSV</p>
+                        <p class="infoText langText" id="pdfByTemplateInfoText">The first row must contain exactly the same names you placed in brackets in the Word document (e.g., [COMPANY]). Each row below will generate a new PDF.</p>
+                        <table class="exampleTable">
+                            <tr>
+                                <th class="langText" id="pdfByTemplateCompany">COMPANY</th>
+                                <th class="langText" id="pdfByTemplateAgent">AGENT</th>
+                            </tr>
+                            <tr>
+                                <td>Reindal</td>
+                                <td>Christian</td>
+                            </tr>
+                            <tr>
+                                <td>Acme Corporation</td>
+                                <td>John Doe</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="formGroup step-margin">
+                    <label for="baseFileName" id="pdfByTemplateNameLabel" class="langText">Base name for PDFs:</label>
+                    <input type="text" id="baseFileName" class="textInput" placeholder="e.g., Confidentiality_Agreement" required>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn">
+                    <span class="langText" id="pdfByTemplateSubmitBtn">Generate PDFs in ZIP</span>
+                </button>
+            </form>
+
+            <div id="status" class="status"></div>
+
+            <div id="progressContainer" class="progress-wrapper hidden">
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-fill"></div>
+                </div>
+                <div id="progressText" class="progress-text">0 / 0</div>
+            </div>
+
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./pdfGenerator.js"></script>
+</body>
+</html>
