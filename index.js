@@ -217,31 +217,46 @@ ipcMain.handle('generate-pptx', async (event, { slides, filePath }) => {
 /////////// LOCAL OFFICE ///////////
 
 // =========================================================
-// 1. LIBREOFFICE PATH RESOLVER
+// LIBREOFFICE PATH RESOLVER
 // =========================================================
 function getSystemLibreOfficePath() {
-    const platform = os.platform();
-    if (platform === 'win32') {
-        const winPaths = [
-            'C:\\Program Files\\LibreOffice\\program\\soffice.exe',
-            'C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe'
-        ];
-        for (let p of winPaths) if (fs.existsSync(p)) return p;
-        try { return require('child_process').execSync('where soffice').toString().trim(); } catch (e) { return null; }
-    } else if (platform === 'darwin') {
-        const macPath = '/Applications/LibreOffice.app/Contents/MacOS/soffice';
-        if (fs.existsSync(macPath)) return macPath;
-        return null;
-    } else { 
-        try { return require('child_process').execSync('which libreoffice').toString().trim(); } 
-        catch (e) { 
-            try { return require('child_process').execSync('which soffice').toString().trim(); } catch (err) { return null; }
+    switch (os.platform()) {
+        case 'win32': {
+            const winPaths = [
+                'C:\\Program Files\\LibreOffice\\program\\soffice.exe',
+                'C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe'
+            ];
+            for (let p of winPaths) {
+                if (fs.existsSync(p)) return p;
+            }
+            try { 
+                return require('child_process').execSync('where soffice').toString().trim(); 
+            } catch (e) { 
+                return null; 
+            }
+        }
+        case 'darwin': {
+            const macPath = '/Applications/LibreOffice.app/Contents/MacOS/soffice';
+            if (fs.existsSync(macPath)) return macPath;
+            return null;
+        }
+        default: {
+            // Linux/Ubuntu and other UNIX-like systems
+            try { 
+                return require('child_process').execSync('which libreoffice').toString().trim(); 
+            } catch (e) { 
+                try { 
+                    return require('child_process').execSync('which soffice').toString().trim(); 
+                } catch (err) { 
+                    return null; 
+                }
+            }
         }
     }
 }
 
 // =========================================================
-// 2. MICROSOFT OFFICE ENGINE
+// MICROSOFT OFFICE ENGINE
 // =========================================================
 function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtension) {
     return new Promise(async (resolve, reject) => {
@@ -249,22 +264,30 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
 
         const tempDir = app.getPath('temp');
         const psPath = path.join(tempDir, `msoffice_${Date.now()}.ps1`);
-
-        let psScript = '';
         
-        // --- PDF TO OFFICE ---
-        if (inputExtension === '.pdf' && format === 'docx') {
-            psScript = `$word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; try { $doc = $word.Documents.Open('${inputPath}'); $doc.SaveAs([ref]'${outputPath}', [ref]16); $doc.Close(); $word.Quit(); exit 0 } catch { if ($word) { $word.Quit() }; exit 1 }`;
-        } else if (inputExtension === '.pdf' && format === 'pptx') {
-            psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 24); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
-        } 
-        // --- OFFICE TO PDF ---
-        else if (inputExtension === '.docx' && format === 'pdf') {
-            psScript = `$word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; try { $doc = $word.Documents.Open('${inputPath}'); $doc.SaveAs([ref]'${outputPath}', [ref]17); $doc.Close(); $word.Quit(); exit 0 } catch { if ($word) { $word.Quit() }; exit 1 }`;
-        } else if (inputExtension === '.pptx' && format === 'pdf') {
-            psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 32); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
-        } else {
-            return reject(new Error("Format not supported by MS Office engine."));
+        // Generate a routing key (e.g., ".pdf_to_docx") for cleaner logic mapping
+        const conversionRoute = `${inputExtension}_to_${format}`;
+        let psScript = '';
+
+        switch (conversionRoute) {
+            // --- PDF TO OFFICE ---
+            case '.pdf_to_docx':
+                psScript = `$word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; try { $doc = $word.Documents.Open('${inputPath}'); $doc.SaveAs([ref]'${outputPath}', [ref]16); $doc.Close(); $word.Quit(); exit 0 } catch { if ($word) { $word.Quit() }; exit 1 }`;
+                break;
+            case '.pdf_to_pptx':
+                psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 24); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
+                break;
+            
+            // --- OFFICE TO PDF ---
+            case '.docx_to_pdf':
+                psScript = `$word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; try { $doc = $word.Documents.Open('${inputPath}'); $doc.SaveAs([ref]'${outputPath}', [ref]17); $doc.Close(); $word.Quit(); exit 0 } catch { if ($word) { $word.Quit() }; exit 1 }`;
+                break;
+            case '.pptx_to_pdf':
+                psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 32); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
+                break;
+            
+            default:
+                return reject(new Error("Format not supported by MS Office engine."));
         }
 
         try {
@@ -282,7 +305,7 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
 }
 
 // =========================================================
-// 3. MAIN CONVERSION HANDLER
+// MAIN CONVERSION HANDLER
 // =========================================================
 ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, outputPath, format = 'pdf', metadata }) => {
     return new Promise(async (resolve, reject) => {
@@ -300,7 +323,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
 
             let conversionSuccess = false;
 
-            // --- ATTEMPT 1: MICROSOFT OFFICE ---
+            // --- MICROSOFT OFFICE ---
             const canUseMSOffice = os.platform() === 'win32' && (
                 (isPdfInput && (format === 'docx' || format === 'pptx')) || 
                 ((inputExt === '.docx' || inputExt === '.pptx') && format === 'pdf')
@@ -317,7 +340,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                 }
             }
 
-            // --- ATTEMPT 2: LIBREOFFICE ---
+            // --- LIBREOFFICE ---
             if (!conversionSuccess) {
                 const libreOfficePath = getSystemLibreOfficePath();
                 if (!libreOfficePath) {
