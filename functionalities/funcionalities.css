@@ -227,3 +227,110 @@
     resize: vertical;
     min-height: 80px;
 }
+
+/*ENGINE WARNINGS*/
+/* engineWarning.css */
+.engine-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+.engine-modal {
+    background-color: var(--reindalLight);
+    width: 90%;
+    max-width: 480px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+    font-family: var(--font-primary), serif;
+    text-align: center;
+}
+
+/* Critical Error Theme (Red) */
+.engine-modal.critical {
+    border-left: 6px solid var(--reindalRed);
+}
+.engine-modal.critical h2 {
+    color: var(--reindalDarkRed);
+}
+.engine-modal.critical .engine-modal-btn {
+    background-color: var(--reindalRed);
+    color: white;
+}
+.engine-modal.critical .engine-modal-btn:hover {
+    background-color: var(--reindalDarkRed);
+}
+
+/* Info Warning Theme (Yellow) */
+.engine-modal.info {
+    border-left: 6px solid var(--reindalYellowHover);
+}
+.engine-modal.info h2 {
+    color: var(--reindalDark);
+}
+.engine-modal.info .engine-modal-btn {
+    background-color: var(--reindalYellow);
+    color: var(--reindalDark);
+}
+.engine-modal.info .engine-modal-btn:hover {
+    background-color: var(--reindalYellowHover);
+}
+
+.engine-modal h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.engine-modal p {
+    color: var(--reindalGray);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+.engine-modal-btn {
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: var(--font-primary), serif;
+    width: 100%;
+}
+
+/* Checkbox "Don't show again" */
+.engine-dont-show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.engine-dont-show input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--reindalYellow);
+    margin: 0;
+}
+
+.engine-dont-show span {
+    font-size: 14px;
+    color: var(--reindalDark);
+    font-family: var(--font-primary), serif;
+}

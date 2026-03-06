@@ -24,6 +24,7 @@ const userDataPath = app.getPath('userData');
 const settingsPath = path.join(userDataPath, 'pdf-settings.json');
 const languagePath = path.join(userDataPath, 'language-settings.json');
 const firstLaunchMarkerPath = path.join(userDataPath, 'first-launch-complete.json');
+const warningsPath = path.join(userDataPath, 'warnings-settings.json');
 
 let mainWindow;
 
@@ -410,6 +411,61 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
             reject(err);
         }
     });
+});
+
+function checkMSOfficeInstalled() {
+    if (os.platform() !== 'win32') return false;
+    
+    // Common installation paths for MS Office (Word) in Windows
+    const paths = [
+        'C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE',
+        'C:\\Program Files (x86)\\Microsoft Office\\root\\Office16\\WINWORD.EXE',
+        'C:\\Program Files\\Microsoft Office\\Office16\\WINWORD.EXE',
+        'C:\\Program Files (x86)\\Microsoft Office\\Office16\\WINWORD.EXE',
+        'C:\\Program Files\\Microsoft Office\\root\\Office15\\WINWORD.EXE'
+    ];
+    
+    for (let p of paths) {
+        if (fs.existsSync(p)) return true;
+    }
+    return false;
+}
+
+// Handle IPC request to check if conversion engines are installed
+ipcMain.handle('check-engines-availability', async () => {
+    const hasLibreOffice = getSystemLibreOfficePath() !== null;
+    // const hasMSOffice = checkMSOfficeInstalled();
+    
+    return { hasLibreOffice, hasMSOffice };
+});
+
+// IPC handler to retrieve hidden warning settings
+ipcMain.handle('get-warning-settings', async () => {
+    try {
+        if (fs.existsSync(warningsPath)) {
+            return JSON.parse(fs.readFileSync(warningsPath, 'utf8'));
+        }
+    } catch (error) {
+        console.error('Error reading warnings settings:', error);
+    }
+    return {};
+});
+
+// IPC handler to save the user's preference to hide a specific feature warning
+ipcMain.handle('save-warning-settings', async (event, featureId) => {
+    try {
+        let settings = {};
+        if (fs.existsSync(warningsPath)) {
+            settings = JSON.parse(fs.readFileSync(warningsPath, 'utf8'));
+        }
+        // Flag the warning as disabled (true) for this specific feature (e.g., 'pdftodocx')
+        settings[featureId] = true; 
+        fs.writeFileSync(warningsPath, JSON.stringify(settings, null, 2), 'utf8');
+        return { success: true };
+    } catch (error) {
+        console.error('Error saving warnings settings:', error);
+        throw error;
+    }
 });
 
 
