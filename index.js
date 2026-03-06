@@ -1,10 +1,13 @@
 const electron = require("electron");
+const os = require('os');
 const path = require("path");
 const url = require("url");
 const fs = require("fs");
+const fsPromises = fs.promises;
 const { BrowserWindow, app , ipcMain, dialog} = electron;
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 const pptxgen = require('pptxgenjs');
+const { exec } = require('child_process');
 
 if (require('electron-squirrel-startup')) return;
 
@@ -208,6 +211,182 @@ ipcMain.handle('generate-pptx', async (event, { slides, filePath }) => {
         console.error("Error in Main process generating PPTX:", error);
         throw error;
     }
+});
+
+
+/////////// LOCAL OFFICE ///////////
+
+// =========================================================
+// 1. LIBREOFFICE PATH RESOLVER
+// =========================================================
+function getSystemLibreOfficePath() {
+    const platform = os.platform();
+    if (platform === 'win32') {
+        const winPaths = [
+            'C:\\Program Files\\LibreOffice\\program\\soffice.exe',
+            'C:\\Program Files (x86)\\LibreOffice\\program\\soffice.exe'
+        ];
+        for (let p of winPaths) if (fs.existsSync(p)) return p;
+        try { return require('child_process').execSync('where soffice').toString().trim(); } catch (e) { return null; }
+    } else if (platform === 'darwin') {
+        const macPath = '/Applications/LibreOffice.app/Contents/MacOS/soffice';
+        if (fs.existsSync(macPath)) return macPath;
+        return null;
+    } else { 
+        try { return require('child_process').execSync('which libreoffice').toString().trim(); } 
+        catch (e) { 
+            try { return require('child_process').execSync('which soffice').toString().trim(); } catch (err) { return null; }
+        }
+    }
+}
+
+// =========================================================
+// 2. MICROSOFT OFFICE ENGINE
+// =========================================================
+function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtension) {
+    return new Promise(async (resolve, reject) => {
+        if (os.platform() !== 'win32') return reject(new Error("Only supported on Windows environment."));
+
+        const tempDir = app.getPath('temp');
+        const psPath = path.join(tempDir, `msoffice_${Date.now()}.ps1`);
+
+        let psScript = '';
+        
+        // --- PDF TO OFFICE ---
+        if (inputExtension === '.pdf' && format === 'docx') {
+            psScript = `$word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; try { $doc = $word.Documents.Open('${inputPath}'); $doc.SaveAs([ref]'${outputPath}', [ref]16); $doc.Close(); $word.Quit(); exit 0 } catch { if ($word) { $word.Quit() }; exit 1 }`;
+        } else if (inputExtension === '.pdf' && format === 'pptx') {
+            psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 24); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
+        } 
+        // --- OFFICE TO PDF ---
+        else if (inputExtension === '.docx' && format === 'pdf') {
+            psScript = `$word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; try { $doc = $word.Documents.Open('${inputPath}'); $doc.SaveAs([ref]'${outputPath}', [ref]17); $doc.Close(); $word.Quit(); exit 0 } catch { if ($word) { $word.Quit() }; exit 1 }`;
+        } else if (inputExtension === '.pptx' && format === 'pdf') {
+            psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 32); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
+        } else {
+            return reject(new Error("Format not supported by MS Office engine."));
+        }
+
+        try {
+            await fsPromises.writeFile(psPath, psScript);
+            const command = `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${psPath}"`;
+            exec(command, async (error) => {
+                try { await fsPromises.unlink(psPath); } catch (e) {} 
+                if (error) reject(error);
+                else resolve();
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
+// =========================================================
+// 3. MAIN CONVERSION HANDLER
+// =========================================================
+ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, outputPath, format = 'pdf', metadata }) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const tempDir = app.getPath('temp');
+            // Parse clean name to avoid double extensions (e.g., file.pdf.pdf -> file.pdf)
+            const parsedName = path.parse(fileName).name;
+            const uniqueFileName = Date.now() + '_' + parsedName + path.parse(fileName).ext;
+            const tempInputPath = path.join(tempDir, uniqueFileName);
+
+            await fsPromises.writeFile(tempInputPath, Buffer.from(fileData));
+            const outputDir = path.dirname(outputPath);
+            const isPdfInput = fileName.toLowerCase().endsWith('.pdf');
+            const inputExt = path.parse(fileName).ext.toLowerCase();
+
+            let conversionSuccess = false;
+
+            // --- ATTEMPT 1: MICROSOFT OFFICE ---
+            const canUseMSOffice = os.platform() === 'win32' && (
+                (isPdfInput && (format === 'docx' || format === 'pptx')) || 
+                ((inputExt === '.docx' || inputExt === '.pptx') && format === 'pdf')
+            );
+
+            if (canUseMSOffice) {
+                console.log(`[Conversion] Attempting native MS Office conversion...`);
+                try {
+                    await convertWithMSOfficeWindows(tempInputPath, outputPath, format, inputExt);
+                    console.log("[Conversion] MS Office conversion successful.");
+                    conversionSuccess = true;
+                } catch (msError) {
+                    console.log("[Conversion] MS Office failed or is not installed. Falling back to LibreOffice...");
+                }
+            }
+
+            // --- ATTEMPT 2: LIBREOFFICE ---
+            if (!conversionSuccess) {
+                const libreOfficePath = getSystemLibreOfficePath();
+                if (!libreOfficePath) {
+                    try { await fsPromises.unlink(tempInputPath); } catch (e) {}
+                    return reject(new Error("LibreOffice installation not found."));
+                }
+
+                console.log(`[Conversion] Using system LibreOffice for ${format.toUpperCase()} conversion...`);
+                
+                // Input filter to force LibreOffice Writer for PDF imports instead of Draw
+                let infilter = "";
+                if (isPdfInput && format === 'docx') {
+                    infilter = `--infilter="writer_pdf_import" `;
+                }
+
+                // Execute headless conversion command
+                const command = `"${libreOfficePath}" --headless ${infilter}--convert-to ${format} "${tempInputPath}" --outdir "${outputDir}"`;
+                
+                await new Promise((res, rej) => {
+                    exec(command, async (error, stdout, stderr) => {
+                        if (error) {
+                            console.error("LibreOffice execution error:", stderr);
+                            return rej(new Error("LibreOffice conversion failed."));
+                        }
+                        
+                        try {
+                            // LibreOffice saves the file with the same base name but a new extension
+                            const baseName = path.parse(tempInputPath).name;
+                            const generatedFilePath = path.join(outputDir, baseName + `.${format}`);
+
+                            // Rename the generated file to the user's requested path
+                            if (fs.existsSync(generatedFilePath)) {
+                                if (generatedFilePath !== outputPath) {
+                                    await fsPromises.rename(generatedFilePath, outputPath);
+                                }
+                                res();
+                            } else {
+                                rej(new Error("LibreOffice process finished, but the expected output file was not found."));
+                            }
+                        } catch (err) { rej(err); }
+                    });
+                });
+            }
+
+            // Clean up temporary file
+            try { await fsPromises.unlink(tempInputPath); } catch (e) {}
+
+            // Apply PDF metadata
+            if (metadata && format === 'pdf') {
+                try {
+                    const { PDFDocument } = require('pdf-lib');
+                    const pdfBytes = await fsPromises.readFile(outputPath);
+                    const pdfDoc = await PDFDocument.load(pdfBytes);
+                    if (metadata.title) pdfDoc.setTitle(metadata.title);
+                    if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+                    if (metadata.author) pdfDoc.setAuthor(metadata.author);
+                    const modifiedPdfBytes = await pdfDoc.save();
+                    await fsPromises.writeFile(outputPath, modifiedPdfBytes);
+                } catch (metaErr) {
+                    console.log("[Warning] Failed to inject metadata into the PDF.");
+                }
+            }
+
+            resolve({ success: true });
+
+        } catch (err) {
+            reject(err);
+        }
+    });
 });
 
 
