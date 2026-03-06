@@ -302,7 +302,14 @@ const languages = {
         metaTitle: "Enter document title",
         metaSubject: "Enter document subject",
         firstLaunchIntroTitle: "Welcome to PDF Converter",
-        firstLaunchIntroText: "Quick setup: choose your language and default PDF metadata. These settings are reused when creating files."
+        firstLaunchIntroText: "Quick setup: choose your language and default PDF metadata. These settings are reused when creating files.",
+
+        engineWarningCriticalTitle: "Missing Requirements",
+        engineWarningCriticalDesc: "This feature requires LibreOffice or Microsoft Office to be installed on your computer.",
+        engineWarningCriticalBtn: "Understood",
+        engineWarningInfoTitle: "Conversion Quality Notice",
+        engineWarningInfoDesc: "You are using LibreOffice for this conversion. While it works well, complex PDFs might lose some styling or formatting. For pixel-perfect conversions, Microsoft Office is recommended.",
+        engineWarningInfoBtn: "Got it, continue"
     },
     it: {
         languageText: "Lingua",
@@ -605,7 +612,14 @@ const languages = {
         metaTitle: "Inserisci il titolo del documento",
         metaSubject: "Inserisci l'oggetto del documento",
         firstLaunchIntroTitle: "Benvenuto in PDF Converter",
-        firstLaunchIntroText: "Configurazione rapida: scegli lingua e metadati PDF predefiniti. Queste impostazioni verranno riutilizzate alla creazione dei file."
+        firstLaunchIntroText: "Configurazione rapida: scegli lingua e metadati PDF predefiniti. Queste impostazioni verranno riutilizzate alla creazione dei file.",
+
+        engineWarningCriticalTitle: "Requisiti mancanti",
+        engineWarningCriticalDesc: "Questa funzione richiede l'installazione di LibreOffice o Microsoft Office sul tuo computer.",
+        engineWarningCriticalBtn: "Ho capito",
+        engineWarningInfoTitle: "Avviso sulla qualità della conversione",
+        engineWarningInfoDesc: "Stai utilizzando LibreOffice per questa conversione. Sebbene funzioni bene, i PDF complessi potrebbero perdere parte dello stile o della formattazione. Per conversioni perfette, si consiglia Microsoft Office.",
+        engineWarningInfoBtn: "Capito, continua"
     },
     pl: {
         languageText: "Język",
@@ -904,7 +918,14 @@ const languages = {
         cancelSettings: "Anuluj",
         settingsSaved: "Ustawienia zapisane!",
         firstLaunchIntroTitle: "Witamy w PDF Converter",
-        firstLaunchIntroText: "Szybka konfiguracja: wybierz jezyk i domyslne metadane PDF. Te ustawienia beda ponownie uzywane przy tworzeniu plikow."
+        firstLaunchIntroText: "Szybka konfiguracja: wybierz jezyk i domyslne metadane PDF. Te ustawienia beda ponownie uzywane przy tworzeniu plikow.",
+
+        engineWarningCriticalTitle: "Brakujące wymagania",
+        engineWarningCriticalDesc: "Ta funkcja wymaga zainstalowania programu LibreOffice lub Microsoft Office na Twoim komputerze.",
+        engineWarningCriticalBtn: "Zrozumiano",
+        engineWarningInfoTitle: "Uwaga dotycząca jakości konwersji",
+        engineWarningInfoDesc: "Używasz programu LibreOffice do tej konwersji. Chociaż działa on dobrze, złożone pliki PDF mogą utracić część stylów lub formatowania. Aby uzyskać idealne konwersje, zaleca się korzystanie z programu Microsoft Office.",
+        engineWarningInfoBtn: "Rozumiem, kontynuuj"
     },
     es: {
         languageText: "Idioma",
@@ -1205,8 +1226,14 @@ const languages = {
         metaSubject: "Introduzca el asunto del documento",
         firstLaunchIntroTitle: "Bienvenido a PDF Converter",
         firstLaunchIntroText: "Configuracion rapida: elige idioma y metadatos PDF por defecto. Estos ajustes se reutilizaran al crear archivos.",
-        // Save as ZIP checkbox
-        saveAsZipLabel: "Guardar como ZIP"
+
+        //Office engine warnign
+        engineWarningCriticalTitle: "Faltan los requisitos mínimos",
+        engineWarningCriticalDesc: "Esta función requiere que LibreOffice o Microsoft Office estén instalados en tu ordenador.",
+        engineWarningCriticalBtn: "Entendido",
+        engineWarningInfoTitle: "Aviso de calidad de conversión",
+        engineWarningInfoDesc: "Estás utilizando LibreOffice para esta conversión. Aunque funciona bien, los PDF complejos pueden perder algo de estilo o formato. Para conversiones perfectas, se recomienda usar Microsoft Office.",
+        engineWarningInfoBtn: "Entendido, continuar"
     },
 };
 
