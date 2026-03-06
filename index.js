@@ -434,7 +434,7 @@ function checkMSOfficeInstalled() {
 // Handle IPC request to check if conversion engines are installed
 ipcMain.handle('check-engines-availability', async () => {
     const hasLibreOffice = getSystemLibreOfficePath() !== null;
-    // const hasMSOffice = checkMSOfficeInstalled();
+    const hasMSOffice = checkMSOfficeInstalled();
     
     return { hasLibreOffice, hasMSOffice };
 });
