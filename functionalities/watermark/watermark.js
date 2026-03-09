@@ -32,20 +32,6 @@ let editingLayerIndex = null;
 const previewCtx = previewCanvas.getContext('2d');
 let pdfPageDimensions = { width: 595, height: 842 }; // Default A4 size in points
 
-// Custom metadata toggle
-const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
-const metadataFieldsDiv = document.getElementById('metadataFields');
-const metadataTitleInput = document.getElementById('metadataTitleInput');
-const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
-
-addMetadataCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        metadataFieldsDiv.classList.add('visible');
-    } else {
-        metadataFieldsDiv.classList.remove('visible');
-    }
-});
-
 // Initialize default color value
 customColorHex.value = '#000000';
 colorPicker.value = '#000000';
@@ -459,35 +445,12 @@ form.addEventListener('submit', async function(e) {
         const fileBuffer = await selectedFile.arrayBuffer();
         const pdfDoc = await PDFDocument.load(fileBuffer);
 
-        // Get metadata from global settings
-        const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+        // Get final metadata from module
+        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
 
-        // Always set author from global settings
-        if (metadata.author) {
-            pdfDoc.setAuthor(metadata.author);
-        }
-
-        // Check if custom metadata is enabled
-        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
-            // Use custom metadata from form fields for Title and Subject (only if not empty)
-            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
-            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
-
-            if (customTitle) {
-                pdfDoc.setTitle(customTitle);
-            }
-            if (customDescription) {
-                pdfDoc.setSubject(customDescription);
-            }
-        } else {
-            // Use global settings for Title and Subject
-            if (metadata.title) {
-                pdfDoc.setTitle(metadata.title);
-            }
-            if (metadata.subject) {
-                pdfDoc.setSubject(metadata.subject);
-            }
-        }
+        if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
+        if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
+        if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
 
         // Embed font
         const helveticaFont = await pdfDoc.embedFont('Helvetica-Bold');
@@ -644,11 +607,9 @@ form.addEventListener('submit', async function(e) {
         previewSection.style.display = 'none';
         layersContainer.style.display = 'none';
         updateLayersList();
+        
         // Clear custom metadata fields
-        metadataTitleInput.value = '';
-        metadataDescriptionInput.value = '';
-        addMetadataCheckbox.checked = false;
-        metadataFieldsDiv.classList.remove('visible');
+        CustomMetadataModule.reset();
 
     } catch (error) {
         console.error('Error adding watermark:', error);

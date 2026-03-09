@@ -24,6 +24,8 @@ form.addEventListener('submit', async function(e) {
     submitBtn.disabled = true;
 
     try {
+        // Get final metadata from module
+        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const defaultPath = path.join(downloadsPath, selectedFile.name.replace('.pdf', '.pptx'));
         
@@ -44,10 +46,14 @@ form.addEventListener('submit', async function(e) {
             fileName: selectedFile.name,
             outputPath: outputPath,
             format: 'pptx',
-            metadata: null 
+            metadata: finalMetadata 
         });
 
         showStatus("✓ PPTX created successfully", 'success');
+        
+        setTimeout(() => {
+            CustomMetadataModule.reset();
+        }, 2000);
 
     } catch (error) {
         console.error('Error converting PDF to PPTX:', error);

@@ -57,7 +57,7 @@ form.addEventListener('submit', async function(e) {
         const worksheet = workbook.Sheets[firstSheetName];
         
         // Convert Excel to an array of objects (each row is an object)
-        // Example: [{ company: "Reindal", Agent: "Adrian" }, ...]
+        // Example: [{ company: "Reindal", Agent: "Christian" }, ...]
         const excelData = XLSX.utils.sheet_to_json(worksheet);
 
         if (excelData.length === 0) {
@@ -65,6 +65,8 @@ form.addEventListener('submit', async function(e) {
         }
 
         // 2. PREPARE FINAL ZIP AND BASE DOCX
+        // Get final metadata from module
+        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
         const finalZip = new JSZip();
         const docxBufferBase = await selectedDocxFile.arrayBuffer();
         const tempDir = os.tmpdir();
@@ -114,7 +116,7 @@ form.addEventListener('submit', async function(e) {
                 fileName: `temp_${i}.docx`,
                 outputPath: tempPdfPath,
                 format: 'pdf',
-                metadata: null 
+                metadata: finalMetadata 
             });
 
             // C. Read generated PDF and add to JSZip
@@ -144,6 +146,7 @@ form.addEventListener('submit', async function(e) {
             excelInfo.textContent = '';
             progressContainer.style.display = 'none';
             progressBar.style.width = '0%';
+            CustomMetadataModule.reset();
         }, 4000);
 
     } catch (error) {

@@ -13,12 +13,6 @@ const addRangeBtn = document.getElementById('addRangeBtn');
 const customFilesContainer = document.getElementById('customFilesContainer');
 const addCustomFileBtn = document.getElementById('addCustomFileBtn');
 
-// Custom metadata toggle
-const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
-const metadataFieldsDiv = document.getElementById('metadataFields');
-const metadataTitleInput = document.getElementById('metadataTitleInput');
-const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
-
 const rangeModeContainer = document.getElementById('rangeModeContainer');
 const everyModeContainer = document.getElementById('everyModeContainer');
 const customModeContainer = document.getElementById('customModeContainer');
@@ -30,44 +24,13 @@ let customFileCount = 1;
 
 // Function to set metadata on a PDF document
 async function setMetadata(pdfDoc) {
-    // Get metadata from global settings
-    const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+    // Get metadata from module
+    const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
 
-    // Always set author from global settings
-    if (metadata.author) {
-        pdfDoc.setAuthor(metadata.author);
-    }
-
-    // Check if custom metadata is enabled
-    if (addMetadataCheckbox && addMetadataCheckbox.checked) {
-        // Use custom metadata from form fields for Title and Subject (only if not empty)
-        const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
-        const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
-
-        if (customTitle) {
-            pdfDoc.setTitle(customTitle);
-        }
-        if (customDescription) {
-            pdfDoc.setSubject(customDescription);
-        }
-    } else {
-        // Use global settings for Title and Subject
-        if (metadata.title) {
-            pdfDoc.setTitle(metadata.title);
-        }
-        if (metadata.subject) {
-            pdfDoc.setSubject(metadata.subject);
-        }
-    }
+    if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
+    if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
+    if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
 }
-
-addMetadataCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        metadataFieldsDiv.classList.add('visible');
-    } else {
-        metadataFieldsDiv.classList.remove('visible');
-    }
-});
 
 addRange();
 addCustomFile();
@@ -376,11 +339,9 @@ form.addEventListener('submit', async function(e) {
         rangesContainer.innerHTML = ''; rangeCount = 1; addRange();
         customFilesContainer.innerHTML = ''; customFileCount = 1; addCustomFile();
         if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
-        // Clear custom metadata fields
-        metadataTitleInput.value = '';
-        metadataDescriptionInput.value = '';
-        addMetadataCheckbox.checked = false;
-        metadataFieldsDiv.classList.remove('visible');
+        
+        // Clear custom metadata fields using module
+        CustomMetadataModule.reset();
 
         // Reset mode containers to show only the checked mode
         rangeModeContainer.style.display = 'none';

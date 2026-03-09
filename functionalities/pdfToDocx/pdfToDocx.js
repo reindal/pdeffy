@@ -25,6 +25,8 @@ form.addEventListener('submit', async function(e) {
     submitBtn.disabled = true;
 
     try {
+        // Get final metadata from module
+        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const defaultPath = path.join(downloadsPath, selectedFile.name.replace('.pdf', '.docx'));
         
@@ -44,11 +46,15 @@ form.addEventListener('submit', async function(e) {
             fileData: arrayBuffer,
             fileName: selectedFile.name,
             outputPath: outputPath,
-            format: 'docx', // FORMATO OBJETIVO
-            metadata: null  // No metemos metadata a los docx
+            format: 'docx',
+            metadata: finalMetadata 
         });
 
         showStatus("✓ DOCX created successfully", 'success');
+        
+        setTimeout(() => {
+            CustomMetadataModule.reset();
+        }, 2000);
 
     } catch (error) {
         console.error('Error converting PDF to DOCX:', error);

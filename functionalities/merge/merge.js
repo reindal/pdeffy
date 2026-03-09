@@ -9,21 +9,7 @@ const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
 const filesOrderContainer = document.getElementById('filesOrderContainer');
 
-// Custom metadata toggle
-const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
-const metadataFieldsDiv = document.getElementById('metadataFields');
-const metadataTitleInput = document.getElementById('metadataTitleInput');
-const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
-
 let selectedFiles = [];
-
-addMetadataCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        metadataFieldsDiv.classList.add('visible');
-    } else {
-        metadataFieldsDiv.classList.remove('visible');
-    }
-});
 
 pdfFiles.addEventListener('change', function (e) {
     const newFiles = Array.from(e.target.files);
@@ -31,7 +17,6 @@ pdfFiles.addEventListener('change', function (e) {
     updateFilesOrder();
     pdfFiles.value = '';
 });
-
 
 function updateFilesOrder() {
     filesOrderContainer.innerHTML = '';
@@ -130,36 +115,11 @@ form.addEventListener('submit', async function (e) {
 
     try {
         const mergedPdf = await PDFDocument.create();
+        const metadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
 
-        // Get metadata from global settings
-        const metadata = await ipcRenderer.invoke('get-pdf-metadata');
-
-        // Always set author from global settings
-        if (metadata.author) {
-            mergedPdf.setAuthor(metadata.author);
-        }
-
-        // Check if custom metadata is enabled
-        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
-            // Use custom metadata from form fields for Title and Subject (only if not empty)
-            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
-            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
-
-            if (customTitle) {
-                mergedPdf.setTitle(customTitle);
-            }
-            if (customDescription) {
-                mergedPdf.setSubject(customDescription);
-            }
-        } else {
-            // Use global settings for Title and Subject
-            if (metadata.title) {
-                mergedPdf.setTitle(metadata.title);
-            }
-            if (metadata.subject) {
-                mergedPdf.setSubject(metadata.subject);
-            }
-        }
+        if (metadata.author) mergedPdf.setAuthor(metadata.author);
+        if (metadata.title) mergedPdf.setTitle(metadata.title);
+        if (metadata.subject) mergedPdf.setSubject(metadata.subject);
 
         for (let file of selectedFiles) {
             const fileBuffer = await file.arrayBuffer();
@@ -210,7 +170,7 @@ form.addEventListener('submit', async function (e) {
         selectedFiles = [];
         updateFilesOrder();
         pdfFiles.value = '';
-
+        CustomMetadataModule.reset();
     } catch (error) {
         console.error('Error merging PDFs:', error);
         showStatus(getMessage('errorPrefix') + error.message, 'error');

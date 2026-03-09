@@ -9,21 +9,7 @@ const submitBtn = document.getElementById('submitBtn');
 const statusDiv = document.getElementById('status');
 const imagesOrderContainer = document.getElementById('imagesOrderContainer');
 
-// Custom metadata toggle
-const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
-const metadataFieldsDiv = document.getElementById('metadataFields');
-const metadataTitleInput = document.getElementById('metadataTitleInput');
-const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
-
 let selectedImages = [];
-
-addMetadataCheckbox.addEventListener('change', function() {
-    if (this.checked) {
-        metadataFieldsDiv.classList.add('visible');
-    } else {
-        metadataFieldsDiv.classList.remove('visible');
-    }
-});
 
 imageFiles.addEventListener('change', function (e) {
     const newFiles = Array.from(e.target.files);
@@ -136,35 +122,12 @@ form.addEventListener('submit', async function(e) {
     try {
         const pdfDoc = await PDFDocument.create();
 
-        // Get metadata from global settings
-        const metadata = await ipcRenderer.invoke('get-pdf-metadata');
+        // Get final metadata from module
+        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
 
-        // Always set author from global settings
-        if (metadata.author) {
-            pdfDoc.setAuthor(metadata.author);
-        }
-
-        // Check if custom metadata is enabled
-        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
-            // Use custom metadata from form fields for Title and Subject (only if not empty)
-            const customTitle = metadataTitleInput ? metadataTitleInput.value.trim() : '';
-            const customDescription = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
-
-            if (customTitle) {
-                pdfDoc.setTitle(customTitle);
-            }
-            if (customDescription) {
-                pdfDoc.setSubject(customDescription);
-            }
-        } else {
-            // Use global settings for Title and Subject
-            if (metadata.title) {
-                pdfDoc.setTitle(metadata.title);
-            }
-            if (metadata.subject) {
-                pdfDoc.setSubject(metadata.subject);
-            }
-        }
+        if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
+        if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
+        if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
 
         for (const imageFile of selectedImages) {
             const imageBytes = await imageFile.arrayBuffer();
@@ -246,6 +209,7 @@ form.addEventListener('submit', async function(e) {
             form.reset();
             selectedImages = [];
             updateImagesOrder();
+            CustomMetadataModule.reset();
         }, 2000);
 
     } catch (error) {

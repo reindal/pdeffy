@@ -8,21 +8,6 @@ const statusDiv = document.getElementById('status');
 const fileNameDisplay = document.getElementById('fileNameDisplay');
 const fileInfo = document.getElementById('fileInfo');
 
-const addMetadataCheckbox = document.getElementById('addMetadataCheckbox');
-const metadataFieldsDiv = document.getElementById('metadataFields');
-const metadataTitleInput = document.getElementById('metadataTitleInput');
-const metadataDescriptionInput = document.getElementById('metadataDescriptionInput');
-
-if (addMetadataCheckbox && metadataFieldsDiv) {
-    addMetadataCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            metadataFieldsDiv.classList.add('visible');
-        } else {
-            metadataFieldsDiv.classList.remove('visible');
-        }
-    });
-}
-
 docxFileInput.addEventListener('change', function(e) {
     if (e.target.files.length > 0) {
         fileInfo.style.display = 'block';
@@ -40,16 +25,8 @@ form.addEventListener('submit', async function(e) {
     submitBtn.disabled = true;
 
     try {
-        const globalMetadata = await ipcRenderer.invoke('get-pdf-metadata');
-        let finalMetadata = { author: globalMetadata.author || '' };
-
-        if (addMetadataCheckbox && addMetadataCheckbox.checked) {
-            finalMetadata.title = metadataTitleInput ? metadataTitleInput.value.trim() : '';
-            finalMetadata.subject = metadataDescriptionInput ? metadataDescriptionInput.value.trim() : '';
-        } else {
-            finalMetadata.title = globalMetadata.title || '';
-            finalMetadata.subject = globalMetadata.subject || '';
-        }
+        // Get final metadata from module
+        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
 
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const defaultPath = path.join(downloadsPath, file.name.replace('.docx', '.pdf'));
@@ -76,10 +53,7 @@ form.addEventListener('submit', async function(e) {
         showStatus(getLocalMessage('successDocxCreated'), 'success');
         
         setTimeout(() => {
-            if (metadataTitleInput) metadataTitleInput.value = '';
-            if (metadataDescriptionInput) metadataDescriptionInput.value = '';
-            if (addMetadataCheckbox) addMetadataCheckbox.checked = false;
-            if (metadataFieldsDiv) metadataFieldsDiv.classList.remove('visible');
+            CustomMetadataModule.reset();
         }, 2000);
 
     } catch (error) {

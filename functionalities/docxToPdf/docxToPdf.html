@@ -30,23 +30,6 @@
                 <span id="fileNameDisplay"></span>
             </div>
 
-            <div class="metadataCheckboxGroup">
-                <label class="metadataCheckboxLabel">
-                    <input type="checkbox" id="addMetadataCheckbox">
-                    <span class="langText" id="addCustomMetadata">Add custom metadata properties</span>
-                </label>
-                <div id="metadataFields" class="metadataFields">
-                    <div class="formGroup">
-                        <label for="metadataTitleInput" class="langText" id="metadataTitle">Title:</label>
-                        <input type="text" id="metadataTitleInput" class="langTextPlaceholder" placeholder="Enter document title">
-                    </div>
-                    <div class="formGroup">
-                        <label for="metadataDescriptionInput" class="langText" id="metadataDescription">Description:</label>
-                        <textarea id="metadataDescriptionInput" class="langTextPlaceholder" placeholder="Enter document description"></textarea>
-                    </div>
-                </div>
-            </div>
-
             <button type="submit" class="submitBtn" id="submitBtn">
                 <span class="langText" id="docxToPdfSubmitBtn">Convert to PDF</span>
             </button>
@@ -59,6 +42,7 @@
 
 <script src="../../changeLang.js"></script>
 <script src="./../../settings.js"></script>
+<script src="./../customMetadata.js"></script>
 <script src="./docxToPdf.js"></script>
 <script src="./../engineWarning.js"></script>
 </body>
