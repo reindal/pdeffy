@@ -5,7 +5,7 @@ var { ipcRenderer } = require('electron');
 
 const form = document.getElementById('watermarkForm');
 const pdfFileInput = document.getElementById('pdfFile');
-const watermarkTextInput = document.getElementById('watermarkText');
+const watermarkTextInput = document.getElementById('watermarkPlaceholder');
 const fontSizeInput = document.getElementById('fontSize');
 const opacityInput = document.getElementById('opacity');
 const opacityValue = document.getElementById('opacityValue');

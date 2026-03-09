@@ -350,40 +350,85 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                 }
 
                 console.log(`[Conversion] Using system LibreOffice for ${format.toUpperCase()} conversion...`);
-                
-                // Input filter to force LibreOffice Writer for PDF imports instead of Draw
-                let infilter = "";
+                const baseName = path.parse(tempInputPath).name;
+
+                // SPECIAL STRATEGY: 2-Step conversion for PDF to DOCX
                 if (isPdfInput && format === 'docx') {
-                    infilter = `--infilter="writer_pdf_import" `;
-                }
+                    console.log(`[Conversion] Applying 2-step process (PDF -> ODT -> DOCX) for better formatting...`);
+                    
+                    const tempOdtPath = path.join(tempDir, baseName + '.odt');
 
-                // Execute headless conversion command
-                const command = `"${libreOfficePath}" --headless ${infilter}--convert-to ${format} "${tempInputPath}" --outdir "${outputDir}"`;
-                
-                await new Promise((res, rej) => {
-                    exec(command, async (error, stdout, stderr) => {
-                        if (error) {
-                            console.error("LibreOffice execution error:", stderr);
-                            return rej(new Error("LibreOffice conversion failed."));
-                        }
-                        
-                        try {
-                            // LibreOffice saves the file with the same base name but a new extension
-                            const baseName = path.parse(tempInputPath).name;
-                            const generatedFilePath = path.join(outputDir, baseName + `.${format}`);
-
-                            // Rename the generated file to the user's requested path
-                            if (fs.existsSync(generatedFilePath)) {
-                                if (generatedFilePath !== outputPath) {
-                                    await fsPromises.rename(generatedFilePath, outputPath);
-                                }
-                                res();
-                            } else {
-                                rej(new Error("LibreOffice process finished, but the expected output file was not found."));
+                    // STEP 1: PDF to ODT (Saves in temp folder)
+                    const step1Command = `"${libreOfficePath}" --headless --infilter="writer_pdf_import" --convert-to odt "${tempInputPath}" --outdir "${tempDir}"`;
+                    
+                    await new Promise((res, rej) => {
+                        exec(step1Command, (error, stdout, stderr) => {
+                            if (error) {
+                                console.error("LibreOffice Step 1 error:", stderr);
+                                return rej(new Error("LibreOffice PDF to ODT conversion failed."));
                             }
-                        } catch (err) { rej(err); }
+                            res();
+                        });
                     });
-                });
+
+                    // STEP 2: ODT to DOCX (Saves to final output folder)
+                    const step2Command = `"${libreOfficePath}" --headless --convert-to docx "${tempOdtPath}" --outdir "${outputDir}"`;
+
+                    await new Promise((res, rej) => {
+                        exec(step2Command, async (error, stdout, stderr) => {
+                            // Clean up the intermediate ODT file
+                            try { await fsPromises.unlink(tempOdtPath); } catch (e) {}
+
+                            if (error) {
+                                console.error("LibreOffice Step 2 error:", stderr);
+                                return rej(new Error("LibreOffice ODT to DOCX conversion failed."));
+                            }
+                            
+                            try {
+                                const generatedFilePath = path.join(outputDir, baseName + '.docx');
+                                if (fs.existsSync(generatedFilePath)) {
+                                    if (generatedFilePath !== outputPath) {
+                                        await fsPromises.rename(generatedFilePath, outputPath);
+                                    }
+                                    res();
+                                } else {
+                                    rej(new Error("LibreOffice process finished, but the expected DOCX file was not found."));
+                                }
+                            } catch (err) { rej(err); }
+                        });
+                    });
+
+                } else {
+                    // STANDARD STRATEGY: 1-Step conversion for everything else
+                    let infilter = "";
+                    if (isPdfInput && format === 'pptx') {
+                        console.log(`[Conversion] Applying impress_pdf_import filter for PPTX...`);
+                        infilter = `--infilter="impress_pdf_import" `;
+                    }
+
+                    const command = `"${libreOfficePath}" --headless ${infilter}--convert-to ${format} "${tempInputPath}" --outdir "${outputDir}"`;
+                    
+                    await new Promise((res, rej) => {
+                        exec(command, async (error, stdout, stderr) => {
+                            if (error) {
+                                console.error("LibreOffice execution error:", stderr);
+                                return rej(new Error("LibreOffice conversion failed."));
+                            }
+                            
+                            try {
+                                const generatedFilePath = path.join(outputDir, baseName + `.${format}`);
+                                if (fs.existsSync(generatedFilePath)) {
+                                    if (generatedFilePath !== outputPath) {
+                                        await fsPromises.rename(generatedFilePath, outputPath);
+                                    }
+                                    res();
+                                } else {
+                                    rej(new Error("LibreOffice process finished, but the expected output file was not found."));
+                                }
+                            } catch (err) { rej(err); }
+                        });
+                    });
+                }
             }
 
             // Clean up temporary file
@@ -433,6 +478,8 @@ function checkMSOfficeInstalled() {
 
 // Handle IPC request to check if conversion engines are installed
 ipcMain.handle('check-engines-availability', async () => {
+    //const hasLibreOffice = false;
+
     const hasLibreOffice = getSystemLibreOfficePath() !== null;
     const hasMSOffice = checkMSOfficeInstalled();
     

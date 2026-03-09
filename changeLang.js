@@ -39,6 +39,12 @@ const languages = {
         backLink: "← Back to main page",
         selectedFile: "✓ Selected file: ",
 
+        //Placeholders
+        metadataTitleInput: "Enter document title",
+        metadataDescriptionInput: "Enter document description",
+        baseFileName: "e.g., Confidentiality_Agreement",
+        watermarkPlaceholder: "CONFIDENTIAL",
+
         // Merge PDF
         mergeHeader: "Merge PDF",
         mergeHeader2: "Merge PDF Documents",
@@ -309,11 +315,12 @@ const languages = {
         engineWarningCriticalBtn: "Understood",
         engineWarningInfoTitle: "Conversion Quality Notice",
         engineWarningInfoDesc: "You are using LibreOffice for this conversion. While it works well, complex PDFs might lose some styling or formatting. For pixel-perfect conversions, Microsoft Office is recommended.",
-        engineWarningInfoBtn: "Got it, continue"
+        engineWarningInfoBtn: "Got it, continue",
+        engineWarningDontShow: "Don't show this warning again"
     },
     it: {
         languageText: "Lingua",
-        welcomeText: "Smart PDF tools",
+        welcomeText: "Strumenti PDF intelligenti",
 
         // Category tiles
         organizePdfTile: "Organizza PDF",
@@ -347,6 +354,12 @@ const languages = {
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
         selectedFile: "✓ File selezionato: ",
+
+        //Placeholders
+        metadataTitleInput: "Inserisci il titolo del documento",
+        metadataDescriptionInput: "Inserisci la descrizione del documento",
+        baseFileName: "es., Accordo_di_Riservatezza",
+        watermarkPlaceholder: "RISERVATO",
 
         // Merge PDF
         mergeHeader: "Unisci file PDF",
@@ -619,11 +632,12 @@ const languages = {
         engineWarningCriticalBtn: "Ho capito",
         engineWarningInfoTitle: "Avviso sulla qualità della conversione",
         engineWarningInfoDesc: "Stai utilizzando LibreOffice per questa conversione. Sebbene funzioni bene, i PDF complessi potrebbero perdere parte dello stile o della formattazione. Per conversioni perfette, si consiglia Microsoft Office.",
-        engineWarningInfoBtn: "Capito, continua"
+        engineWarningInfoBtn: "Capito, continua",
+        engineWarningDontShow: "Non mostrare più questo avvertimento"
     },
     pl: {
         languageText: "Język",
-        welcomeText: "Smart PDF tools",
+        welcomeText: "Inteligentne narzędzia PDF",
 
         // Category tiles
         organizePdfTile: "Organizuj PDF",
@@ -657,6 +671,12 @@ const languages = {
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
         selectedFile: "✓ Wybrano plik: ",
+
+        //Placeholders
+        metadataTitleInput: "Wpisz tytuł dokumentu",
+        metadataDescriptionInput: "Wpisz opis dokumentu",
+        baseFileName: "np. Umowa_poufności",
+        watermarkPlaceholder: "POUFNE",
 
         // Merge PDF
         mergeHeader: "Scal PDF",
@@ -925,11 +945,12 @@ const languages = {
         engineWarningCriticalBtn: "Zrozumiano",
         engineWarningInfoTitle: "Uwaga dotycząca jakości konwersji",
         engineWarningInfoDesc: "Używasz programu LibreOffice do tej konwersji. Chociaż działa on dobrze, złożone pliki PDF mogą utracić część stylów lub formatowania. Aby uzyskać idealne konwersje, zaleca się korzystanie z programu Microsoft Office.",
-        engineWarningInfoBtn: "Rozumiem, kontynuuj"
+        engineWarningInfoBtn: "Rozumiem, kontynuuj",
+        engineWarningDontShow: "Nie pokazuj więcej tego ostrzeżenia"
     },
     es: {
         languageText: "Idioma",
-        welcomeText: "Smart PDF tools",
+        welcomeText: "Herramientas PDF inteligentes",
 
         // Category tiles
         organizePdfTile: "Organizar PDF",
@@ -963,6 +984,12 @@ const languages = {
         removeBtn: "Eliminar",
         backLink: "← Ir a la página principal",
         selectedFile: "✓ Archivo seleccionado: ",
+
+        //Placeholders
+        metadataTitleInput: "Introduce el título del documento",
+        metadataDescriptionInput: "Introduce la descripción del documento",
+        baseFileName: "p. ej., Acuerdo_de_Confidencialidad",
+        watermarkPlaceholder: "CONFIDENCIAL",
 
         // Merge PDF
         mergeHeader: "Unir PDF",
@@ -1233,7 +1260,8 @@ const languages = {
         engineWarningCriticalBtn: "Entendido",
         engineWarningInfoTitle: "Aviso de calidad de conversión",
         engineWarningInfoDesc: "Estás utilizando LibreOffice para esta conversión. Aunque funciona bien, los PDF complejos pueden perder algo de estilo o formato. Para conversiones perfectas, se recomienda usar Microsoft Office.",
-        engineWarningInfoBtn: "Entendido, continuar"
+        engineWarningInfoBtn: "Entendido, continuar",
+        engineWarningDontShow: "No volver a mostrar esta advertencia"
     },
 };
 
@@ -1247,7 +1275,7 @@ function changeLanguage(lang) {
     }
 
     for (let i = 0; i < objectsP.length; i++) {
-        const key = objects[i].dataset.i18n || objectsP[i].id;
+        const key = objectsP[i].dataset.i18n || objectsP[i].id;
         objectsP[i].placeholder = languages[lang][key];
     }
 }

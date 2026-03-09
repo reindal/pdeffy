@@ -30,7 +30,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-            if (typeof window.applyTranslations === 'function') window.applyTranslations();
+            if (typeof changeLanguage === 'function' && window.currentLanguage) {
+                changeLanguage(window.currentLanguage);
+            }
 
             // Redirect the user back to the main menu upon clicking the button
             document.getElementById('closeEngineWarning').addEventListener('click', () => {
@@ -67,7 +69,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
             document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-            if (typeof window.applyTranslations === 'function') window.applyTranslations();
+            if (typeof changeLanguage === 'function' && window.currentLanguage) {
+                changeLanguage(window.currentLanguage);
+            }
 
             document.getElementById('closeEngineWarning').addEventListener('click', async () => {
                 const checkbox = document.getElementById('dontShowAgainCheck');
