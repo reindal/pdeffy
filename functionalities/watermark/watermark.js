@@ -36,12 +36,12 @@ let pdfPageDimensions = { width: 595, height: 842 }; // Default A4 size in point
 customColorHex.value = '#000000';
 colorPicker.value = '#000000';
 
-// Update opacity value display
+// Real-time UI updates and validations
 opacityInput.addEventListener('input', function() {
     opacityValue.textContent = this.value + '%';
+    updatePreview();
 });
 
-// Handle rotation select change
 rotationSelect.addEventListener('change', function() {
     if (this.value === 'custom') {
         customRotationInput.style.display = 'block';
@@ -50,9 +50,9 @@ rotationSelect.addEventListener('change', function() {
         customRotationInput.style.display = 'none';
         customRotationInput.required = false;
     }
+    updatePreview();
 });
 
-// Handle color select change
 colorSelect.addEventListener('change', function() {
     if (this.value === 'custom') {
         customColorWrapper.style.display = 'block';
@@ -63,21 +63,26 @@ colorSelect.addEventListener('change', function() {
         customColorHex.required = false;
         colorError.textContent = '';
     }
+    updatePreview();
 });
 
-// Validate HEX color input
 customColorHex.addEventListener('input', function() {
-    validateColor();
-    // Sync with color picker if valid
     if (validateColor()) {
         colorPicker.value = customColorHex.value;
     }
+    updatePreview();
 });
 
-// Handle color picker change
 colorPicker.addEventListener('input', function() {
     customColorHex.value = this.value.toUpperCase();
     validateColor();
+    updatePreview();
+});
+
+// Attach live preview updates to all relevant inputs
+[watermarkTextInput, fontSizeInput, customRotationInput, positionSelect].forEach(element => {
+    element.addEventListener('input', updatePreview);
+    element.addEventListener('change', updatePreview);
 });
 
 function validateColor() {
@@ -94,22 +99,39 @@ function validateColor() {
         customColorHex.classList.remove('invalid');
         customColorHex.classList.add('valid');
         colorError.textContent = '';
-        // Sync color picker with valid hex
         colorPicker.value = hexValue;
         return true;
     } else {
         customColorHex.classList.remove('valid');
         customColorHex.classList.add('invalid');
-        colorError.textContent = getMessage('invalidHexColor');
+        colorError.textContent = window.getMessage ? window.getMessage('invalidHexColor') : 'Invalid HEX';
         return false;
     }
 }
 
-// Show selected file name
+// Function to safely update file name maintaining selected language
+function updateFileNameDisplay() {
+    if (selectedFile && fileNameDiv) {
+        const prefix = window.getMessage ? window.getMessage('selectedFile') : 'Selected: ';
+        fileNameDiv.textContent = `✓ ${prefix}${selectedFile.name}`;
+    }
+}
+
+// Monkey-patch the global language change to update local dynamic strings
+if (typeof window.changeLanguage === 'function') {
+    const originalChangeLanguage = window.changeLanguage;
+    window.changeLanguage = function(lang) {
+        originalChangeLanguage(lang);
+        updateFileNameDisplay();
+        updateLayersList(); // Refresh translated keys in the layers list
+    };
+}
+
+// Show selected file name and initialize canvas
 pdfFileInput.addEventListener('change', async function(e) {
     if (e.target.files.length > 0) {
         selectedFile = e.target.files[0];
-        fileNameDiv.textContent = `✓ ${getMessage('selectedFile')}${selectedFile.name}`;
+        updateFileNameDisplay();
 
         // Load PDF to get actual page dimensions
         try {
@@ -148,65 +170,67 @@ pdfFileInput.addEventListener('change', async function(e) {
     }
 });
 
-// Add watermark layer button
-addLayerBtn.addEventListener('click', function(e) {
-    e.preventDefault();
-
+// Helper function to extract current form settings into a layer object
+function getCurrentFormLayer() {
     const watermarkText = watermarkTextInput.value.trim();
-    if (!watermarkText) {
-        showStatus(getMessage('pleaseEnterWatermark'), 'error');
-        return;
-    }
+    if (!watermarkText) return null;
 
-    // Get rotation angle
     let rotation;
     if (rotationSelect.value === 'custom') {
         rotation = parseInt(customRotationInput.value);
         if (isNaN(rotation) || rotation < -360 || rotation > 360) {
-            showStatus(getMessage('invalidRotation'), 'error');
-            return;
+            rotation = 0; // Fallback for invalid preview
         }
     } else {
         rotation = parseInt(rotationSelect.value);
     }
 
-    // Get color
     const colorValue = colorSelect.value;
-    let textColor;
-
+    let textColor = colorValue;
     if (colorValue === 'custom') {
-        if (!validateColor()) {
-            showStatus(getMessage('pleaseEnterValidColor'), 'error');
-            return;
-        }
-        textColor = customColorHex.value.trim();
-    } else {
-        textColor = colorValue;
+        textColor = validateColor() ? customColorHex.value.trim() : '#000000';
     }
 
-    const layer = {
+    return {
         text: watermarkText,
-        fontSize: parseInt(fontSizeInput.value),
+        fontSize: parseInt(fontSizeInput.value) || 50,
         opacity: parseInt(opacityInput.value) / 100,
         rotation: rotation,
         color: textColor,
-        position: positionSelect.value
+        position: positionSelect.value,
+        isPreview: true // Flag to render differently in preview
     };
+}
+
+// Add watermark layer button
+addLayerBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    const layer = getCurrentFormLayer();
+    if (!layer) {
+        showStatus(window.getMessage ? window.getMessage('pleaseEnterWatermark') : 'Please enter text', 'error');
+        return;
+    }
+    
+    // Remove the preview flag before saving
+    delete layer.isPreview;
 
     if (editingLayerIndex !== null) {
         // Update existing layer
         watermarkLayers[editingLayerIndex] = layer;
         editingLayerIndex = null;
-        addLayerBtn.querySelector('span').textContent = getMessage('addLayerBtnText');
+        if (window.getMessage) {
+             addLayerBtn.querySelector('span').textContent = window.getMessage('addLayerBtnText');
+        }
     } else {
         // Add new layer
         watermarkLayers.push(layer);
     }
 
     updateLayersList();
-    updatePreview();
     clearForm();
-    showStatus(getMessage('layerAdded'), 'success');
+    updatePreview();
+    showStatus(window.getMessage ? window.getMessage('layerAdded') : 'Layer added', 'success');
 });
 
 function clearForm() {
@@ -239,19 +263,21 @@ function updateLayersList() {
             ? layer.color
             : layer.color.charAt(0).toUpperCase() + layer.color.slice(1);
 
+        const getMsg = window.getMessage || (k => k);
+
         layerItem.innerHTML = `
             <div class="layerInfo">
                 <div class="layerText">${layer.text}</div>
                 <div class="layerDetails">
-                    ${getMessage('fontSize')}: ${layer.fontSize}px | 
-                    ${getMessage('opacity')}: ${Math.round(layer.opacity * 100)}% | 
-                    ${getMessage('rotation')}: ${layer.rotation}° | 
-                    ${getMessage('color')}: ${colorName}
+                    ${getMsg('fontSize')}: ${layer.fontSize}px | 
+                    ${getMsg('opacity')}: ${Math.round(layer.opacity * 100)}% | 
+                    ${getMsg('rotation')}: ${layer.rotation}° | 
+                    ${getMsg('color')}: ${colorName}
                 </div>
             </div>
             <div class="layerActions">
-                <button type="button" class="layerBtn editLayerBtn" data-index="${index}">${getMessage('editBtn')}</button>
-                <button type="button" class="layerBtn removeLayerBtn" data-index="${index}">${getMessage('removeBtn')}</button>
+                <button type="button" class="layerBtn editLayerBtn" data-index="${index}">${getMsg('editBtn')}</button>
+                <button type="button" class="layerBtn removeLayerBtn" data-index="${index}">${getMsg('removeBtn')}</button>
             </div>
         `;
 
@@ -304,17 +330,27 @@ function editLayer(index) {
         customColorWrapper.style.display = 'none';
     }
 
-    addLayerBtn.querySelector('span').textContent = getMessage('updateLayerBtn');
+    if (window.getMessage) {
+         addLayerBtn.querySelector('span').textContent = window.getMessage('updateLayerBtn');
+    }
 
-    // Scroll to form
+    // Scroll to form and trigger live preview
     watermarkTextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    updatePreview();
 }
 
 function removeLayer(index) {
     watermarkLayers.splice(index, 1);
+    if (editingLayerIndex === index) {
+        editingLayerIndex = null;
+        clearForm();
+        if (window.getMessage) {
+            addLayerBtn.querySelector('span').textContent = window.getMessage('addLayerBtnText');
+        }
+    }
     updateLayersList();
     updatePreview();
-    showStatus(getMessage('layerRemoved'), 'success');
+    showStatus(window.getMessage ? window.getMessage('layerRemoved') : 'Layer removed', 'success');
 }
 
 function updatePreview() {
@@ -324,10 +360,19 @@ function updatePreview() {
     previewCtx.fillStyle = 'white';
     previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
 
-    // Draw all watermark layers
-    watermarkLayers.forEach(layer => {
-        drawWatermarkOnCanvas(layer);
+    // Draw all confirmed watermark layers
+    watermarkLayers.forEach((layer, index) => {
+        // Skip drawing the layer being currently edited to avoid visual duplication
+        if (index !== editingLayerIndex) {
+            drawWatermarkOnCanvas(layer);
+        }
     });
+
+    // Overlay the current form state as a live preview
+    const liveLayer = getCurrentFormLayer();
+    if (liveLayer) {
+        drawWatermarkOnCanvas(liveLayer);
+    }
 }
 
 function drawWatermarkOnCanvas(layer) {
@@ -363,7 +408,9 @@ function drawWatermarkOnCanvas(layer) {
 
     // Set fill color and opacity
     ctx.fillStyle = color;
-    ctx.globalAlpha = layer.opacity;
+    
+    // Slightly differentiate the live preview layer visually if desired
+    ctx.globalAlpha = layer.isPreview ? layer.opacity * 0.8 : layer.opacity;
 
     // Calculate position in PDF coordinates, then scale to canvas
     let pdfX, pdfY;
@@ -417,19 +464,35 @@ function drawWatermarkOnCanvas(layer) {
     // Draw text centered at (0, 0) after translation
     ctx.fillText(layer.text, 0, 0);
 
+    // Visual indicator for active editing layer
+    if (layer.isPreview) {
+        ctx.strokeStyle = '#0066cc';
+        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 1;
+        const metrics = ctx.measureText(layer.text);
+        const padding = 10;
+        ctx.strokeRect(
+            -(metrics.width / 2) - padding, 
+            -(scaledFontSize / 2) - padding, 
+            metrics.width + (padding * 2), 
+            scaledFontSize + (padding * 2)
+        );
+    }
+
     ctx.restore();
 }
 
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
+    const getMsg = window.getMessage || (k => k);
 
     if (!selectedFile) {
-        showStatus(getMessage('pleaseSelectPdf'), 'error');
+        showStatus(getMsg('pleaseSelectPdf'), 'error');
         return;
     }
 
     if (watermarkLayers.length === 0) {
-        showStatus(getMessage('pleaseAddAtLeastOneLayer'), 'error');
+        showStatus(getMsg('pleaseAddAtLeastOneLayer'), 'error');
         return;
     }
 
@@ -438,7 +501,7 @@ form.addEventListener('submit', async function(e) {
     const fileNameWithoutExt = originalFileName.replace(/\.pdf$/i, '');
     const defaultFileName = `${fileNameWithoutExt}_watermarked.pdf`;
 
-    showStatus(getMessage('processingFile'), 'success');
+    showStatus(getMsg('processingFile'), 'success');
     submitBtn.disabled = true;
 
     try {
@@ -535,9 +598,6 @@ form.addEventListener('submit', async function(e) {
                     }
                 }
 
-                // pdf-lib rotates around the baseline start point, not the center
-                // We need to manually center and adjust for rotation
-
                 // Convert rotation to radians
                 const rotationRad = (rotationAngle * Math.PI) / 180;
 
@@ -545,7 +605,6 @@ form.addEventListener('submit', async function(e) {
                 const textHeight = layer.fontSize;
 
                 // Offset to center the text at the desired position
-                // When rotated, we need to account for both width and height
                 const offsetX = (textWidth / 2) * Math.cos(rotationRad) + (textHeight / 2) * Math.sin(rotationRad);
                 const offsetY = (textWidth / 2) * Math.sin(rotationRad) - (textHeight / 2) * Math.cos(rotationRad);
 
@@ -580,7 +639,7 @@ form.addEventListener('submit', async function(e) {
 
         if (!outputPath) {
             // User cancelled the save dialog
-            showStatus(getMessage('saveCancelled'), 'error');
+            showStatus(getMsg('saveCancelled'), 'error');
             submitBtn.disabled = false;
             return;
         }
@@ -589,7 +648,7 @@ form.addEventListener('submit', async function(e) {
 
         const fileName = path.basename(outputPath);
 
-        showStatus(getMessage('successWatermark', { filename: fileName }), 'success');
+        showStatus(getMsg('successWatermark', { filename: fileName }), 'success');
         submitBtn.disabled = false;
 
         form.reset();
@@ -613,7 +672,7 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error adding watermark:', error);
-        showStatus(getMessage('errorPrefix') + error.message, 'error');
+        showStatus((window.getMessage ? window.getMessage('errorPrefix') : 'Error: ') + error.message, 'error');
         submitBtn.disabled = false;
     }
 });
