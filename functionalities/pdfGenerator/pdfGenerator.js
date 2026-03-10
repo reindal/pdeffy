@@ -3,7 +3,7 @@ const path = require('path');
 const os = require('os');
 var { ipcRenderer } = require('electron');
 
-// Necessary libraries
+// Required modules
 const XLSX = require('xlsx');
 const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
@@ -44,34 +44,26 @@ form.addEventListener('submit', async function(e) {
     e.preventDefault();
     if (!selectedDocxFile || !selectedExcelFile) return;
 
-    const baseName = baseFileNameInput.value.trim() || 'Document';
-    submitBtn.disabled = true;
-    progressContainer.style.display = 'block';
-
+    // Sanitize base name to prevent invalid file paths
+    let baseName = baseFileNameInput.value.trim() || 'Document';
+    baseName = baseName.replace(/[<>:"/\\|?*]/g, '_');
+    
     try {
-        // 1. READ EXCEL DATA
+        // 1. Read input data from Excel/CSV
         showStatus(getLocalMessage('readingExcel'), 'info');
         const excelBuffer = await selectedExcelFile.arrayBuffer();
         const workbook = XLSX.read(excelBuffer, { type: 'buffer' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         
-        // Convert Excel to an array of objects (each row is an object)
-        // Example: [{ company: "Reindal", Agent: "Christian" }, ...]
+        // Convert sheet to JSON array
         const excelData = XLSX.utils.sheet_to_json(worksheet);
 
         if (excelData.length === 0) {
             throw new Error(getLocalMessage('errorEmptyExcel'));
         }
 
-        // 2. PREPARE FINAL ZIP AND BASE DOCX
-        // Get final metadata from module
-        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
-        const finalZip = new JSZip();
-        const docxBufferBase = await selectedDocxFile.arrayBuffer();
-        const tempDir = os.tmpdir();
-
-        // 3. ASK USER WHERE TO SAVE THE FINAL ZIP
+        // 2. Prompt user for output ZIP location before starting heavy processing
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const zipOutputPath = await ipcRenderer.invoke('show-save-dialog', {
             title: 'Save Generated PDFs',
@@ -80,36 +72,45 @@ form.addEventListener('submit', async function(e) {
         });
 
         if (!zipOutputPath) {
-            submitBtn.disabled = false;
-            progressContainer.style.display = 'none';
-            return;
+            // Processing aborted by user
+            return; 
         }
 
-        // 4. PROCESS ROW BY ROW
+        // 3. Initialize processing environment
+        submitBtn.disabled = true;
+        progressContainer.style.display = 'block';
+        
+        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
+        const finalZip = new JSZip();
+        const docxBufferBase = await selectedDocxFile.arrayBuffer();
+        
+        // Create isolated temporary directory for intermediate files
+        const sessionTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pdfgen-'));
+
+        // 4. Execute row-by-row document generation
         for (let i = 0; i < excelData.length; i++) {
             const rowData = excelData[i];
             const currentFileName = `${baseName}_${i + 1}`;
             
-            // Update UI
+            // Update progress UI
             showStatus(getLocalMessage('generatingItem', { current: i + 1, total: excelData.length }), 'info');
-            progressBar.style.width = `${((i) / excelData.length) * 100}%`;
+            progressBar.style.width = `${(i / excelData.length) * 100}%`;
             progressText.textContent = `${i} / ${excelData.length}`;
 
-            // A. Inject data into DOCX
+            // 4A. Template data injection
             const zip = new PizZip(docxBufferBase);
             const doc = new Docxtemplater(zip, {
                 paragraphLoop: true,
                 linebreaks: true,
-                delimiters: { start: '[', end: ']' }, // Changing {} to []
-                nullGetter() { return ""; } // If cell is empty, return empty string instead of crashing
+                delimiters: { start: '{{', end: '}}' }, 
+                nullGetter() { return ""; }
             });
 
-            doc.render(rowData); // Replaces [company] with actual value
-
+            doc.render(rowData);
             const generatedDocxBuffer = doc.getZip().generate({ type: 'nodebuffer' });
 
-            // B. Send to LibreOffice for PDF conversion
-            const tempPdfPath = path.join(tempDir, `${currentFileName}.pdf`);
+            // 4B. Invoke LibreOffice engine for PDF conversion
+            const tempPdfPath = path.join(sessionTempDir, `${currentFileName}.pdf`);
             
             await ipcRenderer.invoke('convert-with-libreoffice', {
                 fileData: generatedDocxBuffer,
@@ -119,25 +120,26 @@ form.addEventListener('submit', async function(e) {
                 metadata: finalMetadata 
             });
 
-            // C. Read generated PDF and add to JSZip
+            // 4C. Package generated PDF into JSZip instance
             const pdfBytes = await fs.readFile(tempPdfPath);
             finalZip.file(`${currentFileName}.pdf`, pdfBytes);
 
-            // D. Clean up temporary PDF from disk
+            // 4D. Cleanup intermediate file
             try { await fs.unlink(tempPdfPath); } catch (e) {}
             
             progressBar.style.width = `${((i + 1) / excelData.length) * 100}%`;
             progressText.textContent = `${i + 1} / ${excelData.length}`;
         }
 
-        // 5. SAVE FINAL ZIP WITH ALL PDFs
+        // 5. Finalize archive creation and global cleanup
         showStatus(getLocalMessage('savingZip'), 'info');
         const zipContent = await finalZip.generateAsync({ type: 'nodebuffer' });
         await fs.writeFile(zipOutputPath, zipContent);
+        
+        try { await fs.rmdir(sessionTempDir); } catch (e) {}
 
         showStatus(getLocalMessage('successGeneration'), 'success');
 
-        // Reset Form
         setTimeout(() => {
             form.reset();
             selectedDocxFile = null; 
@@ -150,7 +152,7 @@ form.addEventListener('submit', async function(e) {
         }, 4000);
 
     } catch (error) {
-        console.error('Error in Generator:', error);
+        console.error('Error in Generator process:', error);
         showStatus(error.message, 'error');
     } finally {
         submitBtn.disabled = false;

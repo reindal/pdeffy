@@ -251,7 +251,7 @@ const languages = {
         pdfByTemplateNameLabel: "Base name for PDFs:",
         pdfByTemplateSubmitBtn: "Generate PDFs in ZIP",
         pdfByTemplateInfoTitle: "Required format for Excel/CSV",
-        pdfByTemplateInfoText: "The first row must contain exactly the same names you placed in brackets in the Word document (e.g., [COMPANY]). Each row below will generate a new PDF.",
+        pdfByTemplateInfoText: "The first row must contain exactly the same names you placed in double curly braces in the Word document (e.g., {{COMPANY}}). Each row below will generate a new PDF.",
         pdfByTemplateCompany: "Company",
         pdfByTemplateAgent: "Agent",
 
@@ -569,7 +569,7 @@ const languages = {
         pdfByTemplateNameLabel: "Nome base per i PDF:",
         pdfByTemplateSubmitBtn: "Genera PDF in ZIP",
         pdfByTemplateInfoTitle: "Formato richiesto per Excel/CSV",
-        pdfByTemplateInfoText: "La prima riga deve contenere esattamente gli stessi nomi inseriti tra parentesi quadre nel documento Word (es. [AZIENDA]). Ogni riga successiva genererà un nuovo PDF.",
+        pdfByTemplateInfoText: "La prima riga deve contenere esattamente gli stessi nomi inseriti tra doppie parentesi graffe nel documento Word (es. {{COMPANY}}). Ogni riga sottostante genererà un nuovo PDF.",
         pdfByTemplateCompany: "Azienda",
         pdfByTemplateAgent: "Agente",
 
@@ -887,7 +887,7 @@ const languages = {
         pdfByTemplateNameLabel: "Nazwa bazowa dla plików PDF:",
         pdfByTemplateSubmitBtn: "Generuj pliki PDF w formacie ZIP",
         pdfByTemplateInfoTitle: "Wymagany format pliku Excel/CSV",
-        pdfByTemplateInfoText: "Pierwszy wiersz musi zawierać dokładnie te same nazwy, które zostały umieszczone w nawiasach kwadratowych w dokumencie Word (np. [FIRMA]). Każdy kolejny wiersz wygeneruje nowy plik PDF.",
+        pdfByTemplateInfoText: "Pierwszy wiersz musi zawierać dokładnie te same nazwy, które umieszczono w podwójnych nawiasach klamrowych w dokumencie Word (np. {{COMPANY}}). Każdy kolejny wiersz wygeneruje nowy plik PDF.",
         pdfByTemplateCompany: "Firma",
         pdfByTemplateAgent: "Agent",
 
@@ -1199,7 +1199,7 @@ const languages = {
         pdfByTemplateNameLabel: "Nombre base para los PDFs:",
         pdfByTemplateSubmitBtn: "Generar PDFs en ZIP",
         pdfByTemplateInfoTitle: "Formato requerido para el Excel/CSV",
-        pdfByTemplateInfoText: "La primera fila debe contener exactamente los mismos nombres que pusiste entre corchetes en el Word (ej. [EMPRESA]). Cada fila debajo generará un PDF nuevo.",
+        pdfByTemplateInfoText: "La primera fila debe contener exactamente los mismos nombres que colocaste entre llaves dobles en el documento de Word (ej. {{COMPANY}}). Cada fila inferior generará un nuevo PDF.",
         pdfByTemplateCompany: "Empresa",
         pdfByTemplateAgent: "Agente",
 
