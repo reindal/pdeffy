@@ -306,3 +306,9 @@
     margin-bottom: 15px;
     border-left: 4px solid var(--reindalYellow);
 }
+
+#totalPagesInfo{
+    display: none;
+    margin-top: 5px;
+    font-weight: 600;
+}

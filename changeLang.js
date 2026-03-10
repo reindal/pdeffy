@@ -75,6 +75,7 @@ const languages = {
         endPageLabel: "End page:",
         rangeError: "At least one range is required",
         createdSuccesful: '✓ Successfully created ${successCount} file(s) in Downloads folder',
+        totalPagesInfo: "Total pages: {total}",
         // Split PDF messages
         pleaseSelectFile: "Please select a PDF file",
         pageNumbersGreaterThanZero: "Page numbers must be greater than 0",
@@ -391,6 +392,7 @@ const languages = {
         endPageLabel: "Pagina finale:",
         rangeError: "Almeno una fascia è richiesta",
         createdSuccesful: '✓ Creato con successo ${successCount} file in cartella Download',
+        totalPagesInfo: "Pagine totali: {total}",
         // Split PDF messages
         pleaseSelectFile: "Seleziona un file PDF",
         pageNumbersGreaterThanZero: "I numeri di pagina devono essere maggiori di 0",
@@ -707,6 +709,8 @@ const languages = {
         startPageLabel: "Strona początkowa:",
         endPageLabel: "Strona końcowa:",
         rangeError: "Wymagany jest co najmniej jeden zakres",
+        createdSuccesful: '✓ Pomyślnie utworzono ${successCount} plik(ów) w folderze Pobrane',
+        totalPagesInfo: "Całkowita liczba stron: {total}",
         // Split PDF messages
         pleaseSelectFile: "Proszę wybrać plik PDF",
         pageNumbersGreaterThanZero: "Numery stron muszą być większe niż 0",
@@ -1021,6 +1025,7 @@ const languages = {
         endPageLabel: "Página final:",
         rangeError: "Se requiere al menos un rango",
         createdSuccesful: '✓ Creado correctamente ${successCount} archivo(s) en la carpeta de descargas',
+        totalPagesInfo: "Páginas totales: {total}",
         // Split PDF messages
         pleaseSelectFile: "Por favor, selecciona un archivo PDF",
         pageNumbersGreaterThanZero: "Los números de página deben ser mayores que 0",

@@ -18,9 +18,38 @@ const everyModeContainer = document.getElementById('everyModeContainer');
 const customModeContainer = document.getElementById('customModeContainer');
 const sizeModeContainer = document.getElementById('sizeModeContainer');
 const fileSizeInfo = document.getElementById('fileSizeInfo');
+const totalPagesInfo = document.getElementById('totalPagesInfo');
+const languageSelector = document.getElementById('languageSelector');
 
 let rangeCount = 1;
 let customFileCount = 1;
+let totalPdfPages = 0;
+
+
+if (languageSelector) {
+    languageSelector.addEventListener('change', () => {
+        setTimeout(() => {
+            if (totalPdfPages > 0 && totalPagesInfo) {
+                totalPagesInfo.textContent = window.getMessage('totalPagesInfo', { total: totalPdfPages });
+            }
+        }, 50);
+    });
+}
+
+if (typeof window.changeLanguage === 'function') {
+    const originalChangeLanguage = window.changeLanguage;
+    
+    window.changeLanguage = function(lang) {
+        originalChangeLanguage(lang);
+        
+        if (typeof totalPdfPages !== 'undefined' && totalPdfPages > 0) {
+            const infoDiv = document.getElementById('totalPagesInfo');
+            if (infoDiv && typeof window.getMessage === 'function') {
+                infoDiv.textContent = window.getMessage('totalPagesInfo', { total: totalPdfPages });
+            }
+        }
+    };
+}
 
 // Function to set metadata on a PDF document
 async function setMetadata(pdfDoc) {
@@ -30,6 +59,53 @@ async function setMetadata(pdfDoc) {
     if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
     if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
     if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
+}
+
+// Helper to enforce max limits and sync start/end values dynamically
+function attachRangeListeners(startInput, endInput) {
+    startInput.addEventListener('input', () => {
+        let startVal = parseInt(startInput.value) || 1;
+        let endVal = parseInt(endInput.value) || 1;
+
+        // Cap to total pages if a PDF is loaded
+        if (totalPdfPages > 0 && startVal > totalPdfPages) {
+            startVal = totalPdfPages;
+            startInput.value = startVal;
+        }
+
+        // Push the end page up if start page surpasses it
+        if (startVal > endVal) {
+            endInput.value = startVal;
+        }
+    });
+
+    endInput.addEventListener('input', () => {
+        let startVal = parseInt(startInput.value) || 1;
+        let endVal = parseInt(endInput.value) || 1;
+
+        // Cap to total pages if a PDF is loaded
+        if (totalPdfPages > 0 && endVal > totalPdfPages) {
+            endVal = totalPdfPages;
+            endInput.value = endVal;
+        }
+
+        // Pull the start page down if end page goes below it
+        if (endVal < startVal) {
+            startInput.value = endVal;
+        }
+    });
+}
+
+// Force existing inputs to respect the new max page limit when a new PDF is selected
+function enforceMaxPagesLimit() {
+    if (totalPdfPages <= 0) return;
+    const inputs = document.querySelectorAll('.startPage, .endPage, .customStartPage, .customEndPage');
+    inputs.forEach(input => {
+        input.max = totalPdfPages;
+        if (parseInt(input.value) > totalPdfPages) {
+            input.value = totalPdfPages;
+        }
+    });
 }
 
 addRange();
@@ -67,11 +143,31 @@ addCustomFileBtn.addEventListener('click', function(e) {
     if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
 });
 
-pdfFile.addEventListener('change', function(e) {
+pdfFile.addEventListener('change', async function(e) {
     if (e.target.files.length > 0) {
-        fileNameDisplay.textContent = getMessage('selectedFile') + e.target.files[0].name;
+        selectedFile = e.target.files[0];
+        fileNameDisplay.textContent = getMessage('selectedFile') + selectedFile.name;
         fileNameDisplay.classList.add('active');
         updateFileSizeInfo();
+
+        // Read the PDF to get total pages for validation
+        try {
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
+            totalPdfPages = pdfDoc.getPageCount();
+            
+            totalPagesInfo.textContent = window.getMessage('totalPagesInfo', { total: totalPdfPages });
+            totalPagesInfo.style.display = 'block';
+            
+            enforceMaxPagesLimit();
+        } catch (err) {
+            console.error("Error reading PDF pages:", err);
+            totalPdfPages = 0;
+            totalPagesInfo.style.display = 'none';
+        }
+    } else {
+        totalPdfPages = 0;
+        totalPagesInfo.style.display = 'none';
     }
 });
 
@@ -190,7 +286,7 @@ form.addEventListener('submit', async function(e) {
                     const endPage = parseInt(rangeItem.querySelector('.customEndPage').value);
 
                     if (startPage < 1 || endPage < 1 || startPage > endPage || startPage > totalPages || endPage > totalPages) {
-                        showStatus(getMessage('pageNumbersGreaterThanZero'), 'error'); // O el error específico correspondiente
+                        showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
                         submitBtn.disabled = false;
                         return;
                     }
@@ -342,6 +438,8 @@ form.addEventListener('submit', async function(e) {
         
         // Clear custom metadata fields using module
         CustomMetadataModule.reset();
+        totalPdfPages = 0;
+        totalPagesInfo.style.display = 'none';
 
         // Reset mode containers to show only the checked mode
         rangeModeContainer.style.display = 'none';
@@ -369,19 +467,33 @@ form.addEventListener('submit', async function(e) {
 });
 
 function addRange() {
+    let startVal = rangeCount;
+    let endVal = rangeCount;
+
+    // Pre-validate max limits if a PDF is already loaded
+    if (totalPdfPages > 0 && startVal > totalPdfPages) {
+        startVal = totalPdfPages;
+        endVal = totalPdfPages;
+    }
+
     const rangeDiv = document.createElement('div');
     rangeDiv.className = 'rangeItem';
     rangeDiv.innerHTML = `
         <div>
             <label class="langText" data-i18n="startPageLabel">Start page:</label>
-            <input type="number" class="startPage" min="1" value="${rangeCount}" required>
+            <input type="number" class="startPage" min="1" value="${startVal}" max="${totalPdfPages > 0 ? totalPdfPages : ''}" required>
         </div>
         <div>
             <label class="langText" data-i18n="endPageLabel">End page:</label>
-            <input type="number" class="endPage" min="1" value="${rangeCount}" required>
+            <input type="number" class="endPage" min="1" value="${endVal}" max="${totalPdfPages > 0 ? totalPdfPages : ''}" required>
         </div>
         <button type="button" class="removeRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
+
+    // Attach real-time validation to inputs
+    const startInput = rangeDiv.querySelector('.startPage');
+    const endInput = rangeDiv.querySelector('.endPage');
+    attachRangeListeners(startInput, endInput);
 
     rangeDiv.querySelector('.removeRangeBtn').addEventListener('click', function() {
         if (rangesContainer.querySelectorAll('.rangeItem').length > 1) {
@@ -431,19 +543,39 @@ function addCustomFile() {
 }
 
 function addCustomRange(container) {
+    let nextVal = 1;
+    const existingRanges = container.querySelectorAll('.customRangeItem');
+    
+    // Auto-increment logic: Start from the end of the previous range within this specific file
+    if (existingRanges.length > 0) {
+        const lastEndInput = existingRanges[existingRanges.length - 1].querySelector('.customEndPage');
+        const lastEndPage = parseInt(lastEndInput.value) || 0;
+        nextVal = lastEndPage + 1;
+    }
+
+    // Pre-validate max limits if a PDF is already loaded
+    if (totalPdfPages > 0 && nextVal > totalPdfPages) {
+        nextVal = totalPdfPages;
+    }
+
     const rangeDiv = document.createElement('div');
     rangeDiv.className = 'customRangeItem';
     rangeDiv.innerHTML = `
         <div>
             <label class="langText" data-i18n="startPageLabel">Start page:</label>
-            <input type="number" class="customStartPage" min="1" value="1" required>
+            <input type="number" class="customStartPage" min="1" value="${nextVal}" max="${totalPdfPages > 0 ? totalPdfPages : ''}" required>
         </div>
         <div>
             <label class="langText" data-i18n="endPageLabel">End page:</label>
-            <input type="number" class="customEndPage" min="1" value="1" required>
+            <input type="number" class="customEndPage" min="1" value="${nextVal}" max="${totalPdfPages > 0 ? totalPdfPages : ''}" required>
         </div>
         <button type="button" class="removeCustomRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
+
+    // Attach real-time validation to inputs
+    const startInput = rangeDiv.querySelector('.customStartPage');
+    const endInput = rangeDiv.querySelector('.customEndPage');
+    attachRangeListeners(startInput, endInput);
 
     rangeDiv.querySelector('.removeCustomRangeBtn').addEventListener('click', function() {
         if (container.querySelectorAll('.customRangeItem').length > 1) {
