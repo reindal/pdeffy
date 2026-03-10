@@ -434,19 +434,66 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
             // Clean up temporary file
             try { await fsPromises.unlink(tempInputPath); } catch (e) {}
 
-            // Apply PDF metadata
-            if (metadata && format === 'pdf') {
-                try {
-                    const { PDFDocument } = require('pdf-lib');
-                    const pdfBytes = await fsPromises.readFile(outputPath);
-                    const pdfDoc = await PDFDocument.load(pdfBytes);
-                    if (metadata.title) pdfDoc.setTitle(metadata.title);
-                    if (metadata.subject) pdfDoc.setSubject(metadata.subject);
-                    if (metadata.author) pdfDoc.setAuthor(metadata.author);
-                    const modifiedPdfBytes = await pdfDoc.save();
-                    await fsPromises.writeFile(outputPath, modifiedPdfBytes);
-                } catch (metaErr) {
-                    console.log("[Warning] Failed to inject metadata into the PDF.");
+            // Apply Metadata depending on the format
+            if (metadata) {
+                if (format === 'pdf') {
+                    // Standard metadata handling for PDF documents
+                    try {
+                        const { PDFDocument } = require('pdf-lib');
+                        const pdfBytes = await fsPromises.readFile(outputPath);
+                        const pdfDoc = await PDFDocument.load(pdfBytes);
+                        if (metadata.title) pdfDoc.setTitle(metadata.title);
+                        if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+                        if (metadata.author) pdfDoc.setAuthor(metadata.author);
+                        const modifiedPdfBytes = await pdfDoc.save();
+                        await fsPromises.writeFile(outputPath, modifiedPdfBytes);
+                    } catch (metaErr) {
+                        console.log("[Warning] Failed to inject metadata into the PDF.", metaErr);
+                    }
+                } else if (format === 'docx' || format === 'pptx') {
+                    // Metadata injection via internal XML modification (OpenXML)
+                    try {
+                        const JSZip = require('jszip');
+                        const fileData = await fsPromises.readFile(outputPath);
+                        const zip = await JSZip.loadAsync(fileData);
+                        
+                        const coreXmlFile = zip.file("docProps/core.xml");
+                        if (coreXmlFile) {
+                            let coreXml = await coreXmlFile.async("string");
+                            
+                            // Helper function to safely insert or update XML tags
+                            const updateTag = (xml, tag, value) => {
+                                if (!value) return xml;
+                                
+                                // Escape XML special characters to prevent document corruption
+                                const safeValue = value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                const regex = new RegExp(`<${tag}[^>]*>.*?</${tag}>`, 'i');
+                                
+                                if (regex.test(xml)) {
+                                    // Overwrite existing XML tag
+                                    return xml.replace(regex, `<${tag}>${safeValue}</${tag}>`);
+                                } else {
+                                    // Insert new tag before the closing coreProperties tag
+                                    return xml.replace('</cp:coreProperties>', `  <${tag}>${safeValue}</${tag}>\n</cp:coreProperties>`);
+                                }
+                            };
+
+                            // Apply mapped metadata properties
+                            coreXml = updateTag(coreXml, 'dc:title', metadata.title);
+                            coreXml = updateTag(coreXml, 'dc:creator', metadata.author);
+                            coreXml = updateTag(coreXml, 'cp:lastModifiedBy', metadata.author);
+                            coreXml = updateTag(coreXml, 'dc:subject', metadata.subject);
+
+                            // Overwrite the core.xml file within the in-memory ZIP archive
+                            zip.file("docProps/core.xml", coreXml);
+                            
+                            // Generate the updated buffer and commit to disk
+                            const newZipContent = await zip.generateAsync({ type: 'nodebuffer' });
+                            await fsPromises.writeFile(outputPath, newZipContent);
+                        }
+                    } catch (metaErr) {
+                        console.log(`[Warning] Failed to inject metadata into ${format.toUpperCase()}:`, metaErr);
+                    }
                 }
             }
 
