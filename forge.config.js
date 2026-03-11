@@ -35,11 +35,21 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      config: {},
+      config: {
+        options: {
+          // Linux requires a PNG image for the system launcher icon
+          icon: 'assets/logo/png/256x256.png'
+        }
+      },
     },
     {
       name: '@electron-forge/maker-rpm',
-      config: {},
+      config: {
+        options: {
+          // Linux requires a PNG image for the system launcher icon
+          icon: 'assets/logo/png/256x256.png'
+        }
+      },
     },
   ],
   plugins: [

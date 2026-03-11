@@ -352,14 +352,20 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                 console.log(`[Conversion] Using system LibreOffice for ${format.toUpperCase()} conversion...`);
                 const baseName = path.parse(tempInputPath).name;
 
+                // Create a unique, isolated profile directory for LibreOffice
+                // This forces a new instance and prevents silent background execution failures on Linux
+                const profileDir = path.join(tempDir, `lo_profile_${Date.now()}_${Math.random().toString(36).substring(7)}`);
+                const profileUrl = url.pathToFileURL(profileDir).href;
+                const envFlag = `-env:UserInstallation=${profileUrl}`;
+
                 // SPECIAL STRATEGY: 2-Step conversion for PDF to DOCX
                 if (isPdfInput && format === 'docx') {
                     console.log(`[Conversion] Applying 2-step process (PDF -> ODT -> DOCX) for better formatting...`);
                     
                     const tempOdtPath = path.join(tempDir, baseName + '.odt');
 
-                    // STEP 1: PDF to ODT (Saves in temp folder)
-                    const step1Command = `"${libreOfficePath}" --headless --infilter="writer_pdf_import" --convert-to odt "${tempInputPath}" --outdir "${tempDir}"`;
+                    // STEP 1: PDF to ODT
+                    const step1Command = `"${libreOfficePath}" ${envFlag} --headless --infilter="writer_pdf_import" --convert-to odt "${tempInputPath}" --outdir "${tempDir}"`;
                     
                     await new Promise((res, rej) => {
                         exec(step1Command, (error, stdout, stderr) => {
@@ -371,8 +377,8 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                         });
                     });
 
-                    // STEP 2: ODT to DOCX (Saves to final output folder)
-                    const step2Command = `"${libreOfficePath}" --headless --convert-to docx "${tempOdtPath}" --outdir "${outputDir}"`;
+                    // STEP 2: ODT to DOCX
+                    const step2Command = `"${libreOfficePath}" ${envFlag} --headless --convert-to docx "${tempOdtPath}" --outdir "${outputDir}"`;
 
                     await new Promise((res, rej) => {
                         exec(step2Command, async (error, stdout, stderr) => {
@@ -406,7 +412,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                         infilter = `--infilter="impress_pdf_import" `;
                     }
 
-                    const command = `"${libreOfficePath}" --headless ${infilter}--convert-to ${format} "${tempInputPath}" --outdir "${outputDir}"`;
+                    const command = `"${libreOfficePath}" ${envFlag} --headless ${infilter}--convert-to ${format} "${tempInputPath}" --outdir "${outputDir}"`;
                     
                     await new Promise((res, rej) => {
                         exec(command, async (error, stdout, stderr) => {
@@ -428,6 +434,13 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                             } catch (err) { rej(err); }
                         });
                     });
+                }
+
+                // Cleanup isolated profile directory asynchronously to free up disk space
+                try {
+                    await fsPromises.rm(profileDir, { recursive: true, force: true });
+                } catch (cleanupErr) {
+                    console.error("[Warning] Failed to clean up isolated LibreOffice profile:", cleanupErr);
                 }
             }
 
