@@ -84,8 +84,10 @@ form.addEventListener('submit', async function(e) {
         const finalZip = new JSZip();
         const docxBufferBase = await selectedDocxFile.arrayBuffer();
         
-        // Create isolated temporary directory for intermediate files
-        const sessionTempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pdfgen-'));
+        // Bypass Snap sandbox restrictions by creating the isolated directory 
+        // in the same folder as the final ZIP output, utilizing a hidden prefix.
+        const targetOutputDirectory = path.dirname(zipOutputPath);
+        const sessionTempDir = await fs.mkdtemp(path.join(targetOutputDirectory, '.pdfgen-'));
 
         // 4. Execute row-by-row document generation
         for (let i = 0; i < excelData.length; i++) {

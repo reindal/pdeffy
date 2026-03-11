@@ -311,14 +311,20 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
 ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, outputPath, format = 'pdf', metadata }) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const tempDir = app.getPath('temp');
+            // Bypass Linux Snap sandbox restrictions by avoiding the system /tmp directory.
+            // We route temporary files to the user-selected destination folder (e.g., Downloads),
+            // which the Snap environment natively has permission to read and write.
+            const targetDir = path.dirname(outputPath);
+            
             // Parse clean name to avoid double extensions (e.g., file.pdf.pdf -> file.pdf)
             const parsedName = path.parse(fileName).name;
-            const uniqueFileName = Date.now() + '_' + parsedName + path.parse(fileName).ext;
-            const tempInputPath = path.join(tempDir, uniqueFileName);
+            
+            // Prefix with a dot to create a hidden temporary file in UNIX systems
+            const uniqueFileName = `.temp_${Date.now()}_${parsedName}${path.parse(fileName).ext}`;
+            const tempInputPath = path.join(targetDir, uniqueFileName);
 
             await fsPromises.writeFile(tempInputPath, Buffer.from(fileData));
-            const outputDir = path.dirname(outputPath);
+            const outputDir = targetDir;
             const isPdfInput = fileName.toLowerCase().endsWith('.pdf');
             const inputExt = path.parse(fileName).ext.toLowerCase();
 
@@ -352,9 +358,8 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                 console.log(`[Conversion] Using system LibreOffice for ${format.toUpperCase()} conversion...`);
                 const baseName = path.parse(tempInputPath).name;
 
-                // Create a unique, isolated profile directory for LibreOffice
-                // This forces a new instance and prevents silent background execution failures on Linux
-                const profileDir = path.join(tempDir, `lo_profile_${Date.now()}_${Math.random().toString(36).substring(7)}`);
+                // Create a unique, hidden, and isolated profile directory inside the target folder
+                const profileDir = path.join(targetDir, `.lo_profile_${Date.now()}_${Math.random().toString(36).substring(7)}`);
                 const profileUrl = url.pathToFileURL(profileDir).href;
                 const envFlag = `-env:UserInstallation=${profileUrl}`;
 
@@ -362,10 +367,12 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                 if (isPdfInput && format === 'docx') {
                     console.log(`[Conversion] Applying 2-step process (PDF -> ODT -> DOCX) for better formatting...`);
                     
-                    const tempOdtPath = path.join(tempDir, baseName + '.odt');
+                    // FIXED: Replaced tempDir with targetDir for the intermediate file
+                    const tempOdtPath = path.join(targetDir, baseName + '.odt');
 
-                    // STEP 1: PDF to ODT
-                    const step1Command = `"${libreOfficePath}" ${envFlag} --headless --infilter="writer_pdf_import" --convert-to odt "${tempInputPath}" --outdir "${tempDir}"`;
+                    // STEP 1: PDF to ODT (Saves in target directory to bypass Snap sandbox)
+                    // FIXED: Replaced tempDir with targetDir in the --outdir flag
+                    const step1Command = `"${libreOfficePath}" ${envFlag} --headless --infilter="writer_pdf_import" --convert-to odt "${tempInputPath}" --outdir "${targetDir}"`;
                     
                     await new Promise((res, rej) => {
                         exec(step1Command, (error, stdout, stderr) => {
@@ -377,7 +384,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                         });
                     });
 
-                    // STEP 2: ODT to DOCX
+                    // STEP 2: ODT to DOCX (Saves to final output folder)
                     const step2Command = `"${libreOfficePath}" ${envFlag} --headless --convert-to docx "${tempOdtPath}" --outdir "${outputDir}"`;
 
                     await new Promise((res, rej) => {
