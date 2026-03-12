@@ -23,13 +23,12 @@ const currentVersion = app.getVersion();
 function getSavedLanguage() {
     try {
         const userDataPath = app.getPath('userData');
-        // IMPORTANT: Change 'pdf-settings.json' to the actual name of your config file
-        const settingsPath = path.join(userDataPath, 'pdf-settings.json'); 
+        const settingsPath = path.join(userDataPath, 'language-settings.json'); 
         
         if (fs.existsSync(settingsPath)) {
             const rawData = fs.readFileSync(settingsPath, 'utf-8');
             const settings = JSON.parse(rawData);
-            return settings.language || 'en'; // Return the saved language or default to English
+            return settings.language || 'en';
         }
     } catch (error) {
         console.error('Error reading language file:', error);
