@@ -8,6 +8,7 @@ const { BrowserWindow, app , ipcMain, dialog} = electron;
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
 const pptxgen = require('pptxgenjs');
 const { exec } = require('child_process');
+const { execSync } = require('child_process');
 
 if (require('electron-squirrel-startup')) return;
 
@@ -231,7 +232,7 @@ function getSystemLibreOfficePath() {
                 if (fs.existsSync(p)) return p;
             }
             try { 
-                return require('child_process').execSync('where soffice').toString().trim(); 
+                return execSync('where soffice').toString().trim(); 
             } catch (e) { 
                 return null; 
             }
@@ -243,15 +244,47 @@ function getSystemLibreOfficePath() {
         }
         default: {
             // Linux/Ubuntu and other UNIX-like systems
+            // Method 1: Standard APT or Snap installations (Checks system $PATH)
             try { 
-                return require('child_process').execSync('which libreoffice').toString().trim(); 
+                const standardPath = execSync('which libreoffice').toString().trim();
+                if (standardPath && fs.existsSync(standardPath)) return standardPath;
             } catch (e) { 
-                try { 
-                    return require('child_process').execSync('which soffice').toString().trim(); 
-                } catch (err) { 
-                    return null; 
-                }
+                // Silently ignore and fall through
             }
+
+            try { 
+                const sofficePath = execSync('which soffice').toString().trim();
+                if (sofficePath && fs.existsSync(sofficePath)) return sofficePath;
+            } catch (err) { 
+                // Silently ignore and fall through
+            }
+
+            // Method 2: Manual .tar.gz installations (Scans the /opt/ directory)
+            // Official manual installs go to /opt/libreoffice[version]/program/soffice
+            try {
+                const optPath = '/opt';
+                if (fs.existsSync(optPath)) {
+                    const directories = fs.readdirSync(optPath);
+                    
+                    // Filter for libreoffice folders and sort descending to grab the newest version if multiple exist
+                    const loDirs = directories
+                        .filter(dir => dir.toLowerCase().startsWith('libreoffice'))
+                        .sort()
+                        .reverse();
+                    
+                    for (const dir of loDirs) {
+                        const manualPath = path.join(optPath, dir, 'program', 'soffice');
+                        if (fs.existsSync(manualPath)) {
+                            console.log(`[System] Found manual LibreOffice installation at: ${manualPath}`);
+                            return manualPath;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("[Warning] Error scanning /opt/ for LibreOffice:", e);
+            }
+
+            return null; // LibreOffice is definitely not installed
         }
     }
 }
