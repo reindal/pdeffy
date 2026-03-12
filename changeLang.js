@@ -197,7 +197,7 @@ const languages = {
 
         // Delete pages
         deletePagesText: "Delete Pages",
-        deletePagesDesc: "Delete Pages from PDF",
+        deletePagesDesc: "Delete Pages from PDF.",
         deleteSelectLabel: "Select a PDF file:",
         deleteSelectButton: "Click to select file",
         deletePreviewTitle: "Click the pages you want to delete",
@@ -517,7 +517,7 @@ const languages = {
 
         // Delete pages
         deletePagesText: "Elimina Pagine",
-        deletePagesDesc: "Elimina pagine dal PDF",
+        deletePagesDesc: "Elimina pagine dal PDF.",
         deleteSelectLabel: "Seleziona un file PDF:",
         deleteSelectButton: "Clicca per selezionare il file",
         deletePreviewTitle: "Clicca sulle pagine che vuoi eliminare",
@@ -838,7 +838,7 @@ const languages = {
 
         // Delete pages
         deletePagesText: "Usun Strony",
-        deletePagesDesc: "Usun strony z PDF",
+        deletePagesDesc: "Usun strony z PDF.",
         deleteSelectLabel: "Wybierz plik PDF:",
         deleteSelectButton: "Kliknij, aby wybrac plik",
         deletePreviewTitle: "Kliknij strony, ktore chcesz usunac",
@@ -1153,7 +1153,7 @@ const languages = {
 
         // Delete pages
         deletePagesText: "Eliminar Paginas",
-        deletePagesDesc: "Eliminar paginas del PDF",
+        deletePagesDesc: "Eliminar paginas del PDF.",
         deleteSelectLabel: "Selecciona un archivo PDF:",
         deleteSelectButton: "Haz clic para seleccionar archivo",
         deletePreviewTitle: "Haz clic en las paginas que quieras eliminar",
