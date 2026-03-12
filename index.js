@@ -53,34 +53,43 @@ if (platform === 'win32' || platform === 'darwin') {
     // LINUX: Manual Download Notification
     // -----------------------------------------------------
     app.on('ready', () => {
-        // Fetch the latest release info from the public GitHub API
-        fetch('https://api.github.com/repos/reindal/pdeffy/releases/latest')
-            .then(res => res.json())
-            .then(data => {
-                // The GitHub tag usually looks like 'v1.5.0', so we remove the 'v' to compare
-                const latestVersion = data.tag_name.replace('v', '');
+        // Fetch the exact same RELEASES file that Windows uses
+        fetch('https://github.com/reindal/pdeffy/releases/download/latest/RELEASES')
+            .then(res => {
+                if (!res.ok) throw new Error('RELEASES file not found on server.');
+                return res.text();
+            })
+            .then(text => {
+                // The text looks like: "HASH pdeffy-1.5.1-full.nupkg SIZE"
+                // We use a Regular Expression to extract the version numbers from the filename
+                const match = text.match(/pdeffy-([\d.]+)-full\.nupkg/);
                 
-                // Compare semantic versions roughly (current vs latest)
-                if (latestVersion !== currentVersion) {
-                    const dialogOpts = {
-                        type: 'info',
-                        buttons: ['Download Update', 'Cancel'],
-                        title: 'Update Available',
-                        message: `Pdeffy version ${latestVersion} is available!`,
-                        detail: `You are currently running version ${currentVersion}. Linux security policies prevent background updates. Please download the latest .deb installer from our website or GitHub.`,
-                        noLink: true
-                    };
+                if (match && match[1]) {
+                    const latestVersion = match[1];
+                    
+                    // Compare the semantic version cleanly
+                    if (latestVersion !== currentVersion) {
+                        const dialogOpts = {
+                            type: 'info',
+                            buttons: ['Download Update', 'Cancel'], // Index 0 is 'Download Update'
+                            title: 'Update Available',
+                            message: `Pdeffy version ${latestVersion} is available!`,
+                            detail: `You are currently running version ${currentVersion}. Linux security policies prevent background updates. Please download the latest .deb installer from our website or GitHub.`,
+                            noLink: true
+                        };
 
-                    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-                        // If the user clicks 'Download Update' (Index 0)
-                        if (returnValue.response === 0) {
-                            // Open the default web browser to the releases page
-                            shell.openExternal('https://github.com/reindal/pdeffy/releases/latest');
-                        }
-                    });
+                        dialog.showMessageBox(dialogOpts).then((returnValue) => {
+                            if (returnValue.response === 0) {
+                                shell.openExternal('https://github.com/reindal/pdeffy/releases/tag/latest');
+                            }
+                        });
+                    }
                 }
             })
-            .catch(err => console.error('Error checking for Linux updates:', err));
+            .catch(err => {
+                // This will now print to the Ubuntu terminal if launched via command line
+                console.error('Error checking for Linux updates:', err);
+            });
     });
 }
 
