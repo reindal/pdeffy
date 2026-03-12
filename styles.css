@@ -179,7 +179,7 @@ header h1 {
 
 .cardsGrid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
     gap: 12px;
 }
 
@@ -221,7 +221,7 @@ header h1 {
 }
 
 #convertSection .convertCardsGrid {
-    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
 }
 
 .collapsibleSection .cardsGrid .optionCard {
