@@ -77,12 +77,12 @@ jobs:
             gh release upload latest \
               --repo ${{ github.repository }} \
               --clobber \
-              $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" \))
+              $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.nupkg" -o -name "RELEASES" \))
           else
             gh release create latest \
               --repo ${{ github.repository }} \
               --title "Latest Build" \
               --prerelease \
               --notes "Auto-updated on every push to main" \
-              $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" \))
+              $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.nupkg" -o -name "RELEASES" \))
           fi

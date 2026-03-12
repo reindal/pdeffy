@@ -4,21 +4,47 @@ const path = require("path");
 const url = require("url");
 const fs = require("fs");
 const fsPromises = fs.promises;
-const { BrowserWindow, app , ipcMain, dialog} = electron;
-const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+const { BrowserWindow, app, ipcMain, dialog, autoUpdater } = electron;
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
 const pptxgen = require('pptxgenjs');
 const { exec } = require('child_process');
 const { execSync } = require('child_process');
 
 if (require('electron-squirrel-startup')) return;
 
-//updating app
+// =========================================================
+// AUTO-UPDATER CONFIGURATION
+// =========================================================
 updateElectronApp({
-  updateSource: {
-    type: UpdateSourceType.StaticStorage,
-    baseUrl: `https://pdeffy.reindal.com/latest/`
-  }
-})
+    updateSource: {
+        type: UpdateSourceType.StaticStorage,
+        baseUrl: `https://github.com/reindal/pdeffy/releases/download/latest/`
+    },
+    // Disable the default notification to allow for a custom dialog
+    notifyUser: false 
+});
+
+// Listen for the event triggered when the background download is 100% complete
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+        type: 'info',
+        buttons: ['Update Now', 'Later'], // Index 0 is 'Update Now', Index 1 is 'Later'
+        title: 'Application Update',
+        message: 'A new version of Pdeffy is ready.',
+        detail: 'The update has been downloaded in the background. Would you like to restart the application to apply the changes now, or do it later?',
+        noLink: true // Forces standard buttons instead of links on Windows
+    };
+
+    // Show the native system dialog to the user
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+        // Check if the user clicked the 'Update Now' button (Index 0)
+        if (returnValue.response === 0) {
+            autoUpdater.quitAndInstall();
+        }
+        // If they click 'Later' or close the dialog, nothing happens.
+        // The app will quietly update the next time they close it normally.
+    });
+});
 
 // Path to store settings
 const userDataPath = app.getPath('userData');
