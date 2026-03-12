@@ -19,6 +19,25 @@ if (require('electron-squirrel-startup')) return;
 const platform = os.platform();
 const currentVersion = app.getVersion();
 
+// Helper function to read the language directly from the saved file in the Backend
+function getSavedLanguage() {
+    try {
+        const userDataPath = app.getPath('userData');
+        // IMPORTANT: Change 'pdf-settings.json' to the actual name of your config file
+        const settingsPath = path.join(userDataPath, 'pdf-settings.json'); 
+        
+        if (fs.existsSync(settingsPath)) {
+            const rawData = fs.readFileSync(settingsPath, 'utf-8');
+            const settings = JSON.parse(rawData);
+            return settings.language || 'en'; // Return the saved language or default to English
+        }
+    } catch (error) {
+        console.error('Error reading language file:', error);
+    }
+    return 'en'; // Fallback
+}
+
+
 if (platform === 'win32' || platform === 'darwin') {
     // -----------------------------------------------------
     // WINDOWS & MACOS: True Background Auto-Updater
@@ -32,13 +51,52 @@ if (platform === 'win32' || platform === 'darwin') {
     });
 
     autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+        
+        let dialogTitle, dialogMessage, dialogDetail, btnUpdate, btnLater;
+        
+        const currentLanguage = getSavedLanguage();
+
+        switch (currentLanguage) {
+            case 'es':
+                dialogTitle = 'Actualización de la aplicación';
+                dialogMessage = 'Una nueva versión de Pdeffy está lista.';
+                dialogDetail = 'La actualización se ha descargado en segundo plano. ¿Deseas reiniciar la aplicación para aplicar los cambios ahora, o hacerlo más tarde?';
+                btnUpdate = 'Actualizar ahora';
+                btnLater = 'Más tarde';
+                break;
+
+            case 'it':
+                dialogTitle = 'Aggiornamento dell\'applicazione';
+                dialogMessage = 'Una nuova versione di Pdeffy è pronta.';
+                dialogDetail = 'L\'aggiornamento è stato scaricato in background. Vuoi riavviare l\'applicazione per applicare le modifiche ora oppure farlo più tardi?';
+                btnUpdate = 'Aggiorna ora';
+                btnLater = 'Più tardi';
+                break;
+
+            case 'pl':
+                dialogTitle = 'Aktualizacja aplikacji';
+                dialogMessage = 'Nowa wersja Pdeffy jest gotowa.';
+                dialogDetail = 'Aktualizacja została pobrana w tle. Czy chcesz teraz ponownie uruchomić aplikację, aby zastosować zmiany, czy zrobić to później?';
+                btnUpdate = 'Aktualizuj teraz';
+                btnLater = 'Później';
+                break;
+
+            default:
+                dialogTitle = 'Application Update';
+                dialogMessage = 'A new version of Pdeffy is ready.';
+                dialogDetail = 'The update has been downloaded in the background. Would you like to restart the application to apply the changes now, or do it later?';
+                btnUpdate = 'Update Now';
+                btnLater = 'Later';
+                break;
+        }
+
         const dialogOpts = {
             type: 'info',
-            buttons: ['Update Now', 'Later'],
-            title: 'Application Update',
-            message: 'A new version of Pdeffy is ready.',
-            detail: 'The update has been downloaded in the background. Would you like to restart the application to apply the changes now, or do it later?',
-            noLink: true
+            buttons: [btnUpdate, btnLater],
+            title: dialogTitle,
+            message: dialogMessage,
+            detail: dialogDetail,
+            noLink: true 
         };
 
         dialog.showMessageBox(dialogOpts).then((returnValue) => {
@@ -67,20 +125,59 @@ if (platform === 'win32' || platform === 'darwin') {
                 if (match && match[1]) {
                     const latestVersion = match[1];
                     
-                    // Compare the semantic version cleanly
+                    // Compare the semantic version
                     if (latestVersion !== currentVersion) {
+
+                        let dialogTitle, dialogMessage, dialogDetail, btnDownload, btnCancel;
+
+                        const currentLanguage = getSavedLanguage();
+
+                        switch (currentLanguage) {
+                            case 'es':
+                                dialogTitle = 'Actualización disponible';
+                                dialogMessage = `¡La versión ${latestVersion} de Pdeffy está disponible!`;
+                                dialogDetail = `Actualmente ejecutas la versión ${currentVersion}. Las políticas de seguridad de Linux impiden las actualizaciones en segundo plano. Por favor, descarga el último instalador .deb desde nuestra web o GitHub.`;
+                                btnDownload = 'Descargar actualización';
+                                btnCancel = 'Cancelar';
+                                break;
+
+                            case 'it':
+                                dialogTitle = 'Aggiornamento disponibile';
+                                dialogMessage = `La versione ${latestVersion} di Pdeffy è disponibile!`;
+                                dialogDetail = `Attualmente stai usando la versione ${currentVersion}. Le politiche di sicurezza di Linux impediscono gli aggiornamenti in background. Per favore scarica l’ultimo installer .deb dal nostro sito web o da GitHub.`;
+                                btnDownload = 'Scarica aggiornamento';
+                                btnCancel = 'Annulla';
+                                break;
+
+                            case 'pl':
+                                dialogTitle = 'Dostępna aktualizacja';
+                                dialogMessage = `Wersja ${latestVersion} Pdeffy jest dostępna!`;
+                                dialogDetail = `Obecnie używasz wersji ${currentVersion}. Zasady bezpieczeństwa systemu Linux uniemożliwiają aktualizacje w tle. Pobierz najnowszy instalator .deb z naszej strony internetowej lub z GitHub.`;
+                                btnDownload = 'Pobierz aktualizację';
+                                btnCancel = 'Anuluj';
+                                break;
+
+                            default:
+                                dialogTitle = 'Update available';
+                                dialogMessage = `Pdeffy version ${latestVersion} is available!`;
+                                dialogDetail = `You are currently running version ${currentVersion}. Linux security policies prevent background updates. Please download the latest .deb installer from our website or GitHub.`;
+                                btnDownload = 'Download update';
+                                btnCancel = 'Cancel';
+                                break;
+                        }
+
                         const dialogOpts = {
                             type: 'info',
-                            buttons: ['Download Update', 'Cancel'], // Index 0 is 'Download Update'
-                            title: 'Update Available',
-                            message: `Pdeffy version ${latestVersion} is available!`,
-                            detail: `You are currently running version ${currentVersion}. Linux security policies prevent background updates. Please download the latest .deb installer from our website or GitHub.`,
-                            noLink: true
+                            buttons: [btnDownload, btnCancel], 
+                            title: dialogTitle,
+                            message: dialogMessage,
+                            detail: dialogDetail,
+                            noLink: true 
                         };
 
                         dialog.showMessageBox(dialogOpts).then((returnValue) => {
                             if (returnValue.response === 0) {
-                                shell.openExternal('https://github.com/reindal/pdeffy/releases/tag/latest');
+                                electron.shell.openExternal('https://github.com/reindal/pdeffy/releases/tag/latest');
                             }
                         });
                     }
