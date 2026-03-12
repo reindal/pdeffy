@@ -14,6 +14,9 @@ const languages = {
         editPdfTile: "Edit PDF",
         editPdfTileDesc: "Watermark, delete pages",
 
+        toPdf: "To PDF",
+        fromPdf: "From PDF",
+
         // Section titles
         organizePdfSection: "Organize PDF",
         convertPdfSection: "Convert PDF",
@@ -330,6 +333,9 @@ const languages = {
         convertPdfTileDesc: "Converti da e verso PDF",
         editPdfTile: "Modifica PDF",
         editPdfTileDesc: "Filigrana, elimina pagine",
+
+        toPdf: "In PDF",
+        fromPdf: "Da PDF",
 
         // Section titles
         organizePdfSection: "Organizza PDF",
@@ -649,6 +655,9 @@ const languages = {
         editPdfTile: "Edytuj PDF",
         editPdfTileDesc: "Znak wodny, usuń strony",
 
+        toPdf: "Do PDF",
+        fromPdf: "Z PDF",
+
         // Section titles
         organizePdfSection: "Organizuj PDF",
         convertPdfSection: "Konwertuj PDF",
@@ -963,6 +972,9 @@ const languages = {
         convertPdfTileDesc: "Convertir desde y hacia PDF",
         editPdfTile: "Editar PDF",
         editPdfTileDesc: "Marca de agua, eliminar páginas",
+
+        toPdf: "A PDF",
+        fromPdf: "Desde PDF",
 
         // Section titles
         organizePdfSection: "Organizar PDF",
