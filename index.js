@@ -15,36 +15,74 @@ if (require('electron-squirrel-startup')) return;
 // =========================================================
 // AUTO-UPDATER CONFIGURATION
 // =========================================================
-updateElectronApp({
-    updateSource: {
-        type: UpdateSourceType.StaticStorage,
-        baseUrl: `https://github.com/reindal/pdeffy/releases/download/latest/`
-    },
-    // Disable the default notification to allow for a custom dialog
-    notifyUser: false 
-});
 
-// Listen for the event triggered when the background download is 100% complete
-autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-    const dialogOpts = {
-        type: 'info',
-        buttons: ['Update Now', 'Later'], // Index 0 is 'Update Now', Index 1 is 'Later'
-        title: 'Application Update',
-        message: 'A new version of Pdeffy is ready.',
-        detail: 'The update has been downloaded in the background. Would you like to restart the application to apply the changes now, or do it later?',
-        noLink: true // Forces standard buttons instead of links on Windows
-    };
+const platform = os.platform();
+const currentVersion = app.getVersion();
 
-    // Show the native system dialog to the user
-    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-        // Check if the user clicked the 'Update Now' button (Index 0)
-        if (returnValue.response === 0) {
-            autoUpdater.quitAndInstall();
-        }
-        // If they click 'Later' or close the dialog, nothing happens.
-        // The app will quietly update the next time they close it normally.
+if (platform === 'win32' || platform === 'darwin') {
+    // -----------------------------------------------------
+    // WINDOWS & MACOS: True Background Auto-Updater
+    // -----------------------------------------------------
+    updateElectronApp({
+        updateSource: {
+            type: UpdateSourceType.StaticStorage,
+            baseUrl: `https://github.com/reindal/pdeffy/releases/download/latest/`
+        },
+        notifyUser: false 
     });
-});
+
+    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+        const dialogOpts = {
+            type: 'info',
+            buttons: ['Update Now', 'Later'],
+            title: 'Application Update',
+            message: 'A new version of Pdeffy is ready.',
+            detail: 'The update has been downloaded in the background. Would you like to restart the application to apply the changes now, or do it later?',
+            noLink: true
+        };
+
+        dialog.showMessageBox(dialogOpts).then((returnValue) => {
+            if (returnValue.response === 0) {
+                autoUpdater.quitAndInstall();
+            }
+        });
+    });
+
+} else if (platform === 'linux') {
+    // -----------------------------------------------------
+    // LINUX: Manual Download Notification
+    // -----------------------------------------------------
+    app.on('ready', () => {
+        // Fetch the latest release info from the public GitHub API
+        fetch('https://api.github.com/repos/reindal/pdeffy/releases/latest')
+            .then(res => res.json())
+            .then(data => {
+                // The GitHub tag usually looks like 'v1.5.0', so we remove the 'v' to compare
+                const latestVersion = data.tag_name.replace('v', '');
+                
+                // Compare semantic versions roughly (current vs latest)
+                if (latestVersion !== currentVersion) {
+                    const dialogOpts = {
+                        type: 'info',
+                        buttons: ['Download Update', 'Cancel'],
+                        title: 'Update Available',
+                        message: `Pdeffy version ${latestVersion} is available!`,
+                        detail: `You are currently running version ${currentVersion}. Linux security policies prevent background updates. Please download the latest .deb installer from our website or GitHub.`,
+                        noLink: true
+                    };
+
+                    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+                        // If the user clicks 'Download Update' (Index 0)
+                        if (returnValue.response === 0) {
+                            // Open the default web browser to the releases page
+                            shell.openExternal('https://github.com/reindal/pdeffy/releases/latest');
+                        }
+                    });
+                }
+            })
+            .catch(err => console.error('Error checking for Linux updates:', err));
+    });
+}
 
 // Path to store settings
 const userDataPath = app.getPath('userData');
