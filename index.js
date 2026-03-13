@@ -241,7 +241,7 @@ function createWindow() {
 }
 
 function setTranslatedMenu(appVersion, language) {
-    let menuFile, menuExit, menuHelp, menuAbout;
+    let menuFile, menuExit, menuHelp, menuAbout, textVersion, textAuthor, textLicense, textDesc;
 
     switch (language) {
         case 'es':
@@ -249,6 +249,10 @@ function setTranslatedMenu(appVersion, language) {
             menuExit = 'Salir';
             menuHelp = 'Ayuda';
             menuAbout = 'Acerca de Pdeffy';
+            textVersion = 'Versión';
+            textAuthor = 'Autor';
+            textLicense = 'Licencia';
+            textDesc = 'Una aplicación profesional para manipular archivos PDF.';
             break;
 
         case 'it':
@@ -256,6 +260,10 @@ function setTranslatedMenu(appVersion, language) {
             menuExit = 'Esci';
             menuHelp = 'Aiuto';
             menuAbout = 'Informazioni su Pdeffy';
+            textVersion = 'Versione';
+            textAuthor = 'Autore';
+            textLicense = 'Licenza';
+            textDesc = 'Un\'applicazione professionale per la manipolazione di file PDF.';
             break;
 
         case 'pl':
@@ -263,6 +271,10 @@ function setTranslatedMenu(appVersion, language) {
             menuExit = 'Zakończ';
             menuHelp = 'Pomoc';
             menuAbout = 'O Pdeffy';
+            textVersion = 'Wersja';
+            textAuthor = 'Autor';
+            textLicense = 'Licencja';
+            textDesc = 'Profesjonalna aplikacja do manipulowania plikami PDF.';
             break;
 
         default:
@@ -270,6 +282,10 @@ function setTranslatedMenu(appVersion, language) {
             menuExit = 'Exit';
             menuHelp = 'Help';
             menuAbout = 'About Pdeffy';
+            textVersion = 'Version';
+            textAuthor = 'Author';
+            textLicense = 'License';
+            textDesc = 'A professional application for manipulating PDF files.';
             break;
     }
 
@@ -290,7 +306,7 @@ function setTranslatedMenu(appVersion, language) {
                             type: 'info',
                             title: menuAbout,
                             message: 'Pdeffy',
-                            detail: `Version: ${appVersion}\nAuthor: Reindal\nLicense: MIT\n\nA professional application for manipulating PDF files.`,
+                            detail: `${textVersion}: ${appVersion}\n${textAuthor}: Reindal\n${textLicense}: MIT\n\n${textDesc}`,
                             buttons: ['OK'],
                             icon: path.join(__dirname, "assets", "logo", "png", "256x256.png")
                         };
