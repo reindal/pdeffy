@@ -4,7 +4,7 @@ const path = require("path");
 const url = require("url");
 const fs = require("fs");
 const fsPromises = fs.promises;
-const { BrowserWindow, app, ipcMain, dialog, autoUpdater } = electron;
+const { BrowserWindow, app, ipcMain, dialog, autoUpdater, shell } = electron;
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
 const pptxgen = require('pptxgenjs');
 const { exec } = require('child_process');
@@ -176,14 +176,14 @@ if (platform === 'win32' || platform === 'darwin') {
 
                         dialog.showMessageBox(dialogOpts).then((returnValue) => {
                             if (returnValue.response === 0) {
-                                electron.shell.openExternal('https://github.com/reindal/pdeffy/releases/tag/latest');
+                                shell.openExternal('https://github.com/reindal/pdeffy/releases/tag/latest');
                             }
                         });
                     }
                 }
             })
             .catch(err => {
-                // This will now print to the Ubuntu terminal if launched via command line
+                // This will print to the Ubuntu terminal if launched via command line
                 console.error('Error checking for Linux updates:', err);
             });
     });
