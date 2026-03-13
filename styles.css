@@ -18,7 +18,7 @@ header {
     padding: 10px;
     margin: 0;
     border-radius: 20px;
-    width: min(700px, calc(100% - 60px));
+    width: min(1200px, calc(100% - 40px));
     align-items: center;
     display: flex;
     justify-content: space-between;
