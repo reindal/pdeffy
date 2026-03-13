@@ -4,7 +4,7 @@ const path = require("path");
 const url = require("url");
 const fs = require("fs");
 const fsPromises = fs.promises;
-const { BrowserWindow, app, ipcMain, dialog, autoUpdater, shell } = electron;
+const { BrowserWindow, app, ipcMain, dialog, autoUpdater, shell, Menu } = electron;
 const { updateElectronApp, UpdateSourceType } = require('update-electron-app');
 const pptxgen = require('pptxgenjs');
 const { exec } = require('child_process');
@@ -199,8 +199,9 @@ const warningsPath = path.join(userDataPath, 'warnings-settings.json');
 let mainWindow;
 
 function createWindow() {
+    const appVersion = app.getVersion(); 
     mainWindow = new BrowserWindow({
-        autoHideMenuBar: true,
+        title: `Pdeffy v${appVersion}`, 
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -208,7 +209,50 @@ function createWindow() {
         show: false,
         icon: path.join(__dirname, "assets", "logo", "png", "256x256.png")
     });
+
+    // NATIVE APPLICATION MENU
+    
+    const menuTemplate = [
+        {
+            label: 'File',
+            submenu: [
+                { role: 'quit', label: 'Exit' } 
+            ]
+        },
+        {
+            label: 'Help',
+            submenu: [
+                {
+                    label: 'About Pdeffy',
+                    click: () => {
+                        const aboutOptions = {
+                            type: 'info',
+                            title: 'About Pdeffy',
+                            message: 'Pdeffy',
+                            detail: `Version: ${appVersion}\nAuthor: Reindal\nLicense: MIT\n\nA professional application for manipulating PDF files.`,
+                            buttons: ['OK'],
+                            icon: path.join(__dirname, "assets", "logo", "png", "256x256.png")
+                        };
+                        dialog.showMessageBox(mainWindow, aboutOptions);
+                    }
+                }
+            ]
+        }
+    ];
+
+    // Build the menu from the template
+    const customMenu = Menu.buildFromTemplate(menuTemplate);
+    
+    Menu.setApplicationMenu(customMenu);
+
+    // =========================================================
+
+    mainWindow.on('page-title-updated', (event) => {
+        event.preventDefault(); 
+    });
+
     mainWindow.maximize();
+    
     mainWindow.loadURL(url.format({
             pathname: path.join(__dirname, "index.html"),
             protocol: "file:",
