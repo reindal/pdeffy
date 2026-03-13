@@ -1,7 +1,7 @@
 {
   "name": "pdeffy",
   "productName": "Pdeffy",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "main": "index.js",
   "scripts": {
     "start": "electron-forge start",

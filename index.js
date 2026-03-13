@@ -211,39 +211,10 @@ function createWindow() {
     });
 
     // NATIVE APPLICATION MENU
-    
-    const menuTemplate = [
-        {
-            label: 'File',
-            submenu: [
-                { role: 'quit', label: 'Exit' } 
-            ]
-        },
-        {
-            label: 'Help',
-            submenu: [
-                {
-                    label: 'About Pdeffy',
-                    click: () => {
-                        const aboutOptions = {
-                            type: 'info',
-                            title: 'About Pdeffy',
-                            message: 'Pdeffy',
-                            detail: `Version: ${appVersion}\nAuthor: Reindal\nLicense: MIT\n\nA professional application for manipulating PDF files.`,
-                            buttons: ['OK'],
-                            icon: path.join(__dirname, "assets", "logo", "png", "256x256.png")
-                        };
-                        dialog.showMessageBox(mainWindow, aboutOptions);
-                    }
-                }
-            ]
-        }
-    ];
 
-    // Build the menu from the template
-    const customMenu = Menu.buildFromTemplate(menuTemplate);
-    
-    Menu.setApplicationMenu(customMenu);
+    const currentLanguage = getSavedLanguage();
+
+    setTranslatedMenu(appVersion, currentLanguage);
 
     // =========================================================
 
@@ -267,6 +238,71 @@ function createWindow() {
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
     });
+}
+
+function setTranslatedMenu(appVersion, language) {
+    let menuFile, menuExit, menuHelp, menuAbout;
+
+    switch (language) {
+        case 'es':
+            menuFile = 'Archivo';
+            menuExit = 'Salir';
+            menuHelp = 'Ayuda';
+            menuAbout = 'Acerca de Pdeffy';
+            break;
+
+        case 'it':
+            menuFile = 'File';
+            menuExit = 'Esci';
+            menuHelp = 'Aiuto';
+            menuAbout = 'Informazioni su Pdeffy';
+            break;
+
+        case 'pl':
+            menuFile = 'Plik';
+            menuExit = 'Zakończ';
+            menuHelp = 'Pomoc';
+            menuAbout = 'O Pdeffy';
+            break;
+
+        default:
+            menuFile = 'File';
+            menuExit = 'Exit';
+            menuHelp = 'Help';
+            menuAbout = 'About Pdeffy';
+            break;
+    }
+
+    const menuTemplate = [
+        {
+            label: menuFile,
+            submenu: [
+                { role: 'quit', label: menuExit }
+            ]
+        },
+        {
+            label: menuHelp,
+            submenu: [
+                {
+                    label: menuAbout,
+                    click: () => {
+                        const aboutOptions = {
+                            type: 'info',
+                            title: menuAbout,
+                            message: 'Pdeffy',
+                            detail: `Version: ${appVersion}\nAuthor: Reindal\nLicense: MIT\n\nA professional application for manipulating PDF files.`,
+                            buttons: ['OK'],
+                            icon: path.join(__dirname, "assets", "logo", "png", "256x256.png")
+                        };
+                        dialog.showMessageBox(aboutOptions);
+                    }
+                }
+            ]
+        }
+    ];
+
+    const customMenu = Menu.buildFromTemplate(menuTemplate);
+    Menu.setApplicationMenu(customMenu);
 }
 
 // Handle IPC request for downloads path
@@ -390,6 +426,8 @@ ipcMain.handle('save-language', async (event, language) => {
             JSON.stringify({ language }, null, 2),
             'utf8'
         );
+        const appVersion = app.getVersion();
+        setTranslatedMenu(appVersion, language);
         return { success: true };
     } catch (error) {
         console.error('Error saving language file:', error);
