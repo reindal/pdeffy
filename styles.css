@@ -523,3 +523,49 @@ header h1 {
     font-size: 13px;
     line-height: 1.4;
 }
+
+
+/* Custom Alert Boxes */
+.status-box {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    display: none;
+}
+
+.status-processing {
+    background-color: var(--reindalLightYellow);
+    border: 1px solid var(--reindalYellowHover);
+    color: var(--reindalAbsoluteBlack);
+    text-align: center;
+}
+
+.status-success {
+    background-color: var(--reindalMint);
+    border: 1px solid var(--reindalGreen);
+    color: var(--reindalDarkGreen);
+    text-align: center;
+}
+
+.status-error {
+    background-color: var(--reindalLightPink);
+    border: 1px solid var(--reindalRed);
+    color: var(--reindalWineRed);
+    text-align: center;
+}
+
+.open-folder-btn {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--reindalDarkGreen);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.open-folder-btn:hover {
+    color: var(--reindalDark);
+}

@@ -1,51 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Merge PDF</title>
     <link rel="stylesheet" href="../../styles.css">
     <link rel="stylesheet" href="./merge.css">
 </head>
+
 <body>
-<div class="headerContainer">
-    <header>
-        <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
-        <h1 id="mergeHeader" class="langText">Merge PDF</h1>
-        <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
-    </header>
-</div>
-
-<main>
-    <div class="mergeContainer">
-        <h1 id="mergeHeader2" class="langText">Merge PDF Documents</h1>
-
-        <form id="mergeForm">
-            <div class="formGroup">
-                <label for="pdfFiles" id="mergeSelectLabel" class="langText">Select PDF files (can select multiple):</label>
-                <div class="fileInputWrapper">
-                    <input type="file" id="pdfFiles" accept=".pdf" multiple>
-                    <label for="pdfFiles" class="fileInputLabel langText" id="mergeSelectButton">Click to select files</label>
-                </div>
-            </div>
-
-            <div id="filesOrder" class="filesOrder">
-                <h3 id="filesOrderTitle" class="langText">Files Order</h3>
-                <div id="filesOrderContainer"></div>
-                <p class="helpText langText" id="mergeHelpText">Drag to reorder files (top to bottom = first to last in merged PDF)</p>
-            </div>
-
-            <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="mergeSubmitBtn">Merge PDF</span></button>
-        </form>
-
-        <div id="status" class="status"></div>
-
-        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="mergeHeader" class="langText">Merge PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
     </div>
-</main>
 
-<script src="../../changeLang.js"></script>
-<script src="./../../settings.js"></script>
-<script src="./../customMetadata.js"></script>
-<script src="./merge.js"></script>
+    <main>
+        <div class="mergeContainer">
+            <h1 id="mergeHeader2" class="langText">Merge PDF Documents</h1>
+
+            <form id="mergeForm">
+                <div class="formGroup">
+                    <label for="pdfFiles" id="mergeSelectLabel" class="langText">Select PDF files (can select
+                        multiple):</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="pdfFiles" accept=".pdf" multiple>
+                        <label for="pdfFiles" class="fileInputLabel langText" id="mergeSelectButton">Click to select
+                            files</label>
+                    </div>
+                </div>
+
+                <div id="filesOrder" class="filesOrder">
+                    <h3 id="filesOrderTitle" class="langText">Files Order</h3>
+                    <div id="filesOrderContainer"></div>
+                    <p class="helpText langText" id="mergeHelpText">Drag to reorder files (top to bottom = first to last
+                        in merged PDF)</p>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="mergeSubmitBtn">Merge
+                        PDF</span></button>
+            </form>
+
+            <div id="status" class="status"></div>
+
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./merge.js"></script>
 </body>
+
 </html>

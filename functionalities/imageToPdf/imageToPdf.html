@@ -1,52 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Image to PDF</title>
     <link rel="stylesheet" href="../../styles.css">
     <link rel="stylesheet" href="./imageToPdf.css">
 </head>
+
 <body>
-<div class="headerContainer">
-    <header>
-        <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
-        <h1 id="imageToPdfHeader" class="langText">Image to PDF</h1>
-        <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
-    </header>
-</div>
-
-<main>
-    <div class="imageToPdfContainer">
-        <h1 id="imageToPdfHeader2" class="langText">Convert Images to PDF</h1>
-
-        <form id="imageToPdfForm">
-            <div class="formGroup">
-                <label for="imageFiles" id="imageToPdfSelectLabel" class="langText">Select image files (can select multiple):</label>
-                <div class="fileInputWrapper">
-                    <input type="file" id="imageFiles" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp" multiple>
-                    <label for="imageFiles" class="fileInputLabel langText" id="imageToPdfSelectButton">Click to select images</label>
-                </div>
-            </div>
-
-            <div id="imagesOrder" class="imagesOrder">
-                <h3 id="imagesOrderTitle" class="langText">Images Order</h3>
-                <div id="imagesOrderContainer"></div>
-                <p class="helpText langText" id="imageToPdfHelpText">Drag to reorder images (top to bottom = first to last page in PDF)</p>
-            </div>
-
-            <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="imageToPdfSubmitBtn">Create PDF</span></button>
-        </form>
-
-        <div id="status" class="status"></div>
-
-        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="imageToPdfHeader" class="langText">Image to PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
     </div>
-</main>
 
-<script src="../../changeLang.js"></script>
-<script src="./../../settings.js"></script>
-<script src="./../customMetadata.js"></script>
-<script src="./imageToPdf.js"></script>
+    <main>
+        <div class="imageToPdfContainer">
+            <h1 id="imageToPdfHeader2" class="langText">Convert Images to PDF</h1>
+
+            <form id="imageToPdfForm">
+                <div class="formGroup">
+                    <label for="imageFiles" id="imageToPdfSelectLabel" class="langText">Select image files (can select
+                        multiple):</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="imageFiles" accept="image/png,image/jpeg,image/jpg,image/webp,image/bmp"
+                            multiple>
+                        <label for="imageFiles" class="fileInputLabel langText" id="imageToPdfSelectButton">Click to
+                            select images</label>
+                    </div>
+                </div>
+
+                <div id="imagesOrder" class="imagesOrder">
+                    <h3 id="imagesOrderTitle" class="langText">Images Order</h3>
+                    <div id="imagesOrderContainer"></div>
+                    <p class="helpText langText" id="imageToPdfHelpText">Drag to reorder images (top to bottom = first
+                        to last page in PDF)</p>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn"><span class="langText"
+                        id="imageToPdfSubmitBtn">Create PDF</span></button>
+            </form>
+
+            <div id="status" class="status"></div>
+
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./imageToPdf.js"></script>
 </body>
-</html>
 
+</html>

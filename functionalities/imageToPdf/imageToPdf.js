@@ -2,11 +2,11 @@ const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
+const STATUS = '#status';
 
 const form = document.getElementById('imageToPdfForm');
 const imageFiles = document.getElementById('imageFiles');
 const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
 const imagesOrderContainer = document.getElementById('imagesOrderContainer');
 
 let selectedImages = [];
@@ -112,12 +112,12 @@ form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
     if (selectedImages.length === 0) {
-        showStatus(getMessage('pleaseSelectAtLeastOneImage'), 'error');
+        StatusManager.show(STATUS, 'error', 'pleaseSelectAtLeastOneImage');
         return;
     }
 
     submitBtn.disabled = true;
-    showStatus(getMessage('creatingPdf'), 'info');
+    StatusManager.show(STATUS, 'processing', 'processing');
 
     try {
         const pdfDoc = await PDFDocument.create();
@@ -193,16 +193,17 @@ form.addEventListener('submit', async function(e) {
 
         if (!outputPath) {
             // User cancelled the save dialog
-            showStatus(getMessage('saveCancelled'), 'info');
+            StatusManager.show(STATUS, 'error', 'saveCancelled');
             submitBtn.disabled = false;
             return;
         }
 
         await fs.writeFile(outputPath, pdfBytes);
 
-        const fileName = path.basename(outputPath);
-        const outputFolder = path.dirname(outputPath);
-        showStatus(getMessage('successPdfCreatedPath', { filename: fileName, path: outputFolder }), 'success');
+        StatusManager.show(STATUS, 'success', 'successPdfCreated', {
+            filename: path.basename(outputPath),
+            savePath: outputPath
+        });
 
         // Reset form
         setTimeout(() => {
@@ -214,20 +215,8 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error creating PDF:', error);
-        showStatus(getMessage('errorPrefix') + error.message, 'error');
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
     } finally {
         submitBtn.disabled = false;
     }
 });
-
-function showStatus(message, type) {
-    statusDiv.textContent = message;
-    statusDiv.className = `status ${type}`;
-    statusDiv.style.display = 'block';
-
-    if (type === 'success') {
-        setTimeout(() => {
-            statusDiv.style.display = 'none';
-        }, 5000);
-    }
-}

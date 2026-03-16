@@ -1,6 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
+const STATUS = '#status';
 
 // Wait for PDF.js to load from CDN
 let pdfjsLib = null;
@@ -14,11 +15,7 @@ async function initPdfJs() {
             await new Promise(resolve => setTimeout(resolve, 100));
             attempts++;
         }
-
-        if (!window.pdfjsLib) {
-            throw new Error('PDF.js library failed to load');
-        }
-
+        if (!window.pdfjsLib) throw new Error('PDF.js library failed to load');
         pdfjsLib = window.pdfjsLib;
 
         // Configure worker
@@ -38,17 +35,17 @@ let isPreviewCollapsed = false;
 
 // Initialize DOM elements when ready
 document.addEventListener('DOMContentLoaded', function() {
-    form = document.getElementById('pdfToImageForm');
-    pdfFile = document.getElementById('pdfFile');
-    fileInfo = document.getElementById('fileInfo');
-    submitBtn = document.getElementById('submitBtn');
-    statusDiv = document.getElementById('status');
-    pagesPreview = document.getElementById('pagesPreview');
+    form                  = document.getElementById('pdfToImageForm');
+    pdfFile               = document.getElementById('pdfFile');
+    fileInfo              = document.getElementById('fileInfo');
+    submitBtn             = document.getElementById('submitBtn');
+    statusDiv             = document.getElementById('status');
+    pagesPreview          = document.getElementById('pagesPreview');
     pagesPreviewContainer = document.getElementById('pagesPreviewContainer');
-    imageFormat = document.getElementById('imageFormat');
-    togglePreviewBtn = document.getElementById('togglePreviewBtn');
-    togglePreviewText = document.getElementById('togglePreviewText');
-    togglePreviewIcon = document.getElementById('togglePreviewIcon');
+    imageFormat           = document.getElementById('imageFormat');
+    togglePreviewBtn      = document.getElementById('togglePreviewBtn');
+    togglePreviewText     = document.getElementById('togglePreviewText');
+    togglePreviewIcon     = document.getElementById('togglePreviewIcon');
 
     // Add toggle button event listener
     if (togglePreviewBtn) {
@@ -58,13 +55,11 @@ document.addEventListener('DOMContentLoaded', function() {
             isPreviewCollapsed = !isPreviewCollapsed;
 
             if (isPreviewCollapsed) {
-                // Ukrywamy podgląd
                 pagesPreviewContainer.style.display = 'none';
-                updateToggleButtonText('show');  // Przycisk: "Show preview"
+                updateToggleButtonText('show');  //"Show preview"
             } else {
-                // Pokazujemy podgląd
                 pagesPreviewContainer.style.display = 'grid';
-                updateToggleButtonText('hide');  // Przycisk: "Hide preview"
+                updateToggleButtonText('hide');  // "Hide preview"
             }
         });
     }
@@ -73,16 +68,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (pdfFile) {
         pdfFile.addEventListener('change', async function(e) {
             selectedFile = e.target.files[0];
-            if (selectedFile) {
-                await loadPDF(selectedFile);
-            }
+            if (selectedFile) await loadPDF(selectedFile);
         });
     }
 
-    // Add form submit listener
-    if (form) {
-        form.addEventListener('submit', handleFormSubmit);
-    }
+// Add form submit listener
+    if (form) form.addEventListener('submit', handleFormSubmit);
 
     // Add language change listener
     const langSelector = document.getElementById('languageSelector');
@@ -96,34 +87,20 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function updateToggleButtonText(action) {
-    const lang = localStorage.getItem('language') || 'en';
-    const texts = {
-        en: {
-            show: 'Show preview',
-            hide: 'Hide preview'
-        },
-        it: {
-            show: 'Mostra anteprima',
-            hide: 'Nascondi anteprima'
-        },
-        pl: {
-            show: 'Pokaż podgląd',
-            hide: 'Ukryj podgląd'
-        }
-    };
-
     if (togglePreviewText) {
-        togglePreviewText.textContent = texts[lang][action] || texts['en'][action];
+        const key = action === 'show' ? 'showPreview' : 'hidePreview';
+        togglePreviewText.textContent = (typeof window.getMessage === 'function')
+            ? window.getMessage(key)
+            : (action === 'show' ? 'Show preview' : 'Hide preview');
     }
 }
 
 async function loadPDF(file) {
     try {
-        showStatus(getMessage('loadingPdf'), 'info');
+        StatusManager.show(STATUS, 'processing', 'loadingPdf');
 
         // Initialize PDF.js if not already initialized
         const pdfjs = await initPdfJs();
-
         const arrayBuffer = await file.arrayBuffer();
         const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
         pdfDocument = await loadingTask.promise;
@@ -151,10 +128,11 @@ async function loadPDF(file) {
             updateToggleButtonText('hide');
         }
 
-        statusDiv.style.display = 'none';
+        StatusManager.hide(STATUS);
+
     } catch (error) {
         console.error('Error loading PDF:', error);
-        showStatus(getMessage('errorLoadingPdf', { error: error.message }), 'error');
+        StatusManager.show(STATUS, 'error', 'errorLoadingPdf', { error: error.message });
     }
 }
 
@@ -164,7 +142,6 @@ async function generatePreviews(pdfDoc, numPages) {
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
         const page = await pdfDoc.getPage(pageNum);
-
         const scale = 0.5;
         const viewport = page.getViewport({ scale });
 
@@ -173,16 +150,10 @@ async function generatePreviews(pdfDoc, numPages) {
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        const renderContext = {
-            canvasContext: context,
-            viewport: viewport
-        };
-
-        await page.render(renderContext).promise;
+        await page.render({ canvasContext: context, viewport }).promise;
 
         const previewItem = document.createElement('div');
         previewItem.className = 'pagePreviewItem';
-
         canvas.className = 'pagePreviewCanvas';
 
         const label = document.createElement('div');
@@ -199,7 +170,7 @@ async function handleFormSubmit(e) {
     e.preventDefault();
 
     if (!pdfDocument || !selectedFile) {
-        showStatus(getMessage('pleaseSelectPdfFirst'), 'error');
+        StatusManager.show(STATUS, 'error', 'pleaseSelectPdfFirst');
         return;
     }
 
@@ -209,14 +180,14 @@ async function handleFormSubmit(e) {
     const saveAsZipCheckbox = document.getElementById('saveAsZipCheckbox');
     const saveAsZip = saveAsZipCheckbox ? saveAsZipCheckbox.checked : false;
 
-    showStatus(getMessage('convertingPages', { count: numPages }), 'info');
+    StatusManager.show(STATUS, 'processing', 'convertingPages', { count: numPages });
 
     try {
         // Collect all images first
         const imageFiles = [];
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-            showStatus(getMessage('convertingPage', { current: pageNum, total: numPages }), 'info');
+            StatusManager.show(STATUS, 'processing', 'convertingPage', { current: pageNum, total: numPages });
 
             const page = await pdfDocument.getPage(pageNum);
 
@@ -229,12 +200,7 @@ async function handleFormSubmit(e) {
             canvas.height = viewport.height;
             canvas.width = viewport.width;
 
-            const renderContext = {
-                canvasContext: context,
-                viewport: viewport
-            };
-
-            await page.render(renderContext).promise;
+            await page.render({ canvasContext: context, viewport }).promise;
 
             // Convert canvas to blob
             const blob = await new Promise(resolve => {
@@ -252,22 +218,17 @@ async function handleFormSubmit(e) {
         // Show Save As dialog
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const originalFileName = selectedFile.name.replace('.pdf', '');
-
         let outputPath;
-        let outputFolder;
-        let baseName;
 
         if (saveAsZip) {
             // Save as ZIP dialog
             outputPath = await ipcRenderer.invoke('show-save-dialog', {
                 defaultPath: path.join(downloadsPath, `${originalFileName}.zip`),
-                filters: [
-                    { name: 'ZIP Files', extensions: ['zip'] }
-                ]
+                filters: [{ name: 'ZIP Files', extensions: ['zip'] }]
             });
 
             if (!outputPath) {
-                showStatus(getMessage('saveCancelled'), 'info');
+                StatusManager.show(STATUS, 'error', 'saveCancelled');
                 submitBtn.disabled = false;
                 return;
             }
@@ -275,48 +236,44 @@ async function handleFormSubmit(e) {
             // Create ZIP file
             const JSZip = require('jszip');
             const zip = new JSZip();
-
-            baseName = path.basename(outputPath, '.zip');
+            const baseName = path.basename(outputPath, '.zip');
 
             for (let i = 0; i < imageFiles.length; i++) {
-                const fileName = `${baseName}_${i + 1}.${format}`;
-                zip.file(fileName, imageFiles[i]);
+                zip.file(`${baseName}_${i + 1}.${format}`, imageFiles[i]);
             }
 
             const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
             await fs.writeFile(outputPath, zipContent);
 
-            outputFolder = path.dirname(outputPath);
-            showStatus(getMessage('successConvertedZip', { count: numPages, format: format.toUpperCase(), path: outputFolder }), 'success');
-
         } else {
             // Save as image dialog
             outputPath = await ipcRenderer.invoke('show-save-dialog', {
                 defaultPath: path.join(downloadsPath, `${originalFileName}.${format}`),
-                filters: [
-                    { name: format.toUpperCase() + ' Files', extensions: [format] }
-                ]
+                filters: [{ name: format.toUpperCase() + ' Files', extensions: [format] }]
             });
 
             if (!outputPath) {
-                showStatus(getMessage('saveCancelled'), 'info');
+                StatusManager.show(STATUS, 'error', 'saveCancelled');
                 submitBtn.disabled = false;
                 return;
             }
 
-            outputFolder = path.dirname(outputPath);
-            baseName = path.basename(outputPath, `.${format}`);
+            const outputFolder = path.dirname(outputPath);
+            const baseName = path.basename(outputPath, `.${format}`);
 
             // Save all image files
             for (let i = 0; i < imageFiles.length; i++) {
-                const fileName = `${baseName}_${i + 1}.${format}`;
-                const filePath = path.join(outputFolder, fileName);
-                await fs.writeFile(filePath, imageFiles[i]);
+                await fs.writeFile(path.join(outputFolder, `${baseName}_${i + 1}.${format}`), imageFiles[i]);
             }
-
-            showStatus(getMessage('successConvertedPath', { count: numPages, format: format.toUpperCase(), path: outputFolder }), 'success');
         }
 
+        StatusManager.show(STATUS, 'success', 'successConverted', {
+            count: numPages,
+            format: format.toUpperCase(),
+            filename: path.basename(outputPath),
+            savePath: outputPath
+        });
+        
         // Reset form
         setTimeout(() => {
             form.reset();
@@ -330,21 +287,8 @@ async function handleFormSubmit(e) {
 
     } catch (error) {
         console.error('Error converting PDF:', error);
-        showStatus(getMessage('errorPrefix') + error.message, 'error');
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
     } finally {
         submitBtn.disabled = false;
     }
 }
-
-function showStatus(message, type) {
-    statusDiv.textContent = message;
-    statusDiv.className = `status ${type}`;
-    statusDiv.style.display = 'block';
-
-    if (type === 'success') {
-        setTimeout(() => {
-            statusDiv.style.display = 'none';
-        }, 5000);
-    }
-}
-

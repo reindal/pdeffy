@@ -1,49 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Docx to PDF</title>
     <link rel="stylesheet" href="../../styles.css">
-    <link rel="stylesheet" href="./docxToPdf.css"> </head>
+    <link rel="stylesheet" href="./docxToPdf.css">
+</head>
+
 <body>
-<div class="headerContainer">
-    <header>
-        <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
-        <h1 id="docxToPdfHeader" class="langText">Docx to PDF</h1>
-        <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
-    </header>
-</div>
-
-<main>
-    <div class="imageToPdfContainer"> <h1 id="docxToPdfHeader2" class="langText">Convert Word to PDF</h1>
-
-        <form id="docxToPdfForm">
-            <div class="formGroup">
-                <label for="docxFile" id="docxToPdfSelectLabel" class="langText">Select Word file (.docx):</label>
-                <div class="fileInputWrapper">
-                    <input type="file" id="docxFile" accept=".docx" required>
-                    <label for="docxFile" class="fileInputLabel langText" id="docxToPdfSelectButton">Click to select file</label>
-                </div>
-            </div>
-
-            <div id="fileInfo" class="status" style="display: none; background: #eee; color: #333;">
-                <span id="fileNameDisplay"></span>
-            </div>
-
-            <button type="submit" class="submitBtn" id="submitBtn">
-                <span class="langText" id="docxToPdfSubmitBtn">Convert to PDF</span>
-            </button>
-        </form>
-
-        <div id="status" class="status"></div>
-        <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="docxToPdfHeader" class="langText">Docx to PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
     </div>
-</main>
 
-<script src="../../changeLang.js"></script>
-<script src="./../../settings.js"></script>
-<script src="./../customMetadata.js"></script>
-<script src="./docxToPdf.js"></script>
-<script src="./../engineWarning.js"></script>
+    <main>
+        <div class="imageToPdfContainer">
+            <h1 id="docxToPdfHeader2" class="langText">Convert Word to PDF</h1>
+
+            <form id="docxToPdfForm">
+                <div class="formGroup">
+                    <label for="docxFile" id="docxToPdfSelectLabel" class="langText">Select Word file (.docx):</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="docxFile" accept=".docx" required>
+                        <label for="docxFile" class="fileInputLabel langText" id="docxToPdfSelectButton">Click to select
+                            file</label>
+                    </div>
+                </div>
+
+                <div id="fileInfo" class="status" style="display: none; background: #eee; color: #333;">
+                    <span id="fileNameDisplay"></span>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn">
+                    <span class="langText" id="docxToPdfSubmitBtn">Convert to PDF</span>
+                </button>
+            </form>
+
+            <div id="status" class="status"></div>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./docxToPdf.js"></script>
+    <script src="./../engineWarning.js"></script>
 </body>
+
 </html>

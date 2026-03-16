@@ -3,6 +3,8 @@ const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
 
+const STATUS = '#status';
+
 const form = document.getElementById('splitForm');
 const pdfFile = document.getElementById('pdfFile');
 const fileNameDisplay = document.getElementById('fileName');
@@ -25,7 +27,6 @@ let rangeCount = 1;
 let customFileCount = 1;
 let totalPdfPages = 0;
 
-
 if (languageSelector) {
     languageSelector.addEventListener('change', () => {
         setTimeout(() => {
@@ -38,10 +39,8 @@ if (languageSelector) {
 
 if (typeof window.changeLanguage === 'function') {
     const originalChangeLanguage = window.changeLanguage;
-    
     window.changeLanguage = function(lang) {
         originalChangeLanguage(lang);
-        
         if (typeof totalPdfPages !== 'undefined' && totalPdfPages > 0) {
             const infoDiv = document.getElementById('totalPagesInfo');
             if (infoDiv && typeof window.getMessage === 'function') {
@@ -55,9 +54,8 @@ if (typeof window.changeLanguage === 'function') {
 async function setMetadata(pdfDoc) {
     // Get metadata from module
     const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
-
-    if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
-    if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
+    if (finalMetadata.author)  pdfDoc.setAuthor(finalMetadata.author);
+    if (finalMetadata.title)   pdfDoc.setTitle(finalMetadata.title);
     if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
 }
 
@@ -66,45 +64,28 @@ function attachRangeListeners(startInput, endInput) {
     startInput.addEventListener('input', () => {
         let startVal = parseInt(startInput.value) || 1;
         let endVal = parseInt(endInput.value) || 1;
-
         // Cap to total pages if a PDF is loaded
-        if (totalPdfPages > 0 && startVal > totalPdfPages) {
-            startVal = totalPdfPages;
-            startInput.value = startVal;
-        }
-
+        if (totalPdfPages > 0 && startVal > totalPdfPages) { startVal = totalPdfPages; startInput.value = startVal; }
         // Push the end page up if start page surpasses it
-        if (startVal > endVal) {
-            endInput.value = startVal;
-        }
+        if (startVal > endVal) endInput.value = startVal;
     });
 
     endInput.addEventListener('input', () => {
         let startVal = parseInt(startInput.value) || 1;
         let endVal = parseInt(endInput.value) || 1;
-
         // Cap to total pages if a PDF is loaded
-        if (totalPdfPages > 0 && endVal > totalPdfPages) {
-            endVal = totalPdfPages;
-            endInput.value = endVal;
-        }
-
+        if (totalPdfPages > 0 && endVal > totalPdfPages) { endVal = totalPdfPages; endInput.value = endVal; }
         // Pull the start page down if end page goes below it
-        if (endVal < startVal) {
-            startInput.value = endVal;
-        }
+        if (endVal < startVal) startInput.value = endVal;
     });
 }
 
 // Force existing inputs to respect the new max page limit when a new PDF is selected
 function enforceMaxPagesLimit() {
     if (totalPdfPages <= 0) return;
-    const inputs = document.querySelectorAll('.startPage, .endPage, .customStartPage, .customEndPage');
-    inputs.forEach(input => {
+    document.querySelectorAll('.startPage, .endPage, .customStartPage, .customEndPage').forEach(input => {
         input.max = totalPdfPages;
-        if (parseInt(input.value) > totalPdfPages) {
-            input.value = totalPdfPages;
-        }
+        if (parseInt(input.value) > totalPdfPages) input.value = totalPdfPages;
     });
 }
 
@@ -113,21 +94,15 @@ addCustomFile();
 
 document.querySelectorAll('input[name="splitMode"]').forEach(radio => {
     radio.addEventListener('change', function() {
-        rangeModeContainer.style.display = 'none';
-        everyModeContainer.style.display = 'none';
+        rangeModeContainer.style.display  = 'none';
+        everyModeContainer.style.display  = 'none';
         customModeContainer.style.display = 'none';
-        sizeModeContainer.style.display = 'none';
+        sizeModeContainer.style.display   = 'none';
 
-        if (this.value === 'range') {
-            rangeModeContainer.style.display = 'block';
-        } else if (this.value === 'every') {
-            everyModeContainer.style.display = 'block';
-        } else if (this.value === 'custom') {
-            customModeContainer.style.display = 'block';
-        } else if (this.value === 'size') {
-            sizeModeContainer.style.display = 'block';
-            updateFileSizeInfo();
-        }
+        if      (this.value === 'range')  rangeModeContainer.style.display  = 'block';
+        else if (this.value === 'every')  everyModeContainer.style.display  = 'block';
+        else if (this.value === 'custom') customModeContainer.style.display = 'block';
+        else if (this.value === 'size')   { sizeModeContainer.style.display = 'block'; updateFileSizeInfo(); }
     });
 });
 
@@ -155,10 +130,8 @@ pdfFile.addEventListener('change', async function(e) {
             const arrayBuffer = await selectedFile.arrayBuffer();
             const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
             totalPdfPages = pdfDoc.getPageCount();
-            
             totalPagesInfo.textContent = window.getMessage('totalPagesInfo', { total: totalPdfPages });
             totalPagesInfo.style.display = 'block';
-            
             enforceMaxPagesLimit();
         } catch (err) {
             console.error("Error reading PDF pages:", err);
@@ -180,11 +153,11 @@ form.addEventListener('submit', async function(e) {
     const saveAsZip = saveAsZipCheckbox ? saveAsZipCheckbox.checked : false;
 
     if (!file) {
-        showStatus(getMessage('pleaseSelectFile'), 'error');
+        StatusManager.show(STATUS, 'error', 'pleaseSelectFile');
         return;
     }
 
-    showStatus(getMessage('processing'), 'success');
+    StatusManager.show(STATUS, 'processing', 'processing');
     submitBtn.disabled = true;
 
     try {
@@ -202,66 +175,53 @@ form.addEventListener('submit', async function(e) {
 
             for (let item of rangeItems) {
                 const startPage = parseInt(item.querySelector('.startPage').value);
-                const endPage = parseInt(item.querySelector('.endPage').value);
+                const endPage   = parseInt(item.querySelector('.endPage').value);
 
                 if (startPage < 1 || endPage < 1) {
-                    showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
-                    submitBtn.disabled = false;
-                    return;
+                    StatusManager.show(STATUS, 'error', 'pageNumbersGreaterThanZero');
+                    submitBtn.disabled = false; return;
                 }
-
                 if (startPage > endPage) {
-                    showStatus(getMessage('startPageCannotBeGreater'), 'error');
-                    submitBtn.disabled = false;
-                    return;
+                    StatusManager.show(STATUS, 'error', 'startPageCannotBeGreater');
+                    submitBtn.disabled = false; return;
                 }
-
                 if (startPage > totalPages || endPage > totalPages) {
-                    showStatus(getMessage('pdfHasOnlyPages', { total: totalPages }), 'error');
-                    submitBtn.disabled = false;
-                    return;
+                    StatusManager.show(STATUS, 'error', 'pdfHasOnlyPages', { total: totalPages });
+                    submitBtn.disabled = false; return;
                 }
-
                 ranges.push({ startPage, endPage });
             }
 
             if (ranges.length === 0) {
-                showStatus(getMessage('pleaseAddAtLeastOneRange'), 'error');
-                submitBtn.disabled = false;
-                return;
+                StatusManager.show(STATUS, 'error', 'pleaseAddAtLeastOneRange');
+                submitBtn.disabled = false; return;
             }
 
             for (let range of ranges) {
                 const newPdf = await PDFDocument.create();
                 await setMetadata(newPdf);
-
-                for (let pageIdx = range.startPage - 1; pageIdx < range.endPage; pageIdx++) {
-                    const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
-                    newPdf.addPage(copiedPage);
+                for (let i = range.startPage - 1; i < range.endPage; i++) {
+                    const [p] = await newPdf.copyPages(pdfDoc, [i]);
+                    newPdf.addPage(p);
                 }
                 pdfFiles.push(await newPdf.save());
             }
 
         } else if (splitMode === 'every') {
             const interval = parseInt(document.getElementById('pagesInterval').value);
-
             if (interval < 1) {
-                showStatus(getMessage('intervalAtLeastOne'), 'error');
-                submitBtn.disabled = false;
-                return;
+                StatusManager.show(STATUS, 'error', 'intervalAtLeastOne');
+                submitBtn.disabled = false; return;
             }
 
             let currentPage = 0;
-
             while (currentPage < totalPages) {
                 const newPdf = await PDFDocument.create();
                 await setMetadata(newPdf);
-
                 const endPage = Math.min(currentPage + interval, totalPages);
-
-                for (let pageIdx = currentPage; pageIdx < endPage; pageIdx++) {
-                    const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
-                    newPdf.addPage(copiedPage);
+                for (let i = currentPage; i < endPage; i++) {
+                    const [p] = await newPdf.copyPages(pdfDoc, [i]);
+                    newPdf.addPage(p);
                 }
                 pdfFiles.push(await newPdf.save());
                 currentPage = endPage;
@@ -269,11 +229,9 @@ form.addEventListener('submit', async function(e) {
 
         } else if (splitMode === 'custom') {
             const customFileItems = document.querySelectorAll('.customFileItem');
-
             if (customFileItems.length === 0) {
-                showStatus(getMessage('pleaseAddAtLeastOneOutputFile'), 'error');
-                submitBtn.disabled = false;
-                return;
+                StatusManager.show(STATUS, 'error', 'pleaseAddAtLeastOneOutputFile');
+                submitBtn.disabled = false; return;
             }
 
             for (let fileItem of customFileItems) {
@@ -283,125 +241,94 @@ form.addEventListener('submit', async function(e) {
 
                 for (let rangeItem of rangeItems) {
                     const startPage = parseInt(rangeItem.querySelector('.customStartPage').value);
-                    const endPage = parseInt(rangeItem.querySelector('.customEndPage').value);
+                    const endPage   = parseInt(rangeItem.querySelector('.customEndPage').value);
 
                     if (startPage < 1 || endPage < 1 || startPage > endPage || startPage > totalPages || endPage > totalPages) {
-                        showStatus(getMessage('pageNumbersGreaterThanZero'), 'error');
-                        submitBtn.disabled = false;
-                        return;
+                        StatusManager.show(STATUS, 'error', 'pageNumbersGreaterThanZero');
+                        submitBtn.disabled = false; return;
                     }
-
-                    for (let pageIdx = startPage - 1; pageIdx < endPage; pageIdx++) {
-                        const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIdx]);
-                        newPdf.addPage(copiedPage);
+                    for (let i = startPage - 1; i < endPage; i++) {
+                        const [p] = await newPdf.copyPages(pdfDoc, [i]);
+                        newPdf.addPage(p);
                     }
                 }
                 pdfFiles.push(await newPdf.save());
             }
+
         } else if (splitMode === 'size') {
-            const maxSize = parseFloat(document.getElementById('maxFileSize').value);
+            const maxSize  = parseFloat(document.getElementById('maxFileSize').value);
             const sizeUnit = document.getElementById('sizeUnit').value;
 
             if (maxSize <= 0 || isNaN(maxSize)) {
-                showStatus(getMessage('pleaseEnterValidFileSize'), 'error');
-                submitBtn.disabled = false;
-                return;
+                StatusManager.show(STATUS, 'error', 'pleaseEnterValidFileSize');
+                submitBtn.disabled = false; return;
             }
 
-            let maxBytes;
-            switch (sizeUnit) {
-                case 'KB':
-                    maxBytes = maxSize * 1024;
-                    break;
-                case 'MB':
-                    maxBytes = maxSize * 1024 * 1024;
-                    break;
-                case 'GB':
-                    maxBytes = maxSize * 1024 * 1024 * 1024;
-                    break;
-                default:
-                    maxBytes = maxSize * 1024 * 1024;
-            }
+            const unitMap = { KB: 1024, MB: 1024 * 1024, GB: 1024 * 1024 * 1024 };
+            const maxBytes = maxSize * (unitMap[sizeUnit] || unitMap.MB);
 
             let minPageSize = Infinity;
-
             for (let i = 0; i < totalPages; i++) {
-                const singlePagePdf = await PDFDocument.create();
-                const [copiedPage] = await singlePagePdf.copyPages(pdfDoc, [i]);
-                singlePagePdf.addPage(copiedPage);
-                const singlePageBytes = await singlePagePdf.save();
-
-                if (singlePageBytes.length < minPageSize) {
-                    minPageSize = singlePageBytes.length;
-                }
+                const sp = await PDFDocument.create();
+                const [cp] = await sp.copyPages(pdfDoc, [i]);
+                sp.addPage(cp);
+                const bytes = await sp.save();
+                if (bytes.length < minPageSize) minPageSize = bytes.length;
             }
 
             if (maxBytes < minPageSize) {
-                const minSizeFormatted = formatFileSize(minPageSize);
-                showStatus(getMessage('cannotSplitMinSize', { size: minSizeFormatted }), 'error');
-                submitBtn.disabled = false;
-                return;
+                StatusManager.show(STATUS, 'error', 'cannotSplitMinSize', { size: formatFileSize(minPageSize) });
+                submitBtn.disabled = false; return;
             }
 
             let currentPage = 0;
-
             while (currentPage < totalPages) {
                 let newPdf = await PDFDocument.create();
                 await setMetadata(newPdf);
-
                 let pagesInCurrentFile = 0;
 
                 while (currentPage < totalPages) {
                     const tempPdf = await PDFDocument.create();
-
                     if (pagesInCurrentFile > 0) {
-                        const existingBytes = await newPdf.save();
-                        const existingPdf = await PDFDocument.load(existingBytes);
+                        const existingPdf = await PDFDocument.load(await newPdf.save());
                         const existingPages = await tempPdf.copyPages(existingPdf, existingPdf.getPageIndices());
-                        existingPages.forEach(page => tempPdf.addPage(page));
+                        existingPages.forEach(p => tempPdf.addPage(p));
                     }
-
                     const [nextPage] = await tempPdf.copyPages(pdfDoc, [currentPage]);
                     tempPdf.addPage(nextPage);
-
                     const tempBytes = await tempPdf.save();
 
-                    if (pagesInCurrentFile > 0 && tempBytes.length > maxBytes) {
-                        break;
-                    }
-
+                    if (pagesInCurrentFile > 0 && tempBytes.length > maxBytes) break;
                     if (pagesInCurrentFile === 0 && tempBytes.length > maxBytes) {
-                        const [copiedPage] = await newPdf.copyPages(pdfDoc, [currentPage]);
-                        newPdf.addPage(copiedPage);
+                        const [cp] = await newPdf.copyPages(pdfDoc, [currentPage]);
+                        newPdf.addPage(cp);
                         currentPage++;
                         pagesInCurrentFile++;
                         break;
                     }
 
-                    const [copiedPage] = await newPdf.copyPages(pdfDoc, [currentPage]);
-                    newPdf.addPage(copiedPage);
+                    const [cp] = await newPdf.copyPages(pdfDoc, [currentPage]);
+                    newPdf.addPage(cp);
                     currentPage++;
                     pagesInCurrentFile++;
                 }
 
-                if (pagesInCurrentFile > 0) {
-                    const newPdfBytes = await newPdf.save();
-                    pdfFiles.push(newPdfBytes);
-                }
+                if (pagesInCurrentFile > 0) pdfFiles.push(await newPdf.save());
             }
         }
 
-        // Now show Save As dialog
+        // Save dialog
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const originalFileName = file.name.replace('.pdf', '');
-        // Save as ZIP dialog
-        let outputPath = await ipcRenderer.invoke('show-save-dialog', {
+        const outputPath = await ipcRenderer.invoke('show-save-dialog', {
             defaultPath: path.join(downloadsPath, saveAsZip ? `${originalFileName}.zip` : `${originalFileName}.pdf`),
-            filters: saveAsZip ? [{ name: 'ZIP Files', extensions: ['zip'] }] : [{ name: 'PDF Files', extensions: ['pdf'] }]
+            filters: saveAsZip
+                ? [{ name: 'ZIP Files', extensions: ['zip'] }]
+                : [{ name: 'PDF Files', extensions: ['pdf'] }]
         });
 
         if (!outputPath) {
-            showStatus(getMessage('saveCancelled'), 'info');
+            StatusManager.show(STATUS, 'error', 'saveCancelled');
             submitBtn.disabled = false;
             return;
         }
@@ -418,17 +345,21 @@ form.addEventListener('submit', async function(e) {
             }
             const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
             await fs.writeFile(outputPath, zipContent);
-            showStatus(getMessage('successSplitFilesZip', { count: pdfFiles.length, path: outputFolder }), 'success');
         } else {
             for (let i = 0; i < pdfFiles.length; i++) {
                 await fs.writeFile(path.join(outputFolder, `${baseName}_${i + 1}.pdf`), pdfFiles[i]);
             }
-
-            showStatus(getMessage('successSplitFilesPath', { count: pdfFiles.length, path: outputFolder }), 'success');
         }
+
+        StatusManager.show(STATUS, 'success', 'successSplitFiles', {
+            count: pdfFiles.length,
+            filename: path.basename(outputPath),
+            savePath: outputPath
+        });
 
         submitBtn.disabled = false;
 
+        // Reset UI
         form.reset();
         fileNameDisplay.classList.remove('active');
         // Reset containers
@@ -445,36 +376,26 @@ form.addEventListener('submit', async function(e) {
         rangeModeContainer.style.display = 'none';
         everyModeContainer.style.display = 'none';
         customModeContainer.style.display = 'none';
-        sizeModeContainer.style.display = 'none';
-
+        sizeModeContainer.style.display   = 'none';
         const checkedMode = document.querySelector('input[name="splitMode"]:checked');
         if (checkedMode) {
-            if (checkedMode.value === 'range') {
-                rangeModeContainer.style.display = 'block';
-            } else if (checkedMode.value === 'every') {
-                everyModeContainer.style.display = 'block';
-            } else if (checkedMode.value === 'custom') {
-                customModeContainer.style.display = 'block';
-            } else if (checkedMode.value === 'size') {
-                sizeModeContainer.style.display = 'block';
-            }
+            if      (checkedMode.value === 'range')  rangeModeContainer.style.display  = 'block';
+            else if (checkedMode.value === 'every')  everyModeContainer.style.display  = 'block';
+            else if (checkedMode.value === 'custom') customModeContainer.style.display = 'block';
+            else if (checkedMode.value === 'size')   sizeModeContainer.style.display   = 'block';
         }
 
     } catch (error) {
-        showStatus(getMessage('errorPrefix') + error.message, 'error');
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
         submitBtn.disabled = false;
     }
 });
 
 function addRange() {
     let startVal = rangeCount;
-    let endVal = rangeCount;
-
+    let endVal   = rangeCount;
     // Pre-validate max limits if a PDF is already loaded
-    if (totalPdfPages > 0 && startVal > totalPdfPages) {
-        startVal = totalPdfPages;
-        endVal = totalPdfPages;
-    }
+    if (totalPdfPages > 0 && startVal > totalPdfPages) { startVal = totalPdfPages; endVal = totalPdfPages; }
 
     const rangeDiv = document.createElement('div');
     rangeDiv.className = 'rangeItem';
@@ -490,16 +411,13 @@ function addRange() {
         <button type="button" class="removeRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
 
-    // Attach real-time validation to inputs
-    const startInput = rangeDiv.querySelector('.startPage');
-    const endInput = rangeDiv.querySelector('.endPage');
-    attachRangeListeners(startInput, endInput);
+    attachRangeListeners(rangeDiv.querySelector('.startPage'), rangeDiv.querySelector('.endPage'));
 
     rangeDiv.querySelector('.removeRangeBtn').addEventListener('click', function() {
         if (rangesContainer.querySelectorAll('.rangeItem').length > 1) {
             rangeDiv.remove();
         } else {
-            showStatus(getMessage('atLeastOneRangeRequired'), 'error');
+            StatusManager.show(STATUS, 'error', 'atLeastOneRangeRequired');
         }
     });
 
@@ -524,7 +442,7 @@ function addCustomFile() {
 
     const rangesDiv = fileDiv.querySelector('.customFileRanges');
     addCustomRange(rangesDiv);
-    
+
     fileDiv.querySelector('.addCustomRangeBtn').addEventListener('click', function() {
         addCustomRange(rangesDiv);
         if (window.changeLanguage) window.changeLanguage(window.currentLanguage);
@@ -534,7 +452,7 @@ function addCustomFile() {
         if (customFilesContainer.querySelectorAll('.customFileItem').length > 1) {
             fileDiv.remove();
         } else {
-            showStatus(getMessage('atLeastOneFileRequired'), 'error');
+            StatusManager.show(STATUS, 'error', 'atLeastOneFileRequired');
         }
     });
 
@@ -545,18 +463,13 @@ function addCustomFile() {
 function addCustomRange(container) {
     let nextVal = 1;
     const existingRanges = container.querySelectorAll('.customRangeItem');
-    
     // Auto-increment logic: Start from the end of the previous range within this specific file
     if (existingRanges.length > 0) {
-        const lastEndInput = existingRanges[existingRanges.length - 1].querySelector('.customEndPage');
-        const lastEndPage = parseInt(lastEndInput.value) || 0;
-        nextVal = lastEndPage + 1;
+        const lastEnd = existingRanges[existingRanges.length - 1].querySelector('.customEndPage');
+        nextVal = (parseInt(lastEnd.value) || 0) + 1;
     }
-
     // Pre-validate max limits if a PDF is already loaded
-    if (totalPdfPages > 0 && nextVal > totalPdfPages) {
-        nextVal = totalPdfPages;
-    }
+    if (totalPdfPages > 0 && nextVal > totalPdfPages) nextVal = totalPdfPages;
 
     const rangeDiv = document.createElement('div');
     rangeDiv.className = 'customRangeItem';
@@ -572,24 +485,17 @@ function addCustomRange(container) {
         <button type="button" class="removeCustomRangeBtn langText" data-i18n="removeBtn">Remove</button>
     `;
 
-    // Attach real-time validation to inputs
-    const startInput = rangeDiv.querySelector('.customStartPage');
-    const endInput = rangeDiv.querySelector('.customEndPage');
-    attachRangeListeners(startInput, endInput);
+    attachRangeListeners(rangeDiv.querySelector('.customStartPage'), rangeDiv.querySelector('.customEndPage'));
 
     rangeDiv.querySelector('.removeCustomRangeBtn').addEventListener('click', function() {
         if (container.querySelectorAll('.customRangeItem').length > 1) {
             rangeDiv.remove();
         } else {
-            showStatus(getMessage('eachFileMustHaveRange'), 'error');
+            StatusManager.show(STATUS, 'error', 'eachFileMustHaveRange');
         }
     });
-    container.appendChild(rangeDiv);
-}
 
-function showStatus(message, type) {
-    statusDiv.textContent = message;
-    statusDiv.className = 'status ' + type;
+    container.appendChild(rangeDiv);
 }
 
 function updateFileSizeInfo() {
@@ -604,7 +510,7 @@ function updateFileSizeInfo() {
 
 function formatFileSize(bytes) {
     if (bytes >= 1073741824) return (bytes / 1073741824).toFixed(2) + ' GB';
-    if (bytes >= 1048576) return (bytes / 1048576).toFixed(2) + ' MB';
-    if (bytes >= 1024) return (bytes / 1024).toFixed(2) + ' KB';
+    if (bytes >= 1048576)    return (bytes / 1048576).toFixed(2) + ' MB';
+    if (bytes >= 1024)       return (bytes / 1024).toFixed(2) + ' KB';
     return bytes + ' B';
 }

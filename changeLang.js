@@ -77,7 +77,6 @@ const languages = {
         startPageLabel: "Start page:",
         endPageLabel: "End page:",
         rangeError: "At least one range is required",
-        createdSuccesful: '✓ Successfully created ${successCount} file(s) in Downloads folder',
         totalPagesInfo: "Total pages: {total}",
         // Split PDF messages
         pleaseSelectFile: "Please select a PDF file",
@@ -89,7 +88,7 @@ const languages = {
         pleaseAddAtLeastOneOutputFile: "Please add at least one output file",
         pleaseEnterValidFileSize: "Please enter a valid file size",
         cannotSplitMinSize: "Cannot split: minimum required size is {size} (smallest page size)",
-        successSplitFiles: "✓ Successfully created {count} file(s) in Downloads folder!",
+        successSplitFiles: "✓ {count} file(s) created successfully: {filename}",
         successSplitFilesPath: "✓ Saved {count} file(s) in:\n{path}",
         successSplitFilesZip: "✓ Saved {count} file(s) as ZIP in:\n{path}",
         atLeastOneRangeRequired: "You must have at least one range",
@@ -129,13 +128,15 @@ const languages = {
         pdfToImageOutputName: "Output file name prefix:",
         pdfToImageNamesExample: "Files will be named: prefix_1.png, prefix_2.png etc.",
         pdfToImageSubmitBtn: "Convert to Images",
+        showPreview: "Show preview",
+        hidePreview: "Hide preview",
         // PDF to Image messages
         loadingPdf: "Loading PDF...",
         errorLoadingPdf: "Error loading PDF: {error}",
         pleaseSelectPdfFirst: "Please select a PDF file first",
         convertingPages: "Converting {count} page(s) to images...",
         convertingPage: "Converting page {current} of {total}...",
-        successConverted: "✓ Successfully converted {count} page(s) to {format} images",
+        successConverted: "✓ {count} page(s) converted to {format}: {filename}",
         successConvertedPath: "✓ Saved {count} {format} image(s) in:\n{path}",
         successConvertedZip: "✓ Saved {count} {format} image(s) as ZIP in:\n{path}",
 
@@ -224,6 +225,7 @@ const languages = {
         errorPrefix: "Error: ",
         processing: "Processing",
         saveCancelled: "Save cancelled",
+        statusOpenFolder: "Open folder",
 
         // PowerPoint to PDF
         powerPointToPdfText: "PowerPoint to PDF",
@@ -397,7 +399,6 @@ const languages = {
         startPageLabel: "Pagina iniziale:",
         endPageLabel: "Pagina finale:",
         rangeError: "Almeno una fascia è richiesta",
-        createdSuccesful: '✓ Creato con successo ${successCount} file in cartella Download',
         totalPagesInfo: "Pagine totali: {total}",
         // Split PDF messages
         pleaseSelectFile: "Seleziona un file PDF",
@@ -409,7 +410,7 @@ const languages = {
         pleaseAddAtLeastOneOutputFile: "Aggiungi almeno un file di output",
         pleaseEnterValidFileSize: "Inserisci una dimensione file valida",
         cannotSplitMinSize: "Impossibile dividere: la dimensione minima richiesta è {size} (dimensione pagina più piccola)",
-        successSplitFiles: "✓ Creati con successo {count} file nella cartella Download!",
+        successSplitFiles: "✓ {count} file creato/i con successo: {filename}",
         successSplitFilesPath: "✓ Salvati {count} file in:\n{path}",
         successSplitFilesZip: "✓ Salvati {count} file come ZIP in:\n{path}",
         atLeastOneRangeRequired: "Devi avere almeno un intervallo",
@@ -449,13 +450,15 @@ const languages = {
         pdfToImageOutputName: "Prefisso nome file di output:",
         pdfToImageNamesExample: "I file saranno denominati: prefisso_1.png, prefisso_2.png ecc.",
         pdfToImageSubmitBtn: "Converti in Immagini",
+        showPreview: "Mostra anteprima",
+        hidePreview: "Nascondi anteprima",
         // PDF to Image messages
         loadingPdf: "Caricamento PDF...",
         errorLoadingPdf: "Errore nel caricamento del PDF: {error}",
         pleaseSelectPdfFirst: "Seleziona prima un file PDF",
-        convertingPages: "Conversione di {count} pagina/e in immagini...",
+        convertingPages: "Conversione di {count} pagina in immagini...",
         convertingPage: "Conversione pagina {current} di {total}...",
-        successConverted: "✓ Convertite con successo {count} pagina/e in immagini {format}",
+        successConverted: "✓ {count} pagina convertita in {format}: {filename}",
         successConvertedPath: "✓ Salvate {count} immagini {format} in:\n{path}",
         successConvertedZip: "✓ Salvate {count} immagini {format} come ZIP in:\n{path}",
 
@@ -545,6 +548,7 @@ const languages = {
         errorPrefix: "Errore: ",
         processing: "Elaborazione",
         saveCancelled: "Salvataggio annullato",
+        statusOpenFolder: "Apri cartella",
 
         // PowerPoint to PDF
         powerPointToPdfText: "PowerPoint in PDF",
@@ -718,7 +722,6 @@ const languages = {
         startPageLabel: "Strona początkowa:",
         endPageLabel: "Strona końcowa:",
         rangeError: "Wymagany jest co najmniej jeden zakres",
-        createdSuccesful: '✓ Pomyślnie utworzono ${successCount} plik(ów) w folderze Pobrane',
         totalPagesInfo: "Całkowita liczba stron: {total}",
         // Split PDF messages
         pleaseSelectFile: "Proszę wybrać plik PDF",
@@ -730,7 +733,7 @@ const languages = {
         pleaseAddAtLeastOneOutputFile: "Dodaj co najmniej jeden plik wyjściowy",
         pleaseEnterValidFileSize: "Wprowadź prawidłowy rozmiar pliku",
         cannotSplitMinSize: "Nie można podzielić: minimalny wymagany rozmiar to {size} (rozmiar najmniejszej strony)",
-        successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów) w folderze Pobrane!",
+        successSplitFiles: "✓ Pomyślnie utworzono {count} plik(ów): {filename}",
         successSplitFilesPath: "✓ Zapisano {count} plik(ów) w:\n{path}",
         successSplitFilesZip: "✓ Zapisano {count} plik(ów) jako ZIP w:\n{path}",
         atLeastOneRangeRequired: "Musisz mieć co najmniej jeden zakres",
@@ -770,13 +773,15 @@ const languages = {
         pdfToImageOutputName: "Prefiks nazwy pliku wynikowego:",
         pdfToImageNamesExample: "Pliki będą nazwane: prefiks_1.png, prefiks_2.png itd.",
         pdfToImageSubmitBtn: "Konwertuj na Obrazy",
+        showPreview: "Pokaż podgląd",
+        hidePreview: "Ukryj podgląd",
         // PDF to Image messages
         loadingPdf: "Ładowanie PDF...",
         errorLoadingPdf: "Błąd ładowania PDF: {error}",
         pleaseSelectPdfFirst: "Najpierw wybierz plik PDF",
         convertingPages: "Konwersja {count} stron(y) na obrazy...",
         convertingPage: "Konwersja strony {current} z {total}...",
-        successConverted: "✓ Pomyślnie przekonwertowano {count} stron(y) na obrazy {format}",
+        successConverted: "✓ Pomyślnie przekonwertowano {count} stron(y) do {format}: {filename}",
         successConvertedPath: "✓ Zapisano {count} obraz(ów) {format} w:\n{path}",
         successConvertedZip: "✓ Zapisano {count} obraz(ów) {format} jako ZIP w:\n{path}",
 
@@ -866,6 +871,7 @@ const languages = {
         errorPrefix: "Błąd: ",
         processing: "Przetwarzanie",
         saveCancelled: "Zapisywanie anulowane",
+        statusOpenFolder: "Otwórz folder",
 
         // PowerPoint to PDF
         powerPointToPdfText: "PowerPoint do PDF",
@@ -1018,10 +1024,8 @@ const languages = {
         mergeSubmitBtn: "Unir PDF",
         outputName: "documento_unido",
         // Merge PDF messages
-        pleaseSelectAtLeastOnePdf: "Por favor, selecciona al menos un archivo PDF",
         pleaseSelectAtLeastTwoPdfs: "Por favor, selecciona al menos dos archivos PDF para unir",
         processingFiles: "Procesando {count} archivo(s)...",
-        successMerged: "✓ ¡PDF unido creado con éxito: {filename} en la carpeta de Descargas!",
 
         // Split PDF
         splitHeader: "Dividir PDF",
@@ -1036,7 +1040,6 @@ const languages = {
         startPageLabel: "Página de inicio:",
         endPageLabel: "Página final:",
         rangeError: "Se requiere al menos un rango",
-        createdSuccesful: '✓ Creado correctamente ${successCount} archivo(s) en la carpeta de descargas',
         totalPagesInfo: "Páginas totales: {total}",
         // Split PDF messages
         pleaseSelectFile: "Por favor, selecciona un archivo PDF",
@@ -1048,7 +1051,7 @@ const languages = {
         pleaseAddAtLeastOneOutputFile: "Por favor, añade al menos un archivo de salida",
         pleaseEnterValidFileSize: "Por favor, introduce un tamaño de archivo válido",
         cannotSplitMinSize: "No se puede dividir: el tamaño mínimo requerido es {size} (tamaño de la página más pequeña)",
-        successSplitFiles: "✓ {count} archivo(s) creado(s) correctamente en la carpeta Descargas",
+        successSplitFiles: "✓ {count} archivo(s) creado(s) correctamente: {filename}",
         atLeastOneRangeRequired: "Debe haber al menos un rango",
         atLeastOneFileRequired: "Debe haber al menos un archivo de salida",
         eachFileMustHaveRange: "Cada archivo debe tener al menos un rango",
@@ -1064,9 +1067,6 @@ const languages = {
         imageToPdfSubmitBtn: "Crear PDF",
         // Image to PDF messages
         pleaseSelectAtLeastOneImage: "Por favor, selecciona al menos una imagen",
-        creatingPdf: "Creando PDF...",
-        successPdfCreated: "✓ PDF creado con éxito: {filename}",
-        successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
 
         // Custom Metadata
         addCustomMetadata: "Agregar propiedades de metadatos personalizadas",
@@ -1085,13 +1085,15 @@ const languages = {
         pdfToImageOutputName: "Prefijo del nombre del archivo de salida:",
         pdfToImageNamesExample: "Las páginas se llamarán: prefijo_1.png, prefijo_2.png etc.",
         pdfToImageSubmitBtn: "Convertir a Images",
+        showPreview: "Mostrar vista previa",
+        hidePreview: "Ocultar vista previa",
         // PDF to Image messages
         loadingPdf: "Cargando PDF...",
         errorLoadingPdf: "Error al cargar el PDF: {error}",
         pleaseSelectPdfFirst: "Por favor, selecciona primero un archivo PDF",
         convertingPages: "Convirtiendo {count} página(s) a imágenes...",
         convertingPage: "Convirtiendo página {current} de {total}...",
-        successConverted: "✓ Se han convertido con éxito {count} página(s) a imágenes {format}",
+        successConverted: "✓ {count} página(s) convertida(s) a {format}: {filename}",
         successConvertedPath: "✓ Guardadas {count} imágene(s) {format} en:\n{path}",
         successConvertedZip: "✓ Guardadas {count} imágene(s) {format} como ZIP en:\n{path}",
 
@@ -1143,7 +1145,6 @@ const languages = {
         pleaseSelectDocx: "Por favor, selecciona un archivo .docx",
         convertingDocx: "Convirtiendo documento Word...",
         successDocxCreated: "✓ PDF generado correctamente",
-        successPdfCreatedPath: "✓ PDF guardado: {filename}\nen: {path}",
         errorDocx: "Error al convertir el Docx: ",
 
         // PowerPoint to PDF messages
@@ -1162,10 +1163,6 @@ const languages = {
         // Delete pages messages
         loadingPreview: 'Cargando vista previa...',
         mustLeaveAtLeastOnePage: 'Debes dejar al menos una pagina sin seleccionar.',
-        processing: 'Procesando...',
-        successDeleted: 'PDF creado correctamente: {filename}',
-        saveCancelled: 'Guardado cancelado',
-        errorPrefix: 'Error: ',
 
         // PDF to DOCX
         pdfToDocxHeader: "PDF a DOCX",
@@ -1174,13 +1171,14 @@ const languages = {
         pdfToDocxSelectButton: "Haz clic para seleccionar el archivo",
         pdfToDocxOutputLabel: "Nombre del archivo de salida:",
         pdfToDocxSubmitBtn: "Convertir a DOCX",
-        // PDF to DOCX messages
-        successPdfConverted: "✓ PDF convertido a DOCX correctamente: {filename} en la carpeta Descargas",
 
         // General / Shared messages
-        errorPrefix: "Error: ",
-        processing: "Procesando",
+        errorPrefix: "Error: {error}",
+        processing: "Procesando...",
         saveCancelled: "Guardado cancelado",
+        statusOpenFolder: "Abrir carpeta",
+        successPdfCreated: "PDF creado correctamente: {filename}",
+        successPdfConverted: "{format} creado correctamente: {filename}",
 
         // PowerPoint to PDF
         powerPointToPdfText: "PowerPoint a PDF",
@@ -1196,7 +1194,6 @@ const languages = {
         pdfToPptxSelectLabel: "Seleccionar archivo PDF:",
         pdfToPptxSelectButton: "Haz clic para seleccionar el archivo",
         pdfToPptxSubmitBtn: "Convertir a PowerPoint",
-        successPdfConvertedToPptx: "✓ PDF convertido a PowerPoint con éxito: {filename}",
 
         // PDF by template
         pdfByTemplateText: "PDF por Plantilla",

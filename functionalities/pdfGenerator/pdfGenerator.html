@@ -23,25 +23,31 @@
 
             <form id="pdfGeneratorForm">
                 <div class="formGroup">
-                    <label for="docxTemplate" id="pdfByTemplateDocxLabel" class="langText">1. Select the template (.docx):</label>
+                    <label for="docxTemplate" id="pdfByTemplateDocxLabel" class="langText">1. Select the template
+                        (.docx):</label>
                     <div class="fileInputWrapper">
                         <input type="file" id="docxTemplate" accept=".docx" required>
-                        <label for="docxTemplate" class="fileInputLabel langText" id="pdfByTemplateDocxBtn">Click to select Word file</label>
+                        <label for="docxTemplate" class="fileInputLabel langText" id="pdfByTemplateDocxBtn">Click to
+                            select Word file</label>
                     </div>
                     <div id="docxInfo" class="file-status-text"></div>
                 </div>
 
                 <div class="formGroup step-margin">
-                    <label for="excelData" id="pdfByTemplateExcelLabel" class="langText">2. Select the data (.xlsx, .csv):</label>
+                    <label for="excelData" id="pdfByTemplateExcelLabel" class="langText">2. Select the data (.xlsx,
+                        .csv):</label>
                     <div class="fileInputWrapper">
                         <input type="file" id="excelData" accept=".xlsx, .xls, .csv" required>
-                        <label for="excelData" class="fileInputLabel langText" id="pdfByTemplateExcelBtn">Click to select Excel file</label>
+                        <label for="excelData" class="fileInputLabel langText" id="pdfByTemplateExcelBtn">Click to
+                            select Excel file</label>
                     </div>
                     <div id="excelInfo" class="file-status-text"></div>
 
                     <div class="infoBox">
                         <p class="infoTitle langText" id="pdfByTemplateInfoTitle">Required format for Excel/CSV</p>
-                        <p class="infoText langText" id="pdfByTemplateInfoText">The first row must contain exactly the same names you placed in double curly braces in the Word document (e.g., {{COMPANY}}). Each row below will generate a new PDF.</p>
+                        <p class="infoText langText" id="pdfByTemplateInfoText">The first row must contain exactly the
+                            same names you placed in double curly braces in the Word document (e.g., {{COMPANY}}). Each
+                            row below will generate a new PDF.</p>
                         <table class="exampleTable">
                             <tr>
                                 <th class="langText" id="pdfByTemplateCompany">COMPANY</th>
@@ -61,7 +67,8 @@
 
                 <div class="formGroup step-margin">
                     <label for="baseFileName" id="pdfByTemplateNameLabel" class="langText">Base name for PDFs:</label>
-                    <input type="text" id="baseFileName" class="textInput langTextPlaceholder" placeholder="e.g., Confidentiality_Agreement" required>
+                    <input type="text" id="baseFileName" class="textInput langTextPlaceholder"
+                        placeholder="e.g., Confidentiality_Agreement" required>
                 </div>
 
                 <button type="submit" class="submitBtn" id="submitBtn">
@@ -83,9 +90,11 @@
     </main>
 
     <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
     <script src="./../../settings.js"></script>
     <script src="./../customMetadata.js"></script>
     <script src="./pdfGenerator.js"></script>
     <script src="../engineWarning.js"></script>
 </body>
+
 </html>

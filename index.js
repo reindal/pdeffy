@@ -238,7 +238,25 @@ function createWindow() {
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
     });
+    
+    // Ctrl+Shift+I (o Cmd+Option+I en Mac) para toggle DevTools
+    mainWindow.webContents.on('before-input-event', (event, input) => {
+        const isDevToolsShortcut =
+            input.type === 'keyDown' &&
+            input.key === 'I' &&
+            input.shift &&
+            (process.platform === 'darwin' ? input.meta : input.control);
+
+            if (isDevToolsShortcut) {
+                mainWindow.webContents.toggleDevTools();
+                event.preventDefault();
+            }
+        });
 }
+
+ipcMain.handle('open-folder', (_, folderPath) => {
+    shell.openPath(folderPath);
+});
 
 function setTranslatedMenu(appVersion, language) {
     let menuFile, menuExit, menuHelp, menuAbout, textVersion, textAuthor, textLicense, textDesc;

@@ -2,11 +2,11 @@ const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
+const STATUS = '#status';
 
 const form = document.getElementById('mergeForm');
 const pdfFiles = document.getElementById('pdfFiles');
 const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
 const filesOrderContainer = document.getElementById('filesOrderContainer');
 
 let selectedFiles = [];
@@ -100,17 +100,12 @@ function handleDragEnd(e) {
 form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    if (selectedFiles.length === 0) {
-        showStatus(getMessage('pleaseSelectAtLeastOnePdf'), 'error');
+    if (selectedFiles.length < 2) {
+        StatusManager.show(STATUS, 'error', 'pleaseSelectAtLeastTwoPdfs');
         return;
     }
 
-    if (selectedFiles.length === 1) {
-        showStatus(getMessage('pleaseSelectAtLeastTwoPdfs'), 'error');
-        return;
-    }
-
-    showStatus(getMessage('processingFiles', { count: selectedFiles.length }), 'success');
+    StatusManager.show(STATUS, 'processing', 'processingFiles', { count: selectedFiles.length });
     submitBtn.disabled = true;
 
     try {
@@ -146,7 +141,7 @@ form.addEventListener('submit', async function (e) {
         });
 
         if (!filePath) {
-            showStatus('saveCancelled', 'error');
+            StatusManager.show(STATUS, 'error', 'saveCancelled');
             submitBtn.disabled = false;
             return;
         }
@@ -163,7 +158,10 @@ form.addEventListener('submit', async function (e) {
             }
         }
 
-        showStatus(getMessage('successMerged', { filename: path.basename(filePath) }), 'success');
+        StatusManager.show(STATUS, 'success', 'successPdfCreated', {
+            filename: path.basename(filePath),
+            savePath: filePath
+        });
         submitBtn.disabled = false;
 
         form.reset();
@@ -171,15 +169,10 @@ form.addEventListener('submit', async function (e) {
         updateFilesOrder();
         pdfFiles.value = '';
         CustomMetadataModule.reset();
+
     } catch (error) {
         console.error('Error merging PDFs:', error);
-        showStatus(getMessage('errorPrefix') + error.message, 'error');
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
         submitBtn.disabled = false;
     }
 });
-
-function showStatus(message, type) {
-    statusDiv.textContent = message;
-    statusDiv.className = 'status ' + type;
-}
-

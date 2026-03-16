@@ -8,13 +8,13 @@ const XLSX = require('xlsx');
 const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 const JSZip = require('jszip');
+const STATUS = '#status';
 
 const form = document.getElementById('pdfGeneratorForm');
 const docxInput = document.getElementById('docxTemplate');
 const excelInput = document.getElementById('excelData');
 const baseFileNameInput = document.getElementById('baseFileName');
 const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
 
 // UI Elements
 const docxInfo = document.getElementById('docxInfo');
@@ -50,7 +50,7 @@ form.addEventListener('submit', async function(e) {
     
     try {
         // 1. Read input data from Excel/CSV
-        showStatus(getLocalMessage('readingExcel'), 'info');
+        StatusManager.show(STATUS, 'processing', 'readingExcel');
         const excelBuffer = await selectedExcelFile.arrayBuffer();
         const workbook = XLSX.read(excelBuffer, { type: 'buffer' });
         const firstSheetName = workbook.SheetNames[0];
@@ -60,7 +60,7 @@ form.addEventListener('submit', async function(e) {
         const excelData = XLSX.utils.sheet_to_json(worksheet);
 
         if (excelData.length === 0) {
-            throw new Error(getLocalMessage('errorEmptyExcel'));
+            throw new Error(getMessage('errorEmptyExcel'));
         }
 
         // 2. Prompt user for output ZIP location before starting heavy processing
@@ -95,7 +95,7 @@ form.addEventListener('submit', async function(e) {
             const currentFileName = `${baseName}_${i + 1}`;
             
             // Update progress UI
-            showStatus(getLocalMessage('generatingItem', { current: i + 1, total: excelData.length }), 'info');
+            StatusManager.show(STATUS, 'processing', 'generatingItem', { current: i + 1, total: excelData.length });
             progressBar.style.width = `${(i / excelData.length) * 100}%`;
             progressText.textContent = `${i} / ${excelData.length}`;
 
@@ -134,13 +134,15 @@ form.addEventListener('submit', async function(e) {
         }
 
         // 5. Finalize archive creation and global cleanup
-        showStatus(getLocalMessage('savingZip'), 'info');
+        StatusManager.show(STATUS, 'processing', 'savingZip');
         const zipContent = await finalZip.generateAsync({ type: 'nodebuffer' });
         await fs.writeFile(zipOutputPath, zipContent);
         
         try { await fs.rmdir(sessionTempDir); } catch (e) {}
 
-        showStatus(getLocalMessage('successGeneration'), 'success');
+        StatusManager.show(STATUS, 'success', 'successGeneration', {
+            savePath: zipOutputPath
+        });
 
         setTimeout(() => {
             form.reset();
@@ -155,32 +157,8 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error in Generator process:', error);
-        showStatus(error.message, 'error');
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
     } finally {
         submitBtn.disabled = false;
     }
 });
-
-function showStatus(message, type) {
-    statusDiv.textContent = message;
-    statusDiv.className = `status ${type}`;
-    statusDiv.style.display = 'block';
-}
-
-function getLocalMessage(key, params = {}) {
-    if (typeof window.getMessage === 'function') {
-        return window.getMessage(key, params);
-    }
-    const fallbacks = {
-        readingExcel: "Reading Excel data...",
-        errorEmptyExcel: "The Excel file is empty or could not be read.",
-        generatingItem: "Generating PDF {current} of {total}...",
-        savingZip: "Compressing all PDFs into a ZIP file...",
-        successGeneration: "✓ PDF batch generated and saved successfully!"
-    };
-    let text = fallbacks[key] || key;
-    if (params.current) {
-        text = text.replace('{current}', params.current).replace('{total}', params.total);
-    }
-    return text;
-}

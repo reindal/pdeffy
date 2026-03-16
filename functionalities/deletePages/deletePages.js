@@ -6,6 +6,8 @@ const path = require('path');
 // Initialize PDF.js worker
 window.pdfjsLib.GlobalWorkerOptions.workerSrc = './libs/pdf.worker.min.js';
 
+const STATUS = '#status'; // single source of truth for the container selector
+
 const form = document.getElementById('deleteForm');
 const fileInput = document.getElementById('pdfFile');
 const pagesPreview = document.getElementById('pagesPreview');
@@ -14,7 +16,6 @@ const previewSection = document.getElementById('pagesPreviewSection');
 const previewHeaderBtn = document.getElementById('previewHeaderBtn');
 const previewToggleIcon = document.getElementById('previewToggleIcon');
 const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
 
 let currentLang = 'en';
 let originalFileBuffer = null;
@@ -124,12 +125,12 @@ form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
     if (pagesToDelete.size === 0 || pagesToDelete.size === totalPages) {
-        showStatus('You must leave at least one page in the document', 'error');
+        StatusManager.show(STATUS, 'error', 'mustLeaveAtLeastOnePage');
         return;
     }
 
     submitBtn.disabled = true;
-    showStatus('Processing...', 'info');
+    StatusManager.show(STATUS, 'processing', 'processing');
 
     try {
         const pdfDoc = await PDFDocument.load(originalFileBuffer.slice(0));
@@ -143,57 +144,43 @@ form.addEventListener('submit', async function (e) {
 
         // Remove pages in descending order to prevent index shifting issues
         const sortedIndices = Array.from(pagesToDelete).sort((a, b) => b - a);
-        sortedIndices.forEach(index => {
-            pdfDoc.removePage(index);
-        });
+        sortedIndices.forEach(index => pdfDoc.removePage(index));
 
         const pdfBytes = await pdfDoc.save();
-        const fileName = `cleaned_${Date.now()}.pdf`;
+        const filename = `cleaned_${Date.now()}.pdf`;
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const savePath = await ipcRenderer.invoke('show-save-dialog', {
-            defaultPath: path.join(downloadsPath, fileName),
+            defaultPath: path.join(downloadsPath, filename),
             filters: [{ name: 'PDF Files', extensions: ['pdf'] }]
         });
 
         if (!savePath) {
-            showStatus('Save cancelled', 'info');
+            StatusManager.show(STATUS, 'error', 'saveCancelled');
             submitBtn.disabled = false;
             return;
         }
 
         await fs.writeFile(savePath, pdfBytes);
-        showStatus(`PDF saved successfully: ${path.basename(savePath)}`, 'success');
 
-        // Reset custom metadata state post-processing
-        setTimeout(() => {
-            CustomMetadataModule.reset();
-        }, 2000);
-        
-        // Reset UI state
+        StatusManager.show(STATUS, 'success', 'successPdfCreated', {
+            filename: path.basename(savePath),
+            savePath: savePath
+        });
+
+        setTimeout(() => CustomMetadataModule.reset(), 2000);
+
+        // Reset UI
         pagesPreview.style.display = 'none';
         form.reset();
         pagesToDelete.clear();
         
     } catch (error) {
         console.error(error);
-        showStatus('Error: ' + error.message, 'error');
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
     } finally {
         submitBtn.disabled = false;
     }
 });
-
-function showStatus(message, type) {
-    statusDiv.textContent = message;
-    statusDiv.className = 'status ' + type;
-    statusDiv.style.display = 'block';
-
-    // Auto-hide success messages after 5 seconds
-    if (type === 'success') {
-        setTimeout(() => {
-            statusDiv.style.display = 'none';
-        }, 5000);
-    }
-}
 
 window.addEventListener('languageChanged', () => {
     // Refresh status message if visible
