@@ -113,7 +113,7 @@ function validateColor() {
 function updateFileNameDisplay() {
     if (selectedFile && fileNameDiv) {
         const prefix = window.getMessage ? window.getMessage('selectedFile') : 'Selected: ';
-        fileNameDiv.textContent = `✓ ${prefix}${selectedFile.name}`;
+        fileNameDiv.textContent = `${prefix}${selectedFile.name}`;
     }
 }
 

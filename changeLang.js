@@ -300,6 +300,34 @@ const languages = {
         // Save as ZIP checkbox
         saveAsZipLabel: "Save as ZIP",
 
+        // --- index.html card ---
+        compressPdfTile: "Compress PDF",
+        compressPdfTileDesc: "Reduce PDF file size",
+
+        // --- compressPdf.html ---
+        compressPdfHeader: "Compress PDF",
+        compressPdfHeader2: "Reduce PDF file size",
+        compressSelectLabel: "Select PDF file:",
+        compressSelectButton: "Click to select file",
+        compressQualityLabel: "Compression level:",
+        qualityScreenName: "Maximum",
+        qualityScreenDesc: "72 DPI · Smallest file",
+        qualityEbookName: "Balanced",
+        qualityEbookDesc: "150 DPI · Recommended",
+        qualityPrinterName: "High quality",
+        qualityPrinterDesc: "300 DPI · For printing",
+        compressSubmitBtn: "Compress PDF",
+        compressSaved: "-{pct}% · {size}",
+        compressNoReduction: "No reduction achieved",
+
+        // --- ghostscriptWarning.js ---
+        gsWarningTitle: "Ghostscript not found",
+        gsWarningDescLinux: "Ghostscript is required to compress PDFs but was not found on your system. Install it by running the following command in a terminal:",
+        gsWarningDescMac: "Ghostscript is required to compress PDFs but is not installed on your Mac. Recommended option for all users: download and install the package from the link below.",
+        gsWarningMacDownloadBtn: "Download Ghostscript",
+        gsWarningMacAdvanced: "Advanced users (Homebrew):",
+        gsWarningBtn: "Understood",
+
         // Settings
         settingsTitle: "Settings",
         changeLanguageTitle: "Change Language:",
@@ -623,6 +651,30 @@ const languages = {
         // Save as ZIP checkbox
         saveAsZipLabel: "Salva come ZIP",
 
+        compressPdfTile: "Comprimi PDF",
+        compressPdfTileDesc: "Riduci le dimensioni del file PDF",
+
+        compressPdfHeader: "Comprimi PDF",
+        compressPdfHeader2: "Riduci le dimensioni del file PDF",
+        compressSelectLabel: "Seleziona un file PDF:",
+        compressSelectButton: "Clicca per selezionare il file",
+        compressQualityLabel: "Livello di compressione:",
+        qualityScreenName: "Massima",
+        qualityScreenDesc: "72 DPI · File più piccolo",
+        qualityEbookName: "Bilanciata",
+        qualityEbookDesc: "150 DPI · Consigliata",
+        qualityPrinterName: "Alta qualità",
+        qualityPrinterDesc: "300 DPI · Per la stampa",
+        compressSubmitBtn: "Comprimi PDF",
+        compressSaved: "-{pct}% · {size}",
+        compressNoReduction: "Nessuna riduzione ottenuta",
+
+        gsWarningTitle: "Ghostscript non trovato",
+        gsWarningDescLinux: "Ghostscript è necessario per comprimere i PDF ma non è stato trovato sul sistema. Installalo eseguendo il seguente comando nel terminale:",
+        gsWarningDescMac: "Ghostscript è necessario per comprimere i PDF ma non è installato sul tuo Mac. Opzione consigliata per tutti gli utenti: scarica e installa il pacchetto dal link seguente.",
+        gsWarningMacDownloadBtn: "Scarica Ghostscript",
+        gsWarningMacAdvanced: "Utenti avanzati (Homebrew):",
+        gsWarningBtn: "Capito",
         // Settings
         settingsTitle: "Impostazioni",
         changeLanguageTitle: "Cambiare Lingua:",
@@ -946,6 +998,30 @@ const languages = {
         // Save as ZIP checkbox
         saveAsZipLabel: "Zapisz jako ZIP",
 
+        compressPdfTile: "Kompresuj PDF",
+        compressPdfTileDesc: "Zmniejsz rozmiar pliku PDF",
+
+        compressPdfHeader: "Kompresuj PDF",
+        compressPdfHeader2: "Zmniejsz rozmiar pliku PDF",
+        compressSelectLabel: "Wybierz plik PDF:",
+        compressSelectButton: "Kliknij, aby wybrać plik",
+        compressQualityLabel: "Poziom kompresji:",
+        qualityScreenName: "Maksymalna",
+        qualityScreenDesc: "72 DPI · Najmniejszy plik",
+        qualityEbookName: "Zrównoważona",
+        qualityEbookDesc: "150 DPI · Zalecana",
+        qualityPrinterName: "Wysoka jakość",
+        qualityPrinterDesc: "300 DPI · Do druku",
+        compressSubmitBtn: "Kompresuj PDF",
+        compressSaved: "-{pct}% · {size}",
+        compressNoReduction: "Nie udało się zmniejszyć pliku",
+
+        gsWarningTitle: "Nie znaleziono Ghostscript",
+        gsWarningDescLinux: "Ghostscript jest wymagany do kompresji plików PDF, ale nie został znaleziony w systemie. Zainstaluj go, wykonując następujące polecenie w terminalu:",
+        gsWarningDescMac: "Ghostscript jest wymagany do kompresji plików PDF, ale nie jest zainstalowany na Twoim Macu. Zalecana opcja dla wszystkich użytkowników: pobierz i zainstaluj pakiet z poniższego linku.",
+        gsWarningMacDownloadBtn: "Pobierz Ghostscript",
+        gsWarningMacAdvanced: "Zaawansowani użytkownicy (Homebrew):",
+        gsWarningBtn: "Rozumiem",
         // Settings
         settingsTitle: "Ustawienia",
         changeLanguageTitle: "Zmienić Język:",
@@ -993,7 +1069,7 @@ const languages = {
         mergePdfDesc: "Unir tus documentos PDF en un solo archivo.",
         imageToPdfText: "Imagen a PDF",
         imageToPdfDesc: "Convertir uno o mas imágenes en un documento PDF.",
-        pdfToImageText: "PDF to Image",
+        pdfToImageText: "PDF a Imagen",
         pdfToImageDesc: "Convertir páginas PDF en imágenes.",
         watermarkText: "Añadir Marca de Agua",
         watermarkDesc: "Añadir una marca de agua a tu documento PDF.",
@@ -1251,6 +1327,34 @@ const languages = {
 
         // Save as ZIP checkbox
         saveAsZipLabel: "Guardar como ZIP",
+
+        // --- index.html card ---
+        compressPdfTile: "Comprimir PDF",
+        compressPdfTileDesc: "Reduce el tamaño del archivo PDF",
+
+        // --- compressPdf.html ---
+        compressPdfHeader: "Comprimir PDF",
+        compressPdfHeader2: "Reduce el tamaño del archivo PDF",
+        compressSelectLabel: "Selecciona un archivo PDF:",
+        compressSelectButton: "Haz clic para seleccionar",
+        compressQualityLabel: "Nivel de compresión:",
+        qualityScreenName: "Máxima",
+        qualityScreenDesc: "72 PPP · Archivo más pequeño",
+        qualityEbookName: "Equilibrada",
+        qualityEbookDesc: "150 PPP · Recomendada",
+        qualityPrinterName: "Alta calidad",
+        qualityPrinterDesc: "300 PPP · Para imprimir",
+        compressSubmitBtn: "Comprimir PDF",
+        compressSaved: "-{pct}% · {size}",
+        compressNoReduction: "No se pudo reducir el archivo",
+
+        // --- ghostscriptWarning.js ---
+        gsWarningTitle: "Ghostscript no encontrado",
+        gsWarningDescLinux: "Ghostscript es necesario para comprimir PDFs pero no está instalado en tu sistema. Instálalo ejecutando el siguiente comando en un terminal:",
+        gsWarningDescMac: "Ghostscript es necesario para comprimir PDFs pero no está instalado en tu Mac. Opción recomendada para todos los usuarios: descarga e instala el paquete desde el siguiente enlace.",
+        gsWarningMacDownloadBtn: "Descargar Ghostscript",
+        gsWarningMacAdvanced: "Usuarios avanzados (Homebrew):",
+        gsWarningBtn: "Entendido",
 
         // Settings
         settingsTitle: "Configuración",

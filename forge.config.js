@@ -13,6 +13,15 @@ module.exports = {
       /node_modules[/\\](canvas|sqlite3|better-sqlite3|node-gyp)/,
     ],
   },
+  hooks: {
+    generateAssets: async (forgeConfig, platform) => {
+      if (platform === 'win32') {
+        forgeConfig.packagerConfig.extraResource = [
+          'resources/ghostscript/win'
+        ];
+      }
+    }
+  },
   rebuildConfig: {
     enabled: false,
   },

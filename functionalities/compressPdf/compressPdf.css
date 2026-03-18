@@ -1,0 +1,125 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+/* ── Container ───────────────────────────────────────────── */
+.compressContainer {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+/* ── File info badge (shown after file selection) ─────────── */
+.fileInfoBadge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--reindalLight);
+    border: 1px solid var(--reindalYellowHover);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 24px;
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--reindalDark);
+}
+
+.fileSizeBadge {
+    margin-left: auto;
+    background: var(--reindalYellow);
+    color: var(--reindalBlack);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* ── Quality selector ─────────────────────────────────────── */
+.qualityCards {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.qualityCard {
+    flex: 1;
+    cursor: pointer;
+}
+
+.qualityCard input[type="radio"] {
+    display: none;
+}
+
+.qualityCardInner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 10px;
+    border: 2px solid var(--reindalGrayLight);
+    border-radius: 10px;
+    background: var(--reindalBody);
+    transition: border-color 0.15s, background 0.15s;
+    text-align: center;
+}
+
+.qualityCard input[type="radio"]:checked + .qualityCardInner,
+.qualityCard.selected .qualityCardInner {
+    border-color: var(--reindalYellow);
+    background: var(--reindalLight);
+}
+
+.qualityCard:hover .qualityCardInner {
+    border-color: var(--reindalYellowHover);
+}
+
+.qualityIcon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.qualityName {
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--reindalBlack);
+}
+
+.qualityDesc {
+    font-family: var(--font-primary);
+    font-size: 11px;
+    color: var(--reindalGray);
+    line-height: 1.3;
+}
+
+/* ── Result size info (shown after compression) ───────────── */
+.compressionResult {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 6px;
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--reindalDarkGreen);
+}
+
+.compressionResult .arrow {
+    font-size: 18px;
+    color: var(--reindalGray);
+}
+
+.compressionResult .saved {
+    font-weight: 700;
+    color: var(--reindalDarkGreen);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .qualityCards {
+        flex-direction: column;
+    }
+}

@@ -23,8 +23,8 @@ const currentVersion = app.getVersion();
 function getSavedLanguage() {
     try {
         const userDataPath = app.getPath('userData');
-        const settingsPath = path.join(userDataPath, 'language-settings.json'); 
-        
+        const settingsPath = path.join(userDataPath, 'language-settings.json');
+
         if (fs.existsSync(settingsPath)) {
             const rawData = fs.readFileSync(settingsPath, 'utf-8');
             const settings = JSON.parse(rawData);
@@ -46,13 +46,13 @@ if (platform === 'win32' || platform === 'darwin') {
             type: UpdateSourceType.StaticStorage,
             baseUrl: `https://github.com/reindal/pdeffy/releases/download/latest/`
         },
-        notifyUser: false 
+        notifyUser: false
     });
 
     autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-        
+
         let dialogTitle, dialogMessage, dialogDetail, btnUpdate, btnLater;
-        
+
         const currentLanguage = getSavedLanguage();
 
         switch (currentLanguage) {
@@ -95,7 +95,7 @@ if (platform === 'win32' || platform === 'darwin') {
             title: dialogTitle,
             message: dialogMessage,
             detail: dialogDetail,
-            noLink: true 
+            noLink: true
         };
 
         dialog.showMessageBox(dialogOpts).then((returnValue) => {
@@ -120,10 +120,10 @@ if (platform === 'win32' || platform === 'darwin') {
                 // The text looks like: "HASH pdeffy-1.5.1-full.nupkg SIZE"
                 // We use a Regular Expression to extract the version numbers from the filename
                 const match = text.match(/pdeffy-([\d.]+)-full\.nupkg/);
-                
+
                 if (match && match[1]) {
                     const latestVersion = match[1];
-                    
+
                     // Compare the semantic version
                     if (latestVersion !== currentVersion) {
 
@@ -167,11 +167,11 @@ if (platform === 'win32' || platform === 'darwin') {
 
                         const dialogOpts = {
                             type: 'info',
-                            buttons: [btnDownload, btnCancel], 
+                            buttons: [btnDownload, btnCancel],
                             title: dialogTitle,
                             message: dialogMessage,
                             detail: dialogDetail,
-                            noLink: true 
+                            noLink: true
                         };
 
                         dialog.showMessageBox(dialogOpts).then((returnValue) => {
@@ -199,9 +199,9 @@ const warningsPath = path.join(userDataPath, 'warnings-settings.json');
 let mainWindow;
 
 function createWindow() {
-    const appVersion = app.getVersion(); 
+    const appVersion = app.getVersion();
     mainWindow = new BrowserWindow({
-        title: `Pdeffy v${appVersion}`, 
+        title: `Pdeffy v${appVersion}`,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -219,16 +219,16 @@ function createWindow() {
     // =========================================================
 
     mainWindow.on('page-title-updated', (event) => {
-        event.preventDefault(); 
+        event.preventDefault();
     });
 
     mainWindow.maximize();
-    
+
     mainWindow.loadURL(url.format({
-            pathname: path.join(__dirname, "index.html"),
-            protocol: "file:",
-            slashes: true,
-        })
+        pathname: path.join(__dirname, "index.html"),
+        protocol: "file:",
+        slashes: true,
+    })
     );
 
     mainWindow.on("closed", () => {
@@ -238,7 +238,7 @@ function createWindow() {
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
     });
-    
+
     // Ctrl+Shift+I (o Cmd+Option+I en Mac) para toggle DevTools
     mainWindow.webContents.on('before-input-event', (event, input) => {
         const isDevToolsShortcut =
@@ -247,11 +247,11 @@ function createWindow() {
             input.shift &&
             (process.platform === 'darwin' ? input.meta : input.control);
 
-            if (isDevToolsShortcut) {
-                mainWindow.webContents.toggleDevTools();
-                event.preventDefault();
-            }
-        });
+        if (isDevToolsShortcut) {
+            mainWindow.webContents.toggleDevTools();
+            event.preventDefault();
+        }
+    });
 }
 
 ipcMain.handle('open-folder', (_, folderPath) => {
@@ -443,7 +443,7 @@ ipcMain.handle('get-language', async () => {
         if (fs.existsSync(languagePath)) {
             const fileContent = fs.readFileSync(languagePath, 'utf8');
             const data = JSON.parse(fileContent);
-            return data.language || 'en'; 
+            return data.language || 'en';
         }
         return 'en';
     } catch (error) {
@@ -516,10 +516,10 @@ function getSystemLibreOfficePath() {
             for (let p of winPaths) {
                 if (fs.existsSync(p)) return p;
             }
-            try { 
-                return execSync('where soffice').toString().trim(); 
-            } catch (e) { 
-                return null; 
+            try {
+                return execSync('where soffice').toString().trim();
+            } catch (e) {
+                return null;
             }
         }
         case 'darwin': {
@@ -530,17 +530,17 @@ function getSystemLibreOfficePath() {
         default: {
             // Linux/Ubuntu and other UNIX-like systems
             // Method 1: Standard APT or Snap installations (Checks system $PATH)
-            try { 
+            try {
                 const standardPath = execSync('which libreoffice').toString().trim();
                 if (standardPath && fs.existsSync(standardPath)) return standardPath;
-            } catch (e) { 
+            } catch (e) {
                 // Silently ignore and fall through
             }
 
-            try { 
+            try {
                 const sofficePath = execSync('which soffice').toString().trim();
                 if (sofficePath && fs.existsSync(sofficePath)) return sofficePath;
-            } catch (err) { 
+            } catch (err) {
                 // Silently ignore and fall through
             }
 
@@ -550,13 +550,13 @@ function getSystemLibreOfficePath() {
                 const optPath = '/opt';
                 if (fs.existsSync(optPath)) {
                     const directories = fs.readdirSync(optPath);
-                    
+
                     // Filter for libreoffice folders and sort descending to grab the newest version if multiple exist
                     const loDirs = directories
                         .filter(dir => dir.toLowerCase().startsWith('libreoffice'))
                         .sort()
                         .reverse();
-                    
+
                     for (const dir of loDirs) {
                         const manualPath = path.join(optPath, dir, 'program', 'soffice');
                         if (fs.existsSync(manualPath)) {
@@ -583,7 +583,7 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
 
         const tempDir = app.getPath('temp');
         const psPath = path.join(tempDir, `msoffice_${Date.now()}.ps1`);
-        
+
         // Generate a routing key (e.g., ".pdf_to_docx") for cleaner logic mapping
         const conversionRoute = `${inputExtension}_to_${format}`;
         let psScript = '';
@@ -596,7 +596,7 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
             case '.pdf_to_pptx':
                 psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 24); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
                 break;
-            
+
             // --- OFFICE TO PDF ---
             case '.docx_to_pdf':
                 psScript = `$word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; try { $doc = $word.Documents.Open('${inputPath}'); $doc.SaveAs([ref]'${outputPath}', [ref]17); $doc.Close(); $word.Quit(); exit 0 } catch { if ($word) { $word.Quit() }; exit 1 }`;
@@ -604,7 +604,7 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
             case '.pptx_to_pdf':
                 psScript = `$ppt = New-Object -ComObject PowerPoint.Application; $ppt.DisplayAlerts = 1; try { $pres = $ppt.Presentations.Open('${inputPath}', $false, $false, $false); $pres.SaveAs('${outputPath}', 32); $pres.Close(); $ppt.Quit(); exit 0 } catch { if ($ppt) { $ppt.Quit() }; exit 1 }`;
                 break;
-            
+
             default:
                 return reject(new Error("Format not supported by MS Office engine."));
         }
@@ -613,7 +613,7 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
             await fsPromises.writeFile(psPath, psScript);
             const command = `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${psPath}"`;
             exec(command, async (error) => {
-                try { await fsPromises.unlink(psPath); } catch (e) {} 
+                try { await fsPromises.unlink(psPath); } catch (e) { }
                 if (error) reject(error);
                 else resolve();
             });
@@ -633,10 +633,10 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
             // We route temporary files to the user-selected destination folder (e.g., Downloads),
             // which the Snap environment natively has permission to read and write.
             const targetDir = path.dirname(outputPath);
-            
+
             // Parse clean name to avoid double extensions (e.g., file.pdf.pdf -> file.pdf)
             const parsedName = path.parse(fileName).name;
-            
+
             // Prefix with a dot to create a hidden temporary file in UNIX systems
             const uniqueFileName = `.temp_${Date.now()}_${parsedName}${path.parse(fileName).ext}`;
             const tempInputPath = path.join(targetDir, uniqueFileName);
@@ -650,7 +650,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
 
             // --- MICROSOFT OFFICE ---
             const canUseMSOffice = os.platform() === 'win32' && (
-                (isPdfInput && (format === 'docx' || format === 'pptx')) || 
+                (isPdfInput && (format === 'docx' || format === 'pptx')) ||
                 ((inputExt === '.docx' || inputExt === '.pptx') && format === 'pdf')
             );
 
@@ -669,7 +669,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
             if (!conversionSuccess) {
                 const libreOfficePath = getSystemLibreOfficePath();
                 if (!libreOfficePath) {
-                    try { await fsPromises.unlink(tempInputPath); } catch (e) {}
+                    try { await fsPromises.unlink(tempInputPath); } catch (e) { }
                     return reject(new Error("LibreOffice installation not found."));
                 }
 
@@ -684,14 +684,14 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                 // SPECIAL STRATEGY: 2-Step conversion for PDF to DOCX
                 if (isPdfInput && format === 'docx') {
                     console.log(`[Conversion] Applying 2-step process (PDF -> ODT -> DOCX) for better formatting...`);
-                    
+
                     // FIXED: Replaced tempDir with targetDir for the intermediate file
                     const tempOdtPath = path.join(targetDir, baseName + '.odt');
 
                     // STEP 1: PDF to ODT (Saves in target directory to bypass Snap sandbox)
                     // FIXED: Replaced tempDir with targetDir in the --outdir flag
                     const step1Command = `"${libreOfficePath}" ${envFlag} --headless --infilter="writer_pdf_import" --convert-to odt "${tempInputPath}" --outdir "${targetDir}"`;
-                    
+
                     await new Promise((res, rej) => {
                         exec(step1Command, (error, stdout, stderr) => {
                             if (error) {
@@ -708,13 +708,13 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                     await new Promise((res, rej) => {
                         exec(step2Command, async (error, stdout, stderr) => {
                             // Clean up the intermediate ODT file
-                            try { await fsPromises.unlink(tempOdtPath); } catch (e) {}
+                            try { await fsPromises.unlink(tempOdtPath); } catch (e) { }
 
                             if (error) {
                                 console.error("LibreOffice Step 2 error:", stderr);
                                 return rej(new Error("LibreOffice ODT to DOCX conversion failed."));
                             }
-                            
+
                             try {
                                 const generatedFilePath = path.join(outputDir, baseName + '.docx');
                                 if (fs.existsSync(generatedFilePath)) {
@@ -738,14 +738,14 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                     }
 
                     const command = `"${libreOfficePath}" ${envFlag} --headless ${infilter}--convert-to ${format} "${tempInputPath}" --outdir "${outputDir}"`;
-                    
+
                     await new Promise((res, rej) => {
                         exec(command, async (error, stdout, stderr) => {
                             if (error) {
                                 console.error("LibreOffice execution error:", stderr);
                                 return rej(new Error("LibreOffice conversion failed."));
                             }
-                            
+
                             try {
                                 const generatedFilePath = path.join(outputDir, baseName + `.${format}`);
                                 if (fs.existsSync(generatedFilePath)) {
@@ -770,7 +770,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
             }
 
             // Clean up temporary file
-            try { await fsPromises.unlink(tempInputPath); } catch (e) {}
+            try { await fsPromises.unlink(tempInputPath); } catch (e) { }
 
             // Apply Metadata depending on the format
             if (metadata) {
@@ -794,19 +794,19 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                         const JSZip = require('jszip');
                         const fileData = await fsPromises.readFile(outputPath);
                         const zip = await JSZip.loadAsync(fileData);
-                        
+
                         const coreXmlFile = zip.file("docProps/core.xml");
                         if (coreXmlFile) {
                             let coreXml = await coreXmlFile.async("string");
-                            
+
                             // Helper function to safely insert or update XML tags
                             const updateTag = (xml, tag, value) => {
                                 if (!value) return xml;
-                                
+
                                 // Escape XML special characters to prevent document corruption
                                 const safeValue = value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                                 const regex = new RegExp(`<${tag}[^>]*>.*?</${tag}>`, 'i');
-                                
+
                                 if (regex.test(xml)) {
                                     // Overwrite existing XML tag
                                     return xml.replace(regex, `<${tag}>${safeValue}</${tag}>`);
@@ -824,7 +824,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
 
                             // Overwrite the core.xml file within the in-memory ZIP archive
                             zip.file("docProps/core.xml", coreXml);
-                            
+
                             // Generate the updated buffer and commit to disk
                             const newZipContent = await zip.generateAsync({ type: 'nodebuffer' });
                             await fsPromises.writeFile(outputPath, newZipContent);
@@ -845,7 +845,7 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
 
 function checkMSOfficeInstalled() {
     if (os.platform() !== 'win32') return false;
-    
+
     // Common installation paths for MS Office (Word) in Windows
     const paths = [
         'C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE',
@@ -854,7 +854,7 @@ function checkMSOfficeInstalled() {
         'C:\\Program Files (x86)\\Microsoft Office\\Office16\\WINWORD.EXE',
         'C:\\Program Files\\Microsoft Office\\root\\Office15\\WINWORD.EXE'
     ];
-    
+
     for (let p of paths) {
         if (fs.existsSync(p)) return true;
     }
@@ -867,7 +867,7 @@ ipcMain.handle('check-engines-availability', async () => {
 
     const hasLibreOffice = getSystemLibreOfficePath() !== null;
     const hasMSOffice = checkMSOfficeInstalled();
-    
+
     return { hasLibreOffice, hasMSOffice };
 });
 
@@ -891,7 +891,7 @@ ipcMain.handle('save-warning-settings', async (event, featureId) => {
             settings = JSON.parse(fs.readFileSync(warningsPath, 'utf8'));
         }
         // Flag the warning as disabled (true) for this specific feature (e.g., 'pdftodocx')
-        settings[featureId] = true; 
+        settings[featureId] = true;
         fs.writeFileSync(warningsPath, JSON.stringify(settings, null, 2), 'utf8');
         return { success: true };
     } catch (error) {
@@ -901,73 +901,200 @@ ipcMain.handle('save-warning-settings', async (event, featureId) => {
 });
 
 
+// =========================================================
+// GHOSTSCRIPT PATH RESOLVER
+// Add this near getSystemLibreOfficePath() in main.js
+// =========================================================
+
+function getGhostscriptPath() {
+    const platform = os.platform();
+
+    if (platform === 'win32') {
+        // Use the portable binary bundled with the app
+        const gsPortable = app.isPackaged
+            ? path.join(process.resourcesPath, 'win', 'bin', 'gswin64c.exe')
+            : path.join(__dirname, 'resources', 'ghostscript', 'win', 'bin', 'gswin64c.exe')
+
+        if (fs.existsSync(gsPortable)) return gsPortable;
+        return null;
+    }
+
+    if (platform === 'darwin') {
+        // Check common Homebrew paths first
+        const macPaths = [
+            '/usr/local/bin/gs',        // Homebrew Intel
+            '/opt/homebrew/bin/gs',     // Homebrew Apple Silicon
+            '/usr/bin/gs'
+        ];
+        for (const p of macPaths) {
+            if (fs.existsSync(p)) return p;
+        }
+        // Last resort: check PATH
+        try {
+            const fromPath = execSync('which gs').toString().trim();
+            if (fromPath && fs.existsSync(fromPath)) return fromPath;
+        } catch (e) { }
+        return null;
+    }
+
+    // Linux
+    try {
+        const fromPath = execSync('which gs').toString().trim();
+        if (fromPath && fs.existsSync(fromPath)) return fromPath;
+    } catch (e) { }
+    return null;
+}
+
+// =========================================================
+// IPC: CHECK GHOSTSCRIPT AVAILABILITY
+// Add this near check-engines-availability in main.js
+// =========================================================
+
+ipcMain.handle('check-ghostscript-availability', async () => {
+    const gsPath = getGhostscriptPath();
+    return {
+        hasGhostscript: gsPath !== null,
+        platform: os.platform()   // 'win32' | 'darwin' | 'linux'
+    };
+});
+
+// =========================================================
+// IPC: COMPRESS PDF WITH GHOSTSCRIPT
+// Add this near convert-with-libreoffice in main.js
+// =========================================================
+
+ipcMain.handle('compress-with-ghostscript', async (event, { fileData, fileName, outputPath, quality }) => {
+    return new Promise(async (resolve, reject) => {
+        const gsPath = getGhostscriptPath();
+        if (!gsPath) return reject(new Error('Ghostscript not found on this system.'));
+
+        // Write the uploaded file to a temp location beside the output
+        const targetDir = path.dirname(outputPath);
+        const tempInput = path.join(targetDir, `.gs_temp_${Date.now()}_${path.basename(fileName)}`);
+
+        try {
+            await fsPromises.writeFile(tempInput, Buffer.from(fileData));
+
+            // Map quality preset to Ghostscript's -dPDFSETTINGS value
+            // screen   → 72 dpi  (smallest)
+            // ebook    → 150 dpi (balanced — default)
+            // printer  → 300 dpi (high quality)
+            // prepress → 300 dpi (maximum quality, for press)
+            const validQualities = ['screen', 'ebook', 'printer', 'prepress'];
+            const safeQuality = validQualities.includes(quality) ? quality : 'ebook';
+
+            const command = [
+                `"${gsPath}"`,
+                '-dBATCH',
+                '-dNOPAUSE',
+                '-dQUIET',
+                '-sDEVICE=pdfwrite',
+                `-dPDFSETTINGS=/${safeQuality}`,
+                '-dCompatibilityLevel=1.4',
+                '-dEmbedAllFonts=true',
+                '-dSubsetFonts=true',
+                `-sOutputFile="${outputPath}"`,
+                `"${tempInput}"`
+            ].join(' ');
+
+            exec(command, async (error, stdout, stderr) => {
+                // Always clean up temp input
+                try { await fsPromises.unlink(tempInput); } catch (e) { }
+
+                if (error) {
+                    console.error('[Ghostscript] Error:', stderr);
+                    return reject(new Error('Ghostscript compression failed: ' + stderr));
+                }
+
+                // Return the output file size so the renderer can show savings
+                try {
+                    const stats = await fsPromises.stat(outputPath);
+                    resolve({ success: true, outputSize: stats.size });
+                } catch (statErr) {
+                    reject(new Error('Output file not found after compression.'));
+                }
+            });
+
+        } catch (err) {
+            try { await fsPromises.unlink(tempInput); } catch (e) { }
+            reject(err);
+        }
+    });
+});
+
+ipcMain.handle('open-external-url', (_, url) => {
+    shell.openExternal(url);
+});
+
+
+
 //////SQUIRELL EXE INSTALLER CONFIG////////
 
 //const app = require('app');
 
 // this should be placed at top of main.js to handle setup events quickly
 if (handleSquirrelEvent()) {
-  // squirrel event handled and app will exit in 1000ms, so don't do anything else
-  return;
+    // squirrel event handled and app will exit in 1000ms, so don't do anything else
+    return;
 }
 
 function handleSquirrelEvent() {
-  if (process.argv.length === 1) {
-    return false;
-  }
+    if (process.argv.length === 1) {
+        return false;
+    }
 
-  const ChildProcess = require('child_process');
+    const ChildProcess = require('child_process');
 
-  const appFolder = path.resolve(process.execPath, '..');
-  const rootAtomFolder = path.resolve(appFolder, '..');
-  const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
-  const exeName = path.basename(process.execPath);
+    const appFolder = path.resolve(process.execPath, '..');
+    const rootAtomFolder = path.resolve(appFolder, '..');
+    const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+    const exeName = path.basename(process.execPath);
 
-  const spawn = function(command, args) {
-    let spawnedProcess, error;
+    const spawn = function (command, args) {
+        let spawnedProcess, error;
 
-    try {
-      spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
-    } catch (error) {}
+        try {
+            spawnedProcess = ChildProcess.spawn(command, args, { detached: true });
+        } catch (error) { }
 
-    return spawnedProcess;
-  };
+        return spawnedProcess;
+    };
 
-  const spawnUpdate = function(args) {
-    return spawn(updateDotExe, args);
-  };
+    const spawnUpdate = function (args) {
+        return spawn(updateDotExe, args);
+    };
 
-  const squirrelEvent = process.argv[1];
-  switch (squirrelEvent) {
-    case '--squirrel-install':
-    case '--squirrel-updated':
-      // Optionally do things such as:
-      // - Add your .exe to the PATH
-      // - Write to the registry for things like file associations and
-      //   explorer context menus
+    const squirrelEvent = process.argv[1];
+    switch (squirrelEvent) {
+        case '--squirrel-install':
+        case '--squirrel-updated':
+            // Optionally do things such as:
+            // - Add your .exe to the PATH
+            // - Write to the registry for things like file associations and
+            //   explorer context menus
 
-      // Install desktop and start menu shortcuts
-      spawnUpdate(['--createShortcut', exeName]);
+            // Install desktop and start menu shortcuts
+            spawnUpdate(['--createShortcut', exeName]);
 
-      setTimeout(app.quit, 1000);
-      return true;
+            setTimeout(app.quit, 1000);
+            return true;
 
-    case '--squirrel-uninstall':
-      // Undo anything you did in the --squirrel-install and
-      // --squirrel-updated handlers
+        case '--squirrel-uninstall':
+            // Undo anything you did in the --squirrel-install and
+            // --squirrel-updated handlers
 
-      // Remove desktop and start menu shortcuts
-      spawnUpdate(['--removeShortcut', exeName]);
+            // Remove desktop and start menu shortcuts
+            spawnUpdate(['--removeShortcut', exeName]);
 
-      setTimeout(app.quit, 1000);
-      return true;
+            setTimeout(app.quit, 1000);
+            return true;
 
-    case '--squirrel-obsolete':
-      // This is called on the outgoing version of your app before
-      // we update to the new version - it's the opposite of
-      // --squirrel-updated
+        case '--squirrel-obsolete':
+            // This is called on the outgoing version of your app before
+            // we update to the new version - it's the opposite of
+            // --squirrel-updated
 
-      app.quit();
-      return true;
-  }
+            app.quit();
+            return true;
+    }
 };

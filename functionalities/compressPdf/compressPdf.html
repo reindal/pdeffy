@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Compress PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./compressPdf.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="compressPdfHeader" class="langText">Compress PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="compressContainer">
+            <h1 id="compressPdfHeader2" class="langText">Reduce PDF file size</h1>
+
+            <form id="compressForm">
+
+                <!-- File input -->
+                <div class="formGroup">
+                    <label for="pdfFile" id="compressSelectLabel" class="langText">Select PDF file:</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="pdfFile" accept=".pdf" required>
+                        <label for="pdfFile" class="fileInputLabel langText" id="compressSelectButton">Click to select file</label>
+                    </div>
+                </div>
+
+                <!-- File info badge -->
+                <div id="fileInfo" class="fileInfoBadge" style="display:none;">
+                    <span id="fileNameDisplay"></span>
+                    <span id="fileSizeDisplay" class="fileSizeBadge"></span>
+                </div>
+
+                <!-- Quality selector -->
+                <div class="formGroup" id="qualityGroup">
+                    <label id="compressQualityLabel" class="langText">Compression level:</label>
+                    <div class="qualityCards">
+
+                        <label class="qualityCard">
+                            <input type="radio" name="quality" value="screen" id="qualityScreen">
+                            <div class="qualityCardInner">
+                                <span class="qualityName langText" id="qualityScreenName">Maximum</span>
+                                <span class="qualityDesc langText" id="qualityScreenDesc">72 DPI · Smallest file</span>
+                            </div>
+                        </label>
+
+                        <label class="qualityCard selected">
+                            <input type="radio" name="quality" value="ebook" id="qualityEbook" checked>
+                            <div class="qualityCardInner">
+                                <span class="qualityName langText" id="qualityEbookName">Balanced</span>
+                                <span class="qualityDesc langText" id="qualityEbookDesc">150 DPI · Recommended</span>
+                            </div>
+                        </label>
+
+                        <label class="qualityCard">
+                            <input type="radio" name="quality" value="printer" id="qualityPrinter">
+                            <div class="qualityCardInner">
+                                <span class="qualityName langText" id="qualityPrinterName">High quality</span>
+                                <span class="qualityDesc langText" id="qualityPrinterDesc">300 DPI · For printing</span>
+                            </div>
+                        </label>
+
+                    </div>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn" disabled>
+                    <span class="langText" id="compressSubmitBtn">Compress PDF</span>
+                </button>
+
+            </form>
+
+            <div id="status" class="status-box"></div>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./compressPdf.js"></script>
+    <script src="./../ghostscriptWarning.js"></script>
+</body>
+
+</html>
