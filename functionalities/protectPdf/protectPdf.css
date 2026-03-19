@@ -1,0 +1,281 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+/* ── Container ───────────────────────────────────────────── */
+.protectContainer {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+/* ── File info badge ──────────────────────────────────────── */
+.fileInfoBadge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--reindalLight);
+    border: 1px solid var(--reindalYellowHover);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 24px;
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--reindalDark);
+}
+
+/* ── Section blocks ───────────────────────────────────────── */
+.protectSection {
+    background: var(--reindalExtraLight);
+    border: 1px solid var(--reindalGrayLight);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.protectSection h3 {
+    font-family: var(--font-primary);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--reindalBlack);
+    margin: 0 0 4px 0;
+}
+
+.protectSection > p {
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--reindalGray);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.sectionTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.optionalBadge {
+    font-family: var(--font-primary);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--reindalGray);
+    background: var(--reindalGrayLight);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+/* ── Password input with eye button ──────────────────────── */
+.passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.passwordWrapper input[type="password"],
+.passwordWrapper input[type="text"] {
+    width: 100%;
+    padding: 12px 44px 12px 12px;
+    border: 2px solid var(--reindalGrayLight);
+    border-radius: 8px;
+    font-family: var(--font-primary);
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+    background: var(--reindalBody);
+}
+
+.passwordWrapper input:focus {
+    outline: none;
+    border-color: var(--reindalYellow);
+}
+
+.eyeBtn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 0;
+    color: var(--reindalGray);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eyeBtn:hover {
+    color: var(--reindalDark);
+}
+
+.eyeBtn svg,
+.generatedEyeBtn svg {
+    display: block;
+    pointer-events: none;
+}
+
+/* ── Validation message ───────────────────────────────────── */
+.validationMsg {
+    font-family: var(--font-primary);
+    font-size: 12px;
+    color: var(--reindalWineRed);
+    margin: 6px 0 0 0;
+}
+
+/* ── Permission rows ──────────────────────────────────────── */
+.permissionRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--reindalGrayLight);
+    gap: 16px;
+}
+
+.permissionRow:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.permissionRow label:first-child {
+    font-family: var(--font-primary);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--reindalDark);
+    flex: 1;
+}
+
+.permissionRow select {
+    padding: 8px 12px;
+    border: 2px solid var(--reindalGrayLight);
+    border-radius: 6px;
+    font-family: var(--font-primary);
+    font-size: 13px;
+    background: var(--reindalBody);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.permissionRow select:focus {
+    outline: none;
+    border-color: var(--reindalYellow);
+}
+
+/* ── Toggle switch ────────────────────────────────────────── */
+.toggleSwitch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggleSwitch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggleSlider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--reindalGrayLight);
+    border-radius: 24px;
+    transition: background 0.2s;
+}
+
+.toggleSlider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+    background: var(--reindalYellow);
+}
+
+.toggleSwitch input:checked + .toggleSlider::before {
+    transform: translateX(20px);
+}
+
+/* ── Generated owner password block ──────────────────────── */
+.generatedOwnerBlock {
+    background: var(--reindalLight);
+    border: 1px solid var(--reindalYellowHover);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 16px;
+}
+
+.generatedOwnerBlock > .langText {
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--reindalDark);
+    margin: 0 0 12px 0;
+    line-height: 1.5;
+}
+
+.generatedOwnerRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.generatedOwnerRow input[type="password"],
+.generatedOwnerRow input[type="text"] {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid var(--reindalGrayLight);
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 14px;
+    background: var(--reindalBody);
+    color: var(--reindalDark);
+    box-sizing: border-box;
+    cursor: default;
+}
+
+.generatedOwnerRow input:focus {
+    outline: none;
+}
+
+.generatedEyeBtn,
+.copyBtn {
+    background: var(--reindalGrayLight);
+    border: none;
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    color: var(--reindalDark);
+    line-height: 0;
+}
+
+.generatedEyeBtn:hover,
+.copyBtn:hover {
+    background: var(--reindalYellow);
+}
+
+.copiedMsg {
+    font-family: var(--font-primary);
+    font-size: 12px;
+    color: var(--reindalDarkGreen);
+    margin: 13px 0 0 0;
+}

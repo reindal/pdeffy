@@ -328,6 +328,44 @@ const languages = {
         gsWarningMacAdvanced: "Advanced users (Homebrew):",
         gsWarningBtn: "Understood",
 
+        // index.html card
+        protectPdfTile: "Protect PDF",
+        protectPdfTileDesc: "Add passwords and permissions",
+
+        // protectPdf.html
+        protectPdfHeader: "Protect PDF",
+        protectPdfHeader2: "Add password and permissions to PDF",
+        protectSelectLabel: "Select PDF file:",
+        protectSelectButton: "Click to select file",
+
+        protectUserPassTitle: "Open password",
+        protectUserPassDesc: "Required to open the document.",
+        protectUserPassLabel: "Password:",
+        protectUserPassConfirmLabel: "Confirm password:",
+
+        protectOwnerPassTitle: "Owner password",
+        protectOwnerPassOptional: "Optional",
+        protectOwnerPassDesc: "Restricts editing and permissions. If not set, a random password will be generated automatically when permissions are changed.",
+        protectOwnerPassLabel: "Password:",
+        protectOwnerPassConfirmLabel: "Confirm password:",
+
+        protectPasswordPlaceholder: "Enter password...",
+        protectPassMismatch: "Passwords do not match",
+
+        protectPermissionsTitle: "Permissions",
+        protectPermissionsDesc: "Restrict what users can do with the document.",
+        protectPermPrintLabel: "Printing:",
+        protectPermPrintHigh: "Allow (high resolution)",
+        protectPermPrintLow: "Allow (low resolution)",
+        protectPermPrintNone: "Not allowed",
+        protectPermCopyLabel: "Allow copying content:",
+        protectPermEditLabel: "Allow editing:",
+
+        protectSubmitBtn: "Protect PDF",
+
+        protectCopied: "Copied to clipboard!",
+        generatedOwnerLabel: "A random owner password was generated automatically. Save it if you want to modify permissions later:",
+
         // Settings
         settingsTitle: "Settings",
         changeLanguageTitle: "Change Language:",
@@ -675,6 +713,42 @@ const languages = {
         gsWarningMacDownloadBtn: "Scarica Ghostscript",
         gsWarningMacAdvanced: "Utenti avanzati (Homebrew):",
         gsWarningBtn: "Capito",
+
+        protectPdfTile: "Proteggi PDF",
+        protectPdfTileDesc: "Aggiungi password e permessi",
+
+        protectPdfHeader: "Proteggi PDF",
+        protectPdfHeader2: "Aggiungi password e permessi al PDF",
+        protectSelectLabel: "Seleziona un file PDF:",
+        protectSelectButton: "Clicca per selezionare il file",
+
+        protectUserPassTitle: "Password di apertura",
+        protectUserPassDesc: "Necessaria per aprire il documento.",
+        protectUserPassLabel: "Password:",
+        protectUserPassConfirmLabel: "Conferma password:",
+
+        protectOwnerPassTitle: "Password proprietario",
+        protectOwnerPassOptional: "Opzionale",
+        protectOwnerPassDesc: "Limita la modifica e i permessi. Se non impostata, verrà generata automaticamente una password casuale quando i permessi vengono modificati.",
+        protectOwnerPassLabel: "Password:",
+        protectOwnerPassConfirmLabel: "Conferma password:",
+
+        protectPasswordPlaceholder: "Inserisci la password...",
+        protectPassMismatch: "Le password non coincidono",
+
+        protectPermissionsTitle: "Permessi",
+        protectPermissionsDesc: "Limita le operazioni che gli utenti possono eseguire sul documento.",
+        protectPermPrintLabel: "Stampa:",
+        protectPermPrintHigh: "Consenti (alta risoluzione)",
+        protectPermPrintLow: "Consenti (bassa risoluzione)",
+        protectPermPrintNone: "Non consentita",
+        protectPermCopyLabel: "Consenti copia del contenuto:",
+        protectPermEditLabel: "Consenti modifica:",
+
+        protectSubmitBtn: "Proteggi PDF",
+        protectCopied: "Copiato negli appunti!",
+        generatedOwnerLabel: "È stata generata automaticamente una password proprietario casuale. Salvala se vuoi modificare i permessi in seguito:",
+
         // Settings
         settingsTitle: "Impostazioni",
         changeLanguageTitle: "Cambiare Lingua:",
@@ -1022,6 +1096,42 @@ const languages = {
         gsWarningMacDownloadBtn: "Pobierz Ghostscript",
         gsWarningMacAdvanced: "Zaawansowani użytkownicy (Homebrew):",
         gsWarningBtn: "Rozumiem",
+
+        protectPdfTile: "Chroń PDF",
+        protectPdfTileDesc: "Dodaj hasła i uprawnienia",
+
+        protectPdfHeader: "Chroń PDF",
+        protectPdfHeader2: "Dodaj hasło i uprawnienia do pliku PDF",
+        protectSelectLabel: "Wybierz plik PDF:",
+        protectSelectButton: "Kliknij, aby wybrać plik",
+
+        protectUserPassTitle: "Hasło do otwarcia",
+        protectUserPassDesc: "Wymagane do otwarcia dokumentu.",
+        protectUserPassLabel: "Hasło:",
+        protectUserPassConfirmLabel: "Potwierdź hasło:",
+
+        protectOwnerPassTitle: "Hasło właściciela",
+        protectOwnerPassOptional: "Opcjonalne",
+        protectOwnerPassDesc: "Ogranicza edycję i uprawnienia. Jeśli nie zostanie ustawione, zostanie automatycznie wygenerowane losowe hasło przy zmianie uprawnień.",
+        protectOwnerPassLabel: "Hasło:",
+        protectOwnerPassConfirmLabel: "Potwierdź hasło:",
+
+        protectPasswordPlaceholder: "Wprowadź hasło...",
+        protectPassMismatch: "Hasła nie są zgodne",
+
+        protectPermissionsTitle: "Uprawnienia",
+        protectPermissionsDesc: "Ogranicz operacje, które użytkownicy mogą wykonywać na dokumencie.",
+        protectPermPrintLabel: "Drukowanie:",
+        protectPermPrintHigh: "Zezwól (wysoka rozdzielczość)",
+        protectPermPrintLow: "Zezwól (niska rozdzielczość)",
+        protectPermPrintNone: "Niedozwolone",
+        protectPermCopyLabel: "Zezwól na kopiowanie treści:",
+        protectPermEditLabel: "Zezwól na edycję:",
+
+        protectSubmitBtn: "Chroń PDF",
+        protectCopied: "Skopiowano do schowka!",
+        generatedOwnerLabel: "Automatycznie wygenerowano losowe hasło właściciela. Zapisz je, jeśli chcesz później zmienić uprawnienia:",
+
         // Settings
         settingsTitle: "Ustawienia",
         changeLanguageTitle: "Zmienić Język:",
@@ -1355,6 +1465,41 @@ const languages = {
         gsWarningMacDownloadBtn: "Descargar Ghostscript",
         gsWarningMacAdvanced: "Usuarios avanzados (Homebrew):",
         gsWarningBtn: "Entendido",
+
+        protectPdfTile: "Proteger PDF",
+        protectPdfTileDesc: "Añade contraseñas y permisos",
+
+        protectPdfHeader: "Proteger PDF",
+        protectPdfHeader2: "Añade contraseña y permisos al PDF",
+        protectSelectLabel: "Selecciona un archivo PDF:",
+        protectSelectButton: "Haz clic para seleccionar",
+
+        protectUserPassTitle: "Contraseña de apertura",
+        protectUserPassDesc: "Necesaria para abrir el documento.",
+        protectUserPassLabel: "Contraseña:",
+        protectUserPassConfirmLabel: "Confirmar contraseña:",
+
+        protectOwnerPassTitle: "Contraseña de propietario",
+        protectOwnerPassOptional: "Opcional",
+        protectOwnerPassDesc: "Restringe la edición y los permisos. Si no se establece, se generará una contraseña aleatoria automáticamente cuando se cambien los permisos.",
+        protectOwnerPassLabel: "Contraseña:",
+        protectOwnerPassConfirmLabel: "Confirmar contraseña:",
+
+        protectPasswordPlaceholder: "Introduce la contraseña...",
+        protectPassMismatch: "Las contraseñas no coinciden",
+
+        protectPermissionsTitle: "Permisos",
+        protectPermissionsDesc: "Restringe lo que los usuarios pueden hacer con el documento.",
+        protectPermPrintLabel: "Impresión:",
+        protectPermPrintHigh: "Permitir (alta resolución)",
+        protectPermPrintLow: "Permitir (baja resolución)",
+        protectPermPrintNone: "No permitida",
+        protectPermCopyLabel: "Permitir copiar contenido:",
+        protectPermEditLabel: "Permitir editar:",
+
+        protectSubmitBtn: "Proteger PDF",
+        protectCopied: "¡Copiado al portapapeles!",
+        generatedOwnerLabel: "Se ha generado automáticamente una contraseña de propietario aleatoria. Guárdala si quieres modificar los permisos más adelante:",
 
         // Settings
         settingsTitle: "Configuración",

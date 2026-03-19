@@ -1026,6 +1026,116 @@ ipcMain.handle('open-external-url', (_, url) => {
     shell.openExternal(url);
 });
 
+// =========================================================
+// IPC: PROTECT PDF WITH GHOSTSCRIPT (AES-256)
+// Add this in main.js near the compress-with-ghostscript handler
+// =========================================================
+ 
+ipcMain.handle('protect-with-ghostscript', async (event, {
+    fileData,
+    fileName,
+    outputPath,
+    userPassword,
+    ownerPassword,
+    permissions,
+}) => {
+    return new Promise(async (resolve, reject) => {
+        const gsPath = getGhostscriptPath();
+        if (!gsPath) return reject(new Error('Ghostscript not found on this system.'));
+ 
+        const targetDir  = path.dirname(outputPath);
+        const tempInput  = path.join(targetDir, `.gs_protect_${Date.now()}_${path.basename(fileName)}`);
+ 
+        try {
+            await fsPromises.writeFile(tempInput, Buffer.from(fileData));
+ 
+            // ── PDF Permission bitmask ──────────
+            //
+            // Bit positions (1-based, bit 1 = LSB):
+            //   3  → printing (low res when bit 12 is also 0)
+            //   4  → modifying document
+            //   5  → copying text/graphics
+            //   6  → annotating / filling forms (we leave this always on)
+            //   9  → filling forms
+            //   10 → content accessibility (always on)
+            //   11 → document assembly
+            //   12 → high-res printing (combined with bit 3)
+ 
+            // Base: all permission bits set (bits 3-12 = 1, others per spec)
+            // In decimal: bits 3,4,5,6,9,10,11,12 set = -4 in signed 32-bit (Ghostscript accepts negative)
+            // We build it explicitly for clarity:
+ 
+            let permBits = 0;
+ 
+            // Bit 3 — print (low res)
+            const allowPrint = permissions.printing !== 'none';
+            if (allowPrint) permBits |= (1 << 2);
+ 
+            // Bit 4 — modify document
+            if (permissions.editing) permBits |= (1 << 3);
+ 
+            // Bit 5 — copy text/graphics
+            if (permissions.copying) permBits |= (1 << 4);
+ 
+            // Bit 6 — annotate / fill forms (always allow)
+            permBits |= (1 << 5);
+ 
+            // Bit 9 — fill forms (always allow)
+            permBits |= (1 << 8);
+ 
+            // Bit 10 — content accessibility (always allow)
+            permBits |= (1 << 9);
+ 
+            // Bit 11 — document assembly (tied to editing)
+            if (permissions.editing) permBits |= (1 << 10);
+ 
+            // Bit 12 — high-res printing
+            if (permissions.printing === 'highResolution') permBits |= (1 << 11);
+ 
+            // Ghostscript expects the value as a signed 32-bit integer
+            // The spec stores bits 1-2 as 0 and bits 13-32 as 1 (= 0xFFFFF000 in upper bits)
+            // Combined with our permission bits:
+            const gsPermissions = (permBits | 0xFFFFF000) >> 0; // ensure signed 32-bit
+ 
+            // ── Build Ghostscript command ─────────────────────────────────
+            const args = [
+                '-dBATCH',
+                '-dNOPAUSE',
+                '-dQUIET',
+                '-sDEVICE=pdfwrite',
+                '-dEncryptionR=3',
+                '-dKeyLength=128',
+                `-dPermissions=${gsPermissions}`,
+                `-sOutputFile="${outputPath}"`,
+            ];
+ 
+            // Passwords are optional — only add if provided
+            if (userPassword)  args.push(`-sUserPassword=${userPassword}`);
+            if (ownerPassword) args.push(`-sOwnerPassword=${ownerPassword}`);
+ 
+            // Input file must be last
+            args.push(`"${tempInput}"`);
+ 
+            const command = `"${gsPath}" ${args.join(' ')}`;
+ 
+            exec(command, async (error, stdout, stderr) => {
+                try { await fsPromises.unlink(tempInput); } catch (e) {}
+ 
+                if (error) {
+                    console.error('[Ghostscript Protect] Error:', stderr);
+                    return reject(new Error('Ghostscript protection failed: ' + stderr));
+                }
+ 
+                resolve({ success: true });
+            });
+ 
+        } catch (err) {
+            try { await fsPromises.unlink(tempInput); } catch (e) {}
+            reject(err);
+        }
+    });
+});
+
 
 
 //////SQUIRELL EXE INSTALLER CONFIG////////

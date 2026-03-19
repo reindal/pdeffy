@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Protect PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./protectPdf.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="protectPdfHeader" class="langText">Protect PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="protectContainer">
+            <h1 id="protectPdfHeader2" class="langText">Add password and permissions to PDF</h1>
+
+            <form id="protectForm">
+
+                <!-- File input -->
+                <div class="formGroup">
+                    <label for="pdfFile" id="protectSelectLabel" class="langText">Select PDF file:</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="pdfFile" accept=".pdf" required>
+                        <label for="pdfFile" class="fileInputLabel langText" id="protectSelectButton">Click to select file</label>
+                    </div>
+                </div>
+
+                <!-- File info badge -->
+                <div id="fileInfo" class="fileInfoBadge" style="display:none;">
+                    <span id="fileNameDisplay"></span>
+                </div>
+
+                <!-- USER PASSWORD -->
+                <div class="protectSection">
+                    <h3 id="protectUserPassTitle" class="langText">Open password</h3>
+                    <p id="protectUserPassDesc" class="langText">Required to open the document.</p>
+                    <div class="formGroup">
+                        <label for="userPassword" id="protectUserPassLabel" class="langText">Password:</label>
+                        <div class="passwordWrapper">
+                            <input type="password" id="userPassword" autocomplete="new-password" class="langTextPlaceholder" data-i18n="protectPasswordPlaceholder">
+                            <button type="button" class="eyeBtn" id="toggleUserPass" data-visible="false"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+                    <div class="formGroup">
+                        <label for="userPasswordConfirm" id="protectUserPassConfirmLabel" class="langText">Confirm password:</label>
+                        <div class="passwordWrapper">
+                            <input type="password" id="userPasswordConfirm" autocomplete="new-password" class="langTextPlaceholder" data-i18n="protectPasswordPlaceholder">
+                            <button type="button" class="eyeBtn" id="toggleUserPassConfirm" data-visible="false"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+                    <p id="userPassMismatch" class="validationMsg" style="display:none;"></p>
+                </div>
+
+                <!-- OWNER PASSWORD -->
+                <div class="protectSection">
+                    <div class="sectionTitleRow">
+                        <h3 id="protectOwnerPassTitle" class="langText">Owner password</h3>
+                        <span id="protectOwnerPassOptional" class="optionalBadge langText">Optional</span>
+                    </div>
+                    <p id="protectOwnerPassDesc" class="langText">Restricts editing and permissions. If not set, a random password will be generated automatically when permissions are changed.</p>
+                    <div class="formGroup">
+                        <label for="ownerPassword" id="protectOwnerPassLabel" class="langText">Password:</label>
+                        <div class="passwordWrapper">
+                            <input type="password" id="ownerPassword" autocomplete="new-password" class="langTextPlaceholder" data-i18n="protectPasswordPlaceholder">
+                            <button type="button" class="eyeBtn" id="toggleOwnerPass" data-visible="false"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+                    <div class="formGroup">
+                        <label for="ownerPasswordConfirm" id="protectOwnerPassConfirmLabel" class="langText">Confirm password:</label>
+                        <div class="passwordWrapper">
+                            <input type="password" id="ownerPasswordConfirm" autocomplete="new-password" class="langTextPlaceholder" data-i18n="protectPasswordPlaceholder">
+                            <button type="button" class="eyeBtn" id="toggleOwnerPassConfirm" data-visible="false"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                        </div>
+                    </div>
+                    <p id="ownerPassMismatch" class="validationMsg" style="display:none;"></p>
+                </div>
+
+                <!-- PERMISSIONS -->
+                <div class="protectSection">
+                    <h3 id="protectPermissionsTitle" class="langText">Permissions</h3>
+                    <p id="protectPermissionsDesc" class="langText">Restrict what users can do with the document.</p>
+
+                    <!-- Printing -->
+                    <div class="permissionRow">
+                        <label id="protectPermPrintLabel" class="langText">Printing:</label>
+                        <select id="permPrinting">
+                            <option value="highResolution" id="protectPermPrintHigh" class="langText">Allow (high resolution)</option>
+                            <option value="lowResolution" id="protectPermPrintLow" class="langText">Allow (low resolution)</option>
+                            <option value="none" id="protectPermPrintNone" class="langText">Not allowed</option>
+                        </select>
+                    </div>
+
+                    <!-- Copy content -->
+                    <div class="permissionRow">
+                        <label for="permCopying" id="protectPermCopyLabel" class="langText">Allow copying content:</label>
+                        <label class="toggleSwitch">
+                            <input type="checkbox" id="permCopying" checked>
+                            <span class="toggleSlider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Edit document -->
+                    <div class="permissionRow">
+                        <label for="permEditing" id="protectPermEditLabel" class="langText">Allow editing:</label>
+                        <label class="toggleSwitch">
+                            <input type="checkbox" id="permEditing" checked>
+                            <span class="toggleSlider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn" disabled>
+                    <span class="langText" id="protectSubmitBtn">Protect PDF</span>
+                </button>
+
+            </form>
+
+            <!-- Generated owner password (shown only when auto-generated) -->
+            <div id="generatedOwnerBlock" class="generatedOwnerBlock" style="display:none;">
+                <p id="generatedOwnerLabel" class="langText">A random owner password was generated automatically. Save it if you want to modify permissions later:</p>
+                <div class="generatedOwnerRow">
+                    <input type="password" id="generatedOwnerDisplay" readonly>
+                    <button type="button" class="generatedEyeBtn" id="toggleGeneratedOwner" data-visible="false"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+                    <button type="button" class="copyBtn" id="copyGeneratedOwner">⧉</button>
+                </div>
+                <p id="copiedMsg" class="copiedMsg" style="display:none;"></p>
+            </div>
+
+            <div id="status" class="status-box"></div>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../ghostscriptWarning.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./protectPdf.js"></script>
+</body>
+
+</html>
+    
