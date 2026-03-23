@@ -20,9 +20,17 @@ qualityCards.forEach(card => {
     });
 });
 
-pdfFileInput.addEventListener('change', function(e) {
+pdfFileInput.addEventListener('change', async function(e) {
     const file = e.target.files[0];
     if (!file) {
+        selectedFile = null;
+        fileInfo.style.display = 'none';
+        submitBtn.disabled = true;
+        return;
+    }
+
+    const blocked = await PdfEncryptionGuard.check(file, STATUS);
+    if (blocked) {
         selectedFile = null;
         fileInfo.style.display = 'none';
         submitBtn.disabled = true;

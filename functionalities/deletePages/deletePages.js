@@ -48,6 +48,13 @@ fileInput.addEventListener('change', async function (e) {
         return;
     }
 
+    const blocked = await PdfEncryptionGuard.check(file, STATUS);
+    if (blocked) {
+        pagesPreview.style.display = 'none';
+        originalFileBuffer = null;
+        return;
+    }
+
     pagesToDelete.clear();
     const fileArrayBuffer = await file.arrayBuffer();
 

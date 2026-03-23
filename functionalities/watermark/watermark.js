@@ -130,7 +130,14 @@ if (typeof window.changeLanguage === 'function') {
 // Show selected file name and initialize canvas
 pdfFileInput.addEventListener('change', async function(e) {
     if (e.target.files.length > 0) {
-        selectedFile = e.target.files[0];
+        const file = e.target.files[0];
+        const blocked = await PdfEncryptionGuard.check(file, STATUS);
+        if (blocked) {
+            selectedFile = null;
+            return;
+        }
+
+        selectedFile = file;
         updateFileNameDisplay();
 
         // Load PDF to get actual page dimensions

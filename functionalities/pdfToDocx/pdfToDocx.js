@@ -9,10 +9,18 @@ const submitBtn = document.getElementById('submitBtn');
 
 let selectedFile = null;
 
-pdfFile.addEventListener('change', function (e) {
+pdfFile.addEventListener('change', async function (e) {
     if (e.target.files.length > 0) {
-        selectedFile = e.target.files[0];
-        fileNameDisplay.textContent = selectedFile.name;
+        const file = e.target.files[0];
+        const blocked = await PdfEncryptionGuard.check(file, STATUS);
+        if (!blocked) {
+            selectedFile = file;
+            fileNameDisplay.textContent = file.name;
+            submitBtn.disabled = false;
+        } else {
+            selectedFile = null;
+            fileNameDisplay.textContent = '';
+        }
     }
 });
 

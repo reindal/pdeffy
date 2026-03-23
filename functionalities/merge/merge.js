@@ -13,8 +13,14 @@ let selectedFiles = [];
 
 pdfFiles.addEventListener('change', function (e) {
     const newFiles = Array.from(e.target.files);
-    selectedFiles = [...selectedFiles, ...newFiles];
-    updateFilesOrder();
+    newFiles.forEach(file => {
+        PdfEncryptionGuard.checkSync(file, STATUS, (blocked) => {
+            if (!blocked) {
+                selectedFiles.push(file);
+                updateFilesOrder();
+            }
+        });
+    });
     pdfFiles.value = '';
 });
 

@@ -34,22 +34,22 @@ let togglePreviewBtn, togglePreviewText, togglePreviewIcon;
 let isPreviewCollapsed = false;
 
 // Initialize DOM elements when ready
-document.addEventListener('DOMContentLoaded', function() {
-    form                  = document.getElementById('pdfToImageForm');
-    pdfFile               = document.getElementById('pdfFile');
-    fileInfo              = document.getElementById('fileInfo');
-    submitBtn             = document.getElementById('submitBtn');
-    statusDiv             = document.getElementById('status');
-    pagesPreview          = document.getElementById('pagesPreview');
+document.addEventListener('DOMContentLoaded', function () {
+    form = document.getElementById('pdfToImageForm');
+    pdfFile = document.getElementById('pdfFile');
+    fileInfo = document.getElementById('fileInfo');
+    submitBtn = document.getElementById('submitBtn');
+    statusDiv = document.getElementById('status');
+    pagesPreview = document.getElementById('pagesPreview');
     pagesPreviewContainer = document.getElementById('pagesPreviewContainer');
-    imageFormat           = document.getElementById('imageFormat');
-    togglePreviewBtn      = document.getElementById('togglePreviewBtn');
-    togglePreviewText     = document.getElementById('togglePreviewText');
-    togglePreviewIcon     = document.getElementById('togglePreviewIcon');
+    imageFormat = document.getElementById('imageFormat');
+    togglePreviewBtn = document.getElementById('togglePreviewBtn');
+    togglePreviewText = document.getElementById('togglePreviewText');
+    togglePreviewIcon = document.getElementById('togglePreviewIcon');
 
     // Add toggle button event listener
     if (togglePreviewBtn) {
-        togglePreviewBtn.addEventListener('click', function(e) {
+        togglePreviewBtn.addEventListener('click', function (e) {
             e.preventDefault();
 
             isPreviewCollapsed = !isPreviewCollapsed;
@@ -66,13 +66,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add file input listener
     if (pdfFile) {
-        pdfFile.addEventListener('change', async function(e) {
-            selectedFile = e.target.files[0];
-            if (selectedFile) await loadPDF(selectedFile);
+        pdfFile.addEventListener('change', async function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const blocked = await PdfEncryptionGuard.check(file, STATUS);
+            if (blocked) {
+                selectedFile = null;
+                return;
+            }
+
+            selectedFile = file;
+            await loadPDF(selectedFile);
         });
     }
 
-// Add form submit listener
+    // Add form submit listener
     if (form) form.addEventListener('submit', handleFormSubmit);
 
     // Add language change listener
@@ -273,7 +282,7 @@ async function handleFormSubmit(e) {
             filename: path.basename(outputPath),
             savePath: outputPath
         });
-        
+
         // Reset form
         setTimeout(() => {
             form.reset();

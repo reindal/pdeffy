@@ -120,7 +120,18 @@ addCustomFileBtn.addEventListener('click', function(e) {
 
 pdfFile.addEventListener('change', async function(e) {
     if (e.target.files.length > 0) {
-        selectedFile = e.target.files[0];
+        const file = e.target.files[0];
+        const blocked = await PdfEncryptionGuard.check(file, STATUS);
+        if (blocked) {
+            selectedFile = null;
+            fileNameDisplay.textContent = '';
+            fileNameDisplay.classList.remove('active');
+            totalPdfPages = 0;
+            totalPagesInfo.style.display = 'none';
+            return;
+        }
+
+        selectedFile = file;
         fileNameDisplay.textContent = getMessage('selectedFile') + selectedFile.name;
         fileNameDisplay.classList.add('active');
         updateFileSizeInfo();
