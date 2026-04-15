@@ -699,8 +699,9 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                                     });
                                 });
 
-                                // 2. Universal Header/Footer Detection (Mathematical)
+                                // 2. Universal Header/Footer Detection (Mathematical Only)
                                 // If exact text repeats at the exact same Y position across multiple pages, it's a document artifact.
+                                // We strictly removed any hardcoded words (like "page") to prevent data loss.
                                 const textFrequency = new Map();
                                 rawElements.forEach(el => {
                                     const key = `${Math.round(el.y)}_${el.text}`;
@@ -714,12 +715,6 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                                     
                                     // Remove repeating headers/footers (e.g. Title repeating on every page)
                                     if (totalPages > 1 && pagesAppeared > 1) return false;
-                                    
-                                    // Universal heuristic for standalone page numbers at top/bottom margins
-                                    const isEdge = el.y < 3 || el.y > 30; // Standard PDF margins
-                                    const hasNumbers = /\d/.test(el.text);
-                                    if (isEdge && el.text.length < 12 && hasNumbers && /page|pág/i.test(el.text)) return false;
-
                                     return true;
                                 });
 
