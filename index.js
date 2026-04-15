@@ -629,16 +629,14 @@ function convertWithMSOfficeWindows(inputPath, outputPath, format, inputExtensio
 ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, outputPath, format = 'pdf', metadata }) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // Bypass Linux Snap sandbox restrictions by avoiding the system /tmp directory.
-            // We route temporary files to the user-selected destination folder (e.g., Downloads),
-            // which the Snap environment natively has permission to read and write.
+            // Bypass Linux Snap sandbox restrictions
             const targetDir = path.dirname(outputPath);
 
             // Parse clean name to avoid double extensions (e.g., file.pdf.pdf -> file.pdf)
             const parsedName = path.parse(fileName).name;
 
-            // Prefix with a dot to create a hidden temporary file in UNIX systems
-            const uniqueFileName = `.temp_${Date.now()}_${parsedName}${path.parse(fileName).ext}`;
+            // Clean temp name
+            const uniqueFileName = `temp_${Date.now()}_${parsedName}${path.parse(fileName).ext}`;
             const tempInputPath = path.join(targetDir, uniqueFileName);
 
             await fsPromises.writeFile(tempInputPath, Buffer.from(fileData));
@@ -662,6 +660,157 @@ ipcMain.handle('convert-with-libreoffice', async (event, { fileData, fileName, o
                     conversionSuccess = true;
                 } catch (msError) {
                     console.log("[Conversion] MS Office failed or is not installed. Falling back to LibreOffice...");
+                }
+            }
+
+            // --- NATIVE JS STRATEGY: PDF TO EXCEL (iLovePDF Style Algorithm) ---
+            if (!conversionSuccess && isPdfInput && format === 'xlsx') {
+                console.log(`[Conversion] Using Native JS Engine (Advanced Grid & Cleanup) for PDF to Excel...`);
+                
+                try {
+                    const PDFParser = require("pdf2json");
+                    const xlsx = require("xlsx");
+                    
+                    await new Promise((res, rej) => {
+                        const pdfParser = new PDFParser();
+
+                        pdfParser.on("pdfParser_dataError", errData => {
+                            rej(new Error("PDF Parsing failed: " + errData.parserError));
+                        });
+
+                        pdfParser.on("pdfParser_dataReady", async (pdfData) => {
+                            try {
+                                const rawElements = [];
+                                const totalPages = pdfData.Pages.length;
+                                
+                                // 1. Extract ALL texts
+                                pdfData.Pages.forEach((page, pageIndex) => {
+                                    page.Texts.forEach((textNode) => {
+                                        const textString = decodeURIComponent(textNode.R[0].T).trim();
+                                        if (textString) {
+                                            rawElements.push({
+                                                page: pageIndex,
+                                                x: textNode.x,
+                                                y: textNode.y,
+                                                absoluteY: textNode.y + (pageIndex * 1000), // Stack pages vertically
+                                                text: textString
+                                            });
+                                        }
+                                    });
+                                });
+
+                                // 2. Universal Header/Footer Detection (Mathematical)
+                                // If exact text repeats at the exact same Y position across multiple pages, it's a document artifact.
+                                const textFrequency = new Map();
+                                rawElements.forEach(el => {
+                                    const key = `${Math.round(el.y)}_${el.text}`;
+                                    if (!textFrequency.has(key)) textFrequency.set(key, new Set());
+                                    textFrequency.get(key).add(el.page);
+                                });
+
+                                const elements = rawElements.filter(el => {
+                                    const key = `${Math.round(el.y)}_${el.text}`;
+                                    const pagesAppeared = textFrequency.get(key).size;
+                                    
+                                    // Remove repeating headers/footers (e.g. Title repeating on every page)
+                                    if (totalPages > 1 && pagesAppeared > 1) return false;
+                                    
+                                    // Universal heuristic for standalone page numbers at top/bottom margins
+                                    const isEdge = el.y < 3 || el.y > 30; // Standard PDF margins
+                                    const hasNumbers = /\d/.test(el.text);
+                                    if (isEdge && el.text.length < 12 && hasNumbers && /page|pág/i.test(el.text)) return false;
+
+                                    return true;
+                                });
+
+                                // Tolerances for visual grouping
+                                const Y_TOLERANCE = 0.5; 
+                                const X_TOLERANCE = 0.5; // Stricter tolerance to separate close columns (e.g., Rating and Rating Info)
+
+                                // 3. Build Global Columns (X-axis)
+                                const xCoords = elements.map(e => e.x).sort((a, b) => a - b);
+                                const globalCols = [];
+                                xCoords.forEach(x => {
+                                    let found = globalCols.find(c => Math.abs(c.center - x) <= X_TOLERANCE);
+                                    if (!found) {
+                                        globalCols.push({ center: x, xs: [x] });
+                                    } else {
+                                        found.xs.push(x);
+                                        found.center = found.xs.reduce((a, b) => a + b, 0) / found.xs.length;
+                                    }
+                                });
+                                globalCols.sort((a, b) => a.center - b.center);
+
+                                // 4. Build Rows (Y-axis)
+                                const rowsMap = new Map();
+                                elements.forEach(el => {
+                                    let foundY = null;
+                                    for (let existingY of rowsMap.keys()) {
+                                        if (Math.abs(existingY - el.absoluteY) <= Y_TOLERANCE) {
+                                            foundY = existingY;
+                                            break;
+                                        }
+                                    }
+                                    if (foundY === null) {
+                                        foundY = el.absoluteY;
+                                        rowsMap.set(foundY, []);
+                                    }
+                                    rowsMap.get(foundY).push(el);
+                                });
+
+                                // 5. Map elements to the grid
+                                const sortedYKeys = Array.from(rowsMap.keys()).sort((a, b) => a - b);
+                                let finalAOA = sortedYKeys.map(yKey => {
+                                    const gridRow = new Array(globalCols.length).fill("");
+                                    
+                                    rowsMap.get(yKey).forEach(el => {
+                                        const colIdx = globalCols.findIndex(c => Math.abs(c.center - el.x) <= X_TOLERANCE);
+                                        if (colIdx !== -1) {
+                                            if (gridRow[colIdx] !== "") {
+                                                gridRow[colIdx] += " " + el.text;
+                                            } else {
+                                                gridRow[colIdx] = el.text;
+                                            }
+                                        }
+                                    });
+                                    return gridRow;
+                                });
+
+                                // 6. Cleanup Phase: Prune completely empty rows and columns
+                                // Keep only rows that have at least one non-empty cell
+                                finalAOA = finalAOA.filter(row => row.some(cell => cell.trim() !== ""));
+                                
+                                // Keep only columns that have data in at least one row
+                                const colsToKeep = [];
+                                for (let c = 0; c < globalCols.length; c++) {
+                                    if (finalAOA.some(row => row[c] && row[c].trim() !== "")) {
+                                        colsToKeep.push(c);
+                                    }
+                                }
+                                finalAOA = finalAOA.map(row => colsToKeep.map(c => row[c]));
+
+                                // 7. Build and save the Excel workbook
+                                const wb = xlsx.utils.book_new();
+                                const ws = xlsx.utils.aoa_to_sheet(finalAOA);
+                                xlsx.utils.book_append_sheet(wb, ws, "ConvertedData");
+                                xlsx.writeFile(wb, outputPath);
+                                
+                                res();
+                            } catch (e) {
+                                rej(new Error("Excel Assembly Error: " + e.message));
+                            }
+                        });
+
+                        pdfParser.loadPDF(tempInputPath);
+                    });
+
+                    // Clean up temporary file before returning
+                    try { await fsPromises.unlink(tempInputPath); } catch (e) { }
+                    resolve({ success: true });
+                    
+                    return; 
+                } catch (err) {
+                    console.log("[Conversion] Native JS Excel conversion failed. Falling back to LibreOffice...", err);
                 }
             }
 
@@ -903,7 +1052,6 @@ ipcMain.handle('save-warning-settings', async (event, featureId) => {
 
 // =========================================================
 // GHOSTSCRIPT PATH RESOLVER
-// Add this near getSystemLibreOfficePath() in main.js
 // =========================================================
 
 function getGhostscriptPath() {
@@ -947,7 +1095,6 @@ function getGhostscriptPath() {
 
 // =========================================================
 // IPC: CHECK GHOSTSCRIPT AVAILABILITY
-// Add this near check-engines-availability in main.js
 // =========================================================
 
 ipcMain.handle('check-ghostscript-availability', async () => {
@@ -960,7 +1107,6 @@ ipcMain.handle('check-ghostscript-availability', async () => {
 
 // =========================================================
 // IPC: COMPRESS PDF WITH GHOSTSCRIPT
-// Add this near convert-with-libreoffice in main.js
 // =========================================================
 
 ipcMain.handle('compress-with-ghostscript', async (event, { fileData, fileName, outputPath, quality }) => {
@@ -1028,7 +1174,6 @@ ipcMain.handle('open-external-url', (_, url) => {
 
 // =========================================================
 // IPC: PROTECT PDF WITH GHOSTSCRIPT (AES-256)
-// Add this in main.js near the compress-with-ghostscript handler
 // =========================================================
  
 ipcMain.handle('protect-with-ghostscript', async (event, {

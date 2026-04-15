@@ -1,0 +1,25 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+.pdfToExcelContainer {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.pdfToExcelContainer h1 {
+    text-align: center;
+    color: var(--reindalDark);
+    margin-bottom: 30px;
+    font-family: var(--font-primary), serif;
+}
+
+.fileName {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--reindalGray);
+    font-weight: 500;
+}

@@ -1,7 +1,7 @@
 {
   "name": "pdeffy",
   "productName": "Pdeffy",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "main": "index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -33,6 +33,7 @@
     "jszip2": "npm:jszip@2.6.1",
     "mammoth": "^1.11.0",
     "pdf-lib": "^1.17.1",
+    "pdf2json": "^4.0.2",
     "pdfjs-dist": "^5.4.624",
     "pizzip": "^3.2.0",
     "pptx2html": "^0.3.4",

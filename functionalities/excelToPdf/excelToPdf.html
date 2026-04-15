@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Excel to PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./excelToPdf.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="excelToPdfHeader" class="langText">Excel to PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="documentToPdfContainer">
+            <h1 id="excelToPdfHeader2" class="langText">Convert Excel to PDF</h1>
+
+            <form id="excelToPdfForm">
+                <div class="formGroup">
+                    <label for="excelFile" id="excelToPdfSelectLabel" class="langText">Select Excel file (.xlsx, .xls):</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="excelFile" accept=".xlsx, .xls" required>
+                        <label for="excelFile" class="fileInputLabel langText" id="excelToPdfSelectButton">Click to select file</label>
+                    </div>
+                </div>
+
+                <div id="fileInfo" class="status" style="display: none; background: #eee; color: #333;">
+                    <span id="fileNameDisplay"></span>
+                </div>
+
+                <button type="submit" class="submitBtn" id="submitBtn">
+                    <span class="langText" id="excelToPdfSubmitBtn">Convert to PDF</span>
+                </button>
+            </form>
+
+            <div id="status" class="status"></div>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./excelToPdf.js"></script>
+    <script src="./../engineWarning.js"></script>
+</body>
+
+</html>

@@ -260,6 +260,26 @@ const languages = {
         pdfByTemplateCompany: "Company",
         pdfByTemplateAgent: "Agent",
 
+        // Index - Excel & PDF
+        excelToPdfText: "EXCEL To PDF",
+        excelToPdfDesc: "Convert an EXCEL file into a PDF document.",
+        pdfToExcelText: "PDF To EXCEL",
+        pdfToExcelDesc: "Convert a PDF file into an EXCEL document.",
+
+        // Excel to PDF
+        excelToPdfHeader: "Excel to PDF",
+        excelToPdfHeader2: "Convert Excel to PDF",
+        excelToPdfSelectLabel: "Select Excel file (.xlsx, .xls):",
+        excelToPdfSelectButton: "Click to select file",
+        excelToPdfSubmitBtn: "Convert to PDF",
+
+        // PDF to Excel
+        pdfToExcelHeader: "PDF to Excel",
+        pdfToExcelHeader2: "Convert PDF to Excel",
+        pdfToExcelSelectLabel: "Select PDF file:",
+        pdfToExcelSelectButton: "Click to select file",
+        pdfToExcelSubmitBtn: "Convert to Excel",
+
         // PDF by template messages:
         readingExcel: "Reading Excel data...",
         errorEmptyExcel: "The Excel file is empty or could not be read.",
@@ -650,6 +670,26 @@ const languages = {
         pdfByTemplateCompany: "Azienda",
         pdfByTemplateAgent: "Agente",
 
+        // Index - Excel & PDF
+        excelToPdfText: "EXCEL a PDF",
+        excelToPdfDesc: "Converti un file EXCEL in un documento PDF.",
+        pdfToExcelText: "PDF a EXCEL",
+        pdfToExcelDesc: "Converti un file PDF in un documento EXCEL.",
+
+        // Excel to PDF
+        excelToPdfHeader: "Excel a PDF",
+        excelToPdfHeader2: "Converti Excel in PDF",
+        excelToPdfSelectLabel: "Seleziona file Excel (.xlsx, .xls):",
+        excelToPdfSelectButton: "Fai clic per selezionare il file",
+        excelToPdfSubmitBtn: "Converti in PDF",
+
+        // PDF to Excel
+        pdfToExcelHeader: "PDF a Excel",
+        pdfToExcelHeader2: "Converti PDF in Excel",
+        pdfToExcelSelectLabel: "Seleziona file PDF:",
+        pdfToExcelSelectButton: "Fai clic per selezionare il file",
+        pdfToExcelSubmitBtn: "Converti in Excel",
+
         // PDF by template messages:
         readingExcel: "Lettura dati Excel in corso...",
         errorEmptyExcel: "Il file Excel è vuoto o non può essere letto.",
@@ -1034,6 +1074,26 @@ const languages = {
         pdfByTemplateCompany: "Firma",
         pdfByTemplateAgent: "Agent",
 
+        // Index - Excel & PDF
+        excelToPdfText: "EXCEL na PDF",
+        excelToPdfDesc: "Konwertuj plik EXCEL na dokument PDF.",
+        pdfToExcelText: "PDF na EXCEL",
+        pdfToExcelDesc: "Konwertuj plik PDF na dokument EXCEL.",
+
+        // Excel to PDF
+        excelToPdfHeader: "Excel na PDF",
+        excelToPdfHeader2: "Konwertuj Excel na PDF",
+        excelToPdfSelectLabel: "Wybierz plik Excel (.xlsx, .xls):",
+        excelToPdfSelectButton: "Kliknij, aby wybrać plik",
+        excelToPdfSubmitBtn: "Konwertuj na PDF",
+
+        // PDF to Excel
+        pdfToExcelHeader: "PDF na Excel",
+        pdfToExcelHeader2: "Konwertuj PDF na Excel",
+        pdfToExcelSelectLabel: "Wybierz plik PDF:",
+        pdfToExcelSelectButton: "Kliknij, aby wybrać plik",
+        pdfToExcelSubmitBtn: "Konwertuj na Excel",
+
         // PDF by template messages:
         readingExcel: "Odczytywanie danych z pliku Excel...",
         errorEmptyExcel: "Plik Excel jest pusty lub nie można go odczytać.",
@@ -1400,6 +1460,26 @@ const languages = {
         pdfByTemplateInfoText: "La primera fila debe contener exactamente los mismos nombres que colocaste entre llaves dobles en el documento de Word (ej. {{COMPANY}}). Cada fila inferior generará un nuevo PDF.",
         pdfByTemplateCompany: "Empresa",
         pdfByTemplateAgent: "Agente",
+
+        // Index - Excel & PDF
+        excelToPdfText: "EXCEL a PDF",
+        excelToPdfDesc: "Convierte un archivo EXCEL en un documento PDF.",
+        pdfToExcelText: "PDF a EXCEL",
+        pdfToExcelDesc: "Convierte un archivo PDF en un documento EXCEL.",
+
+        // Excel to PDF
+        excelToPdfHeader: "Excel a PDF",
+        excelToPdfHeader2: "Convertir Excel a PDF",
+        excelToPdfSelectLabel: "Seleccionar archivo Excel (.xlsx, .xls):",
+        excelToPdfSelectButton: "Haz clic para seleccionar el archivo",
+        excelToPdfSubmitBtn: "Convertir a PDF",
+
+        // PDF to Excel
+        pdfToExcelHeader: "PDF a Excel",
+        pdfToExcelHeader2: "Convertir PDF a Excel",
+        pdfToExcelSelectLabel: "Seleccionar archivo PDF:",
+        pdfToExcelSelectButton: "Haz clic para seleccionar el archivo",
+        pdfToExcelSubmitBtn: "Convertir a Excel",
 
         // PDF by template messages:
         readingExcel: "Leyendo datos del Excel...",

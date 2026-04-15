@@ -1,0 +1,24 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+.documentToPdfContainer {
+    max-width: 600px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.documentToPdfContainer h1 {
+    text-align: center;
+    color: var(--reindalDark);
+    margin-bottom: 30px;
+}
+
+#fileInfo {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-left: 4px solid var(--reindalYellow);
+    font-size: 0.9em;
+}
