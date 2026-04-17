@@ -26,6 +26,9 @@ const languageSelector = document.getElementById('languageSelector');
 let rangeCount = 1;
 let customFileCount = 1;
 let totalPdfPages = 0;
+let generatedFiles= []
+
+window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
 
 if (languageSelector) {
     languageSelector.addEventListener('change', () => {
@@ -358,11 +361,13 @@ form.addEventListener('submit', async function(e) {
             await fs.writeFile(outputPath, zipContent);
         } else {
             for (let i = 0; i < pdfFiles.length; i++) {
-                await fs.writeFile(path.join(outputFolder, `${baseName}_${i + 1}.pdf`), pdfFiles[i]);
+                generatedFiles[i] = path.join(outputFolder, `${baseName}_${i + 1}.pdf`);
+                await fs.writeFile(generatedFiles[i], pdfFiles[i]);
             }
         }
 
         StatusManager.show(STATUS, 'success', 'successSplitFiles', {
+            savedFiles: generatedFiles,
             count: pdfFiles.length,
             filename: path.basename(outputPath),
             savePath: outputPath

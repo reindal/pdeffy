@@ -254,6 +254,13 @@ async function handleFormSubmit(e) {
             const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
             await fs.writeFile(outputPath, zipContent);
 
+            StatusManager.show(STATUS, 'success', 'successConverted', {
+                count: numPages,
+                format: 'ZIP',
+                filename: path.basename(outputPath),
+                savePath: outputPath
+            });
+
         } else {
             // Save as image dialog
             outputPath = await ipcRenderer.invoke('show-save-dialog', {
@@ -269,19 +276,26 @@ async function handleFormSubmit(e) {
 
             const outputFolder = path.dirname(outputPath);
             const baseName = path.basename(outputPath, `.${format}`);
+            
+            // Array to store the paths of the generated images
+            const generatedFiles = [];
 
             // Save all image files
             for (let i = 0; i < imageFiles.length; i++) {
-                await fs.writeFile(path.join(outputFolder, `${baseName}_${i + 1}.${format}`), imageFiles[i]);
+                const finalPath = path.join(outputFolder, `${baseName}_${i + 1}.${format}`);
+                await fs.writeFile(finalPath, imageFiles[i]);
+                generatedFiles.push(finalPath);
             }
+            
+            // Send the array to StatusManager (it will ignore it if saveAsZip was true)
+            StatusManager.show(STATUS, 'success', 'successConverted', {
+                count: numPages,
+                format: format.toUpperCase(),
+                filename: path.basename(outputPath),
+                savePath: outputPath,
+                savedFiles: generatedFiles 
+            });
         }
-
-        StatusManager.show(STATUS, 'success', 'successConverted', {
-            count: numPages,
-            format: format.toUpperCase(),
-            filename: path.basename(outputPath),
-            savePath: outputPath
-        });
 
         // Reset form
         setTimeout(() => {

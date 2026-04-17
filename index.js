@@ -254,9 +254,36 @@ function createWindow() {
     });
 }
 
-ipcMain.handle('open-folder', (_, folderPath) => {
-    shell.openPath(folderPath);
+ipcMain.handle('open-folder', async (event, folderPath) => {
+    try {
+        // shell.openPath can also open folders in the file explorer
+        const error = await shell.openPath(folderPath);
+        if (error) {
+            console.error('Failed to open folder:', error);
+            return { success: false, error };
+        }
+        return { success: true };
+    } catch (error) {
+        console.error('Exception opening folder:', error);
+        return { success: false, error: error.message };
+    }
 });
+
+ipcMain.handle('open-file', async (event, filePath) => {
+    try {
+        // shell.openPath opens the file with the default desktop application
+        const error = await shell.openPath(filePath);
+        if (error) {
+            console.error('Failed to open file:', error);
+            return { success: false, error };
+        }
+        return { success: true };
+    } catch (error) {
+        console.error('Exception opening file:', error);
+        return { success: false, error: error.message };
+    }
+});
+
 
 function setTranslatedMenu(appVersion, language) {
     let menuFile, menuExit, menuHelp, menuAbout, textVersion, textAuthor, textLicense, textDesc;
@@ -1043,7 +1070,6 @@ ipcMain.handle('save-warning-settings', async (event, featureId) => {
         throw error;
     }
 });
-
 
 // =========================================================
 // GHOSTSCRIPT PATH RESOLVER

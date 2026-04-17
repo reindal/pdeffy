@@ -409,7 +409,13 @@ const languages = {
         engineWarningInfoDesc: "You are using LibreOffice for this conversion. While it works well, complex PDFs might lose some styling or formatting. For pixel-perfect conversions, Microsoft Office is recommended.",
         engineWarningInfoBtn: "Got it, continue",
         engineWarningDontShow: "Don't show this warning again",
-        encryptedPdfError: "This PDF file is password protected and cannot be processed"
+        encryptedPdfError: "This PDF file is password protected and cannot be processed",
+
+        statusOpenFile: "Open file",
+        statusViewResults: "View results",
+        modalGeneratedFilesTitle: "Generated Files",
+        modalCloseBtn: "✕ Close",
+        statusOpenFolder: "Open folder"
     },
     it: {
         languageText: "Lingua",
@@ -813,7 +819,13 @@ const languages = {
         engineWarningInfoDesc: "Stai utilizzando LibreOffice per questa conversione. Sebbene funzioni bene, i PDF complessi potrebbero perdere parte dello stile o della formattazione. Per conversioni perfette, si consiglia Microsoft Office.",
         engineWarningInfoBtn: "Capito, continua",
         engineWarningDontShow: "Non mostrare più questo avvertimento",
-        encryptedPdfError: "Questo file PDF è protetto da password, non può essere elaborato"
+        encryptedPdfError: "Questo file PDF è protetto da password, non può essere elaborato",
+
+        statusOpenFile: "Apri file",
+        statusViewResults: "Vedi risultati",
+        modalGeneratedFilesTitle: "File generati",
+        modalCloseBtn: "✕ Chiudi",
+        statusOpenFolder: "Apri cartella"
     },
     pl: {
         languageText: "Język",
@@ -1214,7 +1226,13 @@ const languages = {
         engineWarningInfoDesc: "Używasz programu LibreOffice do tej konwersji. Chociaż działa on dobrze, złożone pliki PDF mogą utracić część stylów lub formatowania. Aby uzyskać idealne konwersje, zaleca się korzystanie z programu Microsoft Office.",
         engineWarningInfoBtn: "Rozumiem, kontynuuj",
         engineWarningDontShow: "Nie pokazuj więcej tego ostrzeżenia",
-        encryptedPdfError: "Ten plik PDF jest chroniony hasłem, nie można go przetworzyć"
+        encryptedPdfError: "Ten plik PDF jest chroniony hasłem, nie można go przetworzyć",
+
+        statusOpenFile: "Otwórz plik",
+        statusViewResults: "Zobacz wyniki",
+        modalGeneratedFilesTitle: "Wygenerowane pliki",
+        modalCloseBtn: "✕ Zamknij",
+        statusOpenFolder: "Otwórz folder"
     },
     es: {
         languageText: "Idioma",
@@ -1608,7 +1626,13 @@ const languages = {
         engineWarningInfoDesc: "Estás utilizando LibreOffice para esta conversión. Aunque funciona bien, los PDF complejos pueden perder algo de estilo o formato. Para conversiones perfectas, se recomienda usar Microsoft Office.",
         engineWarningInfoBtn: "Entendido, continuar",
         engineWarningDontShow: "No volver a mostrar esta advertencia",
-        encryptedPdfError: "Este archivo PDF está protegido con contraseña, no se puede procesar"
+        encryptedPdfError: "Este archivo PDF está protegido con contraseña, no se puede procesar",
+
+        statusOpenFile: "Abrir archivo",
+        statusViewResults: "Ver resultados",
+        modalGeneratedFilesTitle: "Archivos generados",
+        modalCloseBtn: "✕ Cerrar",
+        statusOpenFolder: "Abrir carpeta"
     },
 };
 
