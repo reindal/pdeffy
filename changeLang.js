@@ -415,7 +415,26 @@ const languages = {
         statusViewResults: "View results",
         modalGeneratedFilesTitle: "Generated Files",
         modalCloseBtn: "✕ Close",
-        statusOpenFolder: "Open folder"
+
+        // Rotate PDF
+        rotatePagesTitle: "Rotate PDF",
+        rotatePagesDesc: "Rotate pages in your PDF",
+        selectPdfFile: "Select a PDF file to rotate:",
+        clickToSelectFile: "Select PDF file:",
+        clickToSelectPages: "Select pages to rotate",
+        columns: "Columns:",
+        waitingForPdf: "Waiting for PDF file...",
+        selectionTools: "Selection Tools",
+        selectAll: "Select All",
+        deselectAll: "Deselect All",
+        pageRange: "Page Range (e.g. 1-5):",
+        modeSelect: "Mode: Select",
+        modeDeselect: "Mode: Deselect",
+        applyRange: "Apply",
+        rotationTools: "Rotate Selected",
+        generateRotatedPdf: "Save Rotated PDF",
+        invalidRangeFormat: "Invalid format. Use numbers (e.g. 5) or ranges (e.g. 1-5).",
+        selectPagesFirst: "Please select at least one page to rotate."
     },
     it: {
         languageText: "Lingua",
@@ -825,7 +844,26 @@ const languages = {
         statusViewResults: "Vedi risultati",
         modalGeneratedFilesTitle: "File generati",
         modalCloseBtn: "✕ Chiudi",
-        statusOpenFolder: "Apri cartella"
+
+        // Rotate PDF
+        rotatePagesTitle: "Ruota PDF",
+        rotatePagesDesc: "Ruota le pagine del tuo PDF",
+        selectPdfFile: "Seleziona un file PDF da ruotare:",
+        clickToSelectFile: "Seleziona file PDF:",
+        clickToSelectPages: "Seleziona le pagine da ruotare",
+        columns: "Colonne:",
+        waitingForPdf: "In attesa del file PDF...",
+        selectionTools: "Strumenti di selezione",
+        selectAll: "Seleziona tutto",
+        deselectAll: "Deseleziona tutto",
+        pageRange: "Intervallo (es. 1-5):",
+        modeSelect: "Modalità: Seleziona",
+        modeDeselect: "Modalità: Deseleziona",
+        applyRange: "Applica",
+        rotationTools: "Ruota selezione",
+        generateRotatedPdf: "Salva PDF ruotato",
+        invalidRangeFormat: "Formato non valido. Usa numeri (es. 5) o intervalli (es. 1-5).",
+        selectPagesFirst: "Seleziona almeno una pagina da ruotare."
     },
     pl: {
         languageText: "Język",
@@ -1232,7 +1270,26 @@ const languages = {
         statusViewResults: "Zobacz wyniki",
         modalGeneratedFilesTitle: "Wygenerowane pliki",
         modalCloseBtn: "✕ Zamknij",
-        statusOpenFolder: "Otwórz folder"
+
+        // Rotate PDF
+        rotatePagesTitle: "Obróć PDF",
+        rotatePagesDesc: "Obróć strony w swoim PDF",
+        selectPdfFile: "Wybierz plik PDF do obrócenia:",
+        clickToSelectFile: "Wybierz plik PDF:",
+        clickToSelectPages: "Wybierz strony do obrócenia",
+        columns: "Kolumny:",
+        waitingForPdf: "Oczekiwanie na plik PDF...",
+        selectionTools: "Narzędzia wyboru",
+        selectAll: "Zaznacz wszystko",
+        deselectAll: "Odznacz wszystko",
+        pageRange: "Zakres (np. 1-5):",
+        modeSelect: "Tryb: Zaznacz",
+        modeDeselect: "Tryb: Odznacz",
+        applyRange: "Zastosuj",
+        rotationTools: "Obróć wybrane",
+        generateRotatedPdf: "Zapisz obrócony PDF",
+        invalidRangeFormat: "Nieprawidłowy format. Użyj liczb (np. 5) lub zakresów (np. 1-5).",
+        selectPagesFirst: "Wybierz przynajmniej jedną stronę do obrócenia."
     },
     es: {
         languageText: "Idioma",
@@ -1632,7 +1689,26 @@ const languages = {
         statusViewResults: "Ver resultados",
         modalGeneratedFilesTitle: "Archivos generados",
         modalCloseBtn: "✕ Cerrar",
-        statusOpenFolder: "Abrir carpeta"
+
+        // Rotate PDF
+        rotatePagesTitle: "Rotar PDF",
+        rotatePagesDesc: "Gira las páginas de tu PDF",
+        selectPdfFile: "Selecciona un archivo PDF para rotar:",
+        clickToSelectFile: "Seleccionar archivo PDF:",
+        clickToSelectPages: "Selecciona las páginas para rotar",
+        columns: "Columnas:",
+        waitingForPdf: "Esperando archivo PDF...",
+        selectionTools: "Herramientas de selección",
+        selectAll: "Seleccionar todo",
+        deselectAll: "Deseleccionar todo",
+        pageRange: "Rango (ej. 1-5):",
+        modeSelect: "Modo: Seleccionar",
+        modeDeselect: "Modo: Deseleccionar",
+        applyRange: "Aplicar",
+        rotationTools: "Rotar selección",
+        generateRotatedPdf: "Guardar PDF Rotado",
+        invalidRangeFormat: "Formato inválido. Usa números (ej. 5) o rangos (ej. 1-5).",
+        selectPagesFirst: "Por favor, selecciona al menos una página para rotarla."
     },
 };
 

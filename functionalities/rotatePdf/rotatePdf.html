@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rotate PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./rotatePdf.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="rotatePagesText" class="langText" data-i18n="rotatePagesTitle">Rotate PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="rotateContainer">
+            <h1 id="rotatePagesDesc" class="langText" data-i18n="rotatePagesDesc">Rotate pages in your PDF</h1>
+            
+            <div class="formGroup">
+                <label for="pdfFile" id="rotateSelectLabel" class="langText" data-i18n="selectPdfFile">Select PDF file:</label>
+                <div class="fileInputWrapper">
+                    <input type="file" id="pdfFile" accept=".pdf" required>
+                    <label for="pdfFile" class="fileInputLabel langText" id="rotateSelectButton" data-i18n="clickToSelectFile">Click to select file</label>
+                </div>
+            </div>
+
+            <div id="rotateWorkspace" class="rotateWorkspace">
+                
+                <div class="pdfPreviewArea">
+                    <div class="previewHeaderRow">
+                        <h3 class="langText" data-i18n="clickToSelectPages">Select pages to rotate</h3>
+                        
+                        <div class="columnControl">
+                            <label for="colCountInput" class="langText" data-i18n="columns">Columns:</label>
+                            <input type="number" id="colCountInput" min="1" max="4" value="3">
+                        </div>
+                    </div>
+                    
+                    <div id="pagesGrid" class="pagesGrid" style="--col-count: 3;">
+                        <p class="placeholderText langText" data-i18n="waitingForPdf">Waiting for PDF file...</p>
+                    </div>
+                </div>
+
+                <div class="controlSidebar">
+                    
+                    <div class="sidebarPanel">
+                        <h4 class="langText" data-i18n="selectionTools">Selection Tools</h4>
+                        <div class="btnGroup">
+                            <button type="button" id="selectAllBtn" class="toolBtn langText" data-i18n="selectAll">Select All</button>
+                            <button type="button" id="deselectAllBtn" class="toolBtn langText" data-i18n="deselectAll">Deselect All</button>
+                        </div>
+
+                        <div class="rangeControl">
+                            <label class="langText" data-i18n="pageRange">Page Range (e.g. 1-5):</label>
+                            <input type="text" id="rangeInput" placeholder="1-5" class="rangeInput">
+                            
+                            <div class="rangeActionGroup">
+                                <button type="button" id="rangeModeBtn" class="modeBtn selectMode langText" data-mode="select" data-i18n="modeSelect">Mode: Select</button>
+                                <button type="button" id="applyRangeBtn" class="applyBtn langText" data-i18n="applyRange">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebarPanel">
+                        <h4 class="langText" data-i18n="rotationTools">Rotate Selected</h4>
+                        <div class="btnGroup">
+                            <button type="button" id="rotateLeftBtn" class="toolBtn rotateActionBtn">↺ -90°</button>
+                            <button type="button" id="rotateRightBtn" class="toolBtn rotateActionBtn">↻ +90°</button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="submitBtn" id="submitBtn" disabled>
+                        <span class="langText" data-i18n="generateRotatedPdf">Save Rotated PDF</span>
+                    </button>
+                    
+                    <div id="status" class="status"></div>
+                </div>
+            </div>
+
+            <a href="../../index.html" class="backLink langText" data-i18n="backLink">← Back to home</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../pdfEncryptionGuard.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./../../libs/pdf.min.js"></script>
+    <script src="./rotatePdf.js"></script>
+</body>
+
+</html>

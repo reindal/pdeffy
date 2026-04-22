@@ -1,0 +1,265 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+.rotateContainer {
+    max-width: 1100px; 
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.rotateContainer h1 {
+    text-align: center;
+    color: var(--reindalDark);
+    margin-bottom: 30px;
+    font-family: var(--font-primary), serif;
+}
+
+/* Workspace Layout */
+.rotateWorkspace {
+    display: flex;
+    gap: 25px;
+    margin-top: 20px;
+    align-items: stretch; 
+}
+
+/* Left Area (Previews) */
+.pdfPreviewArea {
+    flex: 1;
+    background-color: var(--reindalExtraLight);
+    border: 2px solid var(--reindalGray);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; 
+    min-height: calc(100vh - 250px);
+}
+
+.previewHeaderRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--reindalGray);
+}
+
+.previewHeaderRow h3 {
+    margin: 0;
+    color: var(--reindalDark);
+}
+
+.columnControl {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: var(--reindalDark);
+}
+
+.columnControl input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid var(--reindalGray);
+    border-radius: 4px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* Sidebar Controls */
+.controlSidebar {
+    width: 320px;
+    position: sticky;
+    top: 20px; 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: fit-content;
+}
+
+.sidebarPanel {
+    background-color: var(--reindalExtraLight);
+    border: 2px solid var(--reindalGray);
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.sidebarPanel h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--reindalDark);
+    border-bottom: 1px solid var(--reindalGray);
+    padding-bottom: 5px;
+}
+
+.btnGroup {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.toolBtn {
+    flex: 1;
+    padding: 10px;
+    background-color: var(--reindalLight);
+    border: 1px solid var(--reindalGray);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.toolBtn:hover {
+    background-color: var(--reindalYellow);
+    border-color: var(--reindalDark);
+}
+
+.rotateActionBtn {
+    font-size: 1.1rem;
+    background-color: var(--reindalDark);
+    color: white;
+    border: none;
+}
+
+.rotateActionBtn:hover {
+    background-color: var(--reindalYellow);
+    color: var(--reindalDark);
+}
+
+.rangeControl {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rangeInput {
+    padding: 10px;
+    border: 1px solid var(--reindalGray);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.rangeActionGroup {
+    display: flex;
+    gap: 10px;
+}
+
+.modeBtn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.modeBtn.selectMode {
+    background-color: var(--reindalYellow);
+    color: var(--reindalDark);
+}
+
+.modeBtn.deselectMode {
+    background-color: var(--reindalGray);
+    color: var(--reindalDark);
+}
+
+.applyBtn {
+    flex: 1;
+    padding: 8px;
+    background-color: var(--reindalDark);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Pages Grid dynamically sized */
+#pagesGrid {
+    display: grid;
+    grid-template-columns: repeat(var(--col-count, 3), minmax(0, 1fr));
+    gap: 20px;
+    align-content: start; 
+    padding: 5px;
+    padding-right: 15px;
+    overflow-y: auto;
+    flex-grow: 1;
+    height: 0; 
+}
+
+.placeholderText {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--reindalGray);
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.pageItem {
+    box-sizing: border-box;
+    padding: 10px;
+    background-color: var(--reindalLight);
+    border: 3px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.1s, border-color 0.1s;
+    min-width: 0; /* Prevents flex items from expanding beyond bounds */
+    height: 100%;
+}
+
+.pageItem:hover {
+    border-color: var(--reindalYellow);
+}
+
+.pageItem.selected {
+    border-color: var(--reindalMint);
+    background-color: var(--reindalLightYellow);
+}
+
+.canvasWrapper {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    margin-bottom: 10px;
+    min-width: 0;
+    min-height: 0;
+}
+
+.pageItem canvas {
+    width: 90%; 
+    max-width: 100%; /* Safety check */
+    height: auto;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+}
+
+.pageBadge {
+    background-color: var(--reindalDark);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    margin-top: auto;
+}
+
+@media (max-width: 850px) {
+    .rotateWorkspace {
+        flex-direction: column;
+    }
+    .controlSidebar {
+        width: 100%;
+        position: static;
+    }
+}
