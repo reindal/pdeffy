@@ -214,7 +214,7 @@
     justify-content: space-between;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: background-color 0.1s, border-color 0.1s;
-    min-width: 0; /* Prevents flex items from expanding beyond bounds */
+    min-width: 0;
     height: 100%;
 }
 
@@ -240,7 +240,7 @@
 
 .pageItem canvas {
     width: 90%; 
-    max-width: 100%; /* Safety check */
+    max-width: 100%;
     height: auto;
     box-shadow: 0 1px 5px rgba(0,0,0,0.3);
 }

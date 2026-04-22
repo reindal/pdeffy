@@ -32,7 +32,7 @@ let pdfPagesCache = []; // Cache pages to make rotation extremely fast
 colCountInput.addEventListener('input', (e) => {
     let val = parseInt(e.target.value, 10);
     if (isNaN(val) || val < 1) val = 1;
-    if (val > 4) val = 4; // Max 4 columns as requested
+    if (val > 4) val = 4;
     pagesGrid.style.setProperty('--col-count', val);
 });
 
@@ -328,9 +328,6 @@ submitBtn.addEventListener('click', async function (e) {
         });
 
         setTimeout(() => CustomMetadataModule.reset(), 2000);
-
-        // Intentionally leaving the workspace open so the user can see the success message
-        // and keep interacting with the document if they wish.
 
     } catch (error) {
         console.error(error);
