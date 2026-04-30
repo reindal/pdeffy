@@ -22,7 +22,8 @@
             <h1 id="watermarkHeader2" class="langText">Add Watermark to PDF</h1>
 
             <form id="watermarkForm">
-                <div class="formGroup">
+
+                <div class="formGroup fileSelectGroup">
                     <label for="pdfFile" id="watermarkSelectLabel" class="langText">Select PDF file:</label>
                     <div class="fileInputWrapper">
                         <input type="file" id="pdfFile" accept=".pdf" required>
@@ -32,102 +33,181 @@
                     <div id="fileName" class="fileName"></div>
                 </div>
 
-                <!-- Watermark Preview -->
-                <div class="previewSection" id="previewSection" style="display: none;">
-                    <h3 class="langText" id="previewTitle">Watermark Preview</h3>
-                    <div class="previewCanvas">
-                        <canvas id="watermarkPreview" width="400" height="300"></canvas>
-                    </div>
-                    <p class="previewHint langText" id="previewHint">Preview shows how watermark(s) will appear on your
-                        PDF</p>
-                </div>
+                <div id="watermarkWorkspace" class="workspaceGrid" style="display: none;">
 
-                <!-- Watermark Layers List -->
-                <div class="watermarkLayers" id="watermarkLayersContainer" style="display: none;">
-                    <h3 class="langText" id="layersTitle">Watermark Layers</h3>
-                    <div id="layersList"></div>
-                </div>
-                <button type="button" class="addLayerBtn" id="addLayerBtn"><span class="langText" id="addLayerBtnText">+
-                        Add Watermark Layer</span></button>
-                <h3 class="langText" id="watermarkSettingsTitle">Watermark Settings</h3>
 
-                <div class="formGroup">
-                    <label for="watermarkPlaceholder" id="watermarkTextLabel" class="langText">Watermark text:</label>
-                    <input type="text" id="watermarkPlaceholder" class="langTextPlaceholder" placeholder="CONFIDENTIAL">
-                </div>
-
-                <div class="formGroup">
-                    <label for="fontSize" id="fontSizeLabel" class="langText">Font size:</label>
-                    <input type="number" id="fontSize" min="10" max="200" value="50">
-                </div>
-
-                <div class="formGroup">
-                    <label for="opacity" id="opacityLabel" class="langText">Opacity (0-100%):</label>
-                    <input type="range" id="opacity" min="0" max="100" value="30">
-                    <span id="opacityValue" class="opacityValue">30%</span>
-                </div>
-
-                <div class="formGroup">
-                    <label for="rotation" id="rotationLabel" class="langText">Rotation angle:</label>
-                    <select id="rotation">
-                        <option value="0">0° (Horizontal)</option>
-                        <option value="15">15°</option>
-                        <option value="30">30°</option>
-                        <option value="45" selected>45° (Diagonal)</option>
-                        <option value="60">60°</option>
-                        <option value="90">90° (Vertical)</option>
-                        <option value="-15">-15°</option>
-                        <option value="-30">-30°</option>
-                        <option value="-45">-45°</option>
-                        <option value="custom">Custom angle...</option>
-                    </select>
-                    <input type="number" id="customRotation" min="-360" max="360" value="0" step="1"
-                        style="display: none; margin-top: 10px;" placeholder="Enter custom angle">
-                </div>
-
-                <div class="formGroup">
-                    <label for="color" id="colorLabel" class="langText">Text color:</label>
-                    <select id="color">
-                        <option value="gray">Gray</option>
-                        <option value="red">Red</option>
-                        <option value="black" selected>Black</option>
-                        <option value="blue">Blue</option>
-                        <option value="green">Green</option>
-                        <option value="custom">Custom color...</option>
-                    </select>
-                    <div id="customColorWrapper" style="display: none; margin-top: 10px;">
-                        <div class="colorInputRow">
-                            <input type="text" id="customColorHex" placeholder="#000000" maxlength="7"
-                                pattern="^#[0-9A-Fa-f]{6}$">
-                            <input type="color" id="colorPicker" class="colorPicker" value="#000000"
-                                title="Click to open color picker">
+                    <div class="leftPanel">
+                        <div class="previewSection stickyPreview" id="previewSection">
+                            <h3 class="langText" id="previewTitle">Watermark Preview</h3>
+                            <div class="previewCanvas">
+                                <canvas id="watermarkPreview" width="400" height="300"></canvas>
+                            </div>
+                            <p class="previewHint langText" id="previewHint">Preview shows how watermark(s) will appear
+                                on your PDF</p>
                         </div>
-                        <span id="colorError" class="colorError"></span>
+                    </div>
+
+
+                    <div class="rightPanel">
+                        <div class="settingsBox">
+                            <h3 class="langText" id="watermarkSettingsTitle" style="margin-top: 0;">Watermark Settings
+                            </h3>
+
+                            <div class="formGroup">
+                                <label class="langText" id="watermarkTypeLabel">Watermark Type:</label>
+                                <div class="typeToggle">
+                                    <input type="radio" id="typeText" name="watermarkType" value="text" checked>
+                                    <label for="typeText" class="langText toggleLabel" id="typeTextLabel">Text</label>
+
+                                    <input type="radio" id="typeImage" name="watermarkType" value="image">
+                                    <label for="typeImage" class="langText toggleLabel"
+                                        id="typeImageLabel">Image</label>
+                                </div>
+                            </div>
+
+                            <div id="textSettingsGroup">
+                                <div class="formGroup">
+                                    <label for="watermarkPlaceholder" id="watermarkTextLabel" class="langText">Watermark
+                                        text:</label>
+                                    <input type="text" id="watermarkPlaceholder" class="langTextPlaceholder"
+                                        placeholder="CONFIDENTIAL">
+                                </div>
+
+                                <div class="formGroup">
+                                    <label for="fontSize" id="fontSizeLabel" class="langText">Font size:</label>
+                                    <input type="number" id="fontSize" min="10" max="200" value="50">
+                                </div>
+
+                                <div class="formGroup">
+                                    <label for="color" id="colorLabel" class="langText">Text color:</label>
+                                    <select id="color">
+                                        <option value="gray" class="langText" id="colorGray">Gray</option>
+                                        <option value="red" class="langText" id="colorRed">Red</option>
+                                        <option value="black" class="langText" id="colorBlack" selected>Black</option>
+                                        <option value="blue" class="langText" id="colorBlue">Blue</option>
+                                        <option value="green" class="langText" id="colorGreen">Green</option>
+                                        <option value="custom" class="langText" id="colorCustom">Custom color...
+                                        </option>
+                                    </select>
+                                    <div id="customColorWrapper" style="display: none; margin-top: 10px;">
+                                        <div class="colorInputRow">
+                                            <input type="text" id="customColorHex" placeholder="#000000" maxlength="7"
+                                                pattern="^#[0-9A-Fa-f]{6}$">
+                                            <input type="color" id="colorPicker" class="colorPicker" value="#000000"
+                                                title="Click to open color picker">
+                                        </div>
+                                        <span id="colorError" class="colorError"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="imageSettingsGroup" style="display: none;">
+                                <div class="formGroup">
+                                    <label for="imageFile" id="imageFileLabel" class="langText">Select Image (PNG,
+                                        JPG):</label>
+                                    <div class="fileInputWrapper">
+                                        <input type="file" id="imageFile" accept="image/png, image/jpeg">
+                                        <label for="imageFile" class="fileInputLabel langText"
+                                            id="imageSelectButton">Click to select image</label>
+                                    </div>
+                                    <div id="imageFileName" class="fileName"></div>
+                                </div>
+
+                                <div class="formGroup">
+                                    <label for="imageScale" id="imageScaleLabel" class="langText">Image Scale
+                                        (1-200%):</label>
+                                    <input type="number" id="imageScale" min="1" max="200" value="50">
+                                </div>
+                            </div>
+
+                            <div class="formGroup">
+                                <label for="opacity" id="opacityLabel" class="langText">Opacity (0-100%):</label>
+                                <input type="range" id="opacity" min="0" max="100" value="30">
+                                <span id="opacityValue" class="opacityValue">30%</span>
+                            </div>
+
+                            <div class="formGroup">
+                                <label for="rotation" id="rotationLabel" class="langText">Rotation angle:</label>
+                                <select id="rotation">
+                                    <option value="0" class="langText" id="rot0">0° (Horizontal)</option>
+                                    <option value="15">15°</option>
+                                    <option value="30">30°</option>
+                                    <option value="45" class="langText" id="rot45" selected>45° (Diagonal)</option>
+                                    <option value="60">60°</option>
+                                    <option value="90" class="langText" id="rot90">90° (Vertical)</option>
+                                    <option value="-15">-15°</option>
+                                    <option value="-30">-30°</option>
+                                    <option value="-45">-45°</option>
+                                    <option value="custom" class="langText" id="rotCustom">Custom angle...</option>
+                                </select>
+
+                                <div id="customRotationWrapper" class="customPositionWrapper">
+                                    <div class="sliderRow">
+                                        <label class="langText" id="customRotLabel">Angle (°):</label>
+                                        <input type="range" id="customRotSlider" min="-180" max="180" value="45">
+                                        <input type="number" id="customRotation" min="-360" max="360" value="45"
+                                            class="smallInput">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="formGroup">
+                                <label for="position" id="positionLabel" class="langText">Position:</label>
+                                <select id="position">
+                                    <option value="center" class="langText" id="posCenter" selected>Center</option>
+                                    <option value="top" class="langText" id="posTop">Top</option>
+                                    <option value="bottom" class="langText" id="posBottom">Bottom</option>
+                                    <option value="top-left" class="langText" id="posTopLeft">Top Left</option>
+                                    <option value="top-right" class="langText" id="posTopRight">Top Right</option>
+                                    <option value="bottom-left" class="langText" id="posBottomLeft">Bottom Left</option>
+                                    <option value="bottom-right" class="langText" id="posBottomRight">Bottom Right
+                                    </option>
+                                    <option value="custom" class="langText" id="posCustom">Custom (Manual)</option>
+                                </select>
+
+                                <div class="customPositionWrapper">
+                                    <div class="sliderRow">
+                                        <label class="langText" id="posXLabel">Horizontal (X):</label>
+                                        <input type="range" id="posXSlider" min="0" max="100" value="50">
+                                        <input type="number" id="posXInput" min="0" max="100" value="50"
+                                            class="smallInput"> <span
+                                            style="font-weight:bold; color:var(--reindalDark);">%</span>
+                                    </div>
+                                    <div class="sliderRow">
+                                        <label class="langText" id="posYLabel">Vertical (Y):</label>
+                                        <input type="range" id="posYSlider" min="0" max="100" value="50">
+                                        <input type="number" id="posYInput" min="0" max="100" value="50"
+                                            class="smallInput"> <span
+                                            style="font-weight:bold; color:var(--reindalDark);">%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="addLayerBtn" id="addLayerBtn"><span class="langText"
+                                    id="addLayerBtnText">+ Add Watermark Layer</span></button>
+
+
+                            <div class="watermarkLayers" id="watermarkLayersContainer" style="display: none;">
+                                <div class="layersHeader" id="layersHeaderBtn">
+                                    <h3 class="langText" id="layersTitle" style="margin:0;">Watermark Layers</h3>
+                                    <span id="layersToggleIcon" class="toggleIcon">▼</span>
+                                </div>
+                                <div id="layersListWrapper" class="layersListWrapper">
+                                    <div id="layersList"></div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
 
-                <div class="formGroup">
-                    <label for="position" id="positionLabel" class="langText">Position:</label>
-                    <select id="position">
-                        <option value="center" selected>Center</option>
-                        <option value="diagonal">Diagonal</option>
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                        <option value="top-left">Top Left</option>
-                        <option value="top-right">Top Right</option>
-                        <option value="bottom-left">Bottom Left</option>
-                        <option value="bottom-right">Bottom Right</option>
-                    </select>
-                </div>
-
-                <div class="buttonGroup">
+                <div class="buttonGroup" id="finalSubmitGroup" style="display: none;">
                     <button type="submit" class="submitBtn" id="submitBtn"><span class="langText"
                             id="watermarkSubmitBtn">Apply Watermarks to PDF</span></button>
                 </div>
             </form>
 
             <div id="status" class="status"></div>
-
             <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
         </div>
     </main>

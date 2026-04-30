@@ -434,7 +434,41 @@ const languages = {
         rotationTools: "Rotate Selected",
         generateRotatedPdf: "Save Rotated PDF",
         invalidRangeFormat: "Invalid format. Use numbers (e.g. 5) or ranges (e.g. 1-5).",
-        selectPagesFirst: "Please select at least one page to rotate."
+        selectPagesFirst: "Please select at least one page to rotate.",
+
+        watermarkTypeLabel: "Watermark Type:",
+        typeTextLabel: "Text",
+        typeImageLabel: "Image",
+        customRotLabel: "Angle (°):",
+        posXLabel: "Horizontal (X):",
+        posYLabel: "Vertical (Y):",
+
+        // Colors
+        colorGray: "Gray",
+        colorRed: "Red",
+        colorBlack: "Black",
+        colorBlue: "Blue",
+        colorGreen: "Green",
+        colorCustom: "Custom color...",
+
+        // Rotations
+        rot0: "0° (Horizontal)",
+        rot45: "45° (Diagonal)",
+        rot90: "90° (Vertical)",
+        rotCustom: "Custom angle...",
+
+        // Positions
+        posCenter: "Center",
+        posTop: "Top",
+        posBottom: "Bottom",
+        posTopLeft: "Top Left",
+        posTopRight: "Top Right",
+        posBottomLeft: "Bottom Left",
+        posBottomRight: "Bottom Right",
+        posCustom: "Custom (Manual)",
+        imageFileLabel: "Select Image (PNG, JPG):",
+        imageSelectButton: "Click to select image",
+        imageScaleLabel: "Image Scale (1-200%):"
     },
     it: {
         languageText: "Lingua",
@@ -863,7 +897,38 @@ const languages = {
         rotationTools: "Ruota selezione",
         generateRotatedPdf: "Salva PDF ruotato",
         invalidRangeFormat: "Formato non valido. Usa numeri (es. 5) o intervalli (es. 1-5).",
-        selectPagesFirst: "Seleziona almeno una pagina da ruotare."
+        selectPagesFirst: "Seleziona almeno una pagina da ruotare.",
+
+        watermarkTypeLabel: "Tipo di filigrana:",
+        typeTextLabel: "Testo",
+        typeImageLabel: "Immagine",
+        customRotLabel: "Angolo (°):",
+        posXLabel: "Orizzontale (X):",
+        posYLabel: "Verticale (Y):",
+
+        colorGray: "Grigio",
+        colorRed: "Rosso",
+        colorBlack: "Nero",
+        colorBlue: "Blu",
+        colorGreen: "Verde",
+        colorCustom: "Colore personalizzato...",
+
+        rot0: "0° (Orizzontale)",
+        rot45: "45° (Diagonale)",
+        rot90: "90° (Verticale)",
+        rotCustom: "Angolo personalizzato...",
+
+        posCenter: "Centro",
+        posTop: "In alto",
+        posBottom: "In basso",
+        posTopLeft: "In alto a sinistra",
+        posTopRight: "In alto a destra",
+        posBottomLeft: "In basso a sinistra",
+        posBottomRight: "In basso a destra",
+        posCustom: "Personalizzato (Manuale)",
+        imageFileLabel: "Seleziona Immagine (PNG, JPG):",
+        imageSelectButton: "Clicca per selezionare l'immagine",
+        imageScaleLabel: "Scala Immagine (1-200%):"
     },
     pl: {
         languageText: "Język",
@@ -1289,7 +1354,38 @@ const languages = {
         rotationTools: "Obróć wybrane",
         generateRotatedPdf: "Zapisz obrócony PDF",
         invalidRangeFormat: "Nieprawidłowy format. Użyj liczb (np. 5) lub zakresów (np. 1-5).",
-        selectPagesFirst: "Wybierz przynajmniej jedną stronę do obrócenia."
+        selectPagesFirst: "Wybierz przynajmniej jedną stronę do obrócenia.",
+
+        watermarkTypeLabel: "Typ znaku wodnego:",
+        typeTextLabel: "Tekst",
+        typeImageLabel: "Obraz",
+        customRotLabel: "Kąt (°):",
+        posXLabel: "Poziomo (X):",
+        posYLabel: "Pionowo (Y):",
+
+        colorGray: "Szary",
+        colorRed: "Czerwony",
+        colorBlack: "Czarny",
+        colorBlue: "Niebieski",
+        colorGreen: "Zielony",
+        colorCustom: "Niestandardowy kolor...",
+
+        rot0: "0° (Poziomo)",
+        rot45: "45° (Ukośnie)",
+        rot90: "90° (Pionowo)",
+        rotCustom: "Niestandardowy kąt...",
+
+        posCenter: "Środek",
+        posTop: "Góra",
+        posBottom: "Dół",
+        posTopLeft: "Lewy górny",
+        posTopRight: "Prawy górny",
+        posBottomLeft: "Lewy dolny",
+        posBottomRight: "Prawy dolny",
+        posCustom: "Niestandardowe (Ręcznie)",
+        imageFileLabel: "Wybierz obraz (PNG, JPG):",
+        imageSelectButton: "Kliknij, aby wybrać obraz",
+        imageScaleLabel: "Skala obrazu (1-200%):"
     },
     es: {
         languageText: "Idioma",
@@ -1708,7 +1804,38 @@ const languages = {
         rotationTools: "Rotar selección",
         generateRotatedPdf: "Guardar PDF Rotado",
         invalidRangeFormat: "Formato inválido. Usa números (ej. 5) o rangos (ej. 1-5).",
-        selectPagesFirst: "Por favor, selecciona al menos una página para rotarla."
+        selectPagesFirst: "Por favor, selecciona al menos una página para rotarla.",
+
+        watermarkTypeLabel: "Tipo de marca de agua:",
+        typeTextLabel: "Texto",
+        typeImageLabel: "Imagen",
+        customRotLabel: "Ángulo (°):",
+        posXLabel: "Horizontal (X):",
+        posYLabel: "Vertical (Y):",
+
+        colorGray: "Gris",
+        colorRed: "Rojo",
+        colorBlack: "Negro",
+        colorBlue: "Azul",
+        colorGreen: "Verde",
+        colorCustom: "Color personalizado...",
+
+        rot0: "0° (Horizontal)",
+        rot45: "45° (Diagonal)",
+        rot90: "90° (Vertical)",
+        rotCustom: "Ángulo personalizado...",
+
+        posCenter: "Centro",
+        posTop: "Arriba",
+        posBottom: "Abajo",
+        posTopLeft: "Arriba izquierda",
+        posTopRight: "Arriba derecha",
+        posBottomLeft: "Abajo izquierda",
+        posBottomRight: "Abajo derecha",
+        posCustom: "Personalizado (Manual)",
+        imageFileLabel: "Seleccionar Imagen (PNG, JPG):",
+        imageSelectButton: "Haz clic para seleccionar imagen",
+        imageScaleLabel: "Escala de imagen (1-200%):"
     },
 };
 
