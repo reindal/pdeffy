@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Redact PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./redactPdf.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="redactPagesText" class="langText" data-i18n="redactTitle">Redact PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="redactContainer">
+            <h1 id="redactPagesDesc" class="langText" data-i18n="redactDesc">Hide sensitive information in your PDF</h1>
+            
+            <form id="redactForm">
+                <div class="formGroup fileSelectGroup">
+                    <label for="pdfFile" id="redactSelectLabel" class="langText" data-i18n="selectPdfFile">Select PDF file:</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="pdfFile" accept=".pdf" required>
+                        <label for="pdfFile" class="fileInputLabel langText" id="redactSelectButton" data-i18n="clickToSelectFile">Click to select file</label>
+                    </div>
+                </div>
+
+                <div id="redactWorkspace" class="workspaceGrid" style="display: none;">
+                    
+                    <div class="leftPanel">
+                        <div class="redactToolbar">
+                            <div class="toolbarGroup">
+                                <label for="redactColor" class="langText" data-i18n="redactColor">Color:</label>
+                                <input type="color" id="redactColor" value="#000000" title="Choose redaction color">
+                                
+                                <button type="button" id="addBoxBtn" class="addBoxBtn langText" data-i18n="addBoxBtn">+ Add Box</button>
+                            </div>
+                        </div>
+
+                        <div class="pagesScrollContainer">
+                            <div id="pagesGrid" class="pagesGrid"></div>
+                        </div>
+                    </div>
+
+                    <div class="rightPanel">
+                        <div class="settingsBox">
+                            <div class="layersHeader">
+                                <h3 class="langText" data-i18n="redactionListTitle" style="margin:0;">Active Redactions</h3>
+                            </div>
+                            <div id="redactionsListWrapper" class="layersListWrapper">
+                                <div id="redactionList">
+                                    <p class="placeholderText langText" data-i18n="noRedactionsYet">No redactions created yet.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="buttonGroup" id="finalSubmitGroup" style="display: none;">
+                    <button type="submit" class="submitBtn" id="submitBtn" disabled>
+                        <span class="langText" data-i18n="generateRedactedPdf">Generate Redacted PDF</span>
+                    </button>
+                </div>
+            </form>
+            <div class="centerStatus">
+                <div id="status" class="status"></div>
+            </div>
+            <a href="../../index.html" class="backLink langText" data-i18n="backToHome">← Back to home</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="./../statusManager.js"></script>
+    <script src="./../pdfEncryptionGuard.js"></script>
+    <script src="./../../settings.js"></script>
+    <script src="./../customMetadata.js"></script>
+    <script src="./../../libs/pdf.min.js"></script>
+    <script src="./redactPdf.js"></script>
+</body>
+
+</html>
