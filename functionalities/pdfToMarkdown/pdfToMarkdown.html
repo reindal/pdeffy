@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PDF to Markdown</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./pdfToMarkdown.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="pdfToMarkdownHeader" class="langText">PDF to Markdown</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="markdownToolContainer">
+            <h1 id="pdfToMarkdownHeader2" class="langText">Convert PDF to Markdown</h1>
+
+            <form id="formPdfToMd" novalidate onsubmit="return false;">
+                <div class="formGroup">
+                    <label for="pdfFile" id="pdfToMarkdownSelectLabel" class="langText">Select a PDF file:</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="pdfFile" accept=".pdf,application/pdf">
+                        <label for="pdfFile" class="fileInputLabel langText" id="pdfToMarkdownSelectButton">Click to
+                            select PDF</label>
+                    </div>
+                    <div id="fileInfoPdf"><span id="fileNamePdf"></span></div>
+                </div>
+                <p id="pdfToMarkdownNote" class="langText pdfToMarkdownNote">PDF to Markdown extracts readable text;
+                    complex layouts may need manual editing.</p>
+                <button type="button" class="submitBtn" id="submitPdfToMd">
+                    <span class="langText" id="pdfToMarkdownSubmitBtn">Convert to Markdown</span>
+                </button>
+            </form>
+
+            <div id="status" class="status"></div>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script type="module">
+        import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs';
+        window.pdfjsLib = pdfjsLib;
+    </script>
+
+    <script src="../../changeLang.js"></script>
+    <script src="../statusManager.js"></script>
+    <script src="../../settings.js"></script>
+    <script src="../pdfEncryptionGuard.js"></script>
+    <script src="./pdfToMarkdown.js"></script>
+</body>
+
+</html>

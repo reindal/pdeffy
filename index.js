@@ -224,6 +224,16 @@ function createWindow() {
 
     mainWindow.maximize();
 
+    mainWindow.webContents.once('dom-ready', () => {
+        if (!app.isPackaged) {
+            try {
+                mainWindow.webContents.openDevTools({ mode: 'detach' });
+            } catch (e) {
+                console.error('[dev] openDevTools failed:', e);
+            }
+        }
+    });
+
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, "index.html"),
         protocol: "file:",
@@ -374,7 +384,11 @@ ipcMain.handle('get-downloads-path', async () => {
 
 // Handle IPC request to show save dialog
 ipcMain.handle('show-save-dialog', async (event, options) => {
-    const result = await dialog.showSaveDialog(mainWindow, options);
+    const parentWin = BrowserWindow.fromWebContents(event.sender) || mainWindow;
+    if (!parentWin || parentWin.isDestroyed()) {
+        throw new Error('No window available to show save dialog.');
+    }
+    const result = await dialog.showSaveDialog(parentWin, options);
     if (result.canceled) {
         return null;
     }
@@ -383,11 +397,132 @@ ipcMain.handle('show-save-dialog', async (event, options) => {
 
 // Handle IPC request to show open dialog (for folder selection)
 ipcMain.handle('show-open-dialog', async (event, options) => {
-    const result = await dialog.showOpenDialog(mainWindow, options);
+    const parentWin = BrowserWindow.fromWebContents(event.sender) || mainWindow;
+    if (!parentWin || parentWin.isDestroyed()) {
+        throw new Error('No window available to show open dialog.');
+    }
+    const result = await dialog.showOpenDialog(parentWin, options);
     if (result.canceled || result.filePaths.length === 0) {
         return null;
     }
     return result.filePaths[0];
+});
+
+function wrapMarkdownBodyHtmlForPrint(innerBodyHtml) {
+    const body = String(innerBodyHtml);
+    return (
+        '<!DOCTYPE html>\n' +
+        '<html lang="en"><head><meta charset="utf-8">\n' +
+        '<style>\n' +
+        '  body { font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif;\n' +
+        '         font-size: 11pt; line-height: 1.45; color: #222; margin: 24px 36px; min-height: 100vh; box-sizing: border-box; }\n' +
+        '  html { min-height: 100%; }\n' +
+        '  .markdown-body { max-width: 720px; margin: 0 auto; }\n' +
+        '  h1,h2,h3,h4 { margin-top: 1.1em; margin-bottom: 0.35em; font-weight: 600; }\n' +
+        '  h1 { font-size: 1.55em; border-bottom: 1px solid #eaecef; padding-bottom: 0.2em; }\n' +
+        '  h2 { font-size: 1.3em; border-bottom: 1px solid #eaecef; padding-bottom: 0.15em; }\n' +
+        '  h3 { font-size: 1.12em; }\n' +
+        '  p { margin: 0.55em 0; }\n' +
+        '  ul, ol { margin: 0.5em 0 0.5em 1.25em; padding-left: 0.25em; }\n' +
+        '  li { margin: 0.2em 0; }\n' +
+        '  hr { border: 0; border-top: 1px solid #ddd; margin: 1.2em 0; }\n' +
+        '  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;\n' +
+        '         background: #f6f8fa; padding: 0.12em 0.35em; border-radius: 4px; font-size: 0.9em; }\n' +
+        '  pre { background: #f6f8fa; padding: 12px 14px; border-radius: 6px; overflow-x: auto; }\n' +
+        '  pre code { background: none; padding: 0; font-size: 0.88em; }\n' +
+        '  blockquote { margin: 0.6em 0; padding: 0 0 0 14px; border-left: 4px solid #dfe2e5; color: #555; }\n' +
+        '  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95em; }\n' +
+        '  th, td { border: 1px solid #dfe2e5; padding: 6px 10px; }\n' +
+        '  th { background: #f6f8fa; font-weight: 600; }\n' +
+        '  a { color: #0969da; word-break: break-word; }\n' +
+        '  img { max-width: 100%; height: auto; }\n' +
+        '</style></head><body><div class="markdown-body">' +
+        body +
+        '</div></body></html>'
+    );
+}
+
+async function printHtmlStringToPdf(innerHtml, outputPath) {
+    if (innerHtml == null || String(innerHtml).trim().length === 0) {
+        throw new Error('Empty HTML: nothing to convert to PDF.');
+    }
+    if (!outputPath) {
+        throw new Error('No output path specified.');
+    }
+
+    const fullHtml = wrapMarkdownBodyHtmlForPrint(innerHtml);
+    const tempHtml = path.resolve(
+        app.getPath('temp'),
+        `pdeffy_md_${Date.now()}_${Math.random().toString(36).slice(2)}.html`
+    );
+    await fsPromises.writeFile(tempHtml, fullHtml, 'utf8');
+
+    const fileHref = url.pathToFileURL(tempHtml).href;
+
+    const win = new BrowserWindow({
+        show: false,
+        backgroundThrottling: false,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            sandbox: false,
+        },
+    });
+
+    try {
+        await win.webContents.loadURL(fileHref);
+        await new Promise((r) => setTimeout(r, 300));
+        try {
+            await win.webContents.executeJavaScript(
+                'Math.max(document.body && document.body.scrollHeight, document.documentElement.scrollHeight)'
+            );
+        } catch (e) {
+            /* layout hint is best-effort */
+        }
+        const pdfData = await win.webContents.printToPDF({
+            printBackground: true,
+        });
+        const len = pdfData && pdfData.length != null ? pdfData.length : 0;
+        if (len < 400) {
+            throw new Error('PDF generation returned an empty or invalid file.');
+        }
+        await fsPromises.writeFile(outputPath, pdfData);
+        return { success: true };
+    } catch (err) {
+        console.error('[printHtmlStringToPdf]', err);
+        throw err;
+    } finally {
+        if (!win.isDestroyed()) {
+            try {
+                win.destroy();
+            } catch (e) {
+                /* ignore */
+            }
+        }
+        try {
+            await fsPromises.unlink(tempHtml);
+        } catch (e) {
+            /* temp cleanup best-effort */
+        }
+    }
+}
+
+ipcMain.handle('render-html-to-pdf', async (event, { innerHtml, outputPath }) => {
+    return printHtmlStringToPdf(innerHtml, outputPath);
+});
+
+ipcMain.handle('markdown-file-to-pdf', async (event, { inputPath, outputPath }) => {
+    if (!inputPath || !outputPath) {
+        throw new Error('Missing Markdown file path or output path.');
+    }
+    const raw = await fsPromises.readFile(inputPath, 'utf8');
+    const { marked } = await import('marked');
+    let innerHtml = marked.parse(raw, { async: false });
+    if (innerHtml != null && typeof innerHtml.then === 'function') {
+        innerHtml = await innerHtml;
+    }
+    innerHtml = String(innerHtml ?? '');
+    return printHtmlStringToPdf(innerHtml, outputPath);
 });
 
 // Handle IPC request to set file as read-only

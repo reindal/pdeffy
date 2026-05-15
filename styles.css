@@ -556,6 +556,13 @@ header h1 {
     text-align: center;
 }
 
+.status-info {
+    background-color: var(--reindalGray);
+    border: 1px solid var(--reindalGray);
+    color: var(--reindalDark);
+    text-align: center;
+}
+
 .open-folder-btn {
     display: inline-block;
     margin-top: 8px;

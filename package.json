@@ -32,6 +32,7 @@
     "jszip": "^3.10.1",
     "jszip2": "npm:jszip@2.6.1",
     "mammoth": "^1.11.0",
+    "marked": "^18.0.3",
     "pdf-lib": "^1.17.1",
     "pdf2json": "^4.0.2",
     "pdfjs-dist": "^5.4.624",

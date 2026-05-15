@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Markdown to PDF</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./markdownToPdf.css">
+</head>
+
+<body>
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="markdownToPdfHeader" class="langText">Markdown to PDF</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="markdownToolContainer">
+            <h1 id="markdownToPdfHeader2" class="langText">Convert Markdown to PDF</h1>
+
+            <form id="formMdToPdf" novalidate onsubmit="return false;">
+                <div class="formGroup">
+                    <label for="mdFile" id="markdownToPdfSelectLabel" class="langText">Select a Markdown file (.md,
+                        .markdown):</label>
+                    <div class="fileInputWrapper">
+                        <input type="file" id="mdFile" accept=".md,.markdown,.txt,.text,text/markdown,text/plain">
+                        <label for="mdFile" class="fileInputLabel langText" id="markdownToPdfSelectButton">Click to
+                            select file</label>
+                    </div>
+                    <div id="fileInfoMd"><span id="fileNameMd"></span></div>
+                </div>
+                <button type="button" class="submitBtn" id="submitMdToPdf">
+                    <span class="langText" id="markdownToPdfSubmitBtn">Convert to PDF</span>
+                </button>
+            </form>
+
+            <div id="status" class="status"></div>
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="../statusManager.js"></script>
+    <script src="../../settings.js"></script>
+    <script src="./markdownToPdf.js"></script>
+</body>
+
+</html>

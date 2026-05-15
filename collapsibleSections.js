@@ -43,9 +43,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
         const showCardsDelayed = () => {
             clearRevealTimer();
+            // Next frame: links must receive clicks immediately (120ms felt like "nothing happens")
             revealTimer = setTimeout(() => {
                 section.classList.add("cardsVisible");
-            }, 120);
+            }, 0);
         };
 
         const setExpandedState = () => {

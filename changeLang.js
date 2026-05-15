@@ -20,6 +20,8 @@ const languages = {
         // Section titles
         organizePdfSection: "Organize PDF",
         convertPdfSection: "Convert PDF",
+        convertAnyToPdfGroup: "Any To PDF",
+        convertPdfToAnyGroup: "PDF To Any",
         editPdfSection: "Edit PDF",
 
         splitPdfText: "Split PDF",
@@ -280,6 +282,27 @@ const languages = {
         pdfToExcelSelectButton: "Click to select file",
         pdfToExcelSubmitBtn: "Convert to Excel",
 
+        // Markdown ↔ PDF
+        markdownToPdfText: "Markdown to PDF",
+        markdownToPdfDesc: "Convert a Markdown file into a PDF document.",
+        markdownToPdfHeader: "Markdown to PDF",
+        markdownToPdfHeader2: "Convert Markdown to PDF",
+        markdownToPdfSelectLabel: "Select a Markdown file (.md, .markdown, .txt):",
+        markdownToPdfSelectButton: "Click to select file",
+        markdownToPdfSubmitBtn: "Convert to PDF",
+        markdownToPdfPleaseSelect: "Please select a Markdown file first.",
+
+        pdfToMarkdownText: "PDF to Markdown",
+        pdfToMarkdownDesc: "Extract text from a PDF file to a Markdown document.",
+        pdfToMarkdownHeader: "PDF to Markdown",
+        pdfToMarkdownHeader2: "Convert PDF to Markdown",
+        pdfToMarkdownSelectLabel: "Select a PDF file:",
+        pdfToMarkdownSelectButton: "Click to select PDF",
+        pdfToMarkdownSubmitBtn: "Convert to Markdown",
+        pdfToMarkdownNote: "PDF to Markdown extracts readable text; complex layouts may need manual editing.",
+        pdfToMarkdownPleaseSelect: "Please select a PDF file first.",
+        pdfToMarkdownSuccessPath: "✓ Saved Markdown: {filename}\nin: {path}",
+
         // PDF by template messages:
         readingExcel: "Reading Excel data...",
         errorEmptyExcel: "The Excel file is empty or could not be read.",
@@ -509,6 +532,8 @@ const languages = {
         // Section titles
         organizePdfSection: "Organizza PDF",
         convertPdfSection: "Converti PDF",
+        convertAnyToPdfGroup: "Da altro formato a PDF",
+        convertPdfToAnyGroup: "Da PDF ad altro formato",
         editPdfSection: "Modifica PDF",
 
         splitPdfText: "Dividi PDF",
@@ -770,6 +795,27 @@ const languages = {
         pdfToExcelSelectButton: "Fai clic per selezionare il file",
         pdfToExcelSubmitBtn: "Converti in Excel",
 
+        // Markdown ↔ PDF
+        markdownToPdfText: "Markdown a PDF",
+        markdownToPdfDesc: "Converti un file Markdown in un documento PDF.",
+        markdownToPdfHeader: "Markdown a PDF",
+        markdownToPdfHeader2: "Converti Markdown in PDF",
+        markdownToPdfSelectLabel: "Seleziona un file Markdown (.md, .markdown, .txt):",
+        markdownToPdfSelectButton: "Fai clic per selezionare il file",
+        markdownToPdfSubmitBtn: "Converti in PDF",
+        markdownToPdfPleaseSelect: "Seleziona prima un file Markdown.",
+
+        pdfToMarkdownText: "PDF a Markdown",
+        pdfToMarkdownDesc: "Estrai il testo da un file PDF in un documento Markdown.",
+        pdfToMarkdownHeader: "PDF a Markdown",
+        pdfToMarkdownHeader2: "Converti PDF in Markdown",
+        pdfToMarkdownSelectLabel: "Seleziona un file PDF:",
+        pdfToMarkdownSelectButton: "Fai clic per selezionare il PDF",
+        pdfToMarkdownSubmitBtn: "Converti in Markdown",
+        pdfToMarkdownNote: "Da PDF a Markdown viene estratto il testo leggibile; layout complessi possono richiedere una revisione manuale.",
+        pdfToMarkdownPleaseSelect: "Seleziona prima un file PDF.",
+        pdfToMarkdownSuccessPath: "✓ Markdown salvato: {filename}\nin: {path}",
+
         // PDF by template messages:
         readingExcel: "Lettura dati Excel in corso...",
         errorEmptyExcel: "Il file Excel è vuoto o non può essere letto.",
@@ -951,8 +997,8 @@ const languages = {
         imageSelectButton: "Clicca per selezionare l'immagine",
         imageScaleLabel: "Scala Immagine (1-200%):",
 
-        redactPdfTile: "Redact PDF",
-        redactPdfTileDesc: "Hide sensitive information",
+        redactPdfTile: "Censura PDF",
+        redactPdfTileDesc: "Nascondi informazioni sensibili nel tuo PDF",
         redactTitle: "Censura PDF",
         redactDesc: "Nascondi informazioni sensibili nel tuo PDF",
         selectPdfFile: "Seleziona file PDF:",
@@ -990,6 +1036,8 @@ const languages = {
         // Section titles
         organizePdfSection: "Organizuj PDF",
         convertPdfSection: "Konwertuj PDF",
+        convertAnyToPdfGroup: "Dowolny format do PDF",
+        convertPdfToAnyGroup: "PDF na dowolny format",
         editPdfSection: "Edytuj PDF",
 
         splitPdfText: "Podziel PDF",
@@ -1251,6 +1299,27 @@ const languages = {
         pdfToExcelSelectButton: "Kliknij, aby wybrać plik",
         pdfToExcelSubmitBtn: "Konwertuj na Excel",
 
+        // Markdown ↔ PDF
+        markdownToPdfText: "Markdown na PDF",
+        markdownToPdfDesc: "Konwertuj plik Markdown na dokument PDF.",
+        markdownToPdfHeader: "Markdown na PDF",
+        markdownToPdfHeader2: "Konwertuj Markdown na PDF",
+        markdownToPdfSelectLabel: "Wybierz plik Markdown (.md, .markdown, .txt):",
+        markdownToPdfSelectButton: "Kliknij, aby wybrać plik",
+        markdownToPdfSubmitBtn: "Konwertuj na PDF",
+        markdownToPdfPleaseSelect: "Najpierw wybierz plik Markdown.",
+
+        pdfToMarkdownText: "PDF na Markdown",
+        pdfToMarkdownDesc: "Wyciągnij tekst z pliku PDF do dokumentu Markdown.",
+        pdfToMarkdownHeader: "PDF na Markdown",
+        pdfToMarkdownHeader2: "Konwertuj PDF na Markdown",
+        pdfToMarkdownSelectLabel: "Wybierz plik PDF:",
+        pdfToMarkdownSelectButton: "Kliknij, aby wybrać plik PDF",
+        pdfToMarkdownSubmitBtn: "Konwertuj na Markdown",
+        pdfToMarkdownNote: "Konwersja PDF → Markdown pobiera czytelny tekst; złożone układy mogą wymagać ręcznej edycji.",
+        pdfToMarkdownPleaseSelect: "Najpierw wybierz plik PDF.",
+        pdfToMarkdownSuccessPath: "✓ Zapisano Markdown: {filename}\nw: {path}",
+
         // PDF by template messages:
         readingExcel: "Odczytywanie danych z pliku Excel...",
         errorEmptyExcel: "Plik Excel jest pusty lub nie można go odczytać.",
@@ -1468,6 +1537,8 @@ const languages = {
         // Section titles
         organizePdfSection: "Organizar PDF",
         convertPdfSection: "Convertir PDF",
+        convertAnyToPdfGroup: "Cualquier formato a PDF",
+        convertPdfToAnyGroup: "PDF a cualquier formato",
         editPdfSection: "Editar PDF",
 
         splitPdfText: "Dividir PDF",
@@ -1714,6 +1785,27 @@ const languages = {
         pdfToExcelSelectLabel: "Seleccionar archivo PDF:",
         pdfToExcelSelectButton: "Haz clic para seleccionar el archivo",
         pdfToExcelSubmitBtn: "Convertir a Excel",
+
+        // Markdown ↔ PDF
+        markdownToPdfText: "Markdown a PDF",
+        markdownToPdfDesc: "Convierte un archivo Markdown en un documento PDF.",
+        markdownToPdfHeader: "Markdown a PDF",
+        markdownToPdfHeader2: "Convertir Markdown a PDF",
+        markdownToPdfSelectLabel: "Seleccionar archivo Markdown (.md, .markdown, .txt):",
+        markdownToPdfSelectButton: "Haz clic para seleccionar el archivo",
+        markdownToPdfSubmitBtn: "Convertir a PDF",
+        markdownToPdfPleaseSelect: "Selecciona primero un archivo Markdown.",
+
+        pdfToMarkdownText: "PDF a Markdown",
+        pdfToMarkdownDesc: "Extrae el texto de un archivo PDF a un documento Markdown.",
+        pdfToMarkdownHeader: "PDF a Markdown",
+        pdfToMarkdownHeader2: "Convertir PDF a Markdown",
+        pdfToMarkdownSelectLabel: "Seleccionar archivo PDF:",
+        pdfToMarkdownSelectButton: "Haz clic para seleccionar el PDF",
+        pdfToMarkdownSubmitBtn: "Convertir a Markdown",
+        pdfToMarkdownNote: "PDF a Markdown extrae texto legible; diseños complejos pueden requerir edición manual.",
+        pdfToMarkdownPleaseSelect: "Selecciona primero un archivo PDF.",
+        pdfToMarkdownSuccessPath: "✓ Markdown guardado: {filename}\nen: {path}",
 
         // PDF by template messages:
         readingExcel: "Leyendo datos del Excel...",
