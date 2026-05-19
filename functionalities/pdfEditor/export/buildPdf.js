@@ -43,11 +43,12 @@
         }
 
         let exportDoc = outDoc;
-        if (model.redactions?.length) {
+        if (model.redactions?.length || model.watermarks?.length) {
             exportDoc = await global.PdfEditorFlattenRedactions.flattenRedactedPages(
                 outDoc,
                 model,
-                active
+                active,
+                { flattenAllPages: !!model.watermarks?.length }
             );
         }
 
@@ -60,9 +61,9 @@
         }
 
         if (metadata) {
-            if (metadata.author) outDoc.setAuthor(metadata.author);
-            if (metadata.title) outDoc.setTitle(metadata.title);
-            if (metadata.subject) outDoc.setSubject(metadata.subject);
+            if (metadata.author) exportDoc.setAuthor(metadata.author);
+            if (metadata.title) exportDoc.setTitle(metadata.title);
+            if (metadata.subject) exportDoc.setSubject(metadata.subject);
         }
 
         return exportDoc.save();

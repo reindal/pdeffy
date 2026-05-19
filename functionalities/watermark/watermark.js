@@ -1,9 +1,13 @@
-const { PDFDocument, rgb, degrees } = require('pdf-lib');
+const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
 
 const STATUS = '#status';
+
+if (window.pdfjsLib) {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
+}
 
 const form = document.getElementById('watermarkForm');
 const pdfFileInput = document.getElementById('pdfFile');
@@ -24,18 +28,11 @@ const layersHeaderBtn = document.getElementById('layersHeaderBtn');
 const layersListWrapper = document.getElementById('layersListWrapper');
 const layersToggleIcon = document.getElementById('layersToggleIcon');
 
-const positionSelect = document.getElementById('position');
-const posXSlider = document.getElementById('posXSlider');
-const posXInput = document.getElementById('posXInput');
-const posYSlider = document.getElementById('posYSlider');
-const posYInput = document.getElementById('posYInput');
-
 const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
 const fileNameDiv = document.getElementById('fileName');
 const addLayerBtn = document.getElementById('addLayerBtn');
 const previewSection = document.getElementById('previewSection');
-const previewCanvas = document.getElementById('watermarkPreview');
+const pagesGrid = document.getElementById('pagesGrid');
 const layersContainer = document.getElementById('watermarkLayersContainer');
 const layersList = document.getElementById('layersList');
 
@@ -51,10 +48,12 @@ const imageFileNameDiv = document.getElementById('imageFileName');
 const imageScaleInput = document.getElementById('imageScale');
 
 let selectedFile = null;
+let originalFileBuffer = null;
 let watermarkLayers = [];
 let editingLayerIndex = null;
-const previewCtx = previewCanvas.getContext('2d');
-let pdfPageDimensions = { width: 595, height: 842 };
+let pdfPageDimensions = new Map();
+let activeWatermarkId = null;
+let dragState = null;
 
 let currentImageFile = null;
 let currentImageObj = null;
@@ -163,49 +162,6 @@ imageFileInput.addEventListener('change', async function(e) {
     }
 });
 
-const positionPresets = {
-    'center': { x: 50, y: 50 },
-    'top': { x: 50, y: 92 },
-    'bottom': { x: 50, y: 8 },
-    'top-left': { x: 15, y: 92 },
-    'top-right': { x: 85, y: 92 },
-    'bottom-left': { x: 15, y: 8 },
-    'bottom-right': { x: 85, y: 8 }
-};
-
-positionSelect.addEventListener('change', function() {
-    if (positionPresets[this.value]) {
-        const { x, y } = positionPresets[this.value];
-        posXSlider.value = x;
-        posXInput.value = x;
-        posYSlider.value = y;
-        posYInput.value = y;
-    }
-    updatePreview();
-});
-
-function syncPositionInputs(sourceElement, isXAxis) {
-    let val = parseInt(sourceElement.value) || 0;
-    if (val < 0) val = 0;
-    if (val > 100) val = 100;
-
-    if (isXAxis) {
-        posXSlider.value = val;
-        posXInput.value = val;
-    } else {
-        posYSlider.value = val;
-        posYInput.value = val;
-    }
-    
-    positionSelect.value = 'custom';
-    updatePreview();
-}
-
-posXSlider.addEventListener('input', () => syncPositionInputs(posXSlider, true));
-posXInput.addEventListener('input', () => syncPositionInputs(posXInput, true));
-posYSlider.addEventListener('input', () => syncPositionInputs(posYSlider, false));
-posYInput.addEventListener('input', () => syncPositionInputs(posYInput, false));
-
 [watermarkTextInput, fontSizeInput, customRotationInput, imageScaleInput].forEach(element => {
     element.addEventListener('input', updatePreview);
     element.addEventListener('change', updatePreview);
@@ -251,43 +207,123 @@ if (typeof window.changeLanguage === 'function') {
     };
 }
 
+function createId(prefix) {
+    return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+}
+
+async function renderPagePreviews(buffer) {
+    pagesGrid.innerHTML = `<p class="loadingText langText" data-i18n="loadingPdf">Loading document...</p>`;
+
+    const loadingTask = window.pdfjsLib.getDocument({ data: buffer, disableWorker: true });
+    const pdf = await loadingTask.promise;
+    pagesGrid.innerHTML = '';
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+        const pageIndex = i - 1;
+        const page = await pdf.getPage(i);
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        pdfPageDimensions.set(pageIndex, {
+            width: unscaledViewport.width,
+            height: unscaledViewport.height,
+        });
+
+        const scrollContainer = document.querySelector('.pagesScrollContainer');
+        let targetWidth = scrollContainer.clientWidth - 40;
+        if (targetWidth > 850) targetWidth = 850;
+        if (targetWidth < 300) targetWidth = 300;
+
+        const scale = targetWidth / unscaledViewport.width;
+        const viewport = page.getViewport({ scale });
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'pageWrapper';
+        wrapper.dataset.pageIndex = pageIndex;
+
+        const pdfCanvas = document.createElement('canvas');
+        pdfCanvas.className = 'pdfCanvas';
+        pdfCanvas.width = viewport.width;
+        pdfCanvas.height = viewport.height;
+        const pdfContext = pdfCanvas.getContext('2d');
+
+        const watermarkLayer = document.createElement('div');
+        watermarkLayer.className = 'watermarkLayer';
+        watermarkLayer.id = `watermarkLayer_${pageIndex}`;
+
+        const badge = document.createElement('div');
+        badge.className = 'pageBadge';
+        badge.innerText = `Pg ${i}`;
+
+        await page.render({ canvasContext: pdfContext, viewport }).promise;
+
+        wrapper.appendChild(pdfCanvas);
+        wrapper.appendChild(watermarkLayer);
+        wrapper.appendChild(badge);
+        pagesGrid.appendChild(wrapper);
+    }
+}
+
+function getCurrentPageIndex() {
+    let bestIndex = 0;
+    let minDistance = Infinity;
+    const viewportCenter = window.innerHeight / 2;
+
+    document.querySelectorAll('.pageWrapper').forEach(wrapper => {
+        const rect = wrapper.getBoundingClientRect();
+        const wrapperCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(viewportCenter - wrapperCenter);
+        if (distance < minDistance) {
+            minDistance = distance;
+            bestIndex = parseInt(wrapper.dataset.pageIndex);
+        }
+    });
+
+    return bestIndex;
+}
+
+function getLayerElement(pageIndex) {
+    return document.getElementById(`watermarkLayer_${pageIndex}`);
+}
+
 pdfFileInput.addEventListener('change', async function(e) {
     if (e.target.files.length > 0) {
         const file = e.target.files[0];
         const blocked = await PdfEncryptionGuard.check(file, STATUS);
         if (blocked) {
             selectedFile = null;
+            originalFileBuffer = null;
             return;
         }
 
         selectedFile = file;
         updateFileNameDisplay();
-
-        try {
-            const fileBuffer = await selectedFile.arrayBuffer();
-            const pdfDoc = await PDFDocument.load(fileBuffer);
-            const pages = pdfDoc.getPages();
-
-            if (pages.length > 0) {
-                const { width, height } = pages[0].getSize();
-                pdfPageDimensions = { width, height };
-
-                
-                previewCanvas.width = width;
-                previewCanvas.height = height;
-            }
-        } catch (error) {
-            console.error('Error loading PDF for preview:', error);
-            pdfPageDimensions = { width: 595, height: 842 };
-            previewCanvas.width = 595;
-            previewCanvas.height = 842;
-        }
-
         watermarkWorkspace.style.display = 'flex';
         finalSubmitGroup.style.display = 'block';
         watermarkContainer.classList.add('expanded');
+
+        try {
+            const fileBuffer = await selectedFile.arrayBuffer();
+            originalFileBuffer = fileBuffer.slice(0);
+            watermarkLayers = [];
+            activeWatermarkId = null;
+            editingLayerIndex = null;
+            pdfPageDimensions.clear();
+            await renderPagePreviews(fileBuffer.slice(0));
+        } catch (error) {
+            console.error('Error loading PDF for preview:', error);
+            originalFileBuffer = null;
+            pdfPageDimensions.clear();
+            pagesGrid.innerHTML = `<p class="errorText">Failed to load document preview.</p>`;
+        }
+
+        updateLayersList();
         updatePreview();
     } else {
+        selectedFile = null;
+        originalFileBuffer = null;
+        watermarkLayers = [];
+        activeWatermarkId = null;
+        pdfPageDimensions.clear();
+        pagesGrid.innerHTML = '';
         watermarkWorkspace.style.display = 'none';
         finalSubmitGroup.style.display = 'none';
         watermarkContainer.classList.remove('expanded');
@@ -313,12 +349,6 @@ function getCurrentFormLayer() {
         rotation = parseInt(rotationSelect.value);
     }
 
-    
-    const rawX = parseInt(posXInput.value);
-    const rawY = parseInt(posYInput.value);
-    const posX = !isNaN(rawX) ? rawX : 50;
-    const posY = !isNaN(rawY) ? rawY : 50;
-
     if (isImageMode) {
         if (!currentImageObj) return null;
         return {
@@ -329,9 +359,8 @@ function getCurrentFormLayer() {
             imageScale: parseInt(imageScaleInput.value) || 50,
             opacity: parseInt(opacityInput.value) / 100,
             rotation,
-            posX,
-            posY,
-            positionType: positionSelect.value,
+            posX: 50,
+            posY: 50,
             isPreview: true
         };
     } else {
@@ -351,9 +380,8 @@ function getCurrentFormLayer() {
             color: textColor,
             opacity: parseInt(opacityInput.value) / 100,
             rotation,
-            posX,
-            posY,
-            positionType: positionSelect.value,
+            posX: 50,
+            posY: 50,
             isPreview: true
         };
     }
@@ -369,14 +397,30 @@ addLayerBtn.addEventListener('click', function(e) {
         return;
     }
 
-    delete layer.isPreview;
-
     if (editingLayerIndex !== null) {
+        layer.id = watermarkLayers[editingLayerIndex].id;
+        layer.posX = watermarkLayers[editingLayerIndex].posX;
+        layer.posY = watermarkLayers[editingLayerIndex].posY;
+        delete layer.isPreview;
         watermarkLayers[editingLayerIndex] = layer;
+        activeWatermarkId = layer.id;
         editingLayerIndex = null;
         if (window.getMessage) addLayerBtn.querySelector('span').textContent = window.getMessage('addLayerBtnText');
     } else {
+        layer.id = createId('wm');
+        layer.posX = 50;
+        layer.posY = 50;
+        delete layer.isPreview;
+        const currentPageIndex = getCurrentPageIndex();
+        const layerDom = getLayerElement(currentPageIndex);
+        if (layerDom) {
+            const centerX = layerDom.offsetWidth / 2;
+            const centerY = layerDom.offsetHeight / 2;
+            layer.posX = (centerX / layerDom.offsetWidth) * 100;
+            layer.posY = 100 - ((centerY / layerDom.offsetHeight) * 100);
+        }
         watermarkLayers.push(layer);
+        activeWatermarkId = layer.id;
     }
 
     updateLayersList();
@@ -407,13 +451,6 @@ function clearForm() {
     customRotationInput.value = 45;
     
     colorSelect.value = 'black';
-    positionSelect.value = 'center';
-    
-    // Reset position values
-    posXSlider.value = 50; 
-    posXInput.value = 50;
-    posYSlider.value = 50; 
-    posYInput.value = 50;
 
     // Only hide custom color wrapper
     customColorWrapper.style.display = 'none';
@@ -493,13 +530,10 @@ function updateLayersList() {
 function editLayer(index) {
     const layer = watermarkLayers[index];
     editingLayerIndex = index;
+    activeWatermarkId = layer.id;
 
     opacityInput.value = Math.round(layer.opacity * 100);
     opacityValue.textContent = Math.round(layer.opacity * 100) + '%';
-    
-    positionSelect.value = layer.positionType || 'custom';
-    posXSlider.value = layer.posX; posXInput.value = layer.posX;
-    posYSlider.value = layer.posY; posYInput.value = layer.posY;
 
     if (Number.isInteger(layer.rotation)) {
         const rotationOptions = [0, 15, 30, 45, 60, 90, -15, -30, -45];
@@ -551,7 +585,11 @@ function editLayer(index) {
 }
 
 function removeLayer(index) {
+    const removed = watermarkLayers[index];
     watermarkLayers.splice(index, 1);
+    if (removed?.id === activeWatermarkId) {
+        activeWatermarkId = watermarkLayers[0]?.id || null;
+    }
     if (editingLayerIndex === index) {
         editingLayerIndex = null;
         clearForm();
@@ -564,75 +602,209 @@ function removeLayer(index) {
 
 function updatePreview() {
     if (!selectedFile) return;
-
-    previewCtx.fillStyle = 'white';
-    previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
-
-    watermarkLayers.forEach((layer, index) => {
-        if (index !== editingLayerIndex) drawWatermarkOnCanvas(layer);
-    });
-    
-    const liveLayer = getCurrentFormLayer();
-    if (liveLayer) drawWatermarkOnCanvas(liveLayer);
+    renderWatermarkOverlays();
 }
 
 
-function drawWatermarkOnCanvas(layer) {
-    const canvas = previewCanvas;
-    const ctx = previewCtx;
-    ctx.save();
+function renderWatermarkOverlays() {
+    document.querySelectorAll('.watermarkLayer').forEach(layerDom => {
+        layerDom.innerHTML = '';
+        const pageIndex = parseInt(layerDom.closest('.pageWrapper')?.dataset.pageIndex || '0', 10);
+        watermarkLayers.forEach((layer, index) => {
+            if (index !== editingLayerIndex) createWatermarkOverlay(pageIndex, layer, layerDom);
+        });
+    });
+}
 
-    let contentWidth, contentHeight;
+function getWatermarkCssColor(layer) {
+    if (typeof layer.color === 'string' && layer.color.startsWith('#')) return layer.color;
+    const colorMap = { red: '#CC0000', gray: '#808080', black: '#000000', blue: '#0000CC', green: '#009900' };
+    return colorMap[layer.color] || '#000000';
+}
+
+function createWatermarkOverlay(pageIndex, layer, layerDom) {
+    const pageDims = pdfPageDimensions.get(pageIndex) || { width: layerDom.offsetWidth };
+    const uiScale = layerDom.offsetWidth / pageDims.width;
+    const item = document.createElement('div');
+    item.className = 'watermarkOverlayItem';
+    if (layer.id === activeWatermarkId) item.classList.add('active');
+    item.dataset.id = layer.id;
+    item.dataset.pageIndex = pageIndex;
+    item.style.left = `${(layer.posX / 100) * layerDom.offsetWidth}px`;
+    item.style.top = `${(1 - layer.posY / 100) * layerDom.offsetHeight}px`;
+    item.style.opacity = String(layer.opacity);
+    item.style.transform = `translate(-50%, -50%) rotate(${-layer.rotation}deg)`;
 
     if (layer.type === 'image' && layer.imageObj) {
-        contentWidth = layer.imageObj.width * (layer.imageScale / 100);
-        contentHeight = layer.imageObj.height * (layer.imageScale / 100);
-    } else {
-        ctx.font = `bold ${layer.fontSize}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        let color;
-        if (typeof layer.color === 'string' && layer.color.startsWith('#')) color = layer.color;
-        else {
-            const colorMap = { red: '#CC0000', gray: '#808080', black: '#000000', blue: '#0000CC', green: '#009900' };
-            color = colorMap[layer.color] || '#000000';
-        }
-        ctx.fillStyle = color;
-        contentWidth = ctx.measureText(layer.text).width; 
-        contentHeight = layer.fontSize;
+        const img = document.createElement('img');
+        img.src = layer.imageObj.src;
+        img.alt = '';
+        img.style.width = `${layer.imageObj.width * (layer.imageScale / 100) * uiScale}px`;
+        img.style.height = `${layer.imageObj.height * (layer.imageScale / 100) * uiScale}px`;
+        item.appendChild(img);
+    } else if (layer.type === 'text') {
+        item.textContent = layer.text;
+        item.style.fontSize = `${layer.fontSize * uiScale}px`;
+        item.style.fontWeight = 'bold';
+        item.style.color = getWatermarkCssColor(layer);
     }
 
-    ctx.globalAlpha = layer.isPreview ? layer.opacity * 0.8 : layer.opacity;
+    item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activeWatermarkId = layer.id;
+        document.querySelectorAll('.watermarkOverlayItem').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll(`.watermarkOverlayItem[data-id="${layer.id}"]`).forEach(el => el.classList.add('active'));
+        dragState = {
+            layer,
+            startX: e.clientX,
+            startY: e.clientY,
+            startLeft: (layer.posX / 100) * layerDom.offsetWidth,
+            startTop: (1 - layer.posY / 100) * layerDom.offsetHeight,
+            layerWidth: layerDom.offsetWidth,
+            layerHeight: layerDom.offsetHeight,
+        };
+    });
 
-    
-    const canvasX = (layer.posX / 100) * canvas.width;
-    const canvasY = canvas.height - ((layer.posY / 100) * canvas.height); 
+    layerDom.appendChild(item);
+}
 
-    ctx.translate(canvasX, canvasY);
-    ctx.rotate((-layer.rotation * Math.PI) / 180);
+document.addEventListener('mousemove', (e) => {
+    if (!dragState) return;
+
+    const left = Math.max(0, Math.min(dragState.layerWidth, dragState.startLeft + e.clientX - dragState.startX));
+    const top = Math.max(0, Math.min(dragState.layerHeight, dragState.startTop + e.clientY - dragState.startY));
+
+    dragState.layer.posX = (left / dragState.layerWidth) * 100;
+    dragState.layer.posY = 100 - ((top / dragState.layerHeight) * 100);
+
+    document.querySelectorAll(`.watermarkOverlayItem[data-id="${dragState.layer.id}"]`).forEach(item => {
+        const layerDom = item.parentElement;
+        item.style.left = `${(dragState.layer.posX / 100) * layerDom.offsetWidth}px`;
+        item.style.top = `${(1 - dragState.layer.posY / 100) * layerDom.offsetHeight}px`;
+    });
+});
+
+document.addEventListener('mouseup', () => {
+    if (dragState) {
+        updateLayersList();
+    }
+    dragState = null;
+});
+
+function drawWatermarkContentAt(ctx, layer, x, y, renderScale) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((-(layer.rotation || 0) * Math.PI) / 180);
 
     if (layer.type === 'image' && layer.imageObj) {
-        ctx.drawImage(layer.imageObj, -contentWidth / 2, -contentHeight / 2, contentWidth, contentHeight);
-        
-        if (layer.isPreview) {
-            ctx.strokeStyle = '#0066cc';
-            ctx.setLineDash([5, 5]);
-            ctx.lineWidth = 2; 
-            ctx.strokeRect(-contentWidth / 2 - 5, -contentHeight / 2 - 5, contentWidth + 10, contentHeight + 10);
-        }
-    } else if (layer.type === 'text') {
+        const width = layer.imageObj.width * ((layer.imageScale || 50) / 100) * renderScale;
+        const height = layer.imageObj.height * ((layer.imageScale || 50) / 100) * renderScale;
+        ctx.drawImage(layer.imageObj, -width / 2, -height / 2, width, height);
+    } else if (layer.type === 'text' && layer.text) {
+        const fontSize = (layer.fontSize || 50) * renderScale;
+        ctx.font = `bold ${fontSize}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = getWatermarkCssColor(layer);
         ctx.fillText(layer.text, 0, 0);
+    }
 
-        if (layer.isPreview) {
-            ctx.strokeStyle = '#0066cc';
-            ctx.setLineDash([5, 5]);
-            ctx.lineWidth = 2;
-            ctx.strokeRect(-(contentWidth / 2) - 10, -(contentHeight / 2) - 10, contentWidth + 20, contentHeight + 20);
+    ctx.restore();
+}
+
+function getWatermarkTileSpacing(ctx, layer, renderScale) {
+    if (layer.type === 'image' && layer.imageObj) {
+        return {
+            x: Math.max(220 * renderScale, layer.imageObj.width * ((layer.imageScale || 50) / 100) * renderScale * 1.6),
+            y: Math.max(160 * renderScale, layer.imageObj.height * ((layer.imageScale || 50) / 100) * renderScale * 1.8),
+        };
+    }
+
+    const fontSize = (layer.fontSize || 50) * renderScale;
+    ctx.save();
+    ctx.font = `bold ${fontSize}px Arial`;
+    const textWidth = ctx.measureText(layer.text || '').width;
+    ctx.restore();
+
+    return {
+        x: Math.max(260 * renderScale, textWidth * 1.45),
+        y: Math.max(150 * renderScale, fontSize * 3),
+    };
+}
+
+function drawWatermarkLayerOnCanvas(ctx, layer, canvasWidth, canvasHeight, renderScale) {
+    ctx.save();
+    ctx.globalAlpha = layer.opacity ?? 0.3;
+
+    const baseX = (layer.posX / 100) * canvasWidth;
+    const baseY = (1 - layer.posY / 100) * canvasHeight;
+    const spacing = getWatermarkTileSpacing(ctx, layer, renderScale);
+    const startX = ((baseX % spacing.x) + spacing.x) % spacing.x;
+    const startY = ((baseY % spacing.y) + spacing.y) % spacing.y;
+
+    for (let y = startY - spacing.y; y <= canvasHeight + spacing.y; y += spacing.y) {
+        for (let x = startX - spacing.x; x <= canvasWidth + spacing.x; x += spacing.x) {
+            drawWatermarkContentAt(ctx, layer, x, y, renderScale);
         }
     }
 
     ctx.restore();
+}
+
+async function renderWatermarkedPdfBytes(fileBuffer, metadata) {
+    const sourcePdf = await window.pdfjsLib.getDocument({ data: fileBuffer.slice(0), disableWorker: true }).promise;
+    const outDoc = await PDFDocument.create();
+    const renderScale = 2;
+
+    if (metadata.author) outDoc.setAuthor(metadata.author);
+    if (metadata.title) outDoc.setTitle(metadata.title);
+    if (metadata.subject) outDoc.setSubject(metadata.subject);
+
+    for (let pageNumber = 1; pageNumber <= sourcePdf.numPages; pageNumber++) {
+        const sourcePage = await sourcePdf.getPage(pageNumber);
+        const viewport = sourcePage.getViewport({ scale: renderScale });
+        const outputViewport = sourcePage.getViewport({ scale: 1 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+
+        await sourcePage.render({ canvasContext: ctx, viewport }).promise;
+        // Draw watermarks on a separate overlay canvas so no PDF.js render state
+        // (transforms/clips) can affect watermark angle or position.
+        const overlayCanvas = document.createElement('canvas');
+        overlayCanvas.width = canvas.width;
+        overlayCanvas.height = canvas.height;
+        const overlayCtx = overlayCanvas.getContext('2d');
+        overlayCtx.setTransform(1, 0, 0, 1, 0, 0);
+
+        watermarkLayers.forEach(layer => {
+            drawWatermarkLayerOnCanvas(
+                overlayCtx,
+                layer,
+                overlayCanvas.width,
+                overlayCanvas.height,
+                renderScale
+            );
+        });
+
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(overlayCanvas, 0, 0);
+
+        const pngDataUrl = canvas.toDataURL('image/png');
+        const pngBytes = Uint8Array.from(atob(pngDataUrl.split(',')[1]), char => char.charCodeAt(0));
+        const pngImage = await outDoc.embedPng(pngBytes);
+        const outPage = outDoc.addPage([outputViewport.width, outputViewport.height]);
+        outPage.drawImage(pngImage, {
+            x: 0,
+            y: 0,
+            width: outputViewport.width,
+            height: outputViewport.height,
+        });
+    }
+
+    return outDoc.save();
 }
 
 form.addEventListener('submit', async function(e) {
@@ -655,84 +827,9 @@ form.addEventListener('submit', async function(e) {
     submitBtn.disabled = true;
 
     try {
-        const fileBuffer = await selectedFile.arrayBuffer();
-        const pdfDoc = await PDFDocument.load(fileBuffer);
-
+        const fileBuffer = originalFileBuffer ? originalFileBuffer.slice(0) : await selectedFile.arrayBuffer();
         const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
-        if (finalMetadata.author)  pdfDoc.setAuthor(finalMetadata.author);
-        if (finalMetadata.title)   pdfDoc.setTitle(finalMetadata.title);
-        if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
-
-        const helveticaFont = await pdfDoc.embedFont('Helvetica-Bold');
-        
-        for (const layer of watermarkLayers) {
-            if (layer.type === 'image' && !layer.embeddedPdfImage) {
-                const isJpeg = layer.imageFile.type === 'image/jpeg' || layer.imageFile.type === 'image/jpg';
-                layer.embeddedPdfImage = isJpeg 
-                    ? await pdfDoc.embedJpg(layer.imageBytes)
-                    : await pdfDoc.embedPng(layer.imageBytes);
-            }
-        }
-
-        const pages = pdfDoc.getPages();
-
-        pages.forEach(page => {
-            const { width, height } = page.getSize();
-
-            watermarkLayers.forEach(layer => {
-                const x = (layer.posX / 100) * width;
-                const y = (layer.posY / 100) * height;
-                
-                const rotationAngle = layer.rotation || 0;
-                const rotationRad = (rotationAngle * Math.PI) / 180;
-
-                if (layer.type === 'image') {
-                    const scaledDims = layer.embeddedPdfImage.scale(layer.imageScale / 100);
-                    
-                    const offsetX = (scaledDims.width / 2) * Math.cos(rotationRad) - (scaledDims.height / 2) * Math.sin(rotationRad);
-                    const offsetY = (scaledDims.width / 2) * Math.sin(rotationRad) + (scaledDims.height / 2) * Math.cos(rotationRad);
-
-                    page.drawImage(layer.embeddedPdfImage, {
-                        x: x - offsetX,
-                        y: y - offsetY,
-                        width: scaledDims.width,
-                        height: scaledDims.height,
-                        opacity: layer.opacity,
-                        rotate: degrees(rotationAngle)
-                    });
-                } else {
-                    const textWidth = helveticaFont.widthOfTextAtSize(layer.text, layer.fontSize);
-                    const textHeight = layer.fontSize;
-
-                    let textColor;
-                    if (typeof layer.color === 'string' && layer.color.startsWith('#')) textColor = hexToRgb(layer.color);
-                    else {
-                        switch (layer.color) {
-                            case 'red':   textColor = rgb(0.8, 0, 0);    break;
-                            case 'gray':  textColor = rgb(0.5, 0.5, 0.5); break;
-                            case 'blue':  textColor = rgb(0, 0, 0.8);    break;
-                            case 'green': textColor = rgb(0, 0.6, 0);    break;
-                            default:      textColor = rgb(0, 0, 0);
-                        }
-                    }
-
-                    const offsetX = (textWidth / 2) * Math.cos(rotationRad) + (textHeight / 2) * Math.sin(rotationRad);
-                    const offsetY = (textWidth / 2) * Math.sin(rotationRad) - (textHeight / 2) * Math.cos(rotationRad);
-
-                    page.drawText(layer.text, {
-                        x: x - offsetX,
-                        y: y - offsetY,
-                        size: layer.fontSize,
-                        font: helveticaFont,
-                        color: textColor,
-                        opacity: layer.opacity,
-                        rotate: degrees(rotationAngle),
-                    });
-                }
-            });
-        });
-
-        const pdfBytes = await pdfDoc.save();
+        const pdfBytes = await renderWatermarkedPdfBytes(fileBuffer, finalMetadata);
 
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const outputPath = await ipcRenderer.invoke('show-save-dialog', {
@@ -758,6 +855,10 @@ form.addEventListener('submit', async function(e) {
         form.reset();
         clearForm();
         watermarkLayers = [];
+        activeWatermarkId = null;
+        originalFileBuffer = null;
+        pdfPageDimensions.clear();
+        pagesGrid.innerHTML = '';
         editingLayerIndex = null;
         opacityValue.textContent = '30%';
         previewSection.style.display = 'none';
@@ -776,12 +877,3 @@ form.addEventListener('submit', async function(e) {
         submitBtn.disabled = false;
     }
 });
-
-function hexToRgb(hex) {
-    hex = hex.replace('#', '');
-    return rgb(
-        parseInt(hex.substring(0, 2), 16) / 255,
-        parseInt(hex.substring(2, 4), 16) / 255,
-        parseInt(hex.substring(4, 6), 16) / 255
-    );
-}

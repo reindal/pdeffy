@@ -39,8 +39,8 @@
                     <div class="leftPanel">
                         <div class="previewSection stickyPreview" id="previewSection">
                             <h3 class="langText" id="previewTitle">Watermark Preview</h3>
-                            <div class="previewCanvas">
-                                <canvas id="watermarkPreview" width="400" height="300"></canvas>
+                            <div class="pagesScrollContainer">
+                                <div id="pagesGrid" class="pagesGrid"></div>
                             </div>
                             <p class="previewHint langText" id="previewHint">Preview shows how watermark(s) will appear
                                 on your PDF</p>
@@ -151,38 +151,6 @@
                                 </div>
                             </div>
 
-                            <div class="formGroup">
-                                <label for="position" id="positionLabel" class="langText">Position:</label>
-                                <select id="position">
-                                    <option value="center" class="langText" id="posCenter" selected>Center</option>
-                                    <option value="top" class="langText" id="posTop">Top</option>
-                                    <option value="bottom" class="langText" id="posBottom">Bottom</option>
-                                    <option value="top-left" class="langText" id="posTopLeft">Top Left</option>
-                                    <option value="top-right" class="langText" id="posTopRight">Top Right</option>
-                                    <option value="bottom-left" class="langText" id="posBottomLeft">Bottom Left</option>
-                                    <option value="bottom-right" class="langText" id="posBottomRight">Bottom Right
-                                    </option>
-                                    <option value="custom" class="langText" id="posCustom">Custom (Manual)</option>
-                                </select>
-
-                                <div class="customPositionWrapper">
-                                    <div class="sliderRow">
-                                        <label class="langText" id="posXLabel">Horizontal (X):</label>
-                                        <input type="range" id="posXSlider" min="0" max="100" value="50">
-                                        <input type="number" id="posXInput" min="0" max="100" value="50"
-                                            class="smallInput"> <span
-                                            style="font-weight:bold; color:var(--reindalDark);">%</span>
-                                    </div>
-                                    <div class="sliderRow">
-                                        <label class="langText" id="posYLabel">Vertical (Y):</label>
-                                        <input type="range" id="posYSlider" min="0" max="100" value="50">
-                                        <input type="number" id="posYInput" min="0" max="100" value="50"
-                                            class="smallInput"> <span
-                                            style="font-weight:bold; color:var(--reindalDark);">%</span>
-                                    </div>
-                                </div>
-                            </div>
-
                             <button type="button" class="addLayerBtn" id="addLayerBtn"><span class="langText"
                                     id="addLayerBtnText">+ Add Watermark Layer</span></button>
 
@@ -214,10 +182,11 @@
 
     <script src="../../changeLang.js"></script>
     <script src="./../statusManager.js"></script>
-    <script src="./watermark.js"></script>
     <script src="./../pdfEncryptionGuard.js"></script>
     <script src="./../customMetadata.js"></script>
     <script src="./../../settings.js"></script>
+    <script src="./../../libs/pdf.min.js"></script>
+    <script src="./watermark.js"></script>
 </body>
 
 </html>

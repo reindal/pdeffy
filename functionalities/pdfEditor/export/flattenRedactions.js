@@ -52,7 +52,7 @@
     /**
      * Rebuild document: pages with redactions are image-only; others copied as vectors.
      */
-    async function flattenRedactedPages(outDoc, model, activePages) {
+    async function flattenRedactedPages(outDoc, model, activePages, options = {}) {
         const { PDFDocument } = require('pdf-lib');
         const pdfjsLib = global.pdfjsLib || global.window?.pdfjsLib;
         if (!pdfjsLib) {
@@ -77,7 +77,7 @@
             const pageState = activePages[i];
             const redacts = redactionsByPageId.get(pageState.id) || [];
 
-            if (redacts.length > 0) {
+            if (options.flattenAllPages || redacts.length > 0) {
                 const { pngBytes, width, height } = await rasterizePageWithRedactions(
                     pdfJsDoc,
                     i,
