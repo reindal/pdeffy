@@ -81,6 +81,12 @@ header h1 {
     border: 2px solid color-mix(in srgb, var(--reindalTab) 18%, transparent);
 }
 
+a.categoryTileLink {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
 .categoryTile:hover {
     transform: translateY(-5px);
     box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 20px;

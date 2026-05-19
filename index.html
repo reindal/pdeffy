@@ -27,11 +27,11 @@
             <h3 id="convertPdfTile" class="langText">Convert PDF</h3>
             <p id="convertPdfTileDesc" class="langText">Convert to and from PDF</p>
         </div>
-        <div class="categoryTile" data-section="edit">
+        <a href="./functionalities/pdfEditor/pdfEditor.html" class="categoryTile categoryTileLink" id="editPdfCategoryTile">
             <div class="categoryIcon"><img src="./assets/icons/edit.png" alt="Edit image"></div>
             <h3 id="editPdfTile" class="langText">Edit PDF</h3>
             <p id="editPdfTileDesc" class="langText">Watermark, delete pages</p>
-        </div>
+        </a>
     </div>
 
     <main>
@@ -102,7 +102,7 @@
                                     </p>
                                 </a>
                                 <a href="./functionalities/markdownToPdf/markdownToPdf.html" class="optionCard" id="markdownToPdfCard">
-                                    <img src="./assets/icons/convert/doc-pdf.png" alt="Markdown to PDF Icon" class="optionIcon">
+                                    <img src="./assets/icons/convert/md-to-pdf.png" alt="Markdown to PDF Icon" class="optionIcon">
                                     <h2 id="markdownToPdfText" class="langText">Markdown to PDF</h2>
                                     <p id="markdownToPdfDesc" class="langText">Convert a Markdown file into a PDF document.</p>
                                 </a>
@@ -134,7 +134,7 @@
                                     <p id="pdfToImageDesc" class="langText">Convert PDF pages into image files.</p>
                                 </a>
                                 <a href="./functionalities/pdfToMarkdown/pdfToMarkdown.html" class="optionCard" id="pdfToMarkdownCard">
-                                    <img src="./assets/icons/convert/pdf-doc.png" alt="PDF to Markdown Icon" class="optionIcon">
+                                    <img src="./assets/icons/convert/pdf-to.md.png" alt="PDF to Markdown Icon" class="optionIcon">
                                     <h2 id="pdfToMarkdownText" class="langText">PDF to Markdown</h2>
                                     <p id="pdfToMarkdownDesc" class="langText">Extract text from a PDF file to a Markdown document.</p>
                                 </a>
@@ -144,33 +144,6 @@
                 </div>
             </details>
 
-            <details class="toolSection collapsibleSection" id="editSection">
-                <summary class="sectionTitle langText" id="editPdfSection">Edit PDF</summary>
-                <div class="collapsibleContent">
-                    <div class="cardsGrid">
-                        <a href="./functionalities/watermark/watermark.html" class="optionCard" id="addWatermark">
-                            <img src="./assets/icons/edit/watermark.png" alt="Watermark Icon" class="optionIcon">
-                            <h2 id="watermarkText" class="langText">Add Watermark</h2>
-                            <p id="watermarkDesc" class="langText">Add a watermark to your PDF document.</p>
-                        </a>
-                        <a href="./functionalities/deletePages/deletepages.html" class="optionCard" id="deletePages">
-                            <img src="./assets/icons/edit/delete.png" alt="Delete Pages Icon" class="optionIcon">
-                            <h2 id="deletePagesText" class="langText">Delete Pages</h2>
-                            <p id="deletePagesDesc" class="langText">Delete Pages from PDF</p>
-                        </a>
-                        <a href="./functionalities/rotatePdf/rotatePdf.html" class="optionCard" id="rotatePDF">
-                            <img src="./assets/icons/organize/rotate.png" alt="Rotate PDF Icon" class="optionIcon">
-                            <h2 id="rotatePagesTitle" class="langText">Rotate PDF</h2>
-                            <p id="rotatePagesDesc" class="langText">Rotate pages in your PDF</p>
-                        </a>
-                        <a href="./functionalities/redactPdf/redactPdf.html" class="optionCard" id="redactPdf">
-                            <img src="./assets/icons/edit/redact.png" alt="Redact PDF Icon" class="optionIcon">
-                            <h2 id="redactPdfTile" class="langText">Redact PDF</h2>
-                            <p id="redactPdfTileDesc" class="langText">insert Text</p>
-                        </a>
-                    </div>
-                </div>
-            </details>
         </div>
     </main>
     <script src="./collapsibleSections.js"></script>

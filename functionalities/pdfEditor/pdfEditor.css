@@ -1,0 +1,768 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+/* Align header bar with editor workspace (global header defaults to 1200px). */
+body.pdfEditorPage {
+    --pdf-editor-layout-width: min(1400px, calc(100% - 40px));
+    --pdf-editor-chrome-height: 200px;
+}
+
+/* Keep scroll inside the preview panel, not the whole window. */
+body.pdfEditorPage.pdfEditorEditing {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+body.pdfEditorPage.pdfEditorEditing .headerContainer {
+    flex-shrink: 0;
+}
+
+body.pdfEditorPage.pdfEditorEditing main {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+body.pdfEditorPage.pdfEditorEditing .backLink {
+    flex-shrink: 0;
+}
+
+body.pdfEditorPage header {
+    width: var(--pdf-editor-layout-width);
+    max-width: var(--pdf-editor-layout-width);
+    box-sizing: border-box;
+}
+
+body.pdfEditorPage main {
+    width: var(--pdf-editor-layout-width);
+    max-width: var(--pdf-editor-layout-width);
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+.pdfEditorContainer {
+    width: 100%;
+    max-width: none;
+    margin: 5px 0 24px;
+    padding: 16px 20px 20px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    box-sizing: border-box;
+}
+
+.pdfEditorDropZone {
+    border: 2px dashed var(--reindalGray);
+    border-radius: 12px;
+    padding: 48px 24px;
+    text-align: center;
+    background: var(--reindalExtraLight);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.pdfEditorDropZone.dragover {
+    border-color: var(--reindalDark);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.pdfEditorDropZone p {
+    margin: 8px 0;
+    color: var(--reindalDark);
+}
+
+.pdfEditorDropZone input[type="file"] {
+    display: none;
+}
+
+.pdfEditorWorkspace {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 0;
+}
+
+.pdfEditorWorkspace.visible {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.pdfEditorTopBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 4px 10px;
+    border-bottom: 1px solid var(--reindalGray);
+}
+
+.pdfEditorTopBar .fileName {
+    font-weight: 600;
+    color: var(--reindalDark);
+    flex: 1;
+    min-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.pdfEditorTopBarActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.pdfEditorBarBtn {
+    padding: 8px 16px;
+    border: 1px solid var(--reindalGray);
+    border-radius: 8px;
+    background-color: var(--reindalLight);
+    color: var(--reindalDark);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-family: var(--font-primary), serif;
+    white-space: nowrap;
+}
+
+.pdfEditorBarBtn:hover:not(:disabled) {
+    background-color: var(--reindalYellow);
+    border-color: var(--reindalDark);
+}
+
+.pdfEditorBarBtnPrimary {
+    background-color: var(--reindalYellow);
+    border-color: var(--reindalDark);
+}
+
+.pdfEditorBarBtnPrimary:hover:not(:disabled) {
+    background-color: var(--reindalYellowHover);
+}
+
+.pdfEditorBarBtn:disabled,
+.pdfEditorBarBtnPrimary:disabled {
+    background-color: var(--reindalGray);
+    border-color: var(--reindalGray);
+    color: var(--reindalDark);
+    cursor: not-allowed;
+    opacity: 0.75;
+}
+
+.pdfEditorStatusBar {
+    margin: 0;
+    min-height: 0;
+}
+
+.pdfEditorStatusBar:empty {
+    display: none;
+    margin: 0;
+    padding: 0;
+}
+
+.pdfEditorMain {
+    display: grid;
+    grid-template-columns: 200px 1fr 260px;
+    gap: 14px;
+    align-items: stretch;
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
+}
+
+@media (max-width: 1000px) {
+    .pdfEditorMain {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pdfEditorPagesPanel {
+    background: var(--reindalExtraLight);
+    border: 1px solid var(--reindalGray);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.pdfEditorPagesPanel h3 {
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--reindalGray);
+    color: var(--reindalDark);
+}
+
+.pdfEditorThumbsScroll {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pdfEditorThumbItem {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 6px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.pdfEditorThumbItem.selected {
+    border-color: var(--reindalDark);
+    box-shadow: 0 0 0 1px var(--reindalDark);
+}
+
+.pdfEditorThumbItem.dragging {
+    opacity: 0.5;
+}
+
+.pdfEditorThumbItem.drag-over {
+    border-color: var(--reindalGray);
+    border-style: dashed;
+}
+
+.pdfEditorThumbDrag {
+    text-align: center;
+    font-size: 12px;
+    color: #888;
+    cursor: grab;
+    user-select: none;
+}
+
+.pdfEditorThumbCanvasWrap {
+    display: flex;
+    justify-content: center;
+    margin: 4px 0;
+}
+
+.pdfEditorThumbCanvasWrap canvas {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.pdfEditorThumbBadge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--reindalDark);
+    color: var(--reindalLight);
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.pdfEditorThumbActions {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.pdfEditorThumbBtn {
+    border: 1px solid var(--reindalGray);
+    background: #fff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.pdfEditorThumbBtn:hover {
+    background: var(--reindalExtraLight);
+}
+
+.pdfEditorThumbBtnDanger:hover {
+    background: #fee;
+}
+
+.pdfEditorPreviewPanel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: 100%;
+    background: var(--reindalExtraLight);
+    border: 1px solid var(--reindalGray);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.pdfEditorPreviewToolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--reindalGray);
+    background: rgba(255, 255, 255, 0.5);
+    flex-shrink: 0;
+}
+
+.pdfEditorPreviewToolbar .toolBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 32px;
+    padding: 6px 12px;
+    border: 1px solid var(--reindalGray);
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    font-family: inherit;
+}
+
+.pdfEditorPreviewToolbar .pdfEditorNavBtn {
+    min-width: 32px;
+    max-width: 32px;
+    padding: 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pdfEditorPreviewToolbar .toolBtn.active {
+    background: var(--reindalDark);
+    color: var(--reindalLight);
+}
+
+.pdfEditorPageIndicator {
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--reindalDark);
+}
+
+.pdfEditorViewerSingle {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pdfEditorViewerScroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 16px;
+    display: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.pdfEditorPageFrame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.pdfEditorPageFrame canvas {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    background: #fff;
+}
+
+.pdfEditorPageLabel {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.pdfEditorToolsPanel {
+    background: var(--reindalExtraLight);
+    border: 1px solid var(--reindalGray);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+}
+
+.pdfEditorToolTabs {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--reindalGray);
+    background: var(--reindalExtraLight);
+    flex-shrink: 0;
+}
+
+.pdfEditorToolTab {
+    flex: 1;
+    min-width: 60px;
+    padding: 8px 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--reindalDark);
+}
+
+.pdfEditorToolTab.active {
+    background: #fff;
+    font-weight: 700;
+    border-bottom: 2px solid var(--reindalDark);
+    margin-bottom: -1px;
+    padding-bottom: 9px;
+}
+
+.pdfEditorToolTab:first-child.active {
+    border-top-left-radius: 9px;
+}
+
+.pdfEditorToolTab:last-child.active {
+    border-top-right-radius: 9px;
+}
+
+.pdfEditorToolBody {
+    padding: 12px;
+    flex: 1;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.pdfEditorToolBody p {
+    font-size: 13px;
+    color: var(--reindalDark);
+    line-height: 1.45;
+}
+
+.pdfEditorComingSoon {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.pdfEditorThumbEmpty,
+.pdfEditorViewerEmpty {
+    text-align: center;
+    padding: 16px;
+    color: #666;
+}
+
+.pdfEditorPageCanvasWrap {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+}
+
+.pdfEditorPageCanvasWrap canvas {
+    display: block;
+}
+
+.pdfEditorOverlayLayer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.pdfEditorOverlayLayer.pdfEditorOverlayActive {
+    pointer-events: auto;
+    cursor: crosshair;
+}
+
+.pdfEditorOverlayLayer.pdfEditorOverlaySigActive {
+    pointer-events: auto;
+}
+
+.pdfEditorWatermarkLayer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.pdfEditorWatermarkItem {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    transform-origin: center center;
+    white-space: nowrap;
+}
+
+.pdfEditorWatermarkItem.pdfEditorWatermarkDraft {
+    outline: 1px dashed #0066cc;
+    outline-offset: 4px;
+}
+
+.pdfEditorWatermarkItem img {
+    display: block;
+    max-width: none;
+}
+
+.pdfEditorRedactBox {
+    position: absolute;
+    box-sizing: border-box;
+    cursor: move;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.pdfEditorPanelBtnDanger {
+    margin-top: 12px;
+    border-color: #8b0000;
+    color: #8b0000;
+}
+
+.pdfEditorPanelBtnDanger:hover:not(:disabled) {
+    background: #ffe0e0;
+    border-color: #8b0000;
+}
+
+.pdfEditorSignatureMarker {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px dashed var(--reindalDark);
+    background: rgba(255, 255, 255, 0.6);
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #000;
+    pointer-events: auto;
+    cursor: move;
+}
+
+.pdfEditorSignatureMarker.pdfEditorSignatureSelected {
+    border-color: #0066cc;
+    border-width: 2px;
+    box-shadow: 0 0 0 1px #0066cc;
+}
+
+.pdfEditorSignatureMarker img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.pdfEditorHandle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border: 2px solid var(--reindalDark);
+    border-radius: 2px;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+.pdfEditorSignatureMarker .pdfEditorHandle.nw { top: -6px; left: -6px; cursor: nw-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.n  { top: -6px; left: calc(50% - 5px); cursor: n-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.ne { top: -6px; right: -6px; cursor: ne-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.e  { top: calc(50% - 5px); right: -6px; cursor: e-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.se { bottom: -6px; right: -6px; cursor: se-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.s  { bottom: -6px; left: calc(50% - 5px); cursor: s-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.w  { top: calc(50% - 5px); left: -6px; cursor: w-resize; }
+
+.pdfEditorForm label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 8px 0 4px;
+    color: var(--reindalDark);
+}
+
+.pdfEditorInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--reindalGray);
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.pdfEditorRow {
+    display: flex;
+    gap: 8px;
+}
+
+.pdfEditorRow .pdfEditorInput {
+    flex: 1;
+}
+
+.pdfEditorPanelBtn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--reindalGray);
+    border-radius: 8px;
+    background: var(--reindalLight);
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.pdfEditorPanelBtn:hover {
+    background: var(--reindalYellow);
+}
+
+.pdfEditorList {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pdfEditorListItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    background: #fff;
+    border: 1px solid var(--reindalGray);
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.pdfEditorListRemove {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    color: #a00;
+}
+
+.pdfEditorHint {
+    font-size: 12px;
+    color: #555;
+    margin: 0 0 8px;
+    line-height: 1.4;
+}
+
+.pdfEditorHidden {
+    display: none !important;
+}
+
+#pdfEditorSigCanvas {
+    width: 100%;
+    border: 1px solid var(--reindalGray);
+    border-radius: 6px;
+    background: #fff;
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.pdfEditorSearchLayer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.pdfEditorSearchHighlight {
+    position: absolute;
+    background: rgba(255, 230, 0, 0.45);
+    border: 1px solid rgba(200, 160, 0, 0.8);
+    box-sizing: border-box;
+    border-radius: 2px;
+}
+
+.pdfEditorSearchHighlightCurrent {
+    background: rgba(255, 120, 0, 0.55);
+    border-color: rgba(180, 80, 0, 0.95);
+    box-shadow: 0 0 0 2px rgba(255, 120, 0, 0.35);
+}
+
+.pdfEditorSearchCheck {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    margin: 8px 0;
+    color: var(--reindalDark);
+    cursor: pointer;
+}
+
+.pdfEditorSearchActions {
+    margin-top: 4px;
+}
+
+.pdfEditorSearchNav {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.pdfEditorSearchNav .pdfEditorPanelBtn {
+    flex: 1;
+    margin-top: 0;
+    font-size: 18px;
+    padding: 6px;
+}
+
+.pdfEditorSearchStatus {
+    min-height: 1.2em;
+    margin-top: 8px;
+}
+
+.pdfEditorSearchPages {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pdfEditorSearchPagesTitle {
+    margin: 0 0 4px;
+    font-weight: 600;
+}
+
+.pdfEditorSearchPageItem {
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border: 1px solid var(--reindalGray);
+    border-radius: 6px;
+    background: var(--reindalExtraLight);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--reindalDark);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.pdfEditorSearchPageItem:hover {
+    background: var(--reindalYellow);
+    border-color: var(--reindalDark);
+}

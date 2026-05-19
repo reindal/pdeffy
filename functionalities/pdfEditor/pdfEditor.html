@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Editor</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="./pdfEditor.css">
+</head>
+
+<body class="pdfEditorPage">
+    <div class="headerContainer">
+        <header>
+            <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
+            <h1 id="pdfEditorTitle" class="langText">PDF Editor</h1>
+            <a href="../../index.html" class="backArrow" title="Back to main page">←</a>
+        </header>
+    </div>
+
+    <main>
+        <div class="pdfEditorContainer">
+            <div id="pdfEditorDropZone" class="pdfEditorDropZone">
+                <input type="file" id="pdfEditorFileInput" accept=".pdf">
+                <p id="pdfEditorDropHint" class="langText">Drop a PDF here or click to browse</p>
+                <label for="pdfEditorFileInput" class="fileInputLabel langText" id="pdfEditorOpenPdf">Open PDF</label>
+            </div>
+
+            <div id="pdfEditorWorkspace" class="pdfEditorWorkspace">
+                <div class="pdfEditorTopBar">
+                    <span id="pdfEditorFileName" class="fileName"></span>
+                    <div class="pdfEditorTopBarActions">
+                        <button type="button" id="pdfEditorChangeFile" class="pdfEditorBarBtn langText">Change file</button>
+                        <button type="button" id="pdfEditorExport" class="pdfEditorBarBtn pdfEditorBarBtnPrimary langText" disabled>Export PDF</button>
+                    </div>
+                </div>
+                <div id="pdfEditorStatus" class="status pdfEditorStatusBar"></div>
+
+                <div class="pdfEditorMain">
+                    <aside class="pdfEditorPagesPanel">
+                        <h3 id="pdfEditorPagesPanel" class="langText">Pages</h3>
+                        <div id="pdfEditorThumbs" class="pdfEditorThumbsScroll"></div>
+                    </aside>
+
+                    <section class="pdfEditorPreviewPanel">
+                        <div class="pdfEditorPreviewToolbar">
+                            <button type="button" id="pdfEditorZoomOut" class="toolBtn" title="Zoom out">−</button>
+                            <span id="pdfEditorZoomLabel">100%</span>
+                            <button type="button" id="pdfEditorZoomIn" class="toolBtn" title="Zoom in">+</button>
+                            <button type="button" id="pdfEditorZoomFit" class="toolBtn langText">Fit width</button>
+                            <button type="button" id="pdfEditorViewSingle" class="toolBtn active langText">Single page</button>
+                            <button type="button" id="pdfEditorViewContinuous" class="toolBtn langText">Continuous</button>
+                            <button type="button" id="pdfEditorPrevPage" class="toolBtn pdfEditorNavBtn" title="Previous page" aria-label="Previous page">‹</button>
+                            <button type="button" id="pdfEditorNextPage" class="toolBtn pdfEditorNavBtn" title="Next page" aria-label="Next page">›</button>
+                            <span id="pdfEditorPageIndicator" class="pdfEditorPageIndicator">1 / 1</span>
+                        </div>
+                        <div id="pdfEditorViewerSingle" class="pdfEditorViewerSingle"></div>
+                        <div id="pdfEditorViewerScroll" class="pdfEditorViewerScroll"></div>
+                    </section>
+
+                    <aside class="pdfEditorToolsPanel">
+                        <div class="pdfEditorToolTabs">
+                            <button type="button" class="pdfEditorToolTab langText" data-tool="search" id="pdfEditorToolSearch">Search</button>
+                            <button type="button" class="pdfEditorToolTab active langText" data-tool="watermark" id="pdfEditorToolWatermark">Watermark</button>
+                            <button type="button" class="pdfEditorToolTab langText" data-tool="redact" id="pdfEditorToolRedact">Redact</button>
+                            <button type="button" class="pdfEditorToolTab langText" data-tool="signature" id="pdfEditorToolSignature">Signature</button>
+                        </div>
+                        <div id="pdfEditorToolBody" class="pdfEditorToolBody"></div>
+                    </aside>
+                </div>
+            </div>
+
+            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+        </div>
+    </main>
+
+    <script src="../../changeLang.js"></script>
+    <script src="../statusManager.js"></script>
+    <script src="../pdfEncryptionGuard.js"></script>
+    <script src="../../settings.js"></script>
+    <script src="../customMetadata.js"></script>
+    <script src="../../libs/pdf.min.js"></script>
+    <script src="./lib/coords.js"></script>
+    <script src="./model/documentModel.js"></script>
+    <script src="./export/applyAnnotations.js"></script>
+    <script src="./export/flattenRedactions.js"></script>
+    <script src="./export/buildPdf.js"></script>
+    <script src="./view/pageThumbnails.js"></script>
+    <script src="./view/pdfViewer.js"></script>
+    <script src="./view/overlayManager.js"></script>
+    <script src="./view/textSearch.js"></script>
+    <script src="./tools/toolController.js"></script>
+    <script src="./pdfEditor.js"></script>
+</body>
+
+</html>
