@@ -12,6 +12,7 @@
 - [x] Fase 4 — Casi speciali (Markdown PDF, PDF Editor, menu, DevTools)
 - [x] Fase 5 — Packaging, risorse, CI
 - [x] Fase 6 — Test di regressione cross-platform (checklist in `docs/QA-tauri-regression.md`)
+- [x] Fase 7 — Restyle UI desktop (design system + shell + pagine)
 
 ---
 
@@ -214,6 +215,124 @@ Shortcut Ctrl+Shift+I: abilitare solo in debug build (`#[cfg(debug_assertions)]`
 
 ---
 
+## Fase 7 — Restyle UI desktop
+
+> **Stato:** da fare (post cutover funzionale)  
+> **Mockup di riferimento:** [`docs/assets/ui-restyle-mockup.jpg`](./assets/ui-restyle-mockup.jpg)  
+> **Vincolo:** funzionalità e logica Rust/Tauri **invariate**; solo UI/CSS/markup/shell. Nessuna riscrittura della pipeline PDF.
+
+### Obiettivo
+
+Trasformare l’UI multi-page attuale in un’app **desktop-first** moderna (stile suite tipo iLovePDF, ma nativa), con sidebar persistente, home a griglia di tool e editor a layout a 4 colonne.
+
+### Stack da rispettare (analisi preventiva obbligatoria)
+
+Prima di toccare file: confermare punto di ingresso, routing multi-page HTML, bridge Tauri (`src/platform/`), comandi Rust e asset esistenti.
+
+- Frontend attuale: **HTML + JS vanilla** multi-page + **Vite** (non React/Vue/Svelte).
+- Entry: `index.html` + pagine in `functionalities/**/*.html`.
+- Bridge: `src/platform/bridge.js` + shim `vite-plugin-pdeffy-shim.js`.
+- Backend: comandi in `src-tauri/src/commands/` — **riutilizzare**, non duplicare.
+- Design tokens esistenti: `variables.css` / `styles.css` — evolvere in CSS variables globali, non spargere hex hardcoded.
+
+### Design system (token)
+
+| Token | Valore |
+|---|---|
+| Background | `#FFFCF3` |
+| Surface / card | `#FFFFFF` |
+| Sidebar | `#FFFDF8` |
+| Primary yellow | `#FFD91A` (hover `#F2C900`) |
+| Testo primario | `#101A3A` |
+| Testo secondario | `#52617A` |
+| Border | `#E7E7E2` |
+| Accenti icone | blue `#3478F6`, pink `#F54C9B`, purple `#A94CF5`, green `#24C875`, orange `#FF922B`, cyan `#2DD4BF`, red `#FF4D67` |
+| Radius | card 14–18px, button/input 10–12px |
+| Ombre | estremamente leggere |
+| Motion | hover ~120–160ms, sidebar collapse ~180ms |
+
+Definire in CSS variables globali (`--pdeffy-*`): colori, spacing, radius, shadow. Niente colori ripetuti nei singoli componenti.
+
+### Layout shell
+
+Sidebar sinistra persistente (~180–210px; collassata ~56–64px, solo icone + tooltip):
+
+- Logo Pdeffy
+- **Home** (sempre raggiungibile)
+- Organizza PDF
+- Converti PDF
+- Modifica PDF
+- Recenti
+- —  
+- **Impostazioni** ancorate in basso
+
+Voce attiva: background giallo, testo scuro, shape arrotondata.  
+**Non** aggiungere una voce “Strumenti”.  
+In editor PDF: sidebar **auto-collassata** per massimizzare l’area documento.
+
+### Pagine
+
+**Home** — niente tre mega-card di categoria. Header “Ciao! / Cosa vuoi fare oggi?”, search “Cerca uno strumento o un formato…”, griglia **3 colonne** di tool card compatte orizzontali `[icona] Nome + descrizione [→]`.
+
+**Organizza PDF** — Unisci, Dividi, PDF da Modello, Proteggi, Comprimi (stesse card della home).
+
+**Converti PDF** — due sezioni: *Da altro formato a PDF* (DOCX/Excel/PPTX/Immagine/Markdown) e *Da PDF a altro formato* (DOCX/Excel/PPTX/Immagine).
+
+**Modifica PDF (ingresso)** — solo drop zone grande + “Apri PDF” (primary yellow) + “Documenti recenti” (3–4 voci). **Niente** le 4 card Aggiungi testi / Immagini / Filigrana / Censura.
+
+**Editor PDF** — resta concettualmente dentro “Modifica PDF”. Layout:
+
+`| sidebar collassata | thumbnails ~140–170px | documento flex:1 | properties ~250–290px |`
+
+Header: nome file + [Cambia file] [Esporta PDF]. Toolbar zoom/fit/view/nav. Properties tabs: Cerca / Filigrana / Censura / Firma. Thumbnails con ruota/elimina e bordo selezione chiaro. Properties ridimensionabile o collassabile.
+
+### Componenti riutilizzabili (markup/CSS condivisi)
+
+Dato lo stack vanilla, organizzare in partial CSS/JS (o snippet HTML condivisi), non in un framework nuovo:
+
+`AppShell`, `Sidebar`, `PageHeader`, `SearchBar`, `ToolCard`, `ToolGrid`, `DropZone`, `RecentDocumentCard`, `EditorToolbar`, `PageThumbnail`, `PropertiesPanel`, `Button`, `IconButton`, `SectionTitle`.
+
+### Asset
+
+Preferire SVG in struttura tipo:
+
+```
+src/assets/
+  logo/     pdeffy-logo.svg, pdeffy-mark.svg
+  icons/    home, organize, convert, edit, recent, settings, merge, split, …
+  illustrations/  pdf-friendly.svg, empty-recent.svg
+```
+
+Niente emoji come icone UI. Stroke arrotondato, leggibili a 20–24px, colore via CSS quando possibile.
+
+### Responsive desktop (Tauri)
+
+Target: 1280×720, 1440×900, 1920×1080. A 1280px: zero overflow orizzontale; in editor ridurre sidebar/thumbnails e collassare properties **prima** di sacrificare il documento.
+
+### Accessibilità
+
+Focus visibile, keyboard nav, tooltip sidebar collassata, `aria-label` su IconButton, contrasto adeguato, hit target ≥ ~36px.
+
+### Ordine di implementazione
+
+1. Analisi repo (entry, routing multi-page, bridge, comandi, asset).
+2. Token CSS globali + `AppShell` / `Sidebar`.
+3. Home + Organizza + Converti (shell + card + search).
+4. Modifica PDF ingresso (drop zone + recenti).
+5. Restyle Editor (layout 4 colonne, toolbar, properties, thumbnails) **senza** cambiare `documentModel` / export / comandi Rust.
+6. Settings ancorate in sidebar; i18n (`changeLang.js`) aggiornato alle nuove stringhe UI.
+7. Build Vite + smoke: ogni tool esistente ancora raggiungibile; Home da ogni schermata; editor con spazio documento adeguato.
+
+### Cosa non fare
+
+- Non modificare Rust salvo necessità minima di collegamento UI.
+- Non rimuovere funzionalità.
+- Non introdurre React/Vue/Svelte solo per il restyle.
+- Non riscrivere logica PDF (pdf-lib, pdfjs, convert, GS, LO) per adattarla allo stile.
+- Non dipendenze UI pesanti (Material, Bootstrap, ecc.) se evitabili con CSS proprio.
+
+---
+
 ## Stima effort (cutover)
 
 | Fase | Effort indicativo |
@@ -224,7 +343,8 @@ Shortcut Ctrl+Shift+I: abilitare solo in debug build (`#[cfg(debug_assertions)]`
 | Markdown PDF + edge cases | 1–2 giorni |
 | CI/updater/packaging | 2–3 giorni |
 | QA cross-platform | 3–5 giorni |
-| **Totale** | **~3–4 settimane** |
+| Restyle UI desktop (Fase 7) | 4–7 giorni |
+| **Totale** | **~4–5 settimane** |
 
 ---
 
@@ -245,3 +365,11 @@ Shortcut Ctrl+Shift+I: abilitare solo in debug build (`#[cfg(debug_assertions)]`
 - `index.js` e Forge rimossi
 - CI verde su macOS, Windows, Ubuntu
 - Documentazione breve in README: prerequisiti (LibreOffice opzionale, Ghostscript su macOS/Linux)
+
+## Deliverable Fase 7 (restyle)
+
+- Shell con sidebar (espansa/collassata) e navigazione Home / Organizza / Converti / Modifica / Recenti / Impostazioni
+- Home a griglia tool + search; niente mega-card di categoria
+- Modifica PDF: drop zone + recenti; editor a 4 colonne con properties (Cerca / Filigrana / Censura / Firma)
+- Design tokens CSS + asset SVG; mockup di riferimento rispettato
+- Tutte le funzioni pre-restyle ancora raggiungibili; Rust invariato (salvo glue UI minimo)

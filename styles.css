@@ -1,10 +1,16 @@
 @import url('variables.css');
 
 body{
-    background-color: var(--reindalDark);
+    background-color: var(--pdeffy-bg);
+    color: var(--pdeffy-text);
     margin: 0;
     padding: 0;
-    font-family: var(--font-primary), serif;
+    font-family: var(--font-primary), system-ui, sans-serif;
+}
+
+/* Legacy pages without shell still readable */
+body:not(.pdeffy-shell) {
+    background-color: var(--pdeffy-bg);
 }
 
 .optionCard>p{
@@ -358,22 +364,27 @@ a.categoryTileLink {
 }
 
 
-/* Settings icon */
+/* Settings icon — hidden when app shell sidebar is present */
+body.pdeffy-shell .settingsIcon {
+    display: none !important;
+}
+
 .settingsIcon {
     position: fixed;
     top: 20px;
     right: 20px;
     width: 40px;
     height: 40px;
-    background-color: var(--reindalLight);
+    background-color: var(--pdeffy-surface);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    box-shadow: var(--pdeffy-shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     z-index: 1000;
+    border: 1px solid var(--pdeffy-border);
 }
 
 .settingsIcon:hover {

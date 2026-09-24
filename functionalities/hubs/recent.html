@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recenti — Pdeffy</title>
+    <link rel="stylesheet" href="../../variables.css">
+    <link rel="stylesheet" href="../../src/ui/shell.css">
+</head>
+<body data-nav="recent">
+    <header class="pdeffy-page-header">
+        <h1>
+            <span class="pdeffy-page-header-icon accent-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <span class="langText" id="navRecent">Recenti</span>
+        </h1>
+        <p class="langText" id="recentHubSubtitle">Gli ultimi documenti aperti in Pdeffy.</p>
+    </header>
+
+    <div style="margin-bottom: 16px;">
+        <button type="button" class="pdeffy-btn pdeffy-btn-ghost langText" id="clearRecentBtn">Svuota elenco</button>
+    </div>
+
+    <div class="pdeffy-recent-list" id="recentList"></div>
+    <p class="pdeffy-empty-hint langText" id="recentEmptyHint" style="display:none;">Nessun documento recente.</p>
+
+    <script type="module" src="../../src/ui/shell.js"></script>
+    <script type="module" src="../../changeLang.js"></script>
+    <script type="module" src="../../settings.js"></script>
+    <script type="module">
+        import { getRecentDocuments, clearRecentDocuments } from '../../src/ui/shell.js';
+        const list = document.getElementById('recentList');
+        const empty = document.getElementById('recentEmptyHint');
+
+        function render() {
+            const docs = getRecentDocuments();
+            list.innerHTML = '';
+            if (!docs.length) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            docs.forEach((doc) => {
+                const card = document.createElement('div');
+                card.className = 'pdeffy-recent-card';
+                card.innerHTML = `
+                    <span class="pdeffy-recent-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg></span>
+                    <span class="pdeffy-recent-card-body"><strong>${doc.name}</strong><span>${new Date(doc.openedAt).toLocaleString()}</span></span>
+                    <a class="pdeffy-btn pdeffy-btn-primary langText" href="../hubs/edit.html">Apri</a>`;
+                list.appendChild(card);
+            });
+        }
+
+        document.getElementById('clearRecentBtn')?.addEventListener('click', () => {
+            clearRecentDocuments();
+            render();
+        });
+        render();
+    </script>
+</body>
+</html>

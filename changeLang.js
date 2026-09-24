@@ -5,6 +5,28 @@ const languages = {
     en: {
         languageText: "Language",
         welcomeText: "Smart PDF tools",
+        navHome: "Home",
+        navOrganize: "Organize PDF",
+        navConvert: "Convert PDF",
+        navEdit: "Edit PDF",
+        navRecent: "Recent",
+        navSettings: "Settings",
+        homeGreeting: "Hi!",
+        homeQuestion: "What do you want to do today?",
+        homeSubtitle: "Pick a tool and make your PDFs simpler.",
+        homeSearchPlaceholder: "Search a tool or format...",
+        organizeHubSubtitle: "Merge, split, protect and compress your documents.",
+        convertHubSubtitle: "Convert to and from PDF quickly and easily.",
+        editHubSubtitle: "Open a PDF to edit it: watermark, redact and sign.",
+        editDropHint: "Drop a PDF here or click to browse",
+        editSizeHint: "Supports files up to 100 MB",
+        editOpenPdfBtn: "Open PDF",
+        recentDocumentsTitle: "Recent documents",
+        recentEmptyHint: "No recent documents.",
+        recentHubSubtitle: "Documents recently opened in Pdeffy.",
+        otherToolsTile: "More tools",
+        otherToolsTileDesc: "All PDF conversions",
+        pdfEditorBackHome: "Back to Home",
 
         // Category tiles
         organizePdfTile: "Organize PDF",
@@ -560,6 +582,50 @@ const languages = {
     it: {
         languageText: "Lingua",
         welcomeText: "Strumenti PDF intelligenti",
+        navHome: "Inicio",
+        navOrganize: "Organizar PDF",
+        navConvert: "Convertir PDF",
+        navEdit: "Editar PDF",
+        navRecent: "Recientes",
+        navSettings: "Ajustes",
+        homeGreeting: "¡Hola!",
+        homeQuestion: "¿Qué quieres hacer hoy?",
+        homeSubtitle: "Elige una herramienta y simplifica tus PDF.",
+        homeSearchPlaceholder: "Busca una herramienta o formato...",
+        organizeHubSubtitle: "Une, divide, protege y comprime tus documentos.",
+        convertHubSubtitle: "Convierte a y desde PDF de forma rápida y sencilla.",
+        editHubSubtitle: "Abre un PDF para editarlo: marca de agua, censura y firma.",
+        editDropHint: "Arrastra un PDF aquí o haz clic para explorar",
+        editSizeHint: "Admite archivos de hasta 100 MB",
+        editOpenPdfBtn: "Abrir PDF",
+        recentDocumentsTitle: "Documentos recientes",
+        recentEmptyHint: "No hay documentos recientes.",
+        recentHubSubtitle: "Documentos abiertos recientemente en Pdeffy.",
+        otherToolsTile: "Más herramientas",
+        otherToolsTileDesc: "Todas las conversiones PDF",
+        pdfEditorBackHome: "Volver al inicio",
+        navHome: "Home",
+        navOrganize: "Organizza PDF",
+        navConvert: "Converti PDF",
+        navEdit: "Modifica PDF",
+        navRecent: "Recenti",
+        navSettings: "Impostazioni",
+        homeGreeting: "Ciao!",
+        homeQuestion: "Cosa vuoi fare oggi?",
+        homeSubtitle: "Scegli uno strumento e rendi i tuoi PDF più semplici.",
+        homeSearchPlaceholder: "Cerca uno strumento o un formato...",
+        organizeHubSubtitle: "Unisci, dividi, proteggi e comprimi i tuoi documenti.",
+        convertHubSubtitle: "Converti da e verso PDF in modo semplice e veloce.",
+        editHubSubtitle: "Apri un PDF per modificarlo: aggiungi elementi, filigrana, censura e firma.",
+        editDropHint: "Trascina un PDF qui o clicca per sfogliare",
+        editSizeHint: "Supporta file fino a 100 MB",
+        editOpenPdfBtn: "Apri PDF",
+        recentDocumentsTitle: "Documenti recenti",
+        recentEmptyHint: "Nessun documento recente.",
+        recentHubSubtitle: "Gli ultimi documenti aperti in Pdeffy.",
+        otherToolsTile: "Altri strumenti",
+        otherToolsTileDesc: "Tutte le conversioni PDF",
+        pdfEditorBackHome: "Torna alla Home",
 
         // Category tiles
         organizePdfTile: "Organizza PDF",
@@ -1107,6 +1173,28 @@ const languages = {
     pl: {
         languageText: "Język",
         welcomeText: "Inteligentne narzędzia PDF",
+        navHome: "Start",
+        navOrganize: "Organizuj PDF",
+        navConvert: "Konwertuj PDF",
+        navEdit: "Edytuj PDF",
+        navRecent: "Ostatnie",
+        navSettings: "Ustawienia",
+        homeGreeting: "Cześć!",
+        homeQuestion: "Co chcesz dziś zrobić?",
+        homeSubtitle: "Wybierz narzędzie i uprość swoje PDF.",
+        homeSearchPlaceholder: "Szukaj narzędzia lub formatu...",
+        organizeHubSubtitle: "Łącz, dziel, chroń i kompresuj dokumenty.",
+        convertHubSubtitle: "Konwertuj do i z PDF szybko i łatwo.",
+        editHubSubtitle: "Otwórz PDF, aby go edytować: znak wodny, redakcja i podpis.",
+        editDropHint: "Upuść PDF tutaj lub kliknij, aby wybrać",
+        editSizeHint: "Obsługuje pliki do 100 MB",
+        editOpenPdfBtn: "Otwórz PDF",
+        recentDocumentsTitle: "Ostatnie dokumenty",
+        recentEmptyHint: "Brak ostatnich dokumentów.",
+        recentHubSubtitle: "Ostatnio otwarte dokumenty w Pdeffy.",
+        otherToolsTile: "Więcej narzędzi",
+        otherToolsTileDesc: "Wszystkie konwersje PDF",
+        pdfEditorBackHome: "Wróć do Start",
 
         // Category tiles
         organizePdfTile: "Organizuj PDF",
@@ -2188,19 +2276,29 @@ const languages = {
 };
 
 function changeLanguage(lang) {
+    window.currentLanguage = lang;
     let objects = document.getElementsByClassName('langText');
     let objectsP = document.getElementsByClassName('langTextPlaceholder');
+    const dict = languages[lang] || languages.en;
 
     for (let i = 0; i < objects.length; i++) {
         const key = objects[i].dataset.i18n || objects[i].id;
-        objects[i].innerHTML = languages[lang][key];
+        const value = dict[key] || languages.en[key];
+        if (value != null) objects[i].innerHTML = value;
     }
 
     for (let i = 0; i < objectsP.length; i++) {
         const key = objectsP[i].dataset.i18n || objectsP[i].id;
-        objectsP[i].placeholder = languages[lang][key];
+        const value = dict[key] || languages.en[key];
+        if (value != null) objectsP[i].placeholder = value;
     }
+
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
 }
+
+window.applyLanguage = function applyLanguage() {
+    changeLanguage(window.currentLanguage || 'en');
+};
 
 // Helper function to get translated message with parameter substitution
 function getMessage(key, params = {}) {

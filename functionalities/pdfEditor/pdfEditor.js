@@ -124,7 +124,11 @@ async function loadPdfFile(file) {
         fileNameEl.textContent = file.name;
         dropZone.style.display = 'none';
         workspace.classList.add('visible');
-        document.body.classList.add('pdfEditorEditing');
+        document.body.classList.add('pdfEditorEditing', 'pdeffy-sidebar-collapsed');
+        try {
+            const { pushRecentDocument } = await import('/src/ui/shell.js');
+            pushRecentDocument({ name: file.name });
+        } catch (_) { /* ignore */ }
 
         if (!thumbsApi) {
             thumbsApi = PdfEditorPageThumbnails.createPageThumbnails({
@@ -232,12 +236,14 @@ fileInput.addEventListener('change', (e) => {
 
 dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('dragover');
+    dropZone.classList.add('dragover', 'is-dragover');
 });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover', 'is-dragover');
+});
 dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('dragover');
+    dropZone.classList.remove('dragover', 'is-dragover');
     const file = e.dataTransfer.files?.[0];
     if (file && file.type === 'application/pdf') loadPdfFile(file);
 });
@@ -343,4 +349,13 @@ window.addEventListener('languageChanged', () => {
     updatePageIndicator(
         PdfEditorDocumentModel.getActivePages(model).findIndex((p) => p.id === selectedPageId)
     );
+});
+
+document.getElementById('pdfEditorPropsToggle')?.addEventListener('click', () => {
+    document.body.classList.toggle('pdfEditorPropsCollapsed');
+    const btn = document.getElementById('pdfEditorPropsToggle');
+    if (btn) {
+        const collapsed = document.body.classList.contains('pdfEditorPropsCollapsed');
+        btn.textContent = collapsed ? '›' : '‹';
+    }
 });

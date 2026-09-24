@@ -1,28 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Colors */
-    --reindalYellow: #f0d818;
-    --reindalLightYellow: #ece082;
-    --reindalYellowHover: #ddca19;
-    --reindalLight: #fffbe1;
-    --reindalExtraLight: #fcfbf4;
+    /* —— Design system (Fase 7) —— */
+    --pdeffy-bg: #fffcf3;
+    --pdeffy-surface: #ffffff;
+    --pdeffy-sidebar: #fffdf8;
+    --pdeffy-primary: #ffd91a;
+    --pdeffy-primary-hover: #f2c900;
+    --pdeffy-text: #101a3a;
+    --pdeffy-text-muted: #52617a;
+    --pdeffy-border: #e7e7e2;
+
+    --pdeffy-blue: #3478f6;
+    --pdeffy-pink: #f54c9b;
+    --pdeffy-purple: #a94cf5;
+    --pdeffy-green: #24c875;
+    --pdeffy-orange: #ff922b;
+    --pdeffy-cyan: #2dd4bf;
+    --pdeffy-red: #ff4d67;
+
+    --pdeffy-radius-card: 16px;
+    --pdeffy-radius-btn: 11px;
+    --pdeffy-radius-input: 11px;
+    --pdeffy-radius-pill: 14px;
+
+    --pdeffy-shadow: 0 1px 2px rgba(16, 26, 58, 0.04), 0 4px 16px rgba(16, 26, 58, 0.04);
+    --pdeffy-shadow-hover: 0 2px 6px rgba(16, 26, 58, 0.06), 0 8px 24px rgba(16, 26, 58, 0.06);
+
+    --pdeffy-sidebar-w: 200px;
+    --pdeffy-sidebar-collapsed: 60px;
+    --pdeffy-space-1: 4px;
+    --pdeffy-space-2: 8px;
+    --pdeffy-space-3: 12px;
+    --pdeffy-space-4: 16px;
+    --pdeffy-space-5: 24px;
+    --pdeffy-space-6: 32px;
+
+    --pdeffy-ease: 140ms ease;
+    --pdeffy-ease-sidebar: 180ms ease;
+
+    --font-primary: 'Poppins', system-ui, sans-serif;
+
+    /* —— Legacy aliases (compat tool pages) —— */
+    --reindalYellow: var(--pdeffy-primary);
+    --reindalLightYellow: #ffe96a;
+    --reindalYellowHover: var(--pdeffy-primary-hover);
+    --reindalLight: var(--pdeffy-bg);
+    --reindalExtraLight: var(--pdeffy-sidebar);
     --reindalTab: #929294;
-    --reindalGray: #646464;
-    --reindalDark: #3c3c3c;
-    --reindalBlack: #151515;
+    --reindalGray: var(--pdeffy-text-muted);
+    --reindalDark: var(--pdeffy-text);
+    --reindalBlack: #0a1020;
     --reindalAbsoluteBlack: #000;
-    --reindalBody: #fefefe;
-    --reindalGrayLight: #ddddddc5;
-    --reindalRed: #dc3545;
-    --reindalDarkRed: #c82333;
+    --reindalBody: var(--pdeffy-surface);
+    --reindalGrayLight: var(--pdeffy-border);
+    --reindalRed: var(--pdeffy-red);
+    --reindalDarkRed: #d63a52;
     --reindalMint: #d4edda;
     --reindalDarkGreen: #155724;
     --reindalGreen: #c3e6cb;
     --reindalLightPink: #f8d7da;
     --reindalWineRed: #721c24;
     --reindalPink: #f5c6cb;
-
-    /* Fonts */
-    --font-primary: 'Poppins';
 }

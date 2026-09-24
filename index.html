@@ -1,154 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pdeffy</title>
+    <link rel="stylesheet" href="./variables.css">
+    <link rel="stylesheet" href="./src/ui/shell.css">
     <link rel="stylesheet" href="./styles.css">
 </head>
-
-<body>
-
-    <div class="headerContainer">
-        <header>
-            <img src="./assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon" style="cursor: pointer;">
-            <h1 id="welcomeText" class="langText">Smart PDF tools</h1>
-        </header>
+<body data-nav="home">
+    <div class="pdeffy-home-hero">
+        <div>
+            <h1>
+                <span class="langText" id="homeGreeting">Ciao!</span><br>
+                <span class="langText" id="homeQuestion">Cosa vuoi fare oggi?</span>
+            </h1>
+            <p class="langText" id="homeSubtitle">Scegli uno strumento e rendi i tuoi PDF più semplici.</p>
+        </div>
+        <div class="pdeffy-home-illustration" aria-hidden="true">
+            <svg viewBox="0 0 120 100" fill="none">
+                <rect x="18" y="22" width="52" height="66" rx="8" fill="#FFF" stroke="#E7E7E2"/>
+                <rect x="36" y="12" width="52" height="66" rx="8" fill="#FFD91A" stroke="#E7E7E2"/>
+                <rect x="54" y="28" width="52" height="66" rx="8" fill="#3478F6"/>
+                <circle cx="72" cy="52" r="8" fill="#FFF"/>
+                <path d="M68 52h8M70 48c2 2 6 2 8 0" stroke="#3478F6" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        </div>
     </div>
 
-    <div class="categoryTilesContainer">
-        <div class="categoryTile" data-section="organize">
-            <div class="categoryIcon"><img src="./assets/icons/organize.png" alt="Organize image"></div>
-            <h3 id="organizePdfTile" class="langText">Organize PDF</h3>
-            <p id="organizePdfTileDesc" class="langText">Merge, split and organize</p>
-        </div>
-        <div class="categoryTile" data-section="convert">
-            <div class="categoryIcon"><img src="./assets/icons/convert.png" alt="Convert image"></div>
-            <h3 id="convertPdfTile" class="langText">Convert PDF</h3>
-            <p id="convertPdfTileDesc" class="langText">Convert to and from PDF</p>
-        </div>
-        <a href="./functionalities/pdfEditor/pdfEditor.html" class="categoryTile categoryTileLink" id="editPdfCategoryTile">
-            <div class="categoryIcon"><img src="./assets/icons/edit.png" alt="Edit image"></div>
-            <h3 id="editPdfTile" class="langText">Edit PDF</h3>
-            <p id="editPdfTileDesc" class="langText">Watermark, delete pages</p>
+    <div class="pdeffy-search">
+        <span class="pdeffy-search-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </span>
+        <input type="search" id="homeSearch" class="langTextPlaceholder" data-i18n="homeSearchPlaceholder" placeholder="Cerca uno strumento o un formato..." autocomplete="off">
+    </div>
+
+    <div class="pdeffy-tool-grid" id="homeToolGrid">
+        <a class="pdeffy-tool-card" data-tool-card data-search="unisci merge pdf" href="./functionalities/merge/merge.html">
+            <span class="pdeffy-tool-card-icon accent-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 4v8a4 4 0 0 0 4 4"/><path d="M16 4v8a4 4 0 0 1-4 4"/><path d="M12 16v4"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="mergePdfText">Unisci PDF</strong><span class="langText" id="mergePdfDesc">Unisci più PDF in un unico file</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="dividi split pdf" href="./functionalities/split/split.html">
+            <span class="pdeffy-tool-card-icon accent-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v8"/><path d="M12 12 8 20M12 12l4 8"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="splitPdfText">Dividi PDF</strong><span class="langText" id="splitPdfDesc">Dividi un PDF in più file</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="modello template generator" href="./functionalities/pdfGenerator/pdfGenerator.html">
+            <span class="pdeffy-tool-card-icon accent-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfByTemplateText">PDF da Modello</strong><span class="langText" id="pdfByTemplateDesc">Genera PDF da un modello</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="proteggi protect password" href="./functionalities/protectPdf/protectPdf.html">
+            <span class="pdeffy-tool-card-icon accent-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="protectPdfTile">Proteggi PDF</strong><span class="langText" id="protectPdfTileDesc">Password e permessi</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="comprimi compress" href="./functionalities/compressPdf/compressPdf.html">
+            <span class="pdeffy-tool-card-icon accent-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4h8v4H8zM8 16h8v4H8z"/><path d="M12 8v8M9 11l3 3 3-3"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="compressPdfTile">Comprimi PDF</strong><span class="langText" id="compressPdfTileDesc">Riduci le dimensioni del file</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="docx word" href="./functionalities/docxToPdf/docxToPdf.html">
+            <span class="pdeffy-tool-card-icon accent-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="docxToPdfText">DOCX a PDF</strong><span class="langText" id="docxToPdfDesc">Converti Word in PDF</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="excel xlsx" href="./functionalities/excelToPdf/excelToPdf.html">
+            <span class="pdeffy-tool-card-icon accent-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="excelToPdfText">Excel a PDF</strong><span class="langText" id="excelToPdfDesc">Converti fogli di calcolo in PDF</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="pptx powerpoint" href="./functionalities/powerPointToPdf/powerPointToPdf.html">
+            <span class="pdeffy-tool-card-icon accent-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pptxToPdfText">PPTX a PDF</strong><span class="langText" id="pptxToPdfDesc">Converti presentazioni in PDF</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="immagine image png jpg" href="./functionalities/imageToPdf/imageToPdf.html">
+            <span class="pdeffy-tool-card-icon accent-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 15-4.5-4.5L8 19"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="imageToPdfText">Immagine a PDF</strong><span class="langText" id="imageToPdfDesc">Converti immagini in PDF</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="markdown testo md" href="./functionalities/markdownToPdf/markdownToPdf.html">
+            <span class="pdeffy-tool-card-icon accent-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16v12H4z"/><path d="m7 15 2-6 2 6 2-6 2 6"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="markdownToPdfText">Testo/Markdown a PDF</strong><span class="langText" id="markdownToPdfDesc">Converti Markdown in PDF</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="filigrana watermark modifica" href="./functionalities/pdfEditor/pdfEditor.html">
+            <span class="pdeffy-tool-card-icon accent-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="editPdfTile">Modifica PDF</strong><span class="langText" id="editPdfTileDesc">Filigrana, censura e firma</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="pdf docx excel pptx immagine" href="./functionalities/hubs/convert.html">
+            <span class="pdeffy-tool-card-icon accent-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="otherToolsTile">Altri strumenti</strong><span class="langText" id="otherToolsTileDesc">Tutte le conversioni PDF</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
         </a>
     </div>
 
-    <main>
-        <div class="homeLayout">
-            <details class="toolSection collapsibleSection" id="organizeSection">
-                <summary class="sectionTitle langText" id="organizePdfSection">Organize PDF</summary>
-                <div class="collapsibleContent">
-                    <div class="cardsGrid">
-                        <a href="./functionalities/merge/merge.html" class="optionCard" id="mergePDF">
-                            <img src="./assets/icons/organize/merge.png" alt="PDF Merge Icon" class="optionIcon">
-                            <h2 id="mergePdfText" class="langText">Merge PDF</h2>
-                            <p id="mergePdfDesc" class="langText">Merge your PDF documents into single file.</p>
-                        </a>
-                        <a href="./functionalities/split/split.html" class="optionCard" id="splitPDF">
-                            <img src="./assets/icons/organize/split.png" alt="PDF Split Icon" class="optionIcon">
-                            <h2 id="splitPdfText" class="langText">Split PDF</h2>
-                            <p id="splitPdfDesc" class="langText">Split your PDF document into multiple files.</p>
-                        </a>
-                        <a href="./functionalities/pdfGenerator/pdfGenerator.html" class="optionCard" id="pdfGeneratorCard">
-                            <img src="./assets/icons/edit/generator.png" alt="PDF from template Icon" class="optionIcon">
-                            <h2 id="pdfByTemplateText" class="langText">PDF Generator</h2>
-                            <p id="pdfByTemplateDesc" class="langText">Generator of PDF</p>
-                        </a>
-                        <a href="./functionalities/protectPdf/protectPdf.html" class="optionCard" id="protectPdf">
-                            <img src="./assets/icons/edit/protect.png" alt="Protect PDF Icon" class="optionIcon">
-                            <h2 id="protectPdfTile" class="langText">Protect PDF</h2>
-                            <p id="protectPdfTileDesc" class="langText">Add passwords and permissions</p>
-                        </a>
-                        <a href="./functionalities/compressPdf/compressPdf.html" class="optionCard" id="compressPdf">
-                            <img src="./assets/icons/convert/compress.png" alt="Compress PDF Icon" class="optionIcon">
-                            <h2 id="compressPdfTile" class="langText">Compress PDF</h2>
-                            <p id="compressPdfTileDesc" class="langText">Reduce PDF file size</p>
-                        </a>
-                    </div>
-                </div>
-            </details>
-
-            <details class="toolSection collapsibleSection" id="convertSection">
-                <summary class="sectionTitle langText" id="convertPdfSection">Convert PDF</summary>
-                <div class="collapsibleContent">
-                    <div class="convertGroups">
-                        <div class="convertGroup">
-                            <h3 id="convertAnyToPdfGroup" class="convertGroupTitle langText">Any To PDF</h3>
-                            <div class="cardsGrid convertCardsGrid">
-                                <a href="./functionalities/docxToPdf/docxToPdf.html" class="optionCard" id="docxToPDF">
-                                    <img src="./assets/icons/convert/doc-pdf.png" alt="docx To PDF Icon" class="optionIcon">
-                                    <h2 id="docxToPdfText" class="langText">DOCX To PDF</h2>
-                                    <p id="docxToPdfDesc" class="langText">Convert one docx file into a PDF document.</p>
-                                </a>
-                                <a href="./functionalities/excelToPdf/excelToPdf.html" class="optionCard" id="excelToPDF">
-                                    <img src="./assets/icons/convert/excel-pdf.png" alt="excel To PDF Icon" class="optionIcon">
-                                    <h2 id="excelToPdfText" class="langText">EXCEL To PDF</h2>
-                                    <p id="excelToPdfDesc" class="langText">Convert one EXCEL file into a PDF document.</p>
-                                </a>
-                                <a href="./functionalities/powerPointToPdf/powerPointToPdf.html" class="optionCard"
-                                    id="pptxToPDF">
-                                    <img src="./assets/icons/convert/pptx-pdf.png" alt="PowerPoint to PDF Icon"
-                                        class="optionIcon">
-                                    <h2 id="pptxToPdfText" class="langText">PowerPoint to PDF</h2>
-                                    <p id="pptxToPdfDesc" class="langText">Convert one PowerPoint file into a PDF document.
-                                    </p>
-                                </a>
-                                <a href="./functionalities/imageToPdf/imageToPdf.html" class="optionCard" id="imageToPDF">
-                                    <img src="./assets/icons/convert/img-pdf.png" alt="Image to PDF Icon"
-                                        class="optionIcon">
-                                    <h2 id="imageToPdfText" class="langText">Image to PDF</h2>
-                                    <p id="imageToPdfDesc" class="langText">Convert one or more images into a PDF document.
-                                    </p>
-                                </a>
-                                <a href="./functionalities/markdownToPdf/markdownToPdf.html" class="optionCard" id="markdownToPdfCard">
-                                    <img src="./assets/icons/convert/md-to-pdf.png" alt="Markdown to PDF Icon" class="optionIcon">
-                                    <h2 id="markdownToPdfText" class="langText">Markdown to PDF</h2>
-                                    <p id="markdownToPdfDesc" class="langText">Convert a Markdown file into a PDF document.</p>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="convertGroup">
-                            <h3 id="convertPdfToAnyGroup" class="convertGroupTitle langText">PDF To Any</h3>
-                            <div class="cardsGrid convertCardsGrid">
-                                <a href="./functionalities/pdfToDocx/pdfToDocx.html" class="optionCard" id="pdfToDocx">
-                                    <img src="./assets/icons/convert/pdf-doc.png" alt="PDF To docx Icon" class="optionIcon">
-                                    <h2 id="pdfToDocxText" class="langText">PDF To DOCX</h2>
-                                    <p id="pdfToDocxDesc" class="langText">Convert one PDF file into a DOCX document.</p>
-                                </a>
-                                <a href="./functionalities/pdfToExcel/pdfToExcel.html" class="optionCard" id="pdfToExcel">
-                                    <img src="./assets/icons/convert/pdf-excel.png" alt="PDF To excel Icon" class="optionIcon">
-                                    <h2 id="pdfToExcelText" class="langText">PDF To EXCEL</h2>
-                                    <p id="pdfToExcelDesc" class="langText">Convert one PDF file into a EXCEL document.</p>
-                                </a>
-                                <a href="./functionalities/pdfToPptx/pdfToPptx.html" class="optionCard" id="pdfToPptx">
-                                    <img src="./assets/icons/convert/pdf-pptx.png" alt="PDF to PowerPoint icon"
-                                        class="optionIcon">
-                                    <h2 id="pdfToPptxText" class="langText">PDF to PowerPoint</h2>
-                                    <p id="pdfToPptxDesc" class="langText">Convert PDF document into PowerPoint file</p>
-                                </a>
-                                <a href="./functionalities/pdfToImage/pdfToImage.html" class="optionCard" id="pdfToImage">
-                                    <img src="./assets/icons/convert/pdf-img.png" alt="PDF to Image Icon"
-                                        class="optionIcon">
-                                    <h2 id="pdfToImageText" class="langText">PDF to Image</h2>
-                                    <p id="pdfToImageDesc" class="langText">Convert PDF pages into image files.</p>
-                                </a>
-                                <a href="./functionalities/pdfToMarkdown/pdfToMarkdown.html" class="optionCard" id="pdfToMarkdownCard">
-                                    <img src="./assets/icons/convert/pdf-to.md.png" alt="PDF to Markdown Icon" class="optionIcon">
-                                    <h2 id="pdfToMarkdownText" class="langText">PDF to Markdown</h2>
-                                    <p id="pdfToMarkdownDesc" class="langText">Extract text from a PDF file to a Markdown document.</p>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </details>
-
-        </div>
-    </main>
-    <script type="module" src="./collapsibleSections.js"></script>
+    <script type="module" src="./src/ui/shell.js"></script>
     <script type="module" src="./changeLang.js"></script>
     <script type="module" src="./settings.js"></script>
+    <script type="module">
+        import { wireHomeSearch } from './src/ui/shell.js';
+        wireHomeSearch(document.getElementById('homeSearch'));
+    </script>
 </body>
-
 </html>
