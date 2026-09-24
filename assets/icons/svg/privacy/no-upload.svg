@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-labelledby="title">
+  <title id="title">Nessun upload</title>
+  <path d="M4 11.5 12 5l8 6.5" fill="none" stroke="#101A3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M7 11v7.5a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V11" fill="none" stroke="#101A3A" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M10.5 19.5v-4h3v4" fill="none" stroke="#101A3A" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M3.5 3.5l17 17" stroke="#FFD91A" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M3.5 3.5l17 17" stroke="#101A3A" stroke-width="1.3" stroke-linecap="round"/>
+</svg>

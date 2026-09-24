@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240" role="img" aria-labelledby="title desc">
+  <title id="title">Documento PDF protetto sul computer</title>
+  <desc id="desc">Un documento PDF davanti a un computer, protetto da uno scudo.</desc>
+  <g fill="none" stroke="#101A3A" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M54 202h252" stroke="#D5DAE3" stroke-width="4"/>
+    <rect x="72" y="72" width="190" height="120" rx="13" fill="#FFFFFF" stroke-width="4"/>
+    <path d="M77 78h180v88H77z" fill="#EAF2FF" stroke-width="3"/>
+    <path d="M92 82h60l-56 78H77v-53z" fill="#FFFFFF" opacity=".55" stroke="none"/>
+    <path d="M150 192v10M126 202h48" stroke-width="4"/>
+    <path d="M126 30h76l24 24v102a12 12 0 0 1-12 12h-88a12 12 0 0 1-12-12V42a12 12 0 0 1 12-12Z" fill="#FFFFFF" stroke-width="4"/>
+    <path d="M202 30v24h24" stroke-width="4"/>
+    <rect x="136" y="70" width="51" height="28" rx="7" fill="#FF4D67" stroke="none"/>
+    <text x="161.5" y="89" text-anchor="middle" fill="#FFFFFF" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="800" letter-spacing="0.04em" stroke="none">PDF</text>
+    <path d="M141 116h52M141 132h38M141 148h43" stroke="#D9D9D3" stroke-width="7"/>
+    <path d="M226 102c18 14 40 18 54 18v38c0 39-24 62-54 74-30-12-54-35-54-74v-38c14 0 36-4 54-18Z" fill="#FFD91A" stroke-width="4"/>
+    <rect x="208" y="153" width="36" height="32" rx="6" fill="#101A3A" stroke="none"/>
+    <path d="M216 153v-10a10 10 0 0 1 20 0v10" stroke-width="5"/>
+    <path d="M226 166v7" stroke="#FFD91A" stroke-width="4"/>
+    <path d="M292 117h14M284 99l9-9M284 135l9 9" stroke="#FFD91A" stroke-width="6"/>
+  </g>
+</svg>

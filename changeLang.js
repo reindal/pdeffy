@@ -13,9 +13,12 @@ const languages = {
         navSettings: "Settings",
         homeGreeting: "Hi!",
         homeQuestion: "What do you want to do today?",
-        homeSubtitle: "Pick a tool and make your PDFs simpler.",
-        homePrivacyBadge: "Privacy",
-        homePrivacyMotto: "Everything stays on your PC — no cloud, no uploads.",
+        homeSubtitle: "Edit and convert your PDFs simply, right on your computer.",
+        homePrivacyTitle: "Your documents stay private",
+        homePrivacyDesc: "Files are processed directly on your computer.",
+        homePrivacyLocal: "Local processing",
+        homePrivacyNoUpload: "No uploads",
+        homePrivacyNoCloud: "No cloud",
         homeSearchPlaceholder: "Search a tool or format...",
         organizeHubSubtitle: "Merge, split, protect and compress your documents.",
         convertHubSubtitle: "Convert to and from PDF quickly and easily.",
@@ -108,11 +111,11 @@ const languages = {
         pdfToImageDesc: "Convert PDF pages into image files.",
         watermarkText: "Add Watermark",
         watermarkDesc: "Add a watermark to your PDF document.",
-        pdfToDocxText: "PDF to DOCX",
-        pdfToDocxDesc: "Convert PDF document to DOCX format.",
-        pdfToPptxText: "PDF to PPTX",
-        pdfToPptxDesc: "Convert PDF document to PowerPoint format.",
-        pptxToPdfText: "PPTX to PDF",
+        pdfToDocxText: "PDF to Word",
+        pdfToDocxDesc: "Convert a PDF document to Word format.",
+        pdfToPptxText: "PDF to PowerPoint",
+        pdfToPptxDesc: "Convert a PDF document to PowerPoint.",
+        pptxToPdfText: "PowerPoint to PDF",
         pptxToPdfDesc: "Convert one PowerPoint file into a PDF document.",
         removeBtn: "Remove",
         backLink: "← Back to main page",
@@ -362,9 +365,9 @@ const languages = {
         color: "Color",
 
         // Docx to PDF
-        docxToPdfText: "DOCX to PDF",
-        docxToPdfDesc: "Convert DOCX documents into a PDF file.",
-        docxToPdfHeader: "Docx to PDF",
+        docxToPdfText: "Word to PDF",
+        docxToPdfDesc: "Convert Word documents into a PDF file.",
+        docxToPdfHeader: "Word to PDF",
         docxToPdfHeader2: "Convert Word to PDF",
         docxToPdfSelectLabel: "Select Word file (.docx):",
         docxToPdfSelectButton: "Click to select file",
@@ -397,12 +400,12 @@ const languages = {
         errorPrefix: 'Error: ',
 
         // PDF to DOCX
-        pdfToDocxHeader: "PDF to DOCX",
-        pdfToDocxHeader2: "Convert PDF to DOCX",
+        pdfToDocxHeader: "PDF to Word",
+        pdfToDocxHeader2: "Convert PDF to Word",
         pdfToDocxSelectLabel: "Select PDF file:",
         pdfToDocxSelectButton: "Click to select file",
         pdfToDocxOutputLabel: "Output file name:",
-        pdfToDocxSubmitBtn: "Convert to DOCX",
+        pdfToDocxSubmitBtn: "Convert to Word",
         // PDF to DOCX messages
         successPdfConverted: "✓ Successfully converted PDF to DOCX: {filename} in Downloads folder!",
 
@@ -416,7 +419,7 @@ const languages = {
         powerPointToPdfText: "PowerPoint to PDF",
         powerPointToPdfDesc: "Convert one PowerPoint file into a PDF document.",
         pptxToPdfHeader: "PowerPoint to PDF",
-        pptxToPdfHeader2: "Convert PPTX to PDF",
+        pptxToPdfHeader2: "Convert PowerPoint to PDF",
         pptxToPdfSelectLabel: "Select PowerPoint file (.pptx):",
         pptxToPdfSelectButton: "Click to select file",
         pptxToPdfSubmitBtn: "Convert to PDF",
@@ -462,10 +465,10 @@ const languages = {
 
 
         // Index - Excel & PDF
-        excelToPdfText: "EXCEL To PDF",
-        excelToPdfDesc: "Convert an EXCEL file into a PDF document.",
-        pdfToExcelText: "PDF To EXCEL",
-        pdfToExcelDesc: "Convert a PDF file into an EXCEL document.",
+        excelToPdfText: "Excel to PDF",
+        excelToPdfDesc: "Convert an Excel file into a PDF document.",
+        pdfToExcelText: "PDF to Excel",
+        pdfToExcelDesc: "Convert a PDF file into an Excel document.",
 
         // Excel to PDF
         excelToPdfHeader: "Excel to PDF",
@@ -730,9 +733,12 @@ const languages = {
         navSettings: "Ajustes",
         homeGreeting: "¡Hola!",
         homeQuestion: "¿Qué quieres hacer hoy?",
-        homeSubtitle: "Elige una herramienta y simplifica tus PDF.",
-        homePrivacyBadge: "Privacidad",
-        homePrivacyMotto: "Todo permanece en tu PC — sin nube, sin subidas.",
+        homeSubtitle: "Modifica e converti i tuoi PDF in modo semplice, direttamente sul tuo computer.",
+        homePrivacyTitle: "I tuoi documenti restano privati",
+        homePrivacyDesc: "I file vengono elaborati direttamente sul tuo computer.",
+        homePrivacyLocal: "Elaborazione locale",
+        homePrivacyNoUpload: "Nessun upload",
+        homePrivacyNoCloud: "Nessun cloud",
         homeSearchPlaceholder: "Busca una herramienta o formato...",
         organizeHubSubtitle: "Une, divide, protege y comprime tus documentos.",
         convertHubSubtitle: "Convierte a y desde PDF de forma rápida y sencilla.",
@@ -758,9 +764,7 @@ const languages = {
         navSettings: "Impostazioni",
         homeGreeting: "Ciao!",
         homeQuestion: "Cosa vuoi fare oggi?",
-        homeSubtitle: "Scegli uno strumento e rendi i tuoi PDF più semplici.",
-        homePrivacyBadge: "Privacy",
-        homePrivacyMotto: "Tutto resta sul tuo PC — nessun cloud, nessun upload.",
+        homeSubtitle: "Modifica e converti i tuoi PDF in modo semplice, direttamente sul tuo computer.",
         homeSearchPlaceholder: "Cerca uno strumento o un formato...",
         organizeHubSubtitle: "Unisci, dividi, proteggi e comprimi i tuoi documenti.",
         convertHubSubtitle: "Converti da e verso PDF in modo semplice e veloce.",
@@ -853,11 +857,11 @@ const languages = {
         pdfToImageDesc: "Converti le pagine PDF in file immagine.",
         watermarkText: "Aggiungi Filigrana",
         watermarkDesc: "Aggiungi una filigrana al tuo documento PDF.",
-        pdfToDocxText: "PDF a DOCX",
-        pdfToDocxDesc: "Converti documento PDF in formato DOCX.",
-        pdfToPptxText: "PDF a PPTX",
-        pdfToPptxDesc: "Converti documento PDF in formato PowerPoint.",
-        pptxToPdfText: "PPTX a PDF",
+        pdfToDocxText: "PDF a Word",
+        pdfToDocxDesc: "Converti un documento PDF in Word.",
+        pdfToPptxText: "PDF a PowerPoint",
+        pdfToPptxDesc: "Converti un documento PDF in PowerPoint.",
+        pptxToPdfText: "PowerPoint a PDF",
         pptxToPdfDesc: "Converti un file PowerPoint in un documento PDF.",
         removeBtn: "Rimuovi",
         backLink: "← Torna alla pagina principale",
@@ -1107,9 +1111,9 @@ const languages = {
         color: "Colore",
 
         // Docx to PDF
-        docxToPdfText: "DOCX a PDF",
-        docxToPdfDesc: "Convertire documenti DOCX in un file PDF.",
-        docxToPdfHeader: "Docx in PDF",
+        docxToPdfText: "Word a PDF",
+        docxToPdfDesc: "Converti documenti Word in un file PDF.",
+        docxToPdfHeader: "Word a PDF",
         docxToPdfHeader2: "Converti Word in PDF",
         docxToPdfSelectLabel: "Seleziona il file Word (.docx):",
         docxToPdfSelectButton: "Clicca per selezionare il file",
@@ -1143,12 +1147,12 @@ const languages = {
         errorPrefix: 'Errore: ',
 
         // PDF to DOCX
-        pdfToDocxHeader: "PDF a DOCX",
-        pdfToDocxHeader2: "Converti PDF in DOCX",
+        pdfToDocxHeader: "PDF a Word",
+        pdfToDocxHeader2: "Converti PDF in Word",
         pdfToDocxSelectLabel: "Seleziona file PDF:",
         pdfToDocxSelectButton: "Clicca per selezionare file",
         pdfToDocxOutputLabel: "Nome file di output:",
-        pdfToDocxSubmitBtn: "Converti in DOCX",
+        pdfToDocxSubmitBtn: "Converti in Word",
         // PDF to DOCX messages
         successPdfConverted: "✓ PDF convertito in DOCX con successo: {filename} nella cartella Download!",
 
@@ -1159,10 +1163,10 @@ const languages = {
         statusOpenFolder: "Apri cartella",
 
         // PowerPoint to PDF
-        powerPointToPdfText: "PowerPoint in PDF",
+        powerPointToPdfText: "PowerPoint a PDF",
         powerPointToPdfDesc: "Converti un file PowerPoint in un documento PDF.",
-        pptxToPdfHeader: "PowerPoint in PDF",
-        pptxToPdfHeader2: "Converti PPTX in PDF",
+        pptxToPdfHeader: "PowerPoint a PDF",
+        pptxToPdfHeader2: "Converti PowerPoint in PDF",
         pptxToPdfSelectLabel: "Seleziona file PowerPoint (.pptx):",
         pptxToPdfSelectButton: "Clicca per selezionare file",
         pptxToPdfSubmitBtn: "Converti in PDF",
@@ -1208,10 +1212,10 @@ const languages = {
 
 
         // Index - Excel & PDF
-        excelToPdfText: "EXCEL a PDF",
-        excelToPdfDesc: "Converti un file EXCEL in un documento PDF.",
-        pdfToExcelText: "PDF a EXCEL",
-        pdfToExcelDesc: "Converti un file PDF in un documento EXCEL.",
+        excelToPdfText: "Excel a PDF",
+        excelToPdfDesc: "Converti un file Excel in un documento PDF.",
+        pdfToExcelText: "PDF a Excel",
+        pdfToExcelDesc: "Converti un file PDF in un documento Excel.",
 
         // Excel to PDF
         excelToPdfHeader: "Excel a PDF",
@@ -1467,9 +1471,12 @@ const languages = {
         navSettings: "Ustawienia",
         homeGreeting: "Cześć!",
         homeQuestion: "Co chcesz dziś zrobić?",
-        homeSubtitle: "Wybierz narzędzie i uprość swoje PDF.",
-        homePrivacyBadge: "Prywatność",
-        homePrivacyMotto: "Wszystko zostaje na Twoim PC — bez chmury, bez wysyłania.",
+        homeSubtitle: "Edytuj i konwertuj pliki PDF w prosty sposób, bezpośrednio na komputerze.",
+        homePrivacyTitle: "Twoje dokumenty pozostają prywatne",
+        homePrivacyDesc: "Pliki są przetwarzane bezpośrednio na Twoim komputerze.",
+        homePrivacyLocal: "Przetwarzanie lokalne",
+        homePrivacyNoUpload: "Bez wysyłania",
+        homePrivacyNoCloud: "Bez chmury",
         homeSearchPlaceholder: "Szukaj narzędzia lub formatu...",
         organizeHubSubtitle: "Łącz, dziel, chroń i kompresuj dokumenty.",
         convertHubSubtitle: "Konwertuj do i z PDF szybko i łatwo.",
@@ -1562,11 +1569,11 @@ const languages = {
         pdfToImageDesc: "Konwertuj strony PDF na pliki obrazów.",
         watermarkText: "Dodaj Znak Wodny",
         watermarkDesc: "Dodaj znak wodny do swojego dokumentu PDF.",
-        pdfToDocxText: "PDF do DOCX",
-        pdfToDocxDesc: "Konwertuj dokument PDF na format DOCX.",
-        pdfToPptxText: "PDF do PPTX",
+        pdfToDocxText: "PDF do Word",
+        pdfToDocxDesc: "Konwertuj dokument PDF na format Word.",
+        pdfToPptxText: "PDF do PowerPoint",
         pdfToPptxDesc: "Konwertuj dokument PDF na format PowerPoint.",
-        pptxToPdfText: "PPTX do PDF",
+        pptxToPdfText: "PowerPoint do PDF",
         pptxToPdfDesc: "Konwertuj plik PowerPoint na dokument PDF.",
         removeBtn: "Usuń",
         backLink: "← Powrót do strony głównej",
@@ -1816,9 +1823,9 @@ const languages = {
         color: "Kolor",
 
         // Docx to PDF
-        docxToPdfText: "DOCX do PDF",
-        docxToPdfDesc: "Konwertuj dokumenty DOCX do pliku PDF.",
-        docxToPdfHeader: "Docx na PDF",
+        docxToPdfText: "Word do PDF",
+        docxToPdfDesc: "Konwertuj dokumenty Word do pliku PDF.",
+        docxToPdfHeader: "Word do PDF",
         docxToPdfHeader2: "Konwertuj Word na PDF",
         docxToPdfSelectLabel: "Wybierz plik Word (.docx):",
         docxToPdfSelectButton: "Kliknij, aby wybrać plik",
@@ -1852,12 +1859,12 @@ const languages = {
         errorPrefix: 'Blad: ',
 
         // PDF to DOCX
-        pdfToDocxHeader: "PDF do DOCX",
-        pdfToDocxHeader2: "Konwertuj PDF na DOCX",
+        pdfToDocxHeader: "PDF do Word",
+        pdfToDocxHeader2: "Konwertuj PDF na Word",
         pdfToDocxSelectLabel: "Wybierz plik PDF:",
         pdfToDocxSelectButton: "Kliknij, aby wybrać plik",
         pdfToDocxOutputLabel: "Nazwa pliku wynikowego:",
-        pdfToDocxSubmitBtn: "Konwertuj do DOCX",
+        pdfToDocxSubmitBtn: "Konwertuj do Word",
         // PDF to DOCX messages
         successPdfConverted: "✓ Pomyślnie konwertowano PDF na DOCX: {filename} w folderze Pobrane!",
 
@@ -1871,7 +1878,7 @@ const languages = {
         powerPointToPdfText: "PowerPoint do PDF",
         powerPointToPdfDesc: "Konwertuj plik PowerPoint do dokumentu PDF.",
         pptxToPdfHeader: "PowerPoint do PDF",
-        pptxToPdfHeader2: "Konwertuj PPTX do PDF",
+        pptxToPdfHeader2: "Konwertuj PowerPoint do PDF",
         pptxToPdfSelectLabel: "Wybierz plik PowerPoint (.pptx):",
         pptxToPdfSelectButton: "Kliknij, aby wybrac plik",
         pptxToPdfSubmitBtn: "Konwertuj do PDF",
@@ -1917,9 +1924,9 @@ const languages = {
 
 
         // Index - Excel & PDF
-        excelToPdfText: "EXCEL na PDF",
+        excelToPdfText: "Excel na PDF",
         excelToPdfDesc: "Konwertuj plik EXCEL na dokument PDF.",
-        pdfToExcelText: "PDF na EXCEL",
+        pdfToExcelText: "PDF na Excel",
         pdfToExcelDesc: "Konwertuj plik PDF na dokument EXCEL.",
 
         // Excel to PDF
@@ -2176,9 +2183,12 @@ const languages = {
         navSettings: "Ajustes",
         homeGreeting: "¡Hola!",
         homeQuestion: "¿Qué quieres hacer hoy?",
-        homeSubtitle: "Elige una herramienta y simplifica tus PDF.",
-        homePrivacyBadge: "Privacidad",
-        homePrivacyMotto: "Todo permanece en tu PC — sin nube, sin subidas.",
+        homeSubtitle: "Edita y convierte tus PDF de forma sencilla, directamente en tu ordenador.",
+        homePrivacyTitle: "Tus documentos permanecen privados",
+        homePrivacyDesc: "Los archivos se procesan directamente en tu ordenador.",
+        homePrivacyLocal: "Procesamiento local",
+        homePrivacyNoUpload: "Sin subidas",
+        homePrivacyNoCloud: "Sin nube",
         homeSearchPlaceholder: "Busca una herramienta o formato...",
 
         // Category tiles
@@ -2260,11 +2270,11 @@ const languages = {
         pdfToImageDesc: "Convertir páginas PDF en imágenes.",
         watermarkText: "Añadir Marca de Agua",
         watermarkDesc: "Añadir una marca de agua a tu documento PDF.",
-        pdfToDocxText: "PDF a DOCX",
+        pdfToDocxText: "PDF a Word",
         pdfToDocxDesc: "Convertir documento PDF a formato DOCX.",
-        pdfToPptxText: "PDF a PPTX",
+        pdfToPptxText: "PDF a PowerPoint",
         pdfToPptxDesc: "Convertir documento PDF a formato PowerPoint.",
-        pptxToPdfText: "PPTX a PDF",
+        pptxToPdfText: "PowerPoint a PDF",
         pptxToPdfDesc: "Convertir un archivo PowerPoint en un documento PDF.",
         removeBtn: "Eliminar",
         backLink: "← Ir a la página principal",
@@ -2506,9 +2516,9 @@ const languages = {
         color: "Color",
 
         // Docx to PDF
-        docxToPdfText: "DOCX a PDF",
+        docxToPdfText: "Word a PDF",
         docxToPdfDesc: "Convertir documentos DOCX en un archivo PDF.",
-        docxToPdfHeader: "Docx a PDF",
+        docxToPdfHeader: "Word a PDF",
         docxToPdfHeader2: "Convertir Word a PDF",
         docxToPdfSelectLabel: "Selecciona el archivo Word (.docx):",
         docxToPdfSelectButton: "Haz clic para seleccionar el archivo",
@@ -2537,12 +2547,12 @@ const languages = {
         mustLeaveAtLeastOnePage: 'Debes dejar al menos una pagina sin seleccionar.',
 
         // PDF to DOCX
-        pdfToDocxHeader: "PDF a DOCX",
-        pdfToDocxHeader2: "Convertir PDF a DOCX",
+        pdfToDocxHeader: "PDF a Word",
+        pdfToDocxHeader2: "Convertir PDF a Word",
         pdfToDocxSelectLabel: "Seleccionar archivo PDF:",
         pdfToDocxSelectButton: "Haz clic para seleccionar el archivo",
         pdfToDocxOutputLabel: "Nombre del archivo de salida:",
-        pdfToDocxSubmitBtn: "Convertir a DOCX",
+        pdfToDocxSubmitBtn: "Convertir a Word",
 
         // General / Shared messages
         errorPrefix: "Error: {error}",
@@ -2556,7 +2566,7 @@ const languages = {
         powerPointToPdfText: "PowerPoint a PDF",
         powerPointToPdfDesc: "Convierte un archivo PowerPoint en un documento PDF.",
         pptxToPdfHeader: "PowerPoint a PDF",
-        pptxToPdfHeader2: "Convertir PPTX a PDF",
+        pptxToPdfHeader2: "Convertir PowerPoint a PDF",
         pptxToPdfSelectLabel: "Selecciona archivo PowerPoint (.pptx):",
         pptxToPdfSelectButton: "Haz clic para seleccionar archivo",
         pptxToPdfSubmitBtn: "Convertir a PDF",
@@ -2601,9 +2611,9 @@ const languages = {
 
 
         // Index - Excel & PDF
-        excelToPdfText: "EXCEL a PDF",
+        excelToPdfText: "Excel a PDF",
         excelToPdfDesc: "Convierte un archivo EXCEL en un documento PDF.",
-        pdfToExcelText: "PDF a EXCEL",
+        pdfToExcelText: "PDF a Excel",
         pdfToExcelDesc: "Convierte un archivo PDF en un documento EXCEL.",
 
         // Excel to PDF

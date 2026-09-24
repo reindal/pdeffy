@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Privacy</title>
+  <rect x="4" y="4" width="56" height="56" rx="14" fill="#FFD91A"/>
+  <path d="M32 13c7.5 5.8 15 7 18 7v14.5c0 12.5-8 20-18 24.5-10-4.5-18-12-18-24.5V20c3 0 10.5-1.2 18-7Z" fill="none" stroke="#101A3A" stroke-width="3.4" stroke-linejoin="round"/>
+  <rect x="25.5" y="31" width="13" height="12" rx="2.5" fill="#101A3A"/>
+  <path d="M28.5 31v-3.2a3.5 3.5 0 0 1 7 0V31" fill="none" stroke="#101A3A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="36.5" r="1.4" fill="#FFD91A"/>
+</svg>

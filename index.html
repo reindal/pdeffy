@@ -32,19 +32,44 @@
 </head>
 <body data-nav="home">
     <div class="pdeffy-home-hero">
-        <div>
+        <div class="pdeffy-home-hero-copy">
             <h1>
-                <span class="langText" id="homeGreeting">Ciao!</span><br>
+                <span class="langText" id="homeGreeting">Ciao!</span>
                 <span class="langText" id="homeQuestion">Cosa vuoi fare oggi?</span>
             </h1>
-            <p class="langText" id="homeSubtitle">Scegli uno strumento e rendi i tuoi PDF più semplici.</p>
-            <p class="pdeffy-home-motto" role="note">
-                <span class="pdeffy-home-motto-badge langText" id="homePrivacyBadge">Privacy</span>
-                <span class="langText" id="homePrivacyMotto">Tutto resta sul tuo PC — nessun cloud, nessun upload.</span>
-            </p>
+
+            <aside class="pdeffy-privacy-card" aria-label="Privacy">
+                <span class="pdeffy-privacy-card-icon" aria-hidden="true">
+                    <img src="./assets/icons/svg/privacy/privacy-shield.svg" alt="" width="64" height="64">
+                </span>
+                <div class="pdeffy-privacy-card-body">
+                    <strong class="langText" id="homePrivacyTitle">I tuoi documenti restano privati</strong>
+                    <span class="pdeffy-privacy-card-desc langText" id="homePrivacyDesc">I file vengono elaborati direttamente sul tuo computer.</span>
+                    <ul class="pdeffy-privacy-points">
+                        <li>
+                            <span class="pdeffy-privacy-point-icon" aria-hidden="true">
+                                <img src="./assets/icons/svg/privacy/local-processing.svg" alt="" width="20" height="20">
+                            </span>
+                            <span class="langText" id="homePrivacyLocal">Elaborazione locale</span>
+                        </li>
+                        <li>
+                            <span class="pdeffy-privacy-point-icon" aria-hidden="true">
+                                <img src="./assets/icons/svg/privacy/no-upload.svg" alt="" width="20" height="20">
+                            </span>
+                            <span class="langText" id="homePrivacyNoUpload">Nessun upload</span>
+                        </li>
+                        <li>
+                            <span class="pdeffy-privacy-point-icon" aria-hidden="true">
+                                <img src="./assets/icons/svg/privacy/no-cloud.svg" alt="" width="20" height="20">
+                            </span>
+                            <span class="langText" id="homePrivacyNoCloud">Nessun cloud</span>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
         </div>
         <div class="pdeffy-home-illustration" aria-hidden="true">
-            <img src="./assets/icons/svg/illustrations/pdf-decorative.svg" alt="">
+            <img src="./assets/icons/svg/privacy/privacy-hero.svg" alt="">
         </div>
     </div>
 
@@ -86,7 +111,7 @@
     <div class="pdeffy-tool-grid">
         <a class="pdeffy-tool-card" data-tool-card data-search="docx word" href="./functionalities/docxToPdf/docxToPdf.html">
             <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/docx-to-pdf.svg" alt=""></span>
-            <span class="pdeffy-tool-card-body"><strong class="langText" id="docxToPdfText">DOCX a PDF</strong><span class="langText" id="docxToPdfDesc">Converti Word in PDF</span></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="docxToPdfText">Word a PDF</strong><span class="langText" id="docxToPdfDesc">Converti Word in PDF</span></span>
             <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="excel xlsx" href="./functionalities/excelToPdf/excelToPdf.html">
@@ -96,7 +121,7 @@
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="pptx powerpoint" href="./functionalities/powerPointToPdf/powerPointToPdf.html">
             <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pptx-to-pdf.svg" alt=""></span>
-            <span class="pdeffy-tool-card-body"><strong class="langText" id="pptxToPdfText">PPTX a PDF</strong><span class="langText" id="pptxToPdfDesc">Converti presentazioni in PDF</span></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pptxToPdfText">PowerPoint a PDF</strong><span class="langText" id="pptxToPdfDesc">Converti presentazioni in PDF</span></span>
             <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="immagine image png jpg" href="./functionalities/imageToPdf/imageToPdf.html">
@@ -115,7 +140,7 @@
     <div class="pdeffy-tool-grid">
         <a class="pdeffy-tool-card" data-tool-card data-search="pdf docx" href="./functionalities/pdfToDocx/pdfToDocx.html">
             <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pdf-to-docx.svg" alt=""></span>
-            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToDocxText">PDF a DOCX</strong><span class="langText" id="pdfToDocxDesc">Converti PDF in Word</span></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToDocxText">PDF a Word</strong><span class="langText" id="pdfToDocxDesc">Converti PDF in Word</span></span>
             <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="pdf excel" href="./functionalities/pdfToExcel/pdfToExcel.html">
@@ -125,7 +150,7 @@
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="pdf pptx" href="./functionalities/pdfToPptx/pdfToPptx.html">
             <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pdf-to-pptx.svg" alt=""></span>
-            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToPptxText">PDF a PPTX</strong><span class="langText" id="pdfToPptxDesc">Converti PDF in presentazione</span></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToPptxText">PDF a PowerPoint</strong><span class="langText" id="pdfToPptxDesc">Converti PDF in presentazione</span></span>
             <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="pdf immagine image" href="./functionalities/pdfToImage/pdfToImage.html">

@@ -308,11 +308,24 @@ export function ensureStylesheet() {
   }
 }
 
+function normalizeSearchText(value) {
+  // Avoid false positives like "word" ⊂ "password" while keeping mid-token matches.
+  return String(value || '')
+    .toLowerCase()
+    .replace(/password/g, 'pwd');
+}
+
 export function filterToolCards(query) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = normalizeSearchText(String(query || '').trim());
   document.querySelectorAll('[data-tool-card]').forEach((card) => {
-    const hay = (card.getAttribute('data-search') || card.textContent || '').toLowerCase();
-    card.classList.toggle('is-hidden', q.length > 0 && !hay.includes(q));
+    if (!q) {
+      card.classList.remove('is-hidden');
+      return;
+    }
+    const hay = normalizeSearchText(
+      `${card.getAttribute('data-search') || ''} ${card.textContent || ''}`
+    );
+    card.classList.toggle('is-hidden', !hay.includes(q));
   });
 }
 
