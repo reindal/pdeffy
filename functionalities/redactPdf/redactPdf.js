@@ -3,7 +3,7 @@ const { PDFDocument, rgb } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
 
-window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
+// Worker already configured by src/platform/pdfjs-setup.js
 
 const STATUS = '#status';
 
@@ -700,7 +700,49 @@ form.addEventListener('submit', async function (e) {
             return;
         }
 
-        await fs.writeFile(savePath, pdfBytes);
+        // Prefer Rust true-redaction (strips text + paints opaque boxes).
+        const regions = [];
+        for (let i = 0; i < pages.length; i++) {
+            const rects = redactionsMap.get(i) || [];
+            if (rects.length === 0) continue;
+            const originalDims = pdfPageDimensions.get(i);
+            const layerDom = document.getElementById(`layer_${i}`);
+            const uiCanvasWidth = layerDom ? layerDom.offsetWidth : 600;
+            const uiScale = uiCanvasWidth / originalDims.width;
+
+            rects.forEach(rect => {
+                const pdfX = rect.x / uiScale;
+                const pdfWidth = rect.w / uiScale;
+                const pdfHeight = rect.h / uiScale;
+                const canvasY = rect.y / uiScale;
+                regions.push({
+                    page: i + 1,
+                    x: pdfX,
+                    y: canvasY,
+                    width: pdfWidth,
+                    height: pdfHeight,
+                });
+            });
+        }
+
+        let usedTrueRedact = false;
+        try {
+            const tempInput = savePath.replace(/\.pdf$/i, '') + `._src_${Date.now()}.pdf`;
+            await fs.writeFile(tempInput, new Uint8Array(originalFileBuffer.slice(0)));
+            await ipcRenderer.invoke('pdf-redact-true', {
+                path: tempInput,
+                regions,
+                output: savePath,
+            });
+            try { await fs.unlink(tempInput); } catch (_) { /* ignore */ }
+            usedTrueRedact = true;
+        } catch (trueRedactErr) {
+            console.warn('[redact] true redaction failed, falling back to pdf-lib overlay:', trueRedactErr);
+        }
+
+        if (!usedTrueRedact) {
+            await fs.writeFile(savePath, pdfBytes);
+        }
 
         StatusManager.show(STATUS, 'success', 'successPdfCreated', {
             filename: path.basename(savePath),

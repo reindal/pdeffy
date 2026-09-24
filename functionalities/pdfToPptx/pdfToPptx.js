@@ -66,7 +66,7 @@ form.addEventListener('submit', async function(e) {
 
     } catch (error) {
         console.error('Error converting PDF to PPTX:', error);
-        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message || String(error) });
     } finally {
         submitBtn.disabled = false;
     }

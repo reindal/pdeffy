@@ -53,7 +53,7 @@ function initMarkdownToPdfPage() {
 
             const safeName = path.basename(file.name).replace(/[^a-zA-Z0-9._-]/g, '_') || 'document.md';
             const tmpIn = path.join(os.tmpdir(), `pdeffy_md_src_${Date.now()}_${safeName}`);
-            await fs.writeFile(tmpIn, Buffer.from(await file.arrayBuffer()));
+            await fs.writeFile(tmpIn, new Uint8Array(await file.arrayBuffer()));
             try {
                 await ipcRenderer.invoke('markdown-file-to-pdf', {
                     inputPath: tmpIn,

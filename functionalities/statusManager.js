@@ -162,7 +162,15 @@ const StatusManager = (() => {
             const mimeType = ext === 'jpg' ? 'jpeg' : ext;
 
             // Convert buffer to base64 and set as src
-            imgElement.src = `data:image/${mimeType};base64,${fileBuffer.toString('base64')}`;
+            const bytes = fileBuffer instanceof Uint8Array
+                ? fileBuffer
+                : new Uint8Array(fileBuffer);
+            let binary = '';
+            const chunk = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunk) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+            }
+            imgElement.src = `data:image/${mimeType};base64,${btoa(binary)}`;
         } catch (error) {
             console.error('Failed to load image preview for:', filePath, error);
             imgElement.alt = 'Preview Error';

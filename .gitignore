@@ -11,10 +11,11 @@ Thumbs.db
 
 # Build
 dist/
+src-tauri/target/
+out/
 
 # Logs
 *.log
 npm-debug.log*
 
 package-lock.json
-out/

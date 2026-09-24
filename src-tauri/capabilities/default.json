@@ -1,0 +1,106 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default capabilities for Pdeffy",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:path:default",
+    "core:window:default",
+    "core:webview:default",
+    "core:app:default",
+    "core:resources:default",
+    "dialog:default",
+    "dialog:allow-save",
+    "dialog:allow-open",
+    "dialog:allow-message",
+    "dialog:allow-ask",
+    "dialog:allow-confirm",
+    "fs:default",
+    "fs:allow-read",
+    "fs:allow-write",
+    "fs:allow-exists",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-rename",
+    "fs:allow-copy-file",
+    "fs:allow-stat",
+    "fs:allow-read-dir",
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-app-read",
+    "fs:allow-app-write",
+    "fs:allow-app-read-recursive",
+    "fs:allow-app-write-recursive",
+    "fs:allow-download-read",
+    "fs:allow-download-write",
+    "fs:allow-home-read",
+    "fs:allow-home-write",
+    "fs:allow-temp-read",
+    "fs:allow-temp-write",
+    "fs:allow-document-read",
+    "fs:allow-document-write",
+    "fs:allow-desktop-read",
+    "fs:allow-desktop-write",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        { "path": "**" }
+      ]
+    },
+    "shell:default",
+    "shell:allow-open",
+    "shell:allow-execute",
+    {
+      "identifier": "shell:allow-spawn",
+      "allow": [
+        {
+          "name": "soffice",
+          "cmd": "soffice",
+          "args": true
+        },
+        {
+          "name": "libreoffice",
+          "cmd": "libreoffice",
+          "args": true
+        },
+        {
+          "name": "gs",
+          "cmd": "gs",
+          "args": true
+        },
+        {
+          "name": "gswin64c",
+          "cmd": "gswin64c",
+          "args": true
+        },
+        {
+          "name": "powershell",
+          "cmd": "powershell",
+          "args": true
+        },
+        {
+          "name": "powershell-exe",
+          "cmd": "powershell.exe",
+          "args": true
+        }
+      ]
+    },
+    "opener:default",
+    "store:default",
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-save",
+    "store:allow-load",
+    "store:allow-delete",
+    "store:allow-clear",
+    "store:allow-keys",
+    "store:allow-values",
+    "store:allow-entries",
+    "store:allow-length",
+    "store:allow-has",
+    "store:allow-reset"
+  ]
+}

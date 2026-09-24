@@ -21,54 +21,40 @@ The result is a modern, practical tool born from cross-cultural collaboration, i
 
 ## ⚙ Requirements
 
-To run this project, **Node.js and npm are required**.
-
-Make sure you have Node.js installed (npm is included with Node.js).
-
-You can verify installation with:
+- **Node.js** (npm included) — frontend tooling
+- **Rust** (stable) — [rustup](https://rustup.rs/)
+- **System deps** for Tauri (see [Tauri prerequisites](https://tauri.app/start/prerequisites/))
+- Optional: **LibreOffice** for Office↔PDF conversions
+- Optional: **Ghostscript** on macOS/Linux (`brew install ghostscript` / `sudo apt install ghostscript`). Windows ships a bundled portable Ghostscript.
 
 ```bash
 node -v
 npm -v
+rustc -V
 ```
-
-If not installed, download Node.js from:
-https://nodejs.org/
 
 ---
 
 ## 🏗️ Launch the Project
 
-### Development Mode
-
-To run the application in development mode:
+### Development
 
 ```bash
 npm install
-npm start
+npm run dev
 ```
 
-Or using Electron Forge:
+This starts Vite on port 1420 and the Tauri window (`tauri dev`).
 
-```Bash
-npm run start
+### Production build
+
+```bash
+npm run build
 ```
 
-Build & Package
-To create a distributable installer:
+Installers are written under `src-tauri/target/release/bundle/` (`.dmg`, `.msi`/NSIS, `.deb` / AppImage depending on OS).
 
-Package the application:
-
-```Bash
-npm run package
-```
-
-Create installer/executable:
-
-```Bash
-npm run make
-```
-The installer will be generated in the out/make directory.
+---
 
 ## 🎯 Purpose
 

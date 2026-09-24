@@ -1,12 +1,14 @@
-name: Build Electron App
+name: Build Tauri App
 
 on:
   push:
     branches:
       - main
+      - feat/tauri-migration
   pull_request:
     branches:
       - main
+      - dev
   workflow_dispatch:
 
 jobs:
@@ -16,7 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        include:
+          - os: macos-latest
+          - os: windows-latest
+          - os: ubuntu-latest
 
     steps:
       - name: Check out Git repository
@@ -27,32 +32,46 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Install system dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
         run: npm install
-        env:
-          npm_config_build_from_source: false
 
-      - name: Build Electron App
-        run: npm run make
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: .
+          tauriScript: npm run tauri
+          args: build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: installer-${{ matrix.os }}
-          path: out/make/**/*
+          path: |
+            src-tauri/target/release/bundle/**/*
+            !**/*.sig
+          if-no-files-found: warn
 
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Download all artifacts
@@ -61,33 +80,24 @@ jobs:
           path: installers
 
       - name: List downloaded artifacts (debug)
-        run: find installers -type f
-
-      - name: Rename artifacts
-        run: |
-          mv $(find installers -name "*.exe") installers/pdeffy.exe
-          mv $(find installers -name "*.deb") installers/pdeffy.deb
-          mv $(find installers -name "*.dmg") installers/pdeffy.dmg
+        run: find installers -type f | head -100
 
       - name: Upload to Latest Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          ASSETS=$(find installers -type f \( -name "*.dmg" -o -name "*.app.tar.gz" -o -name "*.msi" -o -name "*.exe" -o -name "*.deb" -o -name "*.AppImage" -o -name "*.rpm" \) | tr '\n' ' ')
+          if [ -z "$ASSETS" ]; then
+            echo "No installer assets found"
+            exit 0
+          fi
           if gh release view latest --repo ${{ github.repository }} &>/dev/null; then
-            # --- CLEANUP STEP ---
-            # Find and delete all old .nupkg files to keep the release page clean
-            gh release view latest --repo ${{ github.repository }} --json assets -q '.assets[].name' | grep '\.nupkg$' | xargs -I {} gh release delete-asset latest "{}" --repo ${{ github.repository }} -y || true
-            # ------------------------
-            
-            gh release upload latest \
-              --repo ${{ github.repository }} \
-              --clobber \
-              $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.nupkg" -o -name "RELEASES" \))
+            gh release upload latest --repo ${{ github.repository }} --clobber $ASSETS
           else
             gh release create latest \
               --repo ${{ github.repository }} \
               --title "Latest Build" \
               --prerelease \
-              --notes "Auto-updated on every push to main" \
-              $(find installers -type f \( -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.nupkg" -o -name "RELEASES" \))
+              --notes "Auto-updated Tauri build on push to main" \
+              $ASSETS
           fi

@@ -3,7 +3,7 @@ const { PDFDocument, degrees } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
 
-window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
+// Worker already configured by src/platform/pdfjs-setup.js
 
 const STATUS = '#status';
 

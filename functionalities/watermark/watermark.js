@@ -6,7 +6,7 @@ var { ipcRenderer } = require('electron');
 const STATUS = '#status';
 
 if (window.pdfjsLib) {
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
+    // Worker already configured by src/platform/pdfjs-setup.js
 }
 
 const form = document.getElementById('watermarkForm');

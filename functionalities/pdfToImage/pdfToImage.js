@@ -19,7 +19,7 @@ async function initPdfJs() {
         pdfjsLib = window.pdfjsLib;
 
         // Configure worker
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+        // Worker already configured by src/platform/pdfjs-setup.js
     }
     return pdfjsLib;
 }
@@ -141,7 +141,7 @@ async function loadPDF(file) {
 
     } catch (error) {
         console.error('Error loading PDF:', error);
-        StatusManager.show(STATUS, 'error', 'errorLoadingPdf', { error: error.message });
+        StatusManager.show(STATUS, 'error', 'errorLoadingPdf', { error: error.message || String(error) });
     }
 }
 
@@ -192,7 +192,71 @@ async function handleFormSubmit(e) {
     StatusManager.show(STATUS, 'processing', 'convertingPages', { count: numPages });
 
     try {
-        // Collect all images first
+        const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
+        const originalFileName = selectedFile.name.replace('.pdf', '');
+
+        // Prefer Ghostscript rasterization when available (faster, native).
+        try {
+            const gsCheck = await ipcRenderer.invoke('check-ghostscript-availability');
+            if (gsCheck && gsCheck.hasGhostscript) {
+                let outputPath;
+                if (saveAsZip) {
+                    outputPath = await ipcRenderer.invoke('show-save-dialog', {
+                        defaultPath: path.join(downloadsPath, `${originalFileName}.zip`),
+                        filters: [{ name: 'ZIP Files', extensions: ['zip'] }]
+                    });
+                } else {
+                    outputPath = await ipcRenderer.invoke('show-save-dialog', {
+                        defaultPath: path.join(downloadsPath, `${originalFileName}.${format}`),
+                        filters: [{ name: format.toUpperCase() + ' Files', extensions: [format] }]
+                    });
+                }
+                if (!outputPath) {
+                    StatusManager.show(STATUS, 'error', 'saveCancelled');
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                const outDir = saveAsZip ? path.dirname(outputPath) : path.dirname(outputPath);
+                const workDir = path.join(outDir, `.pdeffy_img_${Date.now()}`);
+                const tempPdf = path.join(workDir, selectedFile.name);
+                await fs.mkdir(workDir, { recursive: true });
+                await fs.writeFile(tempPdf, new Uint8Array(await selectedFile.arrayBuffer()));
+
+                const result = await ipcRenderer.invoke('pdf-to-images-gs', {
+                    path: tempPdf,
+                    outputDir: workDir,
+                    format,
+                    dpi: 144,
+                });
+
+                const files = (result && result.files) || [];
+                if (saveAsZip) {
+                    await ipcRenderer.invoke('zip-files', { paths: files, output: outputPath });
+                } else {
+                    const baseName = path.basename(outputPath, `.${format}`);
+                    for (let i = 0; i < files.length; i++) {
+                        const dest = path.join(outDir, `${baseName}_${i + 1}.${format}`);
+                        const bytes = await fs.readFile(files[i]);
+                        await fs.writeFile(dest, new Uint8Array(bytes));
+                    }
+                }
+
+                StatusManager.show(STATUS, 'success', 'successConverted', {
+                    count: files.length || numPages,
+                    format: saveAsZip ? 'ZIP' : format.toUpperCase(),
+                    filename: path.basename(outputPath),
+                    savePath: outputPath,
+                    savedFiles: files,
+                });
+                submitBtn.disabled = false;
+                return;
+            }
+        } catch (gsErr) {
+            console.warn('[pdfToImage] Ghostscript path failed, falling back to PDF.js:', gsErr);
+        }
+
+        // Collect all images first (PDF.js canvas fallback)
         const imageFiles = [];
 
         for (let pageNum = 1; pageNum <= numPages; pageNum++) {
@@ -221,12 +285,10 @@ async function handleFormSubmit(e) {
             });
 
             const buffer = await blob.arrayBuffer();
-            imageFiles.push(Buffer.from(buffer));
+            imageFiles.push(new Uint8Array(buffer));
         }
 
         // Show Save As dialog
-        const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
-        const originalFileName = selectedFile.name.replace('.pdf', '');
         let outputPath;
 
         if (saveAsZip) {
@@ -251,7 +313,7 @@ async function handleFormSubmit(e) {
                 zip.file(`${baseName}_${i + 1}.${format}`, imageFiles[i]);
             }
 
-            const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+            const zipContent = await zip.generateAsync({ type: 'uint8array' });
             await fs.writeFile(outputPath, zipContent);
 
             StatusManager.show(STATUS, 'success', 'successConverted', {
@@ -310,7 +372,7 @@ async function handleFormSubmit(e) {
 
     } catch (error) {
         console.error('Error converting PDF:', error);
-        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message || String(error) });
     } finally {
         submitBtn.disabled = false;
     }

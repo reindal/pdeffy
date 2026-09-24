@@ -2246,3 +2246,4 @@ if (headerIcon) {
 }
 
 window.getMessage = getMessage;
+window.changeLanguage = changeLanguage;

@@ -28,7 +28,7 @@ let customFileCount = 1;
 let totalPdfPages = 0;
 let generatedFiles= []
 
-window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
+// Worker already configured by src/platform/pdfjs-setup.js
 
 if (languageSelector) {
     languageSelector.addEventListener('change', () => {
@@ -357,7 +357,7 @@ form.addEventListener('submit', async function(e) {
             for (let i = 0; i < pdfFiles.length; i++) {
                 zip.file(`${baseName}_${i + 1}.pdf`, pdfFiles[i]);
             }
-            const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+            const zipContent = await zip.generateAsync({ type: 'uint8array' });
             await fs.writeFile(outputPath, zipContent);
         } else {
             for (let i = 0; i < pdfFiles.length; i++) {

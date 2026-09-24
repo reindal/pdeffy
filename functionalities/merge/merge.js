@@ -84,7 +84,6 @@ function handleDrop(e) {
     if (this !== draggedItem) {
         this.classList.remove('dragover');
 
-        const allItems = Array.from(filesOrderContainer.querySelectorAll('.fileOrderItem'));
         const draggedIndex = parseInt(draggedItem.dataset.index);
         const targetIndex = parseInt(this.dataset.index);
 
@@ -115,26 +114,6 @@ form.addEventListener('submit', async function (e) {
     submitBtn.disabled = true;
 
     try {
-        const mergedPdf = await PDFDocument.create();
-        const metadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
-
-        if (metadata.author) mergedPdf.setAuthor(metadata.author);
-        if (metadata.title) mergedPdf.setTitle(metadata.title);
-        if (metadata.subject) mergedPdf.setSubject(metadata.subject);
-
-        for (let file of selectedFiles) {
-            const fileBuffer = await file.arrayBuffer();
-            const pdfDoc = await PDFDocument.load(fileBuffer);
-
-            const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
-            pages.forEach(page => {
-                mergedPdf.addPage(page);
-            });
-        }
-
-        const mergedPdfBytes = await mergedPdf.save();
-
-        // Use Electron API to get downloads path
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const defaultFileName = 'merged_document.pdf';
         const defaultPath = path.join(downloadsPath, defaultFileName);
@@ -152,9 +131,61 @@ form.addEventListener('submit', async function (e) {
             return;
         }
 
-        await fs.writeFile(filePath, mergedPdfBytes);
+        const totalSize = selectedFiles.reduce((sum, f) => sum + (f.size || 0), 0);
+        const LARGE_PDF_BYTES = 20 * 1024 * 1024;
+        let usedRustMerge = false;
 
-        // Set read-only if checkbox is checked
+        if (totalSize >= LARGE_PDF_BYTES) {
+            try {
+                const workDir = path.join(path.dirname(filePath), `.pdeffy_merge_${Date.now()}`);
+                await fs.mkdir(workDir, { recursive: true });
+                const tempPaths = [];
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const tempPath = path.join(workDir, `${i}_${selectedFiles[i].name}`);
+                    await fs.writeFile(tempPath, new Uint8Array(await selectedFiles[i].arrayBuffer()));
+                    tempPaths.push(tempPath);
+                }
+                await ipcRenderer.invoke('pdf-merge', { paths: tempPaths, output: filePath });
+                usedRustMerge = true;
+            } catch (rustErr) {
+                console.warn('[merge] Rust merge failed, falling back to pdf-lib:', rustErr);
+            }
+        }
+
+        if (!usedRustMerge) {
+            const mergedPdf = await PDFDocument.create();
+            const metadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
+
+            if (metadata.author) mergedPdf.setAuthor(metadata.author);
+            if (metadata.title) mergedPdf.setTitle(metadata.title);
+            if (metadata.subject) mergedPdf.setSubject(metadata.subject);
+
+            for (let file of selectedFiles) {
+                const fileBuffer = await file.arrayBuffer();
+                const pdfDoc = await PDFDocument.load(fileBuffer);
+
+                const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+                pages.forEach(page => {
+                    mergedPdf.addPage(page);
+                });
+            }
+
+            const mergedPdfBytes = await mergedPdf.save();
+            await fs.writeFile(filePath, mergedPdfBytes);
+        } else {
+            try {
+                const metadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
+                if (metadata.author || metadata.title || metadata.subject) {
+                    const bytes = await fs.readFile(filePath);
+                    const doc = await PDFDocument.load(bytes);
+                    if (metadata.author) doc.setAuthor(metadata.author);
+                    if (metadata.title) doc.setTitle(metadata.title);
+                    if (metadata.subject) doc.setSubject(metadata.subject);
+                    await fs.writeFile(filePath, await doc.save());
+                }
+            } catch (_) { /* optional metadata */ }
+        }
+
         const readOnlyCheckbox = document.getElementById('readOnlyCheckbox');
         if (readOnlyCheckbox && readOnlyCheckbox.checked) {
             try {

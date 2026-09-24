@@ -6,12 +6,12 @@
 
 ## Checklist
 
-- [ ] Fase 1 — Scaffold Tauri 2 + Vite multi-page
-- [ ] Fase 2 — Platform bridge (sostituisce ipcRenderer)
-- [ ] Fase 3 — Port Rust del backend (da index.js)
-- [ ] Fase 4 — Casi speciali (Markdown PDF, PDF Editor, menu, DevTools)
-- [ ] Fase 5 — Packaging, risorse, CI
-- [ ] Fase 6 — Test di regressione cross-platform
+- [x] Fase 1 — Scaffold Tauri 2 + Vite multi-page
+- [x] Fase 2 — Platform bridge (sostituisce ipcRenderer)
+- [x] Fase 3 — Port Rust del backend (da index.js)
+- [x] Fase 4 — Casi speciali (Markdown PDF, PDF Editor, menu, DevTools)
+- [x] Fase 5 — Packaging, risorse, CI
+- [x] Fase 6 — Test di regressione cross-platform (checklist in `docs/QA-tauri-regression.md`)
 
 ---
 

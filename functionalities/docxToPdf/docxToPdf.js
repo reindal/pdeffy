@@ -59,7 +59,7 @@ form.addEventListener('submit', async function (e) {
 
     } catch (error) {
         console.error(error);
-        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message || String(error) });
     } finally {
         submitBtn.disabled = false;
     }

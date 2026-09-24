@@ -3,8 +3,16 @@
  */
 (function (global) {
     function createToolController(ctx) {
-        const { model, toolBodyEl, viewerApi, getSelectedPageId, onModelChange, getPdfPage, onGoToPage } =
-            ctx;
+        const {
+            model,
+            toolBodyEl,
+            viewerApi,
+            getSelectedPageId,
+            onModelChange,
+            getPdfPage,
+            onGoToPage,
+            onExportStateChange,
+        } = ctx;
 
         let activeTool = 'watermark';
         const sigDrawCanvas = document.createElement('canvas');
@@ -257,6 +265,35 @@
         function refreshWatermarkPreview() {
             PdfEditorOverlayManager.setWatermarkDraft(collectWatermarkDraft());
             PdfEditorOverlayManager.syncOverlays(model, viewerApi);
+            if (typeof onExportStateChange === 'function') onExportStateChange();
+        }
+
+        function clearWatermarkFormFields() {
+            const textInput = document.getElementById('pdfEditorWmText');
+            if (textInput) textInput.value = '';
+            clearWatermarkImagePreview();
+        }
+
+        /**
+         * Promote live preview draft into model.watermarks so export matches the preview.
+         * @returns {boolean} true if a draft was committed
+         */
+        function commitWatermarkDraft() {
+            const draft = collectWatermarkDraft();
+            if (!draft) {
+                // Form may be unmounted (other tool); fall back to overlay draft.
+                const overlayDraft = PdfEditorOverlayManager.getWatermarkDraft?.();
+                if (!overlayDraft) return false;
+                const { isDraft, ...layer } = overlayDraft;
+                PdfEditorDocumentModel.addWatermark(model, layer);
+                PdfEditorOverlayManager.setWatermarkDraft(null);
+                return true;
+            }
+            const { isDraft, ...layer } = draft;
+            PdfEditorDocumentModel.addWatermark(model, layer);
+            clearWatermarkFormFields();
+            PdfEditorOverlayManager.setWatermarkDraft(null);
+            return true;
         }
 
         function clearWatermarkImagePreview() {
@@ -308,6 +345,7 @@
                     posY: parseInt(document.getElementById('pdfEditorWmY').value, 10) || 50,
                     color: document.getElementById('pdfEditorWmColor').value,
                 });
+                clearWatermarkFormFields();
                 onModelChange();
                 renderWatermarkList();
                 refreshWatermarkPreview();
@@ -319,9 +357,7 @@
                 if (!hadLayers && !hadDraft) return;
 
                 PdfEditorDocumentModel.clearAllWatermarks(model);
-                clearWatermarkImagePreview();
-                const textInput = document.getElementById('pdfEditorWmText');
-                if (textInput) textInput.value = '';
+                clearWatermarkFormFields();
                 PdfEditorOverlayManager.setWatermarkDraft(null);
                 if (hadLayers) onModelChange();
                 else refreshWatermarkPreview();
@@ -343,7 +379,7 @@
                     posX: parseInt(document.getElementById('pdfEditorWmX').value, 10) || 50,
                     posY: parseInt(document.getElementById('pdfEditorWmY').value, 10) || 50,
                 });
-                clearWatermarkImagePreview();
+                clearWatermarkFormFields();
                 onModelChange();
                 renderWatermarkList();
                 refreshWatermarkPreview();
@@ -519,6 +555,13 @@
         }
 
         function switchTool(tool) {
+            // Persist live watermark preview before leaving the watermark panel.
+            if (activeTool === 'watermark' && tool !== 'watermark') {
+                if (commitWatermarkDraft()) {
+                    onModelChange();
+                }
+            }
+
             activeTool = tool;
             syncTabButtons(tool);
 
@@ -541,6 +584,7 @@
             if (tool === 'signature') wireSignature();
 
             PdfEditorOverlayManager.syncOverlays(model, viewerApi);
+            if (typeof onExportStateChange === 'function') onExportStateChange();
             if (tool === 'search' && PdfEditorTextSearch.getState().query) {
                 performSearch();
             }
@@ -581,7 +625,7 @@
             switchTool('watermark');
         }
 
-        return { initTabs, onViewerRendered, switchTool, onDocumentLoaded };
+        return { initTabs, onViewerRendered, switchTool, onDocumentLoaded, commitWatermarkDraft };
     }
 
     global.PdfEditorToolController = { createToolController };

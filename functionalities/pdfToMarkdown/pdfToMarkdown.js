@@ -15,8 +15,7 @@ async function initPdfJs() {
         }
         if (!window.pdfjsLib) throw new Error('PDF.js library failed to load');
         pdfjsLib = window.pdfjsLib;
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
+        // Worker already configured by src/platform/pdfjs-setup.js
     }
     return pdfjsLib;
 }
@@ -141,7 +140,7 @@ function initPdfToMarkdownPage() {
             });
         } catch (err) {
             console.error(err);
-            StatusManager.show(STATUS, 'error', 'errorPrefix', { error: err.message });
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: err.message || String(err) });
         } finally {
             submitPdfToMd.disabled = false;
         }

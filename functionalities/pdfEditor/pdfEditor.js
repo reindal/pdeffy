@@ -2,7 +2,7 @@ var { ipcRenderer } = require('electron');
 const fs = require('fs').promises;
 const path = require('path');
 
-window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
+// Worker already configured by src/platform/pdfjs-setup.js
 
 const STATUS = '#pdfEditorStatus';
 
@@ -36,8 +36,12 @@ async function getPdfPage(sourceIndex) {
 }
 
 function updateExportButton() {
+    const hasWmDraft =
+        typeof PdfEditorOverlayManager !== 'undefined' &&
+        !!PdfEditorOverlayManager.getWatermarkDraft?.();
     exportBtn.disabled =
-        !model.originalBuffer || !PdfEditorDocumentModel.hasExportableEdits(model);
+        !model.originalBuffer ||
+        !(PdfEditorDocumentModel.hasExportableEdits(model) || hasWmDraft);
 }
 
 function updatePageIndicator(displayIndex) {
@@ -156,6 +160,7 @@ async function loadPdfFile(file) {
                 viewerApi,
                 getSelectedPageId: () => selectedPageId,
                 onModelChange,
+                onExportStateChange: updateExportButton,
                 getPdfPage,
                 onGoToPage: async (pageId, displayIndex) => {
                     selectedPageId = pageId;
@@ -295,6 +300,11 @@ document.getElementById('pdfEditorNextPage').addEventListener('click', async () 
 exportBtn.addEventListener('click', async () => {
     if (!model.originalBuffer) return;
 
+    // Live watermark preview is a draft until "Add layer" — commit it so export matches the preview.
+    if (toolController?.commitWatermarkDraft?.()) {
+        // Draft was promoted; keep export enabled for the build below.
+    }
+
     exportBtn.disabled = true;
     StatusManager.show(STATUS, 'processing', 'processing');
 
@@ -323,7 +333,7 @@ exportBtn.addEventListener('click', async () => {
         setTimeout(() => CustomMetadataModule.reset(), 2000);
     } catch (err) {
         console.error('[pdfEditor] export', err);
-        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: err.message });
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: err.message || String(err) });
     } finally {
         updateExportButton();
     }

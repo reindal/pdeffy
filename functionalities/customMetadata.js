@@ -88,6 +88,9 @@ const CustomMetadataModule = {
     }
 };
 
+// ES modules don't share scope — expose for page scripts (Electron used a shared classic scope).
+window.CustomMetadataModule = CustomMetadataModule;
+
 // Automatically initialize the module when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     CustomMetadataModule.init();

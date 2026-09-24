@@ -68,17 +68,13 @@
         </div>
     </main>
 
-    <script type="module">
-        // Load PDF.js from CDN and expose it globally
-        import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs';
-        window.pdfjsLib = pdfjsLib;
-    </script>
+    <script type="module" src="/src/platform/pdfjs-setup.js"></script>
 
-    <script src="../../changeLang.js"></script>
-    <script src="./../statusManager.js"></script>
-    <script src="./../../settings.js"></script>
-    <script src="./../pdfEncryptionGuard.js"></script>
-    <script src="./pdfToImage.js"></script>
+    <script type="module" src="../../changeLang.js"></script>
+    <script type="module" src="./../statusManager.js"></script>
+    <script type="module" src="./../../settings.js"></script>
+    <script type="module" src="./../pdfEncryptionGuard.js"></script>
+    <script type="module" src="./pdfToImage.js"></script>
 </body>
 
 </html>

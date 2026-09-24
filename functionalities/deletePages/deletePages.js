@@ -4,7 +4,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 // Initialize PDF.js worker
-window.pdfjsLib.GlobalWorkerOptions.workerSrc = './../../libs/pdf.worker.min.js';
+// Worker already configured by src/platform/pdfjs-setup.js
 
 const STATUS = '#status'; // single source of truth for the container selector
 

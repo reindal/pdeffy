@@ -388,6 +388,10 @@
         watermarkDraft = draft;
     }
 
+    function getWatermarkDraft() {
+        return watermarkDraft;
+    }
+
     function setOverlayChangeHandler(fn) {
         overlayChangeHandler = fn;
     }
@@ -420,6 +424,7 @@
         setMode,
         setRedactColor,
         setWatermarkDraft,
+        getWatermarkDraft,
         setOverlayChangeHandler,
         placeSignatureOnPage,
     };

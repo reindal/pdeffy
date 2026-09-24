@@ -109,7 +109,7 @@ form.addEventListener('submit', async function(e) {
             });
 
             doc.render(rowData);
-            const generatedDocxBuffer = doc.getZip().generate({ type: 'nodebuffer' });
+            const generatedDocxBuffer = doc.getZip().generate({ type: 'uint8array' });
 
             // 4B. Invoke LibreOffice engine for PDF conversion
             const tempPdfPath = path.join(sessionTempDir, `${currentFileName}.pdf`);
@@ -135,7 +135,7 @@ form.addEventListener('submit', async function(e) {
 
         // 5. Finalize archive creation and global cleanup
         StatusManager.show(STATUS, 'processing', 'savingZip');
-        const zipContent = await finalZip.generateAsync({ type: 'nodebuffer' });
+        const zipContent = await finalZip.generateAsync({ type: 'uint8array' });
         await fs.writeFile(zipOutputPath, zipContent);
         
         try { await fs.rmdir(sessionTempDir); } catch (e) {}
