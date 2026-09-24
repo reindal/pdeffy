@@ -1,16 +1,18 @@
 /**
  * App shell: persistent sidebar + shared navigation for multi-page HTML.
  */
+import { actionMaskIcon, navMaskIcon } from './icons.js';
+
 const ICONS = {
   mark: `<svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="3" y="2" width="16" height="20" rx="3" fill="#FFD91A"/><rect x="9" y="6" width="16" height="20" rx="3" fill="#3478F6"/><path d="M14 12h6M14 16h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z"/></svg>`,
-  organize: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="13" width="7" height="7" rx="1.5"/><rect x="14" y="13" width="7" height="7" rx="1.5"/></svg>`,
-  convert: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/><path d="M7 7v7a3 3 0 0 0 3 3h1M17 17v-7a3 3 0 0 0-3-3h-1"/></svg>`,
-  edit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg>`,
-  recent: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`,
-  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M3 12h2M19 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>`,
-  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`,
-  upload: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M8 8l4-4 4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>`,
+  home: null,
+  organize: null,
+  convert: null,
+  edit: null,
+  recent: null,
+  settings: null,
+  search: null,
+  upload: null,
   merge: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 4v8a4 4 0 0 0 4 4"/><path d="M16 4v8a4 4 0 0 1-4 4"/><path d="M12 16v4"/></svg>`,
   split: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v8"/><path d="M12 12 8 20M12 12l4 8"/><path d="M8 8H4M20 8h-4"/></svg>`,
   protect: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`,
@@ -24,7 +26,29 @@ const ICONS = {
   pdf: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5M8 14h3a1.5 1.5 0 0 0 0-3H8v6M14 17v-6h2.5a2 2 0 0 1 0 4H14"/></svg>`,
 };
 
+function resolveIcon(name, base = appBase()) {
+  const navMap = {
+    home: () => navMaskIcon(base, 'home.svg'),
+    organize: () => navMaskIcon(base, 'organize.svg'),
+    convert: () => navMaskIcon(base, 'convert.svg'),
+    edit: () => navMaskIcon(base, 'edit.svg'),
+    recent: () => navMaskIcon(base, 'recent.svg'),
+    settings: () => navMaskIcon(base, 'settings.svg'),
+    search: () => actionMaskIcon(base, 'search.svg'),
+    upload: () => actionMaskIcon(base, 'upload.svg'),
+  };
+  if (navMap[name]) return navMap[name]();
+  return ICONS[name] || '';
+}
+
 const RECENT_KEY = 'pdeffy.recentDocuments';
+const RECENT_OPEN_KEY = 'pdeffy.openRecent';
+const THEME_KEY = 'pdeffy.theme';
+
+try {
+  const early = localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', early);
+} catch (_) { /* ignore */ }
 
 function appBase() {
   const path = window.location.pathname.replace(/\\/g, '/');
@@ -78,11 +102,41 @@ function t(key, fallback) {
 
 function navItems(base) {
   return [
-    { id: 'home', href: `${base}index.html`, labelKey: 'navHome', label: 'Home', icon: 'home' },
-    { id: 'organize', href: `${base}functionalities/hubs/organize.html`, labelKey: 'navOrganize', label: 'Organizza PDF', icon: 'organize' },
-    { id: 'convert', href: `${base}functionalities/hubs/convert.html`, labelKey: 'navConvert', label: 'Converti PDF', icon: 'convert' },
-    { id: 'edit', href: `${base}functionalities/pdfEditor/pdfEditor.html`, labelKey: 'navEdit', label: 'Modifica PDF', icon: 'edit' },
-    { id: 'recent', href: `${base}functionalities/hubs/recent.html`, labelKey: 'navRecent', label: 'Recenti', icon: 'recent' },
+    {
+      id: 'home',
+      href: `${base}index.html`,
+      labelKey: 'navHome',
+      label: 'Home',
+      iconHtml: resolveIcon('home', base),
+    },
+    {
+      id: 'organize',
+      href: `${base}functionalities/hubs/organize.html`,
+      labelKey: 'navOrganize',
+      label: 'Organizza PDF',
+      iconHtml: resolveIcon('organize', base),
+    },
+    {
+      id: 'convert',
+      href: `${base}functionalities/hubs/convert.html`,
+      labelKey: 'navConvert',
+      label: 'Converti PDF',
+      iconHtml: resolveIcon('convert', base),
+    },
+    {
+      id: 'edit',
+      href: `${base}functionalities/pdfEditor/pdfEditor.html`,
+      labelKey: 'navEdit',
+      label: 'Modifica PDF',
+      iconHtml: resolveIcon('edit', base),
+    },
+    {
+      id: 'recent',
+      href: `${base}functionalities/hubs/recent.html`,
+      labelKey: 'navRecent',
+      label: 'Recenti',
+      iconHtml: resolveIcon('recent', base),
+    },
   ];
 }
 
@@ -91,7 +145,7 @@ function buildSidebar(base, active) {
     .map(
       (item) => `
       <a class="pdeffy-nav-item${item.id === active ? ' is-active' : ''}" href="${item.href}" data-nav-id="${item.id}" title="${item.label}" aria-label="${item.label}">
-        <span class="pdeffy-nav-icon">${ICONS[item.icon]}</span>
+        <span class="pdeffy-nav-icon">${item.iconHtml}</span>
         <span class="pdeffy-nav-label langText" id="${item.labelKey}">${item.label}</span>
       </a>`
     )
@@ -100,13 +154,12 @@ function buildSidebar(base, active) {
   return `
     <aside class="pdeffy-sidebar" aria-label="Primary">
       <a class="pdeffy-sidebar-brand" href="${base}index.html" title="Pdeffy">
-        ${ICONS.mark}
-        <span class="pdeffy-sidebar-brand-text">pdeffy</span>
+        <img class="pdeffy-sidebar-logo" src="${logoSrcForTheme(getTheme(), base)}" alt="pdeffy" data-pdeffy-logo data-icon-light="${base}assets/pdeffy-flat-dark.png" data-icon-dark="${base}assets/pdeffy-flat-light.png">
       </a>
       <nav class="pdeffy-nav">${items}</nav>
       <div class="pdeffy-sidebar-footer">
         <button type="button" class="pdeffy-nav-item" id="pdeffyOpenSettings" title="Impostazioni" aria-label="Impostazioni">
-          <span class="pdeffy-nav-icon">${ICONS.settings}</span>
+          <span class="pdeffy-nav-icon">${resolveIcon('settings', base)}</span>
           <span class="pdeffy-nav-label langText" id="navSettings">Impostazioni</span>
         </button>
       </div>
@@ -121,14 +174,29 @@ function wrapBody() {
 
   document.body.classList.add('pdeffy-shell');
   if (isEditor) {
-    document.body.classList.add('pdeffy-editor-mode', 'pdeffy-sidebar-collapsed');
+    // Keep full-width editor chrome, but collapse sidebar only after a PDF is opened.
+    document.body.classList.add('pdeffy-editor-mode');
   }
 
   const main = document.createElement('div');
   main.className = 'pdeffy-main';
 
+  const keepOnBody = new Set([
+    'settingsModal',
+    'settingsIcon',
+    'pdfEditorPasswordModal',
+    'pdeffyAboutModal',
+    'peg-toast',
+  ]);
+
   Array.from(document.body.children)
-    .filter((el) => !['SCRIPT', 'LINK', 'STYLE'].includes(el.tagName))
+    .filter((el) => {
+      if (['SCRIPT', 'LINK', 'STYLE'].includes(el.tagName)) return false;
+      if (el.classList?.contains('pdeffy-sidebar')) return false;
+      if (el.classList?.contains('pdeffy-main')) return false;
+      if (el.id && keepOnBody.has(el.id)) return false;
+      return true;
+    })
     .forEach((el) => main.appendChild(el));
 
   document.body.insertAdjacentHTML('afterbegin', buildSidebar(base, active));
@@ -145,7 +213,7 @@ function wrapBody() {
 
 /** Public helpers for hub pages */
 export function icon(name) {
-  return ICONS[name] || '';
+  return resolveIcon(name) || ICONS[name] || '';
 }
 
 export function getAppBase() {
@@ -162,17 +230,64 @@ export function getRecentDocuments() {
 
 export function pushRecentDocument(entry) {
   if (!entry?.name) return;
-  const list = getRecentDocuments().filter((x) => x.name !== entry.name);
+  const list = getRecentDocuments().filter((x) => {
+    if (entry.path && x.path) return x.path !== entry.path;
+    return x.name !== entry.name;
+  });
   list.unshift({
     name: entry.name,
     openedAt: entry.openedAt || Date.now(),
-    href: entry.href || null,
+    href: entry.href || getPdfEditorHref(),
+    path: entry.path || null,
   });
   localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 12)));
+  if (entry.path) {
+    import('./recentFiles.js')
+      .then((m) => m.rememberPath?.(entry.name, entry.path))
+      .catch(() => { /* ignore */ });
+  }
 }
 
 export function clearRecentDocuments() {
   localStorage.removeItem(RECENT_KEY);
+}
+
+/** Absolute editor URL for recent handoff from any page. */
+export function getPdfEditorHref() {
+  return `${appBase()}functionalities/pdfEditor/pdfEditor.html`;
+}
+
+/**
+ * Open a recent PDF in the editor.
+ * Stashes name/path and navigates; the editor reloads via path or IndexedDB cache.
+ */
+export function openRecentInEditor(doc) {
+  if (!doc?.name && !doc?.path) return false;
+  const payload = { path: doc.path || null, name: doc.name || null };
+
+  try {
+    sessionStorage.setItem(RECENT_OPEN_KEY, JSON.stringify(payload));
+  } catch (_) { /* ignore */ }
+
+  const onEditorPage = /\/pdfEditor\/pdfEditor\.html/i.test(window.location.pathname);
+  if (onEditorPage) {
+    window.dispatchEvent(new CustomEvent('pdeffy:open-recent', { detail: payload }));
+    return true;
+  }
+
+  window.location.href = getPdfEditorHref();
+  return true;
+}
+
+export function consumeRecentOpenRequest() {
+  try {
+    const raw = sessionStorage.getItem(RECENT_OPEN_KEY);
+    if (!raw) return null;
+    sessionStorage.removeItem(RECENT_OPEN_KEY);
+    return JSON.parse(raw);
+  } catch (_) {
+    return null;
+  }
 }
 
 export function ensureStylesheet() {
@@ -210,9 +325,131 @@ export function setSidebarCollapsed(collapsed) {
   document.body.classList.toggle('pdeffy-sidebar-collapsed', !!collapsed);
 }
 
+export function getTheme() {
+  try {
+    const t = localStorage.getItem(THEME_KEY);
+    return t === 'dark' ? 'dark' : 'light';
+  } catch (_) {
+    return 'light';
+  }
+}
+
+export function logoSrcForTheme(theme, base = appBase()) {
+  // flat-light = yellow/white mark for dark UI; flat-dark = yellow/black mark for light UI
+  return theme === 'dark'
+    ? `${base}assets/pdeffy-flat-light.png`
+    : `${base}assets/pdeffy-flat-dark.png`;
+}
+
+export function applyTheme(theme) {
+  const next = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  document.body.setAttribute('data-theme', next);
+  try {
+    localStorage.setItem(THEME_KEY, next);
+  } catch (_) { /* ignore */ }
+
+  const base = appBase();
+  const src = logoSrcForTheme(next, base);
+  document.querySelectorAll('[data-pdeffy-logo]').forEach((img) => {
+    const light = img.dataset.iconLight;
+    const dark = img.dataset.iconDark;
+    if (light && dark) {
+      img.src = next === 'dark' ? dark : light;
+    } else {
+      img.src = src;
+    }
+  });
+  document.querySelectorAll('[data-pdeffy-nav-icon]').forEach((img) => {
+    const nextSrc = next === 'dark' ? img.dataset.iconDark : img.dataset.iconLight;
+    if (nextSrc) img.src = nextSrc;
+  });
+
+  window.dispatchEvent(new CustomEvent('pdeffy:theme-changed', { detail: { theme: next } }));
+  return next;
+}
+
+function ensureAboutModal() {
+  if (document.getElementById('pdeffyAboutModal')) return;
+
+  const base = appBase();
+  document.body.insertAdjacentHTML(
+    'beforeend',
+    `<div class="pdeffy-about-modal" id="pdeffyAboutModal" hidden>
+      <div class="pdeffy-about-dialog" role="dialog" aria-modal="true" aria-labelledby="pdeffyAboutTitle">
+        <img class="pdeffy-about-logo" src="${logoSrcForTheme(getTheme(), base)}" alt="Pdeffy" data-pdeffy-logo data-icon-light="${base}assets/pdeffy-flat-dark.png" data-icon-dark="${base}assets/pdeffy-flat-light.png">
+        <h2 id="pdeffyAboutTitle">Pdeffy</h2>
+        <p class="pdeffy-about-version" id="pdeffyAboutVersion"></p>
+        <p class="pdeffy-about-org">Reindal</p>
+        <p class="pdeffy-about-license"><span class="langText" id="aboutLicenseLabel">License</span>: <strong>MIT</strong></p>
+        <p class="pdeffy-about-web">
+          <a href="https://pdeffy.reindal.com" id="pdeffyAboutWebsite" target="_blank" rel="noopener noreferrer">pdeffy.reindal.com</a>
+        </p>
+        <button type="button" class="pdeffy-btn pdeffy-btn-primary langText" id="aboutClose">Close</button>
+      </div>
+    </div>`
+  );
+
+  const modal = document.getElementById('pdeffyAboutModal');
+  const close = () => modal?.setAttribute('hidden', '');
+  document.getElementById('aboutClose')?.addEventListener('click', close);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) close();
+  });
+
+  document.getElementById('pdeffyAboutWebsite')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const url = 'https://pdeffy.reindal.com';
+    try {
+      const { invoke } = await import('@tauri-apps/api/core');
+      await invoke('open-external-url', { url });
+    } catch (_) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  });
+}
+
+export async function openAboutModal() {
+  ensureAboutModal();
+  applyTheme(getTheme());
+  const modal = document.getElementById('pdeffyAboutModal');
+  const versionEl = document.getElementById('pdeffyAboutVersion');
+  let version = '2.0.0';
+  try {
+    const { getVersion } = await import('@tauri-apps/api/app');
+    version = await getVersion();
+  } catch (_) { /* browser fallback */ }
+  if (versionEl) versionEl.textContent = `v${version}`;
+  if (typeof window.applyLanguage === 'function') {
+    try {
+      window.applyLanguage();
+    } catch (_) { /* ignore */ }
+  }
+  modal?.removeAttribute('hidden');
+}
+
+function wireAboutMenuEvent() {
+  import('@tauri-apps/api/event')
+    .then(({ listen }) => listen('pdeffy-about', () => openAboutModal()))
+    .catch(() => { /* not in Tauri */ });
+  window.addEventListener('pdeffy:open-about', () => openAboutModal());
+}
+
 function boot() {
   ensureStylesheet();
+  applyTheme(getTheme());
   wrapBody();
+  ensureAboutModal();
+  wireAboutMenuEvent();
+  // Re-apply logo after sidebar inject
+  applyTheme(getTheme());
+  document.documentElement.classList.remove('pdeffy-booting');
+  import('./filePicker.js')
+    .then((m) => m.installNativeFilePickers?.())
+    .catch(() => { /* ignore */ });
+  import('./toolWorkspace.js')
+    .then((m) => m.enhanceToolWorkspace?.())
+    .catch(() => { /* ignore */ });
   if (typeof window.applyLanguage === 'function') {
     try {
       window.applyLanguage();
@@ -232,8 +469,15 @@ export default {
   getRecentDocuments,
   pushRecentDocument,
   clearRecentDocuments,
+  openRecentInEditor,
+  consumeRecentOpenRequest,
+  getPdfEditorHref,
   filterToolCards,
   wireHomeSearch,
   setSidebarCollapsed,
+  getTheme,
+  applyTheme,
+  logoSrcForTheme,
+  openAboutModal,
   ICONS,
 };

@@ -57,9 +57,7 @@ if (typeof window.changeLanguage === 'function') {
 async function setMetadata(pdfDoc) {
     // Get metadata from module
     const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
-    if (finalMetadata.author)  pdfDoc.setAuthor(finalMetadata.author);
-    if (finalMetadata.title)   pdfDoc.setTitle(finalMetadata.title);
-    if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
+    CustomMetadataModule.applyToPdfDoc(pdfDoc, finalMetadata);
 }
 
 // Helper to enforce max limits and sync start/end values dynamically

@@ -34,6 +34,29 @@ header {
     font-size: 90%;
 }
 
+/* Tool workspace hero must not inherit the legacy top-bar `header` chrome */
+body.pdeffy-shell .pdeffy-ws-hero,
+body.pdeffy-shell header.pdeffy-ws-hero {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    width: auto;
+    max-width: none;
+    box-shadow: none;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+body.pdeffy-shell .pdeffy-ws-hero h1,
+body.pdeffy-shell header.pdeffy-ws-hero h1 {
+    position: static;
+    left: auto;
+    transform: none;
+    pointer-events: auto;
+}
+
 header h1 {
     position: absolute;
     left: 50%;
@@ -403,32 +426,39 @@ body.pdeffy-shell .settingsIcon {
     fill: var(--reindalDark);
 }
 
-/* Settings modal */
+/* Settings modal — always a centered overlay, never a side dock */
 .settingsModal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 2000;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background-color: rgba(16, 26, 58, 0.45);
+    z-index: 10000;
     justify-content: center;
     align-items: center;
+    padding: 24px;
+    box-sizing: border-box;
 }
 
 .settingsModal.active {
-    display: flex;
+    display: flex !important;
 }
 
 .settingsContent {
-    background-color: var(--reindalLight);
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: rgba(0, 0, 0, 0.36) 0px 6px 12px;
-    max-width: 450px;
-    width: 90%;
-    font-family: var(--font-primary), serif;
+    background-color: var(--pdeffy-surface);
+    padding: 28px;
+    border-radius: 16px;
+    border: 1px solid var(--pdeffy-border);
+    box-shadow: var(--pdeffy-shadow-hover);
+    max-width: 440px;
+    width: min(440px, 100%);
+    max-height: min(90vh, 720px);
+    overflow: auto;
+    font-family: var(--font-primary), system-ui, sans-serif;
+    position: relative;
+    margin: 0 auto;
 }
 
 .settingsContent h2 {
@@ -474,6 +504,22 @@ body.pdeffy-shell .settingsIcon {
     display: flex;
     gap: 10px;
     margin-top: 25px;
+}
+
+.settingsAbout {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.settingsAboutLink {
+    background: none;
+    border: none;
+    color: var(--pdeffy-blue, #3478f6);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9rem;
+    text-decoration: underline;
+    padding: 0;
 }
 
 .settingsBtn {

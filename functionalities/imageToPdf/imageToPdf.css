@@ -43,8 +43,12 @@
     background-color: var(--reindalLight);
     border: 2px solid var(--reindalGray);
     border-radius: 8px;
-    cursor: move;
+    cursor: grab;
     transition: all 0.3s ease;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    gap: 8px;
 }
 
 .imageOrderItem:hover {

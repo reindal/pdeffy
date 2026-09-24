@@ -2,6 +2,7 @@ const { PDFDocument } = require('pdf-lib');
 const fs = require('fs').promises;
 const path = require('path');
 var { ipcRenderer } = require('electron');
+import { enableListReorder, moveArrayItem } from '../../src/ui/listReorder.js';
 const STATUS = '#status';
 
 const form = document.getElementById('imageToPdfForm');
@@ -24,8 +25,8 @@ function updateImagesOrder() {
     selectedImages.forEach((image, index) => {
         const imageOrderItem = document.createElement('div');
         imageOrderItem.className = 'imageOrderItem';
-        imageOrderItem.draggable = true;
-        imageOrderItem.dataset.index = index;
+        imageOrderItem.dataset.reorderItem = '';
+        imageOrderItem.dataset.index = String(index);
 
         // Create preview
         const reader = new FileReader();
@@ -39,72 +40,55 @@ function updateImagesOrder() {
 
         imageOrderItem.innerHTML = `
             <div class="imageOrderIndex">${index + 1}</div>
-            <img class="imageOrderPreview" src="" alt="Preview">
+            <img class="imageOrderPreview" src="" alt="Preview" draggable="false">
             <div class="imageOrderName">${image.name}</div>
+            <div class="pdeffy-ws-move">
+              <button type="button" class="fileOrderMove fileOrderMoveUp" aria-label="Sposta su" title="Sposta su" ${index === 0 ? 'disabled' : ''}>
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 3.5 3.5 9h9L8 3.5Z" fill="currentColor"/></svg>
+              </button>
+              <button type="button" class="fileOrderMove fileOrderMoveDown" aria-label="Sposta giù" title="Sposta giù" ${index === selectedImages.length - 1 ? 'disabled' : ''}>
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 12.5 12.5 7h-9L8 12.5Z" fill="currentColor"/></svg>
+              </button>
+            </div>
             <button type="button" class="imageOrderRemove langText" data-index="${index}">Remove</button>
         `;
 
         const removeBtn = imageOrderItem.querySelector('.imageOrderRemove');
         removeBtn.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             selectedImages.splice(index, 1);
             updateImagesOrder();
             imageFiles.value = '';
         });
 
-        imageOrderItem.addEventListener('dragstart', handleDragStart);
-        imageOrderItem.addEventListener('dragover', handleDragOver);
-        imageOrderItem.addEventListener('drop', handleDrop);
-        imageOrderItem.addEventListener('dragend', handleDragEnd);
-        imageOrderItem.addEventListener('dragleave', handleDragLeave);
+        imageOrderItem.querySelector('.fileOrderMoveUp')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (index <= 0) return;
+            moveArrayItem(selectedImages, index, index - 1);
+            updateImagesOrder();
+        });
+        imageOrderItem.querySelector('.fileOrderMoveDown')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (index >= selectedImages.length - 1) return;
+            moveArrayItem(selectedImages, index, index + 1);
+            updateImagesOrder();
+        });
 
         imagesOrderContainer.appendChild(imageOrderItem);
     });
 }
 
-let draggedItem = null;
-
-function handleDragStart(e) {
-    draggedItem = this;
-    this.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-
-    if (this !== draggedItem) {
-        this.classList.add('dragover');
-    }
-}
-
-function handleDragLeave(e) {
-    this.classList.remove('dragover');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-
-    if (this !== draggedItem) {
-        this.classList.remove('dragover');
-
-        const draggedIndex = parseInt(draggedItem.dataset.index);
-        const targetIndex = parseInt(this.dataset.index);
-
-        const [draggedImage] = selectedImages.splice(draggedIndex, 1);
-        selectedImages.splice(targetIndex, 0, draggedImage);
-
-        updateImagesOrder();
-    }
-}
-
-function handleDragEnd(e) {
-    this.classList.remove('dragging');
-
-    const allItems = document.querySelectorAll('.imageOrderItem');
-    allItems.forEach(item => {
-        item.classList.remove('dragover');
+if (imagesOrderContainer) {
+    enableListReorder(imagesOrderContainer, {
+        itemSelector: '.imageOrderItem',
+        ignoreSelector: 'button, a, input, textarea, select, label, .imageOrderRemove, .fileOrderMove, .pdeffy-ws-move',
+        onReorder(fromIndex, toIndex) {
+            moveArrayItem(selectedImages, fromIndex, toIndex);
+            updateImagesOrder();
+        },
     });
 }
 
@@ -125,9 +109,7 @@ form.addEventListener('submit', async function(e) {
         // Get final metadata from module
         const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
 
-        if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
-        if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
-        if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
+        CustomMetadataModule.applyToPdfDoc(pdfDoc, finalMetadata);
 
         for (const imageFile of selectedImages) {
             const imageBytes = await imageFile.arrayBuffer();

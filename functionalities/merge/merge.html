@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../src/ui/shell.css">
 </head>
 
-<body data-nav="">
+<body data-nav="organize">
     <div class="headerContainer">
         <header>
             <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
@@ -22,32 +22,36 @@
     <main>
         <div class="mergeContainer">
             <h1 id="mergeHeader2" class="langText">Merge PDF Documents</h1>
+            <p class="langText" id="mergePdfDesc" hidden>Merge your PDF documents into single file.</p>
 
             <form id="mergeForm">
                 <div class="formGroup">
                     <label for="pdfFiles" id="mergeSelectLabel" class="langText">Select PDF files (can select
                         multiple):</label>
                     <div class="fileInputWrapper">
-                        <input type="file" id="pdfFiles" accept=".pdf" multiple>
+                        <input type="file" id="pdfFiles" accept=".pdf,application/pdf" multiple>
                         <label for="pdfFiles" class="fileInputLabel langText" id="mergeSelectButton">Click to select
                             files</label>
                     </div>
                 </div>
 
-                <div id="filesOrder" class="filesOrder">
-                    <h3 id="filesOrderTitle" class="langText">Files Order</h3>
+                <div id="filesOrder" class="filesOrder" hidden>
+                    <div class="pdeffy-ws-files-head">
+                        <h3><span id="filesOrderTitle" class="langText">Selected files</span></h3>
+                    </div>
                     <div id="filesOrderContainer"></div>
                     <p class="helpText langText" id="mergeHelpText">Drag to reorder files (top to bottom = first to last
                         in merged PDF)</p>
                 </div>
 
-                <button type="submit" class="submitBtn" id="submitBtn"><span class="langText" id="mergeSubmitBtn">Merge
-                        PDF</span></button>
+                <button type="submit" class="submitBtn" id="submitBtn">
+                    <span class="langText" id="mergeSubmitBtn">Merge PDF</span>
+                </button>
             </form>
 
             <div id="status" class="status"></div>
 
-            <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>
+            <a href="../hubs/organize.html" class="backLink langText" id="backLink">← Back to main page</a>
         </div>
     </main>
 

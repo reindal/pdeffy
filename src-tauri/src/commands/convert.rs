@@ -259,12 +259,16 @@ fn inject_pdf_metadata(path: &Path, metadata: &PdfMetadata) -> Result<(), String
     if !metadata.title.is_empty() {
         info.set("Title", Object::string_literal(metadata.title.clone()));
     }
-    if !metadata.author.is_empty() {
-        info.set("Author", Object::string_literal(metadata.author.clone()));
+    let author = format_author_field(&metadata.author, &metadata.company);
+    if !author.is_empty() {
+        info.set("Author", Object::string_literal(author));
     }
     if !metadata.subject.is_empty() {
         info.set("Subject", Object::string_literal(metadata.subject.clone()));
     }
+    // Application shown by PDF readers
+    info.set("Creator", Object::string_literal("Pdeffy"));
+    info.set("Producer", Object::string_literal("Pdeffy"));
 
     doc.objects
         .insert(info_id, Object::Dictionary(info));
@@ -293,6 +297,10 @@ fn inject_openxml_metadata(path: &Path, metadata: &PdfMetadata) -> Result<(), St
                 if let Ok(text) = String::from_utf8(contents.clone()) {
                     contents = update_core_xml(text, metadata).into_bytes();
                 }
+            } else if name == "docProps/app.xml" {
+                if let Ok(text) = String::from_utf8(contents.clone()) {
+                    contents = update_app_xml(text, metadata).into_bytes();
+                }
             }
 
             writer
@@ -306,12 +314,31 @@ fn inject_openxml_metadata(path: &Path, metadata: &PdfMetadata) -> Result<(), St
     fs::write(path, out_buf.into_inner()).map_err(|e| e.to_string())
 }
 
+fn format_author_field(author: &str, company: &str) -> String {
+    let a = author.trim();
+    let c = company.trim();
+    match (a.is_empty(), c.is_empty()) {
+        (false, false) => format!("{a} — {c}"),
+        (false, true) => a.to_string(),
+        (true, false) => c.to_string(),
+        (true, true) => String::new(),
+    }
+}
+
 fn update_core_xml(xml: String, metadata: &PdfMetadata) -> String {
     let mut out = xml;
     out = update_tag(&out, "dc:title", &metadata.title);
-    out = update_tag(&out, "dc:creator", &metadata.author);
-    out = update_tag(&out, "cp:lastModifiedBy", &metadata.author);
+    let author = format_author_field(&metadata.author, &metadata.company);
+    out = update_tag(&out, "dc:creator", &author);
+    out = update_tag(&out, "cp:lastModifiedBy", &author);
     out = update_tag(&out, "dc:subject", &metadata.subject);
+    out
+}
+
+fn update_app_xml(xml: String, metadata: &PdfMetadata) -> String {
+    // Application / producing tool
+    let mut out = update_tag(&xml, "Application", "Pdeffy");
+    out = update_tag(&out, "Company", &metadata.company);
     out
 }
 
@@ -328,6 +355,11 @@ fn update_tag(xml: &str, tag: &str, value: &str) -> String {
     if re.is_match(xml) {
         re.replace(xml, format!("<{tag}>{safe}</{tag}>"))
             .to_string()
+    } else if xml.contains("</Properties>") {
+        xml.replace(
+            "</Properties>",
+            &format!("  <{tag}>{safe}</{tag}>\n</Properties>"),
+        )
     } else {
         xml.replace(
             "</cp:coreProperties>",

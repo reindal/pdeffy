@@ -6,8 +6,14 @@ use tauri::{AppHandle, Manager};
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct PdfMetadata {
+    #[serde(default)]
     pub author: String,
+    #[serde(default)]
+    pub company: String,
+    /// Kept for per-document custom overrides / older settings files.
+    #[serde(default)]
     pub title: String,
+    #[serde(default)]
     pub subject: String,
 }
 
@@ -62,6 +68,7 @@ pub fn get_pdf_metadata(app: AppHandle) -> Result<PdfMetadata, String> {
 pub fn save_pdf_metadata(app: AppHandle, metadata: PdfMetadata) -> Result<serde_json::Value, String> {
     let settings = PdfMetadata {
         author: metadata.author,
+        company: metadata.company,
         title: metadata.title,
         subject: metadata.subject,
     };

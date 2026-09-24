@@ -145,9 +145,7 @@ form.addEventListener('submit', async function (e) {
         // Inject custom metadata if available
         const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
 
-        if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
-        if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
-        if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
+        CustomMetadataModule.applyToPdfDoc(pdfDoc, finalMetadata);
 
         // Remove pages in descending order to prevent index shifting issues
         const sortedIndices = Array.from(pagesToDelete).sort((a, b) => b - a);

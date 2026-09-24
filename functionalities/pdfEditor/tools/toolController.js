@@ -146,23 +146,6 @@
         }
 
         const panels = {
-            search: () => `
-                <div class="pdfEditorForm">
-                    <label class="langText" id="pdfEditorSearchLabel">${msg('pdfEditorSearchLabel', 'Find in document')}</label>
-                    <input type="text" id="pdfEditorSearchInput" class="pdfEditorInput" placeholder="${msg('pdfEditorSearchPlaceholder', 'Search text...')}" autocomplete="off">
-                    <label class="pdfEditorSearchCheck">
-                        <input type="checkbox" id="pdfEditorSearchCase"> ${msg('pdfEditorSearchCase', 'Match case')}
-                    </label>
-                    <div class="pdfEditorSearchActions">
-                        <button type="button" id="pdfEditorSearchBtn" class="pdfEditorPanelBtn langText">${msg('pdfEditorSearchBtn', 'Search')}</button>
-                    </div>
-                    <div class="pdfEditorSearchNav">
-                        <button type="button" id="pdfEditorSearchPrev" class="pdfEditorPanelBtn" title="${msg('pdfEditorSearchPrev', 'Previous')}">‹</button>
-                        <button type="button" id="pdfEditorSearchNext" class="pdfEditorPanelBtn" title="${msg('pdfEditorSearchNext', 'Next')}">›</button>
-                    </div>
-                    <p id="pdfEditorSearchStatus" class="pdfEditorHint pdfEditorSearchStatus"></p>
-                    <div id="pdfEditorSearchPages" class="pdfEditorSearchPages"></div>
-                </div>`,
             watermark: () => `
                 <div class="pdfEditorForm">
                     <label class="langText" id="watermarkTextLabel">${msg('watermarkTextLabel', 'Watermark text')}</label>
@@ -264,7 +247,10 @@
 
         function refreshWatermarkPreview() {
             PdfEditorOverlayManager.setWatermarkDraft(collectWatermarkDraft());
-            PdfEditorOverlayManager.syncOverlays(model, viewerApi);
+            // Defer until layout has canvas sizes (avoids empty preview right after render).
+            requestAnimationFrame(() => {
+                PdfEditorOverlayManager.syncOverlays(model, viewerApi);
+            });
             if (typeof onExportStateChange === 'function') onExportStateChange();
         }
 
@@ -424,61 +410,6 @@
             }
         }
 
-        function wireSearch() {
-            const input = document.getElementById('pdfEditorSearchInput');
-            const searchBtn = document.getElementById('pdfEditorSearchBtn');
-            const prevBtn = document.getElementById('pdfEditorSearchPrev');
-            const nextBtn = document.getElementById('pdfEditorSearchNext');
-            const caseBox = document.getElementById('pdfEditorSearchCase');
-
-            searchBtn?.addEventListener('click', () => performSearch());
-            input?.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    if (e.shiftKey) {
-                        PdfEditorTextSearch.goToPrev((pageId, displayIndex) => {
-                            if (onGoToPage) onGoToPage(pageId, displayIndex);
-                            updateSearchStatus(PdfEditorTextSearch.getState().count);
-                        });
-                    } else {
-                        const st = PdfEditorTextSearch.getState();
-                        if (st.count > 0) {
-                            PdfEditorTextSearch.goToNext((pageId, displayIndex) => {
-                                if (onGoToPage) onGoToPage(pageId, displayIndex);
-                                updateSearchStatus(st.count);
-                            });
-                        } else {
-                            performSearch();
-                        }
-                    }
-                }
-            });
-
-            caseBox?.addEventListener('change', () => {
-                if (PdfEditorTextSearch.getState().query) performSearch();
-            });
-
-            prevBtn?.addEventListener('click', () => {
-                PdfEditorTextSearch.goToPrev((pageId, displayIndex) => {
-                    if (onGoToPage) onGoToPage(pageId, displayIndex);
-                    updateSearchStatus(PdfEditorTextSearch.getState().count);
-                });
-            });
-
-            nextBtn?.addEventListener('click', () => {
-                PdfEditorTextSearch.goToNext((pageId, displayIndex) => {
-                    if (onGoToPage) onGoToPage(pageId, displayIndex);
-                    updateSearchStatus(PdfEditorTextSearch.getState().count);
-                });
-            });
-
-            const st = PdfEditorTextSearch.getState();
-            if (st.query && input) {
-                input.value = st.query;
-                updateSearchStatus(st.count);
-            }
-        }
-
         function wireSignature() {
             const canvas = document.getElementById('pdfEditorSigCanvas');
             const ctx = canvas?.getContext('2d');
@@ -571,23 +502,16 @@
             if (tool !== 'watermark') {
                 PdfEditorOverlayManager.setWatermarkDraft(null);
             }
-            if (tool !== 'search') {
-                PdfEditorTextSearch.clear();
-            }
 
             toolBodyEl.innerHTML = panels[tool] ? panels[tool]() : '';
             if (typeof window.applyLanguage === 'function') window.applyLanguage();
 
-            if (tool === 'search') wireSearch();
             if (tool === 'watermark') wireWatermark();
             if (tool === 'redact') wireRedact();
             if (tool === 'signature') wireSignature();
 
             PdfEditorOverlayManager.syncOverlays(model, viewerApi);
             if (typeof onExportStateChange === 'function') onExportStateChange();
-            if (tool === 'search' && PdfEditorTextSearch.getState().query) {
-                performSearch();
-            }
         }
 
         function onViewerRendered() {
@@ -595,8 +519,10 @@
                 onModelChange();
                 if (activeTool === 'redact') renderRedactList();
             });
-            PdfEditorOverlayManager.syncOverlays(model, viewerApi);
-            if (activeTool === 'search' && PdfEditorTextSearch.getState().query) {
+            requestAnimationFrame(() => {
+                PdfEditorOverlayManager.syncOverlays(model, viewerApi);
+            });
+            if (PdfEditorTextSearch.getState().query) {
                 const zoom = viewerApi?.getZoomPercent?.() ?? 100;
                 PdfEditorTextSearch.runSearch(model, getPdfPage, zoom, PdfEditorTextSearch.getState().query).then(
                     ({ count }) => {
@@ -609,7 +535,65 @@
 
         function onDocumentLoaded() {
             PdfEditorTextSearch.clear();
-            switchTool(activeTool);
+            updateSearchStatus(0);
+            const input = document.getElementById('pdfEditorSearchInput');
+            if (input) input.value = '';
+            switchTool(activeTool === 'search' ? 'watermark' : activeTool);
+        }
+
+        let searchWired = false;
+
+        function wireSearch() {
+            if (searchWired) return;
+            const input = document.getElementById('pdfEditorSearchInput');
+            const searchBtn = document.getElementById('pdfEditorSearchBtn');
+            const prevBtn = document.getElementById('pdfEditorSearchPrev');
+            const nextBtn = document.getElementById('pdfEditorSearchNext');
+            const caseBox = document.getElementById('pdfEditorSearchCase');
+            if (!input || !searchBtn) return;
+            searchWired = true;
+            input.placeholder = msg('pdfEditorSearchPlaceholder', 'Search text...');
+
+            searchBtn.addEventListener('click', () => performSearch());
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        PdfEditorTextSearch.goToPrev((pageId, displayIndex) => {
+                            if (onGoToPage) onGoToPage(pageId, displayIndex);
+                            updateSearchStatus(PdfEditorTextSearch.getState().count);
+                        });
+                    } else {
+                        const st = PdfEditorTextSearch.getState();
+                        if (st.count > 0) {
+                            PdfEditorTextSearch.goToNext((pageId, displayIndex) => {
+                                if (onGoToPage) onGoToPage(pageId, displayIndex);
+                                updateSearchStatus(st.count);
+                            });
+                        } else {
+                            performSearch();
+                        }
+                    }
+                }
+            });
+
+            caseBox?.addEventListener('change', () => {
+                if (PdfEditorTextSearch.getState().query) performSearch();
+            });
+
+            prevBtn?.addEventListener('click', () => {
+                PdfEditorTextSearch.goToPrev((pageId, displayIndex) => {
+                    if (onGoToPage) onGoToPage(pageId, displayIndex);
+                    updateSearchStatus(PdfEditorTextSearch.getState().count);
+                });
+            });
+
+            nextBtn?.addEventListener('click', () => {
+                PdfEditorTextSearch.goToNext((pageId, displayIndex) => {
+                    if (onGoToPage) onGoToPage(pageId, displayIndex);
+                    updateSearchStatus(PdfEditorTextSearch.getState().count);
+                });
+            });
         }
 
         function initTabs() {
@@ -622,6 +606,7 @@
                     switchTool(tab.dataset.tool);
                 });
             });
+            wireSearch();
             switchTool('watermark');
         }
 

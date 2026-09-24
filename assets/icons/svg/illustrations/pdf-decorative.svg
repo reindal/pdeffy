@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240" fill="none" role="img" aria-label="Illustrazione PDF decorativa">
+  <!-- soft yellow rays -->
+  <g stroke="#FFD91A" stroke-width="3" stroke-linecap="round" opacity="0.9">
+    <path d="M118 52v-18"/>
+    <path d="M98 62 86 48"/>
+    <path d="M138 62l12-14"/>
+    <path d="M88 88H70"/>
+    <path d="M148 88h18"/>
+  </g>
+  <!-- back doc (pink) -->
+  <rect x="168" y="48" width="118" height="148" rx="18" transform="rotate(8 168 48)" fill="#FFD0D8" stroke="#101A3A" stroke-width="2.2"/>
+  <rect x="186" y="78" width="58" height="10" rx="5" transform="rotate(8 186 78)" fill="#FF4D67"/>
+  <rect x="184" y="100" width="72" height="7" rx="3.5" transform="rotate(8 184 100)" fill="#FFFFFF" opacity="0.7"/>
+  <rect x="182" y="118" width="56" height="7" rx="3.5" transform="rotate(8 182 118)" fill="#FFFFFF" opacity="0.55"/>
+  <!-- front doc (white) -->
+  <rect x="78" y="42" width="130" height="162" rx="18" fill="#FFFFFF" stroke="#101A3A" stroke-width="2.4"/>
+  <path d="M170 42v28h28" fill="#FFF3A6" stroke="#101A3A" stroke-width="2.4" stroke-linejoin="round"/>
+  <!-- red PDF badge -->
+  <rect x="108" y="88" width="54" height="36" rx="8" fill="#FF4D67"/>
+  <text x="135" y="111" text-anchor="middle" fill="#FFFFFF" font-family="system-ui,sans-serif" font-size="12" font-weight="700">PDF</text>
+  <rect x="108" y="140" width="78" height="8" rx="4" fill="#E7E7E2"/>
+  <rect x="108" y="158" width="62" height="8" rx="4" fill="#E7E7E2"/>
+  <rect x="108" y="176" width="48" height="8" rx="4" fill="#E7E7E2"/>
+</svg>

@@ -1,47 +1,41 @@
+@import url('./styles/design-tokens.css');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
 :root {
-    /* —— Design system (Fase 7) —— */
-    --pdeffy-bg: #fffcf3;
-    --pdeffy-surface: #ffffff;
-    --pdeffy-sidebar: #fffdf8;
-    --pdeffy-primary: #ffd91a;
-    --pdeffy-primary-hover: #f2c900;
-    --pdeffy-text: #101a3a;
-    --pdeffy-text-muted: #52617a;
-    --pdeffy-border: #e7e7e2;
+    /* Bridge pack tokens → existing app variable names */
+    --pdeffy-bg: var(--pdeffy-color-bg);
+    --pdeffy-surface: var(--pdeffy-color-surface);
+    --pdeffy-sidebar: var(--pdeffy-color-sidebar);
+    --pdeffy-primary: var(--pdeffy-color-primary);
+    --pdeffy-primary-hover: var(--pdeffy-color-primary-hover);
+    --pdeffy-text: var(--pdeffy-color-text);
+    --pdeffy-text-muted: var(--pdeffy-color-text-muted);
+    --pdeffy-border: var(--pdeffy-color-border);
 
-    --pdeffy-blue: #3478f6;
-    --pdeffy-pink: #f54c9b;
-    --pdeffy-purple: #a94cf5;
-    --pdeffy-green: #24c875;
-    --pdeffy-orange: #ff922b;
-    --pdeffy-cyan: #2dd4bf;
-    --pdeffy-red: #ff4d67;
+    --pdeffy-blue: var(--pdeffy-color-blue);
+    --pdeffy-pink: var(--pdeffy-color-pink);
+    --pdeffy-purple: var(--pdeffy-color-purple);
+    --pdeffy-green: var(--pdeffy-color-green);
+    --pdeffy-orange: var(--pdeffy-color-orange);
+    --pdeffy-cyan: var(--pdeffy-color-cyan);
+    --pdeffy-red: var(--pdeffy-color-red);
 
-    --pdeffy-radius-card: 16px;
-    --pdeffy-radius-btn: 11px;
-    --pdeffy-radius-input: 11px;
-    --pdeffy-radius-pill: 14px;
+    --pdeffy-radius-card: var(--pdeffy-radius-lg);
+    --pdeffy-radius-btn: var(--pdeffy-radius-sm);
+    --pdeffy-radius-input: var(--pdeffy-radius-sm);
 
-    --pdeffy-shadow: 0 1px 2px rgba(16, 26, 58, 0.04), 0 4px 16px rgba(16, 26, 58, 0.04);
-    --pdeffy-shadow-hover: 0 2px 6px rgba(16, 26, 58, 0.06), 0 8px 24px rgba(16, 26, 58, 0.06);
+    --pdeffy-shadow: var(--pdeffy-shadow-sm);
+    --pdeffy-shadow-hover: var(--pdeffy-shadow-md);
 
-    --pdeffy-sidebar-w: 200px;
-    --pdeffy-sidebar-collapsed: 60px;
-    --pdeffy-space-1: 4px;
-    --pdeffy-space-2: 8px;
-    --pdeffy-space-3: 12px;
-    --pdeffy-space-4: 16px;
-    --pdeffy-space-5: 24px;
-    --pdeffy-space-6: 32px;
+    --pdeffy-sidebar-w: var(--pdeffy-sidebar-width);
+    --pdeffy-sidebar-collapsed: var(--pdeffy-sidebar-collapsed-width);
 
     --pdeffy-ease: 140ms ease;
     --pdeffy-ease-sidebar: 180ms ease;
 
-    --font-primary: 'Poppins', system-ui, sans-serif;
+    --font-primary: 'Poppins', var(--pdeffy-font-sans);
 
-    /* —— Legacy aliases (compat tool pages) —— */
+    /* Legacy aliases (compat tool pages) */
     --reindalYellow: var(--pdeffy-primary);
     --reindalLightYellow: #ffe96a;
     --reindalYellowHover: var(--pdeffy-primary-hover);
@@ -62,4 +56,43 @@
     --reindalLightPink: #f8d7da;
     --reindalWineRed: #721c24;
     --reindalPink: #f5c6cb;
+}
+
+html[data-theme="dark"],
+body[data-theme="dark"] {
+    color-scheme: dark;
+
+    --pdeffy-color-bg: #12151f;
+    --pdeffy-color-bg-soft: #1a1f2c;
+    --pdeffy-color-sidebar: #161a26;
+    --pdeffy-color-surface: #1c2130;
+    --pdeffy-color-surface-raised: #232938;
+    --pdeffy-color-surface-muted: #1a1f2c;
+
+    --pdeffy-color-text: #f4f6fb;
+    --pdeffy-color-text-muted: #9aa6bd;
+    --pdeffy-color-text-soft: #7b869c;
+    --pdeffy-color-border: #2c3345;
+    --pdeffy-color-border-strong: #3a4258;
+
+    --pdeffy-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.24);
+    --pdeffy-shadow-sm: 0 8px 22px rgba(0, 0, 0, 0.28);
+    --pdeffy-shadow-md: 0 18px 48px rgba(0, 0, 0, 0.32);
+    --pdeffy-shadow-focus: 0 0 0 4px rgb(255 217 26 / 0.28);
+
+    --pdeffy-bg: var(--pdeffy-color-bg);
+    --pdeffy-surface: var(--pdeffy-color-surface);
+    --pdeffy-sidebar: var(--pdeffy-color-sidebar);
+    --pdeffy-text: var(--pdeffy-color-text);
+    --pdeffy-text-muted: var(--pdeffy-color-text-muted);
+    --pdeffy-border: var(--pdeffy-color-border);
+    --pdeffy-shadow: var(--pdeffy-shadow-sm);
+    --pdeffy-shadow-hover: var(--pdeffy-shadow-md);
+
+    --reindalLight: var(--pdeffy-bg);
+    --reindalExtraLight: var(--pdeffy-sidebar);
+    --reindalGray: var(--pdeffy-text-muted);
+    --reindalDark: var(--pdeffy-text);
+    --reindalBody: var(--pdeffy-surface);
+    --reindalGrayLight: var(--pdeffy-border);
 }

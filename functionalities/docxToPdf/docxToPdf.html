@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../src/ui/shell.css">
 </head>
 
-<body data-nav="">
+<body data-nav="convert">
     <div class="headerContainer">
         <header>
             <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
@@ -27,7 +27,7 @@
                 <div class="formGroup">
                     <label for="docxFile" id="docxToPdfSelectLabel" class="langText">Select Word file (.docx):</label>
                     <div class="fileInputWrapper">
-                        <input type="file" id="docxFile" accept=".docx" required>
+                        <input type="file" id="docxFile" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
                         <label for="docxFile" class="fileInputLabel langText" id="docxToPdfSelectButton">Click to select
                             file</label>
                     </div>

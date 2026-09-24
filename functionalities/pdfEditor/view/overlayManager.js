@@ -14,11 +14,18 @@
     const MIN_BOX_PX = 24;
 
     function getOverlaySize(overlay) {
+        // Prefer CSS box of the overlay (matches visual canvas after max-width scaling).
+        const w = overlay.clientWidth;
+        const h = overlay.clientHeight;
+        if (w > 1 && h > 1) return { w, h };
         const canvas = overlay.parentElement?.querySelector('canvas');
         if (canvas) {
-            return { w: canvas.width, h: canvas.height };
+            return {
+                w: canvas.clientWidth || canvas.width || 1,
+                h: canvas.clientHeight || canvas.height || 1,
+            };
         }
-        return { w: overlay.clientWidth || 1, h: overlay.clientHeight || 1 };
+        return { w: 1, h: 1 };
     }
 
     function getPdfScale(overlay) {

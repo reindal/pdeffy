@@ -15,25 +15,28 @@
     <main class="pdfEditorContainer">
         <div id="pdfEditorDropZone" class="pdeffy-dropzone pdfEditorDropZone">
             <div class="pdeffy-dropzone-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5M8 8l4-4 4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+                <img src="../../assets/icons/svg/pdf-tools/edit-pdf.svg" alt="" width="56" height="56">
             </div>
-            <header class="pdeffy-page-header" style="margin-bottom:8px;text-align:center;width:100%;">
-                <h1 style="justify-content:center;">
-                    <span class="pdeffy-page-header-icon accent-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg></span>
-                    <span class="langText" id="pdfEditorTitle">Modifica PDF</span>
-                </h1>
-                <p class="langText" id="editHubSubtitle">Apri un PDF per modificarlo: aggiungi elementi, filigrana, censura e firma.</p>
-            </header>
+            <h1 class="pdfEditorDropTitle langText" id="pdfEditorTitle">Modifica PDF</h1>
+            <p class="pdfEditorDropSubtitle langText" id="editHubSubtitle">Apri un PDF per modificarlo: aggiungi elementi, filigrana, censura e firma.</p>
             <p id="pdfEditorDropHint" class="langText">Trascina un PDF qui o clicca per sfogliare</p>
             <input type="file" id="pdfEditorFileInput" accept=".pdf,application/pdf" hidden>
             <label for="pdfEditorFileInput" class="pdeffy-btn pdeffy-btn-primary langText" id="pdfEditorOpenPdf">Apri PDF</label>
             <p class="pdeffy-dropzone-hint langText" id="editSizeHint">Supporta file fino a 100 MB</p>
         </div>
 
+        <section id="pdfEditorRecent" class="pdfEditorRecent" aria-label="Recenti">
+            <div class="pdfEditorRecentHeader">
+                <h2 class="langText" id="editRecentTitle">Recenti</h2>
+                <a class="pdeffy-btn pdeffy-btn-ghost" href="../hubs/recent.html" id="editRecentSeeAll">→</a>
+            </div>
+            <div class="pdeffy-recent-list" id="pdfEditorRecentList"></div>
+            <p class="pdeffy-empty-hint langText" id="editRecentEmpty" style="display:none;">Nessun PDF recente.</p>
+        </section>
+
         <div id="pdfEditorWorkspace" class="pdfEditorWorkspace">
             <div class="pdfEditorTopBar">
                 <div class="pdfEditorTopBarLeft">
-                    <a href="../../index.html" class="pdeffy-btn pdeffy-btn-ghost langText" id="pdfEditorBackHome">Torna alla Home</a>
                     <span id="pdfEditorFileName" class="fileName"></span>
                 </div>
                 <div class="pdfEditorTopBarActions">
@@ -57,9 +60,22 @@
                         <button type="button" id="pdfEditorZoomFit" class="toolBtn langText">Adatta larghezza</button>
                         <button type="button" id="pdfEditorViewSingle" class="toolBtn active langText">Pagina singola</button>
                         <button type="button" id="pdfEditorViewContinuous" class="toolBtn langText">Scorrimento continuo</button>
+                        <span class="pdfEditorToolbarSep" aria-hidden="true"></span>
                         <button type="button" id="pdfEditorPrevPage" class="toolBtn pdfEditorNavBtn" title="Previous page" aria-label="Previous page">‹</button>
                         <button type="button" id="pdfEditorNextPage" class="toolBtn pdfEditorNavBtn" title="Next page" aria-label="Next page">›</button>
                         <span id="pdfEditorPageIndicator" class="pdfEditorPageIndicator">1 / 1</span>
+                        <span class="pdfEditorToolbarSep" aria-hidden="true"></span>
+                        <div class="pdfEditorToolbarSearch" role="search">
+                            <input type="search" id="pdfEditorSearchInput" class="pdfEditorToolbarSearchInput" placeholder="Cerca…" autocomplete="off">
+                            <label class="pdfEditorToolbarSearchCase" title="Match case">
+                                <input type="checkbox" id="pdfEditorSearchCase" aria-label="Match case">
+                                <span aria-hidden="true">Aa</span>
+                            </label>
+                            <button type="button" id="pdfEditorSearchBtn" class="toolBtn langText">Cerca</button>
+                            <button type="button" id="pdfEditorSearchPrev" class="toolBtn" title="Previous">‹</button>
+                            <button type="button" id="pdfEditorSearchNext" class="toolBtn" title="Next">›</button>
+                            <span id="pdfEditorSearchStatus" class="pdfEditorToolbarSearchStatus"></span>
+                        </div>
                     </div>
                     <div id="pdfEditorViewerSingle" class="pdfEditorViewerSingle"></div>
                     <div id="pdfEditorViewerScroll" class="pdfEditorViewerScroll"></div>
@@ -68,7 +84,6 @@
                 <aside class="pdfEditorToolsPanel" id="pdfEditorToolsPanel">
                     <button type="button" class="pdfEditorPropsToggle" id="pdfEditorPropsToggle" aria-label="Collapse properties" title="Pannello">‹</button>
                     <div class="pdfEditorToolTabs">
-                        <button type="button" class="pdfEditorToolTab langText" data-tool="search" id="pdfEditorToolSearch">Cerca</button>
                         <button type="button" class="pdfEditorToolTab active langText" data-tool="watermark" id="pdfEditorToolWatermark">Filigrana</button>
                         <button type="button" class="pdfEditorToolTab langText" data-tool="redact" id="pdfEditorToolRedact">Censura</button>
                         <button type="button" class="pdfEditorToolTab langText" data-tool="signature" id="pdfEditorToolSignature">Firma</button>
@@ -79,9 +94,21 @@
         </div>
     </main>
 
+    <div id="pdfEditorPasswordModal" class="pdfEditorPasswordModal" hidden>
+        <div class="pdfEditorPasswordDialog" role="dialog" aria-modal="true" aria-labelledby="pdfEditorPasswordTitle">
+            <h3 id="pdfEditorPasswordTitle" class="langText">PDF protetto</h3>
+            <p id="pdfEditorPasswordHint" class="langText">Inserisci la password per aprire questo PDF.</p>
+            <input type="password" id="pdfEditorPasswordInput" class="pdfEditorInput" autocomplete="current-password">
+            <p id="pdfEditorPasswordError" class="pdfEditorPasswordError" hidden></p>
+            <div class="pdfEditorPasswordActions">
+                <button type="button" id="pdfEditorPasswordCancel" class="pdeffy-btn pdeffy-btn-ghost langText">Annulla</button>
+                <button type="button" id="pdfEditorPasswordOk" class="pdeffy-btn pdeffy-btn-primary langText">Apri</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="../../changeLang.js"></script>
     <script type="module" src="../statusManager.js"></script>
-    <script type="module" src="../pdfEncryptionGuard.js"></script>
     <script type="module" src="../../settings.js"></script>
     <script type="module" src="../customMetadata.js"></script>
     <script type="module" src="/src/platform/pdfjs-setup.js"></script>

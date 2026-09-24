@@ -1,0 +1,103 @@
+:root {
+  color-scheme: light;
+
+  --pdeffy-color-bg: #fffcf3;
+  --pdeffy-color-bg-soft: #fff8df;
+  --pdeffy-color-sidebar: #fffdf8;
+  --pdeffy-color-surface: #ffffff;
+  --pdeffy-color-surface-raised: #ffffff;
+  --pdeffy-color-surface-muted: #f8f5eb;
+
+  --pdeffy-color-text: #101a3a;
+  --pdeffy-color-text-muted: #52617a;
+  --pdeffy-color-text-soft: #7a8497;
+  --pdeffy-color-border: #e7e7e2;
+  --pdeffy-color-border-strong: #ccd2df;
+
+  --pdeffy-color-primary: #ffd91a;
+  --pdeffy-color-primary-hover: #f2c900;
+  --pdeffy-color-primary-soft: #fff3a6;
+  --pdeffy-color-primary-pressed: #dfb700;
+
+  --pdeffy-color-blue: #3478f6;
+  --pdeffy-color-pink: #f54c9b;
+  --pdeffy-color-purple: #a94cf5;
+  --pdeffy-color-green: #24c875;
+  --pdeffy-color-orange: #ff922b;
+  --pdeffy-color-cyan: #2dd4bf;
+  --pdeffy-color-red: #ff4d67;
+
+  --pdeffy-radius-xs: 6px;
+  --pdeffy-radius-sm: 10px;
+  --pdeffy-radius-md: 14px;
+  --pdeffy-radius-lg: 18px;
+  --pdeffy-radius-xl: 24px;
+  --pdeffy-radius-pill: 999px;
+
+  --pdeffy-shadow-xs: 0 1px 2px rgb(16 26 58 / 0.06);
+  --pdeffy-shadow-sm: 0 8px 22px rgb(16 26 58 / 0.08);
+  --pdeffy-shadow-md: 0 18px 48px rgb(16 26 58 / 0.12);
+  --pdeffy-shadow-focus: 0 0 0 4px rgb(255 217 26 / 0.32);
+
+  --pdeffy-space-1: 4px;
+  --pdeffy-space-2: 8px;
+  --pdeffy-space-3: 12px;
+  --pdeffy-space-4: 16px;
+  --pdeffy-space-5: 20px;
+  --pdeffy-space-6: 24px;
+  --pdeffy-space-8: 32px;
+  --pdeffy-space-10: 40px;
+  --pdeffy-space-12: 48px;
+
+  --pdeffy-sidebar-width: 224px;
+  --pdeffy-sidebar-collapsed-width: 64px;
+  --pdeffy-editor-thumbnails-width: 160px;
+  --pdeffy-editor-properties-width: 280px;
+  --pdeffy-topbar-height: 64px;
+
+  --pdeffy-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pdeffy-font-size-xs: 12px;
+  --pdeffy-font-size-sm: 14px;
+  --pdeffy-font-size-md: 16px;
+  --pdeffy-font-size-lg: 20px;
+  --pdeffy-font-size-xl: 28px;
+  --pdeffy-font-size-2xl: 40px;
+  --pdeffy-line-height-tight: 1.15;
+  --pdeffy-line-height-normal: 1.45;
+  --pdeffy-font-weight-regular: 400;
+  --pdeffy-font-weight-medium: 600;
+  --pdeffy-font-weight-bold: 750;
+}
+
+.pdeffy-theme {
+  min-height: 100vh;
+  background: var(--pdeffy-color-bg);
+  color: var(--pdeffy-color-text);
+  font-family: var(--pdeffy-font-sans);
+  font-size: var(--pdeffy-font-size-md);
+  line-height: var(--pdeffy-line-height-normal);
+}
+
+.pdeffy-card {
+  background: var(--pdeffy-color-surface);
+  border: 1px solid var(--pdeffy-color-border);
+  border-radius: var(--pdeffy-radius-lg);
+  box-shadow: var(--pdeffy-shadow-sm);
+}
+
+.pdeffy-button-primary {
+  background: var(--pdeffy-color-primary);
+  color: var(--pdeffy-color-text);
+  border: 1px solid transparent;
+  border-radius: var(--pdeffy-radius-sm);
+  font-weight: var(--pdeffy-font-weight-bold);
+}
+
+.pdeffy-button-primary:hover {
+  background: var(--pdeffy-color-primary-hover);
+}
+
+.pdeffy-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: var(--pdeffy-shadow-focus);
+}

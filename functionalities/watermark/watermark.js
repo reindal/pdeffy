@@ -757,9 +757,7 @@ async function renderWatermarkedPdfBytes(fileBuffer, metadata) {
     const outDoc = await PDFDocument.create();
     const renderScale = 2;
 
-    if (metadata.author) outDoc.setAuthor(metadata.author);
-    if (metadata.title) outDoc.setTitle(metadata.title);
-    if (metadata.subject) outDoc.setSubject(metadata.subject);
+    CustomMetadataModule.applyToPdfDoc(outDoc, metadata);
 
     for (let pageNumber = 1; pageNumber <= sourcePdf.numPages; pageNumber++) {
         const sourcePage = await sourcePdf.getPage(pageNumber);

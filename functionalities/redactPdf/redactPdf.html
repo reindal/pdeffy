@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../src/ui/shell.css">
 </head>
 
-<body data-nav="">
+<body data-nav="edit">
     <div class="headerContainer">
         <header>
             <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
@@ -27,7 +27,7 @@
                 <div class="formGroup fileSelectGroup">
                     <label for="pdfFile" id="redactSelectLabel" class="langText" data-i18n="selectPdfFile">Select PDF file:</label>
                     <div class="fileInputWrapper">
-                        <input type="file" id="pdfFile" accept=".pdf" required>
+                        <input type="file" id="pdfFile" accept=".pdf,application/pdf" required>
                         <label for="pdfFile" class="fileInputLabel langText" id="redactSelectButton" data-i18n="clickToSelectFile">Click to select file</label>
                     </div>
                 </div>

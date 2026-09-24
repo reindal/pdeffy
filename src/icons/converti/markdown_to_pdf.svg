@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-hidden="true">
+<rect x="5" y="5" width="54" height="54" rx="12" fill="#F4E8FF"/><path d="M15 11h16l6 6v24a5 5 0 0 1-5 5H15a5 5 0 0 1-5-5V16a5 5 0 0 1 5-5Z" fill="#A94CF5" stroke="#101A3A" stroke-width="2" stroke-linejoin="round"/>
+<path d="M31 11v6h6" fill="none" stroke="#101A3A" stroke-width="2" stroke-linejoin="round"/><path d="M15 21v12M15 21l5 7 5-7v12M29 21v12M26 30l3 3 3-3" fill="none" stroke="#101A3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M36 19h14l6 6v22a5 5 0 0 1-5 5H36a5 5 0 0 1-5-5V24a5 5 0 0 1 5-5Z" fill="#FFFFFF" stroke="#101A3A" stroke-width="2" stroke-linejoin="round"/>
+<path d="M50 19v6h6" fill="none" stroke="#101A3A" stroke-width="2" stroke-linejoin="round"/><path d="M37 34h13M37 39h9" stroke="#FF4D67" stroke-width="2.2" stroke-linecap="round"/>
+<circle cx="32" cy="34" r="8" fill="#101A3A" stroke="#FFFFFF" stroke-width="2"/>
+<g fill="none" stroke="#101A3A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M28 34h8m-3-3 3 3-3 3" stroke="#FFFFFF"/></g>
+</svg>

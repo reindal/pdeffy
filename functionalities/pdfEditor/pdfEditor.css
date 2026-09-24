@@ -25,12 +25,18 @@ body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
     width: 100%;
     flex: 1;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .pdfEditorDropZone.pdeffy-dropzone {
     cursor: pointer;
-    margin: 8px auto;
-    max-width: 720px;
+    margin: 0;
+    max-width: none;
+    width: 100%;
+    flex: 1;
+    min-height: calc(100vh - 48px);
+    justify-content: center;
 }
 
 .pdfEditorDropZone.dragover,
@@ -165,6 +171,63 @@ body.pdfEditorPropsCollapsed .pdfEditorMain {
     flex-shrink: 0;
 }
 
+.pdfEditorToolbarSep {
+    width: 1px;
+    height: 22px;
+    background: var(--pdeffy-border);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+.pdfEditorToolbarSearch {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1 1 220px;
+    min-width: 180px;
+    max-width: 420px;
+}
+
+.pdfEditorToolbarSearchInput {
+    flex: 1 1 auto;
+    min-width: 100px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1px solid var(--pdeffy-border);
+    background: var(--pdeffy-bg, var(--pdeffy-surface));
+    color: var(--pdeffy-text);
+    font: inherit;
+    font-size: 0.85rem;
+}
+
+.pdfEditorToolbarSearchCase {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 8px;
+    border: 1px solid var(--pdeffy-border);
+    background: var(--pdeffy-surface);
+    color: var(--pdeffy-text-muted);
+    font-size: 0.75rem;
+    font-weight: 650;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pdfEditorToolbarSearchCase input {
+    margin: 0;
+}
+
+.pdfEditorToolbarSearchStatus {
+    font-size: 0.75rem;
+    color: var(--pdeffy-text-muted);
+    white-space: nowrap;
+    min-width: 3.5rem;
+}
+
 .toolBtn {
     min-height: 32px;
     padding: 0 10px;
@@ -269,32 +332,54 @@ body.pdfEditorPropsCollapsed .pdfEditorPropsToggle {
 .pdfEditorInput,
 .pdfEditorForm input[type="text"],
 .pdfEditorForm input[type="number"],
+.pdfEditorForm input[type="password"],
+.pdfEditorForm input[type="file"],
 .pdfEditorForm select,
 .pdfEditorForm textarea {
     width: 100%;
     border: 1px solid var(--pdeffy-border);
-    border-radius: var(--pdeffy-radius-input);
+    border-radius: var(--pdeffy-radius-input, 10px);
     padding: 8px 10px;
     font-family: inherit;
+    font-size: 0.85rem;
     margin-bottom: 8px;
-    background: var(--pdeffy-surface);
+    background: var(--pdeffy-surface, #fff);
+    color: var(--pdeffy-text);
+    box-sizing: border-box;
+}
+
+.pdfEditorForm input[type="range"] {
+    width: 100%;
+    margin: 4px 0 12px;
+    accent-color: var(--pdeffy-blue, #3478f6);
+}
+
+.pdfEditorForm input[type="color"] {
+    width: 100%;
+    height: 36px;
+    padding: 2px;
+    border: 1px solid var(--pdeffy-border);
+    border-radius: 8px;
+    background: #fff;
 }
 
 .pdfEditorPanelBtn {
     width: 100%;
     margin-top: 6px;
     min-height: 36px;
-    border-radius: var(--pdeffy-radius-btn);
+    border-radius: var(--pdeffy-radius-btn, 999px);
     border: 1px solid var(--pdeffy-border);
-    background: var(--pdeffy-bg);
+    background: var(--pdeffy-bg, #fdfbf7);
     font-family: inherit;
     font-weight: 600;
+    font-size: 0.85rem;
     cursor: pointer;
+    color: var(--pdeffy-text);
 }
 
 .pdfEditorPanelBtn:hover {
-    background: var(--pdeffy-primary);
-    border-color: var(--pdeffy-primary);
+    background: var(--pdeffy-primary, #ffd91a);
+    border-color: var(--pdeffy-primary, #ffd91a);
 }
 
 .pdfEditorBarBtn,
@@ -320,4 +405,386 @@ body.pdfEditorPropsCollapsed .pdfEditorPropsToggle {
     .pdfEditorToolsPanel {
         /* keep available via toggle later if needed */
     }
+}
+
+/* —— Restored overlay / thumb / form styles (needed for watermark preview) —— */
+.pdfEditorThumbItem {
+    position: relative;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pdfEditorThumbItem.dragging { opacity: 0.5; }
+.pdfEditorThumbItem.drag-over { border-color: var(--pdeffy-text-muted); }
+.pdfEditorThumbDrag {
+    font-size: 12px;
+    color: var(--pdeffy-text-muted);
+    cursor: grab;
+    text-align: center;
+    user-select: none;
+}
+.pdfEditorThumbCanvasWrap {
+    display: flex;
+    justify-content: center;
+    background: #f5f5f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.pdfEditorThumbCanvasWrap canvas { max-width: 100%; height: auto; display: block; }
+.pdfEditorThumbBadge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--pdeffy-text);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 999px;
+}
+.pdfEditorThumbActions {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 6px;
+}
+.pdfEditorThumbBtn {
+    border: 1px solid var(--pdeffy-border);
+    background: #fff;
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.pdfEditorThumbBtn:hover { background: var(--pdeffy-primary); }
+.pdfEditorThumbBtnDanger:hover { background: #ffd0d6; }
+
+.pdfEditorPageFrame {
+    position: relative;
+    margin: 0 auto 20px;
+    width: fit-content;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: none;
+    background: transparent;
+}
+.pdfEditorPageFrame canvas {
+    display: block;
+    box-shadow: var(--pdeffy-shadow);
+    background: #fff;
+}
+.pdfEditorPageLabel {
+    font-size: 12px;
+    color: var(--pdeffy-text-muted);
+    margin-bottom: 6px;
+}
+.pdfEditorPageCanvasWrap {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+    max-width: 100%;
+}
+.pdfEditorPageCanvasWrap canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.pdfEditorSearchLayer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.pdfEditorOverlayLayer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+.pdfEditorOverlayLayer.pdfEditorOverlayActive,
+.pdfEditorOverlayLayer.pdfEditorOverlaySigActive {
+    pointer-events: auto;
+    cursor: crosshair;
+}
+
+.pdfEditorWatermarkLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+}
+.pdfEditorWatermarkItem {
+    position: absolute;
+    white-space: nowrap;
+    font-weight: 700;
+    pointer-events: none;
+    line-height: 1;
+    user-select: none;
+    transform-origin: center center;
+}
+.pdfEditorWatermarkItem.pdfEditorWatermarkDraft {
+    outline: 1px dashed rgba(52, 120, 246, 0.55);
+    outline-offset: 4px;
+}
+.pdfEditorWatermarkItem img {
+    display: block;
+    max-width: none;
+}
+
+.pdfEditorRedactBox {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.35);
+    pointer-events: auto;
+    cursor: move;
+}
+
+.pdfEditorSignatureMarker {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px dashed transparent;
+    pointer-events: auto;
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: rgba(255,255,255,0.01);
+}
+.pdfEditorSignatureMarker.pdfEditorSignatureSelected {
+    border-color: var(--pdeffy-blue);
+    box-shadow: 0 0 0 1px var(--pdeffy-blue);
+}
+.pdfEditorSignatureMarker img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.pdfEditorHandle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border: 1px solid var(--pdeffy-blue);
+    border-radius: 2px;
+    z-index: 5;
+}
+.pdfEditorSignatureMarker .pdfEditorHandle.nw { top: -6px; left: -6px; cursor: nw-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.n  { top: -6px; left: calc(50% - 5px); cursor: n-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.ne { top: -6px; right: -6px; cursor: ne-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.e  { top: calc(50% - 5px); right: -6px; cursor: e-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.se { bottom: -6px; right: -6px; cursor: se-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.s  { bottom: -6px; left: calc(50% - 5px); cursor: s-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.sw { bottom: -6px; left: -6px; cursor: sw-resize; }
+.pdfEditorSignatureMarker .pdfEditorHandle.w  { top: calc(50% - 5px); left: -6px; cursor: w-resize; }
+
+.pdfEditorForm {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.pdfEditorForm label {
+    display: block;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--pdeffy-text-muted);
+}
+.pdfEditorForm hr {
+    border: none;
+    border-top: 1px solid var(--pdeffy-border);
+    margin: 12px 0;
+}
+.pdfEditorRow {
+    display: flex;
+    gap: 8px;
+}
+.pdfEditorRow > * { flex: 1; }
+.pdfEditorList {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.pdfEditorListItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--pdeffy-bg);
+    border: 1px solid var(--pdeffy-border);
+    border-radius: 10px;
+    font-size: 0.8rem;
+}
+.pdfEditorListRemove {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--pdeffy-text-muted);
+}
+.pdfEditorHidden { display: none !important; }
+.pdfEditorPanelBtnDanger {
+    background: #fff5f6 !important;
+    border-color: #ffc9d1 !important;
+    color: var(--pdeffy-red) !important;
+}
+.pdfEditorPanelBtnDanger:hover:not(:disabled) {
+    background: #ffe0e5 !important;
+}
+
+/* Dropzone entrance: almost full page before a file is opened */
+.pdfEditorDropZone.pdeffy-dropzone {
+    gap: 12px;
+    padding: 48px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+body.pdfEditorPage:not(.pdfEditorEditing) .pdeffy-main,
+body.pdfEditorPage:not(.pdfEditorEditing) .pdfEditorContainer {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body.pdfEditorPage:not(.pdfEditorEditing) .pdfEditorDropZone.pdeffy-dropzone {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
+    min-height: min(52vh, 420px);
+    margin: 0;
+}
+
+.pdfEditorRecent {
+    flex: 0 0 auto;
+    width: 100%;
+    margin-top: 20px;
+    padding-bottom: 8px;
+}
+
+body.pdfEditorPage.pdfEditorEditing .pdfEditorRecent {
+    display: none !important;
+}
+
+.pdfEditorRecentHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.pdfEditorRecentHeader h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 650;
+    color: var(--pdeffy-text);
+}
+
+.pdfEditorRecentError {
+    margin: 0 0 12px;
+    color: var(--pdeffy-red, #e11d48);
+    font-size: 0.9rem;
+}
+
+.pdfEditorRecent .pdeffy-recent-list {
+    margin: 0;
+}
+
+body.pdfEditorPage.pdfEditorEditing .pdfEditorDropZone {
+    display: none !important;
+}
+
+.pdfEditorDropZone .pdfEditorDropTitle {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--pdeffy-text);
+    line-height: 1.25;
+}
+.pdfEditorDropZone .pdfEditorDropSubtitle {
+    margin: 0;
+    max-width: 32rem;
+    color: var(--pdeffy-text-muted);
+    font-size: 1rem;
+    line-height: 1.45;
+}
+.pdfEditorDropZone > p.langText,
+.pdfEditorDropZone #pdfEditorDropHint {
+    margin: 8px 0 0;
+    color: var(--pdeffy-text-muted);
+}
+.pdfEditorDropZone .pdeffy-btn {
+    margin-top: 12px;
+}
+.pdfEditorDropZone .pdeffy-dropzone-hint {
+    margin-top: 4px;
+}
+
+/* Password unlock modal */
+.pdfEditorPasswordModal {
+    position: fixed;
+    inset: 0;
+    z-index: 11000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(16, 26, 58, 0.45);
+}
+.pdfEditorPasswordModal[hidden] {
+    display: none !important;
+}
+.pdfEditorPasswordDialog {
+    width: min(400px, 100%);
+    background: var(--pdeffy-surface, #fff);
+    border-radius: 16px;
+    border: 1px solid var(--pdeffy-border);
+    box-shadow: 0 16px 40px rgba(16, 26, 58, 0.18);
+    padding: 24px;
+}
+.pdfEditorPasswordDialog h3 {
+    margin: 0 0 8px;
+}
+.pdfEditorPasswordDialog p {
+    margin: 0 0 12px;
+    color: var(--pdeffy-text-muted);
+    font-size: 0.9rem;
+}
+.pdfEditorPasswordError {
+    color: var(--pdeffy-red, #c62828) !important;
+    font-size: 0.85rem !important;
+    margin: 0 0 8px !important;
+}
+.pdfEditorPasswordActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+/* Hide dead chrome when not editing */
+body.pdfEditorPage:not(.pdfEditorEditing) .pdfEditorWorkspace {
+    display: none !important;
+}
+body.pdfEditorPage:not(.pdfEditorEditing) .pdfEditorPropsToggle {
+    display: none !important;
 }

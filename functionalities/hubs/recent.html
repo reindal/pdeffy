@@ -27,9 +27,29 @@
     <script type="module" src="../../changeLang.js"></script>
     <script type="module" src="../../settings.js"></script>
     <script type="module">
-        import { getRecentDocuments, clearRecentDocuments } from '../../src/ui/shell.js';
+        import {
+            getRecentDocuments,
+            clearRecentDocuments,
+            openRecentInEditor,
+        } from '../../src/ui/shell.js';
+
         const list = document.getElementById('recentList');
         const empty = document.getElementById('recentEmptyHint');
+
+        function escapeHtml(s) {
+            return String(s || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function openDoc(doc) {
+            openRecentInEditor({
+                name: doc.name,
+                path: doc.path || null,
+            });
+        }
 
         function render() {
             const docs = getRecentDocuments();
@@ -39,13 +59,28 @@
                 return;
             }
             empty.style.display = 'none';
+            let openLabel = 'Apri';
+            try {
+                if (typeof window.getMessage === 'function') {
+                    const t = window.getMessage('editRecentOpen');
+                    if (t && t !== 'editRecentOpen') openLabel = t;
+                }
+            } catch (_) { /* ignore */ }
+
             docs.forEach((doc) => {
                 const card = document.createElement('div');
                 card.className = 'pdeffy-recent-card';
+                card.style.cursor = 'pointer';
                 card.innerHTML = `
                     <span class="pdeffy-recent-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg></span>
-                    <span class="pdeffy-recent-card-body"><strong>${doc.name}</strong><span>${new Date(doc.openedAt).toLocaleString()}</span></span>
-                    <a class="pdeffy-btn pdeffy-btn-primary langText" href="../hubs/edit.html">Apri</a>`;
+                    <span class="pdeffy-recent-card-body"><strong>${escapeHtml(doc.name)}</strong><span>${doc.openedAt ? new Date(doc.openedAt).toLocaleString() : ''}</span></span>
+                    <button type="button" class="pdeffy-btn pdeffy-btn-primary">${escapeHtml(openLabel)}</button>`;
+
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openDoc(doc);
+                });
                 list.appendChild(card);
             });
         }

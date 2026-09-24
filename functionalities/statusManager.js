@@ -291,18 +291,21 @@ const StatusManager = (() => {
 
         // Determine if the output is a ZIP file by checking the extension
         const isZip = params.savePath && String(params.savePath).toLowerCase().endsWith('.zip');
+        const isDirectory = !!params.isDirectory;
 
         // Only treat as multiple files if it's an array of >1 AND it is NOT a ZIP archive
         const hasMultipleFiles = Array.isArray(params.savedFiles) && params.savedFiles.length > 1 && !isZip;
-        const hasSingleFile = params.savePath !== undefined;
+        const hasSingleFile = params.savePath !== undefined && !isDirectory;
 
         if (type === 'success') {
             inner += `<br>`;
 
             // If it's a zip, use savePath as the reference, otherwise use the first saved file
             const referencePath = hasMultipleFiles ? params.savedFiles[0] : params.savePath;
-            const sep = referencePath.includes('\\') ? '\\' : '/';
-            const folderPath = referencePath.substring(0, referencePath.lastIndexOf(sep));
+            const sep = String(referencePath || '').includes('\\') ? '\\' : '/';
+            const folderPath = isDirectory
+                ? referencePath
+                : String(referencePath || '').substring(0, String(referencePath || '').lastIndexOf(sep));
 
             const folderLabel = (typeof window.getMessage === 'function')
                 ? window.getMessage('statusOpenFolder')

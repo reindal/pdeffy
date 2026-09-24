@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../src/ui/shell.css">
 </head>
 
-<body data-nav="">
+<body data-nav="edit">
     <div class="headerContainer">
         <header>
             <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
@@ -28,7 +28,7 @@
                 <div class="formGroup fileSelectGroup">
                     <label for="pdfFile" id="watermarkSelectLabel" class="langText">Select PDF file:</label>
                     <div class="fileInputWrapper">
-                        <input type="file" id="pdfFile" accept=".pdf" required>
+                        <input type="file" id="pdfFile" accept=".pdf,application/pdf" required>
                         <label for="pdfFile" class="fileInputLabel langText" id="watermarkSelectButton">Click to select
                             file</label>
                     </div>
@@ -108,7 +108,7 @@
                                     <label for="imageFile" id="imageFileLabel" class="langText">Select Image (PNG,
                                         JPG):</label>
                                     <div class="fileInputWrapper">
-                                        <input type="file" id="imageFile" accept="image/png, image/jpeg">
+                                        <input type="file" id="imageFile" accept=".png,.jpg,.jpeg,image/png,image/jpeg">
                                         <label for="imageFile" class="fileInputLabel langText"
                                             id="imageSelectButton">Click to select image</label>
                                     </div>

@@ -19,6 +19,8 @@
             pdfJsPagesBySource: new Map(),
             pdfJsDoc: null,
             sourcePageCount: 0,
+            pdfPassword: null,
+            isEncrypted: false,
         };
     }
 
@@ -175,6 +177,8 @@
         model.pdfJsPagesBySource.clear();
         model.pdfJsDoc = null;
         model.sourcePageCount = 0;
+        model.pdfPassword = null;
+        model.isEncrypted = false;
     }
 
     global.PdfEditorDocumentModel = {

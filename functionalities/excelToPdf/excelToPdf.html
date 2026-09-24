@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../src/ui/shell.css">
 </head>
 
-<body data-nav="">
+<body data-nav="convert">
     <div class="headerContainer">
         <header>
             <img src="../../assets/pdeffy-flat-light.png" alt="PDF Icon" class="headerIcon">
@@ -27,7 +27,7 @@
                 <div class="formGroup">
                     <label for="excelFile" id="excelToPdfSelectLabel" class="langText">Select Excel file (.xlsx, .xls):</label>
                     <div class="fileInputWrapper">
-                        <input type="file" id="excelFile" accept=".xlsx, .xls" required>
+                        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" required>
                         <label for="excelFile" class="fileInputLabel langText" id="excelToPdfSelectButton">Click to select file</label>
                     </div>
                 </div>

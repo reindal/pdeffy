@@ -4,6 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pdeffy</title>
+    <script data-pdeffy-theme-boot>
+      (function () {
+        try {
+          var t = localStorage.getItem('pdeffy.theme') === 'dark' ? 'dark' : 'light';
+          var root = document.documentElement;
+          root.setAttribute('data-theme', t);
+          root.style.colorScheme = t;
+          root.style.backgroundColor = t === 'dark' ? '#12151f' : '#fffcf3';
+          root.classList.add('pdeffy-booting');
+        } catch (e) {
+          document.documentElement.style.backgroundColor = '#fffcf3';
+        }
+        setTimeout(function () {
+          document.documentElement.classList.remove('pdeffy-booting');
+        }, 2500);
+      })();
+    </script>
+    <style data-pdeffy-theme-boot>
+      html, body { background-color: #fffcf3; }
+      html[data-theme="dark"], html[data-theme="dark"] body { background-color: #12151f; }
+      html.pdeffy-booting body { visibility: hidden !important; }
+    </style>
     <link rel="stylesheet" href="./variables.css">
     <link rel="stylesheet" href="./src/ui/shell.css">
     <link rel="stylesheet" href="./styles.css">
@@ -16,85 +38,134 @@
                 <span class="langText" id="homeQuestion">Cosa vuoi fare oggi?</span>
             </h1>
             <p class="langText" id="homeSubtitle">Scegli uno strumento e rendi i tuoi PDF più semplici.</p>
+            <p class="pdeffy-home-motto" role="note">
+                <span class="pdeffy-home-motto-badge langText" id="homePrivacyBadge">Privacy</span>
+                <span class="langText" id="homePrivacyMotto">Tutto resta sul tuo PC — nessun cloud, nessun upload.</span>
+            </p>
         </div>
         <div class="pdeffy-home-illustration" aria-hidden="true">
-            <svg viewBox="0 0 120 100" fill="none">
-                <rect x="18" y="22" width="52" height="66" rx="8" fill="#FFF" stroke="#E7E7E2"/>
-                <rect x="36" y="12" width="52" height="66" rx="8" fill="#FFD91A" stroke="#E7E7E2"/>
-                <rect x="54" y="28" width="52" height="66" rx="8" fill="#3478F6"/>
-                <circle cx="72" cy="52" r="8" fill="#FFF"/>
-                <path d="M68 52h8M70 48c2 2 6 2 8 0" stroke="#3478F6" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
+            <img src="./assets/icons/svg/illustrations/pdf-decorative.svg" alt="">
         </div>
     </div>
 
     <div class="pdeffy-search">
-        <span class="pdeffy-search-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        </span>
+        <span class="pdeffy-search-icon"><img src="./assets/icons/svg/actions/search.svg" alt="" aria-hidden="true"></span>
         <input type="search" id="homeSearch" class="langTextPlaceholder" data-i18n="homeSearchPlaceholder" placeholder="Cerca uno strumento o un formato..." autocomplete="off">
     </div>
 
-    <div class="pdeffy-tool-grid" id="homeToolGrid">
+    <h2 class="pdeffy-section-title langText" id="organizePdfSection">Organizza PDF</h2>
+    <div class="pdeffy-tool-grid">
         <a class="pdeffy-tool-card" data-tool-card data-search="unisci merge pdf" href="./functionalities/merge/merge.html">
-            <span class="pdeffy-tool-card-icon accent-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 4v8a4 4 0 0 0 4 4"/><path d="M16 4v8a4 4 0 0 1-4 4"/><path d="M12 16v4"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/merge-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="mergePdfText">Unisci PDF</strong><span class="langText" id="mergePdfDesc">Unisci più PDF in un unico file</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="dividi split pdf" href="./functionalities/split/split.html">
-            <span class="pdeffy-tool-card-icon accent-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v8"/><path d="M12 12 8 20M12 12l4 8"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/split-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="splitPdfText">Dividi PDF</strong><span class="langText" id="splitPdfDesc">Dividi un PDF in più file</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="modello template generator" href="./functionalities/pdfGenerator/pdfGenerator.html">
-            <span class="pdeffy-tool-card-icon accent-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/template-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfByTemplateText">PDF da Modello</strong><span class="langText" id="pdfByTemplateDesc">Genera PDF da un modello</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="proteggi protect password" href="./functionalities/protectPdf/protectPdf.html">
-            <span class="pdeffy-tool-card-icon accent-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/shield.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="protectPdfTile">Proteggi PDF</strong><span class="langText" id="protectPdfTileDesc">Password e permessi</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="comprimi compress" href="./functionalities/compressPdf/compressPdf.html">
-            <span class="pdeffy-tool-card-icon accent-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4h8v4H8zM8 16h8v4H8z"/><path d="M12 8v8M9 11l3 3 3-3"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/compress-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="compressPdfTile">Comprimi PDF</strong><span class="langText" id="compressPdfTileDesc">Riduci le dimensioni del file</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
+    </div>
+
+    <h2 class="pdeffy-section-title langText" id="convertAnyToPdfGroup">Da altro formato a PDF</h2>
+    <div class="pdeffy-tool-grid">
         <a class="pdeffy-tool-card" data-tool-card data-search="docx word" href="./functionalities/docxToPdf/docxToPdf.html">
-            <span class="pdeffy-tool-card-icon accent-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v5h5"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/docx-to-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="docxToPdfText">DOCX a PDF</strong><span class="langText" id="docxToPdfDesc">Converti Word in PDF</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="excel xlsx" href="./functionalities/excelToPdf/excelToPdf.html">
-            <span class="pdeffy-tool-card-icon accent-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/xlsx-to-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="excelToPdfText">Excel a PDF</strong><span class="langText" id="excelToPdfDesc">Converti fogli di calcolo in PDF</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="pptx powerpoint" href="./functionalities/powerPointToPdf/powerPointToPdf.html">
-            <span class="pdeffy-tool-card-icon accent-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pptx-to-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="pptxToPdfText">PPTX a PDF</strong><span class="langText" id="pptxToPdfDesc">Converti presentazioni in PDF</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="immagine image png jpg" href="./functionalities/imageToPdf/imageToPdf.html">
-            <span class="pdeffy-tool-card-icon accent-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 15-4.5-4.5L8 19"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/image-to-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="imageToPdfText">Immagine a PDF</strong><span class="langText" id="imageToPdfDesc">Converti immagini in PDF</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
         <a class="pdeffy-tool-card" data-tool-card data-search="markdown testo md" href="./functionalities/markdownToPdf/markdownToPdf.html">
-            <span class="pdeffy-tool-card-icon accent-pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16v12H4z"/><path d="m7 15 2-6 2 6 2-6 2 6"/></svg></span>
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/text-to-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="markdownToPdfText">Testo/Markdown a PDF</strong><span class="langText" id="markdownToPdfDesc">Converti Markdown in PDF</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
-        <a class="pdeffy-tool-card" data-tool-card data-search="filigrana watermark modifica" href="./functionalities/pdfEditor/pdfEditor.html">
-            <span class="pdeffy-tool-card-icon accent-yellow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"/></svg></span>
+    </div>
+
+    <h2 class="pdeffy-section-title langText" id="convertPdfToAnyGroup">Da PDF a altro formato</h2>
+    <div class="pdeffy-tool-grid">
+        <a class="pdeffy-tool-card" data-tool-card data-search="pdf docx" href="./functionalities/pdfToDocx/pdfToDocx.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pdf-to-docx.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToDocxText">PDF a DOCX</strong><span class="langText" id="pdfToDocxDesc">Converti PDF in Word</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="pdf excel" href="./functionalities/pdfToExcel/pdfToExcel.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pdf-to-xlsx.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToExcelText">PDF a Excel</strong><span class="langText" id="pdfToExcelDesc">Converti PDF in foglio di calcolo</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="pdf pptx" href="./functionalities/pdfToPptx/pdfToPptx.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pdf-to-pptx.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToPptxText">PDF a PPTX</strong><span class="langText" id="pdfToPptxDesc">Converti PDF in presentazione</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="pdf immagine image" href="./functionalities/pdfToImage/pdfToImage.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pdf-to-image.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToImageText">PDF a Immagine</strong><span class="langText" id="pdfToImageDesc">Esporta pagine come immagini</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="pdf markdown testo" href="./functionalities/pdfToMarkdown/pdfToMarkdown.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/pdf-to-markdown.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="pdfToMarkdownText">PDF a Markdown</strong><span class="langText" id="pdfToMarkdownDesc">Estrai testo in Markdown</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+    </div>
+
+    <h2 class="pdeffy-section-title langText" id="editPdfSection">Modifica PDF</h2>
+    <div class="pdeffy-tool-grid">
+        <a class="pdeffy-tool-card" data-tool-card data-search="modifica editor filigrana censura firma" href="./functionalities/pdfEditor/pdfEditor.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/edit-pdf.svg" alt=""></span>
             <span class="pdeffy-tool-card-body"><strong class="langText" id="editPdfTile">Modifica PDF</strong><span class="langText" id="editPdfTileDesc">Filigrana, censura e firma</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
-        <a class="pdeffy-tool-card" data-tool-card data-search="pdf docx excel pptx immagine" href="./functionalities/hubs/convert.html">
-            <span class="pdeffy-tool-card-icon accent-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg></span>
-            <span class="pdeffy-tool-card-body"><strong class="langText" id="otherToolsTile">Altri strumenti</strong><span class="langText" id="otherToolsTileDesc">Tutte le conversioni PDF</span></span>
-            <span class="pdeffy-tool-card-arrow" aria-hidden="true">→</span>
+        <a class="pdeffy-tool-card" data-tool-card data-search="filigrana watermark" href="./functionalities/watermark/watermark.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/watermark.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="watermarkTile">Filigrana</strong><span class="langText" id="watermarkTileDesc">Aggiungi testo o immagine</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="censura redact" href="./functionalities/redactPdf/redactPdf.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/redact.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="redactTile">Censura</strong><span class="langText" id="redactTileDesc">Oscura parti del documento</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="ruota rotate pagine" href="./functionalities/rotatePdf/rotatePdf.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/rotate-pages.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="rotatePagesTitle">Ruota PDF</strong><span class="langText" id="rotatePagesDesc">Ruota le pagine del documento</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
+        </a>
+        <a class="pdeffy-tool-card" data-tool-card data-search="elimina delete pagine" href="./functionalities/deletePages/deletepages.html">
+            <span class="pdeffy-tool-card-icon"><img src="./assets/icons/svg/pdf-tools/delete-pages.svg" alt=""></span>
+            <span class="pdeffy-tool-card-body"><strong class="langText" id="deletePagesText">Elimina Pagine</strong><span class="langText" id="deletePagesDesc">Rimuovi pagine dal PDF</span></span>
+            <span class="pdeffy-tool-card-arrow" aria-hidden="true"><img src="./assets/icons/svg/actions/arrow-right.svg" alt=""></span>
         </a>
     </div>
 

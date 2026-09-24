@@ -283,9 +283,7 @@ submitBtn.addEventListener('click', async function (e) {
         const pdfDoc = await PDFDocument.load(originalFileBuffer.slice(0));
 
         const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
-        if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
-        if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
-        if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
+        CustomMetadataModule.applyToPdfDoc(pdfDoc, finalMetadata);
 
         for (let i = 0; i < totalPages; i++) {
             const addedRotation = pageRotations.get(i) || 0;

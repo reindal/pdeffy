@@ -45,27 +45,43 @@ const CustomMetadataModule = {
         });
     },
 
-    // Retrieve the final metadata object, merging global settings with custom inputs
+    // Author + optional company, e.g. "Mario Rossi — Reindal"
+    formatAuthorField: function(author, company) {
+        const a = String(author || '').trim();
+        const c = String(company || '').trim();
+        if (a && c) return `${a} — ${c}`;
+        return a || c || '';
+    },
+
+    // Apply metadata to a pdf-lib PDFDocument
+    applyToPdfDoc: function(pdfDoc, metadata) {
+        if (!pdfDoc || !metadata) return;
+        const author = this.formatAuthorField(metadata.author, metadata.company);
+        if (author) pdfDoc.setAuthor(author);
+        if (metadata.title) pdfDoc.setTitle(metadata.title);
+        if (metadata.subject) pdfDoc.setSubject(metadata.subject);
+        if (typeof pdfDoc.setCreator === 'function') pdfDoc.setCreator('Pdeffy');
+        if (typeof pdfDoc.setProducer === 'function') pdfDoc.setProducer('Pdeffy');
+    },
+
+    // Always include settings author/company; title/description only when the user fills them.
     getFinalMetadata: async function(ipcRenderer) {
-        // Fetch default global metadata from the main process
         const globalMetadata = await ipcRenderer.invoke('get-pdf-metadata');
-        
-        // Initialize the payload using global settings as base values
-        let finalMetadata = { 
+
+        const finalMetadata = {
             author: globalMetadata.author || '',
-            title: globalMetadata.title || '',
-            subject: globalMetadata.subject || ''
+            company: globalMetadata.company || '',
+            title: '',
+            subject: ''
         };
 
         const checkbox = document.getElementById('addMetadataCheckbox');
         const titleInput = document.getElementById('metadataTitleInput');
         const descInput = document.getElementById('metadataDescriptionInput');
 
-        // Override global settings with custom inputs if the checkbox is checked
         if (checkbox && checkbox.checked) {
             const customTitle = titleInput ? titleInput.value.trim() : '';
             const customDesc = descInput ? descInput.value.trim() : '';
-            
             if (customTitle) finalMetadata.title = customTitle;
             if (customDesc) finalMetadata.subject = customDesc;
         }

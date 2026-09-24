@@ -159,6 +159,35 @@ export function pdeffyRequireShim() {
           return `<script type="module"${sp}src="${src}"${rest}>`;
         }
       );
+
+      // Prevent theme/layout flash on multi-page navigations: apply theme before paint.
+      if (!out.includes('data-pdeffy-theme-boot')) {
+        const boot = `
+    <script data-pdeffy-theme-boot>
+      (function () {
+        try {
+          var t = localStorage.getItem('pdeffy.theme') === 'dark' ? 'dark' : 'light';
+          var root = document.documentElement;
+          root.setAttribute('data-theme', t);
+          root.style.colorScheme = t;
+          root.style.backgroundColor = t === 'dark' ? '#12151f' : '#fffcf3';
+          root.classList.add('pdeffy-booting');
+        } catch (e) {
+          document.documentElement.style.backgroundColor = '#fffcf3';
+        }
+        setTimeout(function () {
+          document.documentElement.classList.remove('pdeffy-booting');
+        }, 2500);
+      })();
+    </script>
+    <style data-pdeffy-theme-boot>
+      html, body { background-color: #fffcf3; }
+      html[data-theme="dark"], html[data-theme="dark"] body { background-color: #12151f; }
+      html.pdeffy-booting body { visibility: hidden !important; }
+    </style>`;
+        out = out.replace(/<head([^>]*)>/i, `<head$1>${boot}`);
+      }
+
       return out;
     },
   };

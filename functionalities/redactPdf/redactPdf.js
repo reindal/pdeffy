@@ -647,9 +647,7 @@ form.addEventListener('submit', async function (e) {
         const pdfDoc = await PDFDocument.load(originalFileBuffer.slice(0));
 
         const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
-        if (finalMetadata.author) pdfDoc.setAuthor(finalMetadata.author);
-        if (finalMetadata.title) pdfDoc.setTitle(finalMetadata.title);
-        if (finalMetadata.subject) pdfDoc.setSubject(finalMetadata.subject);
+        CustomMetadataModule.applyToPdfDoc(pdfDoc, finalMetadata);
 
         const pages = pdfDoc.getPages();
 

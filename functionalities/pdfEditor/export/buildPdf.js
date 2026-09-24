@@ -18,7 +18,10 @@
             throw new Error('PDF data is no longer available. Re-open the file and try again.');
         }
         const sourceBytes = raw instanceof Uint8Array ? raw.slice() : new Uint8Array(raw.slice(0));
-        const sourceDoc = await PDFDocument.load(sourceBytes);
+        // Owner/user-password PDFs: ignoreEncryption after pdf.js already unlocked for preview.
+        const sourceDoc = await PDFDocument.load(sourceBytes, {
+            ignoreEncryption: !!model.isEncrypted || !!model.pdfPassword,
+        });
         const outDoc = await PDFDocument.create();
 
         const sourceIndices = active.map((p) => p.sourceIndex);
@@ -61,9 +64,18 @@
         }
 
         if (metadata) {
-            if (metadata.author) exportDoc.setAuthor(metadata.author);
-            if (metadata.title) exportDoc.setTitle(metadata.title);
-            if (metadata.subject) exportDoc.setSubject(metadata.subject);
+            if (typeof CustomMetadataModule !== 'undefined' && CustomMetadataModule.applyToPdfDoc) {
+                CustomMetadataModule.applyToPdfDoc(exportDoc, metadata);
+            } else {
+                const a = String(metadata.author || '').trim();
+                const c = String(metadata.company || '').trim();
+                const author = a && c ? `${a} — ${c}` : a || c;
+                if (author) exportDoc.setAuthor(author);
+                if (metadata.title) exportDoc.setTitle(metadata.title);
+                if (metadata.subject) exportDoc.setSubject(metadata.subject);
+                if (typeof exportDoc.setCreator === 'function') exportDoc.setCreator('Pdeffy');
+                if (typeof exportDoc.setProducer === 'function') exportDoc.setProducer('Pdeffy');
+            }
         }
 
         return exportDoc.save();
