@@ -1,13 +1,14 @@
-name: Build Pdeffy App
+name: Build Tauri App (tauri-migration)
 
 on:
   push:
     branches:
-      - main
+      - feat/tauri-migration
+      - tauri-migration
   pull_request:
     branches:
-      - main
-      - dev
+      - feat/tauri-migration
+      - tauri-migration
   workflow_dispatch:
 
 jobs:
@@ -61,42 +62,8 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: installer-${{ matrix.os }}
+          name: tauri-migration-${{ matrix.os }}-${{ github.sha }}
           path: |
             src-tauri/target/release/bundle/**/*
             !**/*.sig
           if-no-files-found: warn
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: installers
-
-      - name: List downloaded artifacts (debug)
-        run: find installers -type f | head -100
-
-      - name: Upload to Latest Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ASSETS=$(find installers -type f \( -name "*.dmg" -o -name "*.app.tar.gz" -o -name "*.msi" -o -name "*.exe" -o -name "*.deb" -o -name "*.AppImage" -o -name "*.rpm" \) | tr '\n' ' ')
-          if [ -z "$ASSETS" ]; then
-            echo "No installer assets found"
-            exit 0
-          fi
-          if gh release view latest --repo ${{ github.repository }} &>/dev/null; then
-            gh release upload latest --repo ${{ github.repository }} --clobber $ASSETS
-          else
-            gh release create latest \
-              --repo ${{ github.repository }} \
-              --title "Latest Build" \
-              --prerelease \
-              --notes "Auto-updated Tauri build on push to main" \
-              $ASSETS
-          fi
