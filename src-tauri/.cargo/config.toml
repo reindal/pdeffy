@@ -1,0 +1,5 @@
+# llama-cpp-sys-2 / ggml use C++17 std::filesystem (macOS 10.15+). The `cc` crate
+# defaults to 10.13 for apple-darwin unless this is set for every crate build script.
+[env]
+MACOSX_DEPLOYMENT_TARGET = { value = "11.0", force = true }
+CMAKE_OSX_DEPLOYMENT_TARGET = { value = "11.0", force = true }

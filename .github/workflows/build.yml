@@ -15,6 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       MACOSX_DEPLOYMENT_TARGET: "11.0"
+      CMAKE_OSX_DEPLOYMENT_TARGET: "11.0"
 
     strategy:
       fail-fast: false
@@ -62,6 +63,8 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
+          CMAKE_OSX_DEPLOYMENT_TARGET: "11.0"
         with:
           projectPath: .
           args: ${{ matrix.tauriArgs }}
