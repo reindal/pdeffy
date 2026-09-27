@@ -31,12 +31,10 @@ body.pdeffy-shell {
     overflow-x: hidden;
 }
 
-body.pdeffy-shell .headerContainer,
 body.pdeffy-shell > .backLink,
 body.pdeffy-shell .pdeffy-main .backLink,
 body.pdeffy-shell .pdeffy-main > .backLink,
 body.pdeffy-shell a.backLink,
-body.pdeffy-shell .backArrow,
 body.pdeffy-shell #settingsIcon.settingsIcon {
     display: none !important;
 }
@@ -1127,10 +1125,6 @@ body.pdeffy-tool-page .pdeffy-main::after {
 body.pdeffy-tool-page .pdeffy-main > * {
     position: relative;
     z-index: 1;
-}
-
-body.pdeffy-tool-page .headerContainer {
-    display: none !important;
 }
 
 .pdeffy-ws {

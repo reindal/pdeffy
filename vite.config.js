@@ -15,7 +15,7 @@ function collectHtmlPages(rootDir) {
       if (st.isDirectory()) {
         if (name === 'node_modules' || name === 'dist' || name === 'src-tauri' || name === 'out') continue;
         walk(full);
-      } else if (name.endsWith('.html') && !full.includes('landingPage')) {
+      } else if (name.endsWith('.html')) {
         const rel = full.slice(rootDir.length + 1).replace(/\\/g, '/');
         const key = rel.replace(/\.html$/, '').replace(/\//g, '-');
         pages[key] = full;

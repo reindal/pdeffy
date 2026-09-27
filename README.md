@@ -177,23 +177,18 @@ The company develops custom digital solutions and actively participates in inter
 
 ## 📦 Third-Party Dependencies
 
-This project uses the following open-source libraries:
+This project uses the following open-source libraries (see `package.json` for versions):
 
-- docx ^8.5.0 — MIT License
-- electron-squirrel-startup ^1.0.1 — MIT License
-- fs-extra ^11.2.0 — MIT License
-- html2canvas ^1.4.1 — MIT License
-- jspdf ^4.1.0 — MIT License
-- jszip ^3.10.1 — MIT License
-- jszip (alias: jszip2) 2.6.1 — MIT License
-- mammoth ^1.11.0 — BSD-2-Clause License
-- pdf-lib ^1.17.1 — MIT License
-- pdfjs-dist ^5.4.624 — Apache-2.0 License
-- pptx2html ^0.3.4 — MIT License
-- pptxgenjs ^4.0.1 — MIT License
-- signtool ^1.0.0 — MIT License
-- update-electron-app ^3.1.2 — MIT License
-- xml2js ^0.6.2 — MIT License
+- @tauri-apps/api, @tauri-apps/cli, and Tauri plugins — MIT or Apache-2.0
+- docxtemplater, pizzip — MIT License
+- html2canvas — MIT License
+- jspdf — MIT License
+- jszip — MIT License
+- marked — MIT License
+- pdf-lib — MIT License
+- pdfjs-dist — Apache-2.0 License
+- vite — MIT License
+- xlsx — Apache-2.0 License
 
 ---
 

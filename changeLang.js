@@ -4074,17 +4074,5 @@ window.addEventListener('settingsUIReady', async () => {
     });
 });
 
-// Add click handler to logo to navigate back to main page
-const headerIcon = document.querySelector('.headerIcon');
-if (headerIcon) {
-    headerIcon.addEventListener('click', function () {
-        // Check if we're not on the main page already
-        const currentPath = window.location.pathname;
-        if (!currentPath.endsWith('index.html') && currentPath !== '/') {
-            window.location.replace('../../index.html');
-        }
-    });
-}
-
 window.getMessage = getMessage;
 window.changeLanguage = changeLanguage;
