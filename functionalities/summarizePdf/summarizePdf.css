@@ -1,0 +1,116 @@
+@import url('../../variables.css');
+@import url('../funcionalities.css');
+
+.summarizeContainer {
+    max-width: 640px;
+    margin: 5px auto 40px;
+    padding: 30px;
+    background-color: var(--reindalLight);
+    border-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.summarizeLead {
+    margin: -8px 0 22px;
+    color: var(--reindalGray, #6b7280);
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+.summarizeModelNotice {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid rgba(16, 26, 58, 0.12);
+}
+
+/* `display: flex` above would otherwise override the native [hidden] rule */
+.summarizeModelNotice[hidden] {
+    display: none !important;
+}
+
+.summarizeModelNotice p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--reindalGray, #6b7280);
+}
+
+.fileInfoBadge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--reindalLight);
+    border: 1px solid var(--reindalYellowHover);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 24px;
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--reindalDark);
+}
+
+.fileSizeBadge {
+    margin-left: auto;
+    background: var(--reindalYellow);
+    color: var(--reindalBlack);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.summarizeResult {
+    margin-top: 24px;
+}
+
+.summarizeResult h2 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    color: var(--reindalDark);
+}
+
+.summarizeResultText {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 180px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(16, 26, 58, 0.14);
+    background: #fff;
+    font-family: var(--font-primary), system-ui, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--reindalDark);
+    resize: vertical;
+}
+
+.pdeffy-btn {
+    appearance: none;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 650;
+    font-family: inherit;
+    cursor: pointer;
+    background: var(--reindalYellow, #FFD91A);
+    color: #101A3A;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.pdeffy-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+#copySummaryBtn {
+    margin-top: 10px;
+}

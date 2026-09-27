@@ -927,9 +927,13 @@ body.pdeffy-editor-mode .pdfEditorContainer {
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
-    height: calc(100vh - 24px);
+    height: 100%;
     display: flex;
     flex-direction: column;
+}
+
+body.pdeffy-editor-mode.pdfEditorEditing .pdfEditorContainer {
+    height: 100%;
 }
 
 /* —— Settings: centered modal only (never a right dock) —— */

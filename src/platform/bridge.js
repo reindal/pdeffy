@@ -93,6 +93,16 @@ export const ipcRenderer = {
         case 'open-external-url':
           await openUrl(payload);
           return { success: true };
+        case 'share-file': {
+          const p = typeof payload === 'string' ? payload : payload?.filePath || payload?.path;
+          const title = typeof payload === 'object' ? payload?.title : undefined;
+          return safeInvoke('share-file', { filePath: p, title });
+        }
+        case 'print-file': {
+          const p = typeof payload === 'string' ? payload : payload?.filePath || payload?.path;
+          const title = typeof payload === 'object' ? payload?.title : undefined;
+          return safeInvoke('print-file', { filePath: p, title });
+        }
         case 'set-file-readonly':
           return safeInvoke('set-file-readonly', { filePath: payload });
         case 'get-pdf-metadata':
@@ -203,6 +213,42 @@ export const ipcRenderer = {
         case 'zip-files': {
           const { paths, output } = payload || {};
           return safeInvoke('zip_files', { paths, output });
+        }
+        case 'get-ocr-status':
+          return safeInvoke('get-ocr-status');
+        case 'download-ocr-models':
+          return safeInvoke('download-ocr-models');
+        case 'get-ner-status':
+          return safeInvoke('get-ner-status');
+        case 'download-ner-models':
+          return safeInvoke('download-ner-models');
+        case 'unload-ner-model':
+          return safeInvoke('unload-ner-model');
+        case 'list-ai-models':
+          return safeInvoke('list-ai-models');
+        case 'set-selected-model': {
+          const modelId =
+            typeof payload === 'string' ? payload : payload?.modelId || payload?.model_id;
+          return safeInvoke('set-selected-model', { modelId });
+        }
+        case 'get-model-status':
+          return safeInvoke('get-model-status');
+        case 'download-model': {
+          const modelId =
+            typeof payload === 'string'
+              ? payload
+              : payload?.modelId || payload?.model_id || null;
+          return safeInvoke('download-model', { modelId });
+        }
+        case 'unload-model':
+          return safeInvoke('unload-model');
+        case 'summarize-pdf': {
+          const p = typeof payload === 'string' ? payload : payload?.path;
+          return safeInvoke('summarize-pdf', { path: p });
+        }
+        case 'anonymize-pdf': {
+          const p = typeof payload === 'string' ? payload : payload?.path;
+          return safeInvoke('anonymize-pdf', { path: p });
         }
         default:
           console.warn('[bridge] Unknown IPC channel:', channel);

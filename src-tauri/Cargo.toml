@@ -37,6 +37,26 @@ uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 regex = "1"
 
+# Local AI (llama.cpp in-process) — enabled by default via feature `ai`
+llama-cpp-2 = { version = "0.1.157", optional = true, default-features = false }
+reqwest = { version = "0.12", optional = true, default-features = false, features = ["blocking", "rustls-tls", "stream"] }
+encoding_rs = { version = "0.8", optional = true }
+rapidocr-core = { version = "0.2.2", features = ["model-download"], optional = true }
+ort = { version = "2.0.0-rc.9", optional = true, default-features = false, features = ["download-binaries"] }
+tokenizers = { version = "0.21", optional = true, default-features = false, features = ["onig"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6"
+objc2-app-kit = { version = "0.3", features = ["NSPrintInfo", "NSPrintOperation"] }
+objc2-foundation = { version = "0.3", features = ["NSObject", "NSString", "NSURL"] }
+objc2-pdf-kit = { version = "0.3", features = ["PDFDocument", "objc2-app-kit"] }
+objc2-web-kit = { version = "0.3", features = ["WKWebView"] }
+
 [features]
-default = []
+default = ["ai", "ai-metal"]
 updater = ["dep:tauri-plugin-updater"]
+ai = ["dep:llama-cpp-2", "dep:reqwest", "dep:encoding_rs", "dep:rapidocr-core", "ner-onnx"]
+ner-onnx = ["dep:ort", "dep:tokenizers"]
+ai-metal = ["ai", "llama-cpp-2/metal"]
+ai-cuda = ["ai", "llama-cpp-2/cuda"]
+ai-vulkan = ["ai", "llama-cpp-2/vulkan"]

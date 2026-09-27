@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Redirect the user back to the main menu upon clicking the button
             document.getElementById('closeEngineWarning').addEventListener('click', () => {
-                window.location.href = '../../index.html';
+                window.location.replace('../../index.html');
             });
             return; // Halt execution to prevent displaying any other UI elements
         }

@@ -15,6 +15,24 @@
             watermarks: [],
             redactions: [],
             signatures: [],
+            /** @type {{ id: string, pageId: string, type: 'highlight'|'underline', x:number, y:number, width:number, height:number, color:string, text?: string }[]} */
+            markups: [],
+            /** @type {{ id: string, pageId: string, x:number, y:number, text:string, color:string, author?: string, createdAt:number, updatedAt?: number }[]} */
+            comments: [],
+            /** @type {{ id: string, pageId: string, color:string, width:number, shape?: 'freehand'|'rect'|'ellipse'|'arrow'|'polygon', points:{x:number,y:number}[] }[]} */
+            inks: [],
+            /** @type {{ id: string, pageId: string, title:string, y?: number }[]} */
+            bookmarks: [],
+            /** @type {object[]} AcroForm widgets detected via pdf.js */
+            formFields: [],
+            /** @type {Record<string, any>} current fill values keyed by field name */
+            formValues: {},
+            /** @type {Record<string, any>} values as loaded from the PDF */
+            formInitialValues: {},
+            /** True when PDF catalog has an AcroForm dictionary */
+            acroFormPresent: false,
+            /** @type {{ id: string, pageId: string, type: 'text'|'check', x:number, y:number, width:number, height:number, text?: string, checked?: boolean }[]} */
+            manualFormFills: [],
             /** Cached pdf.js page objects keyed by sourceIndex */
             pdfJsPagesBySource: new Map(),
             pdfJsDoc: null,
@@ -125,11 +143,24 @@
         return false;
     }
 
+    function hasFormEdits(model) {
+        if (global.PdfEditorFormFields?.hasFormEdits) {
+            return global.PdfEditorFormFields.hasFormEdits(model);
+        }
+        return false;
+    }
+
     function hasAnnotationEdits(model) {
         return (
             (model.watermarks && model.watermarks.length > 0) ||
             (model.redactions && model.redactions.length > 0) ||
-            (model.signatures && model.signatures.length > 0)
+            (model.signatures && model.signatures.length > 0) ||
+            (model.markups && model.markups.length > 0) ||
+            (model.comments && model.comments.length > 0) ||
+            (model.inks && model.inks.length > 0) ||
+            (model.bookmarks && model.bookmarks.length > 0) ||
+            (model.manualFormFills && model.manualFormFills.length > 0) ||
+            hasFormEdits(model)
         );
     }
 
@@ -159,12 +190,107 @@
         model.redactions = model.redactions.filter((r) => r.id !== id);
     }
 
+    function addMarkup(model, markup) {
+        if (!model.markups) model.markups = [];
+        model.markups.push({ ...markup, id: markup.id || createId('mk') });
+    }
+
+    function removeMarkup(model, id) {
+        model.markups = (model.markups || []).filter((m) => m.id !== id);
+    }
+
     function addSignature(model, signature) {
         model.signatures.push({ ...signature, id: signature.id || createId('sig') });
     }
 
     function removeSignature(model, id) {
         model.signatures = model.signatures.filter((s) => s.id !== id);
+    }
+
+    function addComment(model, comment) {
+        if (!model.comments) model.comments = [];
+        model.comments.push({
+            color: '#f4b400',
+            author: '',
+            createdAt: Date.now(),
+            text: '',
+            x: 0.1,
+            y: 0.1,
+            ...comment,
+            id: comment.id || createId('cmt'),
+        });
+    }
+
+    function removeComment(model, id) {
+        model.comments = (model.comments || []).filter((c) => c.id !== id);
+    }
+
+    function updateComment(model, id, patch) {
+        const c = (model.comments || []).find((x) => x.id === id);
+        if (!c) return;
+        Object.assign(c, patch);
+    }
+
+    function addInk(model, ink) {
+        if (!model.inks) model.inks = [];
+        model.inks.push({
+            color: '#e53935',
+            width: 2.5,
+            shape: 'freehand',
+            points: [],
+            ...ink,
+            id: ink.id || createId('ink'),
+        });
+    }
+
+    function removeInk(model, id) {
+        model.inks = (model.inks || []).filter((i) => i.id !== id);
+    }
+
+    function addBookmark(model, bookmark) {
+        if (!model.bookmarks) model.bookmarks = [];
+        model.bookmarks.push({
+            title: 'Bookmark',
+            y: 0,
+            ...bookmark,
+            id: bookmark.id || createId('bm'),
+        });
+    }
+
+    function removeBookmark(model, id) {
+        model.bookmarks = (model.bookmarks || []).filter((b) => b.id !== id);
+    }
+
+    function updateBookmark(model, id, patch) {
+        const b = (model.bookmarks || []).find((x) => x.id === id);
+        if (!b) return;
+        Object.assign(b, patch);
+    }
+
+    function addManualFormFill(model, entry) {
+        if (!model.manualFormFills) model.manualFormFills = [];
+        model.manualFormFills.push({
+            type: 'text',
+            text: '',
+            checked: true,
+            framed: true,
+            fontSize: 12,
+            color: '#000000',
+            width: 0.28,
+            height: 0.08,
+            ...entry,
+            id: entry.id || createId('mff'),
+        });
+    }
+
+    function removeManualFormFill(model, id) {
+        model.manualFormFills = (model.manualFormFills || []).filter((e) => e.id !== id);
+    }
+
+    function updateManualFormFill(model, id, patch) {
+        const e = (model.manualFormFills || []).find((x) => x.id === id);
+        if (!e) return;
+        Object.assign(e, patch);
     }
 
     function resetModel(model) {
@@ -174,11 +300,24 @@
         model.watermarks = [];
         model.redactions = [];
         model.signatures = [];
+        model.markups = [];
+        model.comments = [];
+        model.inks = [];
+        model.bookmarks = [];
+        model.formFields = [];
+        model.formValues = {};
+        model.formInitialValues = {};
+        model.acroFormPresent = false;
+        model.manualFormFills = [];
         model.pdfJsPagesBySource.clear();
         model.pdfJsDoc = null;
         model.sourcePageCount = 0;
         model.pdfPassword = null;
         model.isEncrypted = false;
+        model.ocrText = '';
+        model.anonymizedText = '';
+        model.hasEmbeddedText = true;
+        model.viewerContentMode = 'pdf';
     }
 
     global.PdfEditorDocumentModel = {
@@ -193,6 +332,7 @@
         rotatePage,
         reorderPages,
         hasPageStructureEdits,
+        hasFormEdits,
         hasAnnotationEdits,
         hasExportableEdits,
         addWatermark,
@@ -200,8 +340,22 @@
         clearAllWatermarks,
         addRedaction,
         removeRedaction,
+        addMarkup,
+        removeMarkup,
         addSignature,
         removeSignature,
+        addComment,
+        removeComment,
+        updateComment,
+        addInk,
+        removeInk,
+        addBookmark,
+        removeBookmark,
+        updateBookmark,
+        addManualFormFill,
+        removeManualFormFill,
+        updateManualFormFill,
         resetModel,
+        createId,
     };
 })(typeof window !== 'undefined' ? window : global);

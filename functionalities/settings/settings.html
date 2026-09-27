@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostazioni — Pdeffy</title>
+    <link rel="stylesheet" href="../../variables.css">
+    <link rel="stylesheet" href="../../src/ui/shell.css">
+    <link rel="stylesheet" href="./settingsPage.css">
+</head>
+<body data-nav="settings">
+    <header class="pdeffy-page-header settingsPageHeader">
+        <div class="settingsPageHeaderTop">
+            <h1>
+                <span class="pdeffy-page-header-icon"><img src="../../assets/icons/svg/navigation/settings.svg" alt="" width="22" height="22"></span>
+                <span class="langText" id="settingsTitle">Impostazioni</span>
+            </h1>
+            <button type="button" class="settingsAboutLink langText" id="aboutOpenFromSettings">Informazioni su Pdeffy</button>
+        </div>
+        <p class="langText" id="settingsPageSubtitle">Lingua, tema, metadati PDF e modello AI locale.</p>
+    </header>
+
+    <div class="settingsPage" id="settingsPage">
+        <div class="settingsIntro settingsPageWelcome" id="firstLaunchIntro" hidden>
+            <h3 id="firstLaunchIntroTitle" class="langText">Welcome to PDF Converter</h3>
+            <p id="firstLaunchIntroText" class="langText">Quick setup: choose your language and default PDF metadata.</p>
+        </div>
+
+        <section class="settingsSection">
+            <h2 class="langText" id="changeLanguageTitle">Cambiare Lingua</h2>
+            <select id="languageSelector" aria-label="Language">
+                <option value="en">🇬🇧 English</option>
+                <option value="it">🇮🇹 Italiano</option>
+                <option value="pl">🇵🇱 Polski</option>
+                <option value="es">🇪🇸 Español</option>
+            </select>
+        </section>
+
+        <section class="settingsSection">
+            <h2 class="langText" id="themeTitle">Tema</h2>
+            <select id="themeSelector" aria-label="Theme">
+                <option value="light" id="themeOptionLight" class="langText">Light</option>
+                <option value="dark" id="themeOptionDark" class="langText">Dark</option>
+            </select>
+        </section>
+
+        <section class="settingsSection">
+            <h2 class="langText" id="metadataTitle">Metadati PDF</h2>
+            <div class="settingsFormGroup">
+                <label for="metaAuthor" id="authorLabel" class="langText">Author:</label>
+                <input type="text" id="metaAuthor" class="langTextPlaceholder" placeholder="Enter author name">
+            </div>
+            <div class="settingsFormGroup">
+                <label for="metaCompany" id="companyLabel" class="langText">Company:</label>
+                <input type="text" id="metaCompany" class="langTextPlaceholder" placeholder="Enter company name">
+            </div>
+        </section>
+
+        <section class="settingsSection settingsLocalModels" id="aiModelSection" aria-label="Local AI model">
+            <h2 class="langText" id="settingsLocalModelsTitle">Modelli locali</h2>
+            <p class="settingsSectionHint langText" id="settingsLocalModelsHint">
+                Tutto resta sul computer. <strong>Disco</strong> = file scaricati; <strong>RAM</strong> = caricato ora (riassunti e GLiNER).
+            </p>
+
+            <div class="localModelsTable" role="table" aria-label="Local models">
+                <div class="localModelsHead" role="row">
+                    <span class="langText" id="localModelsColComponent">Componente</span>
+                    <span class="langText" id="localModelsColDisk">Disco</span>
+                    <span class="langText" id="localModelsColRam">RAM</span>
+                    <span class="langText" id="localModelsColActions">Azioni</span>
+                </div>
+
+                <div class="localModelsRow" role="row" id="localModelRowSummarize">
+                    <div class="localModelsCell localModelsCellName">
+                        <strong class="langText" id="localModelsSummarizeName">Riassunto PDF</strong>
+                        <span class="localModelsSub" id="localModelsSummarizeSub">Modello Qwen (GGUF)</span>
+                    </div>
+                    <div class="localModelsCell"><span id="localModelsSummarizeDisk" class="localModelsState">—</span></div>
+                    <div class="localModelsCell"><span id="localModelsSummarizeRam" class="localModelsState">—</span></div>
+                    <div class="localModelsCell localModelsCellActions">
+                        <button type="button" class="settingsBtn save settingsBtnCompact" id="downloadModelBtn">
+                            <span class="langText" id="summarizeDownloadBtn">Scarica</span>
+                        </button>
+                        <button type="button" class="settingsBtn settingsBtnCompact" id="unloadModelBtn" hidden>
+                            <span class="langText" id="summarizeUnloadBtn">Libera RAM</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="localModelsRow" role="row" id="localModelRowOcr">
+                    <div class="localModelsCell localModelsCellName">
+                        <strong class="langText" id="localModelsOcrName">OCR scansioni</strong>
+                        <span class="localModelsSub langText" id="localModelsOcrSub">RapidOCR · ~15–25 MB</span>
+                    </div>
+                    <div class="localModelsCell"><span id="localModelsOcrDisk" class="localModelsState">—</span></div>
+                    <div class="localModelsCell"><span class="localModelsState localModelsStateMuted langText" id="localModelsOcrRamLabel">All'uso</span></div>
+                    <div class="localModelsCell localModelsCellActions">
+                        <button type="button" class="settingsBtn save settingsBtnCompact" id="downloadOcrBtn">
+                            <span class="langText" id="settingsOcrDownloadBtn">Scarica</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="localModelsRow" role="row" id="localModelRowNer">
+                    <div class="localModelsCell localModelsCellName">
+                        <strong class="langText" id="localModelsNerName">Anonimizzazione</strong>
+                        <span class="localModelsSub langText" id="localModelsNerSub">GLiNER · ~200 MB</span>
+                    </div>
+                    <div class="localModelsCell"><span id="localModelsNerDisk" class="localModelsState">—</span></div>
+                    <div class="localModelsCell"><span id="localModelsNerRam" class="localModelsState">—</span></div>
+                    <div class="localModelsCell localModelsCellActions">
+                        <button type="button" class="settingsBtn save settingsBtnCompact" id="downloadNerBtn">
+                            <span class="langText" id="settingsNerDownloadBtn">Scarica</span>
+                        </button>
+                        <button type="button" class="settingsBtn settingsBtnCompact" id="unloadNerBtn">
+                            <span class="langText" id="settingsNerUnloadBtn">Libera RAM</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <p class="settingsSectionHint langText" id="settingsAiPickHint">
+                Scegli il modello Qwen per i riassunti (velocità vs qualità):
+            </p>
+            <div class="settingsAiModelList" id="settingsAiModelList" role="radiogroup" aria-label="AI models"></div>
+
+            <div class="settingsAiCard settingsAiCardCompact" id="settingsAiSelectedCard">
+                <p id="settingsModelDetail" class="settingsAiDetail langText" data-i18n="summarizeModelChecking">
+                    Verifica stato modello…
+                </p>
+                <div class="settingsAiProgressTrack" id="settingsAiProgressTrack" hidden>
+                    <p class="settingsProgressLabel" id="settingsAiProgressLabel"></p>
+                    <div class="settingsAiProgressBar" id="settingsAiProgressBar"></div>
+                </div>
+                <span id="settingsModelBadge" class="settingsAiBadge" hidden aria-hidden="true">—</span>
+            </div>
+            <p id="settingsOcrDetail" class="settingsAiDetail" hidden aria-hidden="true">—</p>
+            <p id="settingsNerDetail" class="settingsAiDetail" hidden aria-hidden="true">—</p>
+            <span id="settingsOcrBadge" hidden aria-hidden="true"></span>
+            <span id="settingsNerBadge" hidden aria-hidden="true"></span>
+        </section>
+
+        <div class="settingsButtons">
+            <button type="button" class="settingsBtn save" id="saveSettingsBtn">
+                <span class="langText" id="saveSettings">Salva Impostazioni</span>
+            </button>
+        </div>
+
+        <div class="settingsStatus" id="settingsStatus" hidden></div>
+    </div>
+
+    <script type="module" src="../../changeLang.js"></script>
+    <script type="module" src="../../settings.js"></script>
+    <script type="module" src="./settingsPage.js"></script>
+    <script type="module" src="../../src/ui/shell.js"></script>
+</body>
+</html>

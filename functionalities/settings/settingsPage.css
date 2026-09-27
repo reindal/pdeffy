@@ -1,0 +1,422 @@
+.settingsPage {
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 48px;
+}
+
+.settingsPageWelcome {
+    margin-bottom: 8px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: var(--pdeffy-surface, #fff);
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+}
+
+.settingsPageWelcome h3 {
+    margin: 0 0 6px;
+    color: var(--pdeffy-text, #101a3a);
+}
+
+.settingsPageWelcome p {
+    margin: 0;
+    color: var(--pdeffy-text-muted, #5c647a);
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
+.settingsSection {
+    padding: 18px 0 8px;
+    border-bottom: 1px solid var(--pdeffy-border, #e7e7e2);
+}
+
+.settingsSection:last-of-type {
+    border-bottom: none;
+}
+
+.settingsSection h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    color: var(--pdeffy-text, #101a3a);
+}
+
+.settingsSectionHint {
+    margin: -4px 0 14px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--pdeffy-text-muted, #5c647a);
+}
+
+.settingsPage select,
+.settingsFormGroup input {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    border-radius: 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: var(--pdeffy-surface, #fff);
+    color: var(--pdeffy-text, #101a3a);
+    font-family: inherit;
+}
+
+.settingsPage select:focus,
+.settingsFormGroup input:focus {
+    outline: none;
+    border-color: var(--pdeffy-primary, #ffd91a);
+}
+
+.settingsFormGroup {
+    margin-bottom: 14px;
+}
+
+.settingsFormGroup label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--pdeffy-text-muted, #5c647a);
+}
+
+.settingsAiModelList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.settingsAiModelOption {
+    appearance: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    background: var(--pdeffy-surface, #fff);
+    color: var(--pdeffy-text, #101a3a);
+    font-family: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.settingsAiModelOption:hover {
+    border-color: rgba(16, 26, 58, 0.28);
+}
+
+.settingsAiModelOption.is-selected {
+    border-color: var(--pdeffy-primary, #ffd91a);
+    box-shadow: 0 0 0 2px rgba(255, 217, 26, 0.35);
+}
+
+.settingsAiModelOptionHead {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.settingsAiModelOptionHead strong {
+    font-size: 0.98rem;
+}
+
+.settingsAiModelTier {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #1e3a8a;
+}
+
+.settingsAiModelTier.is-light {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.settingsAiModelTier.is-recommended {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.settingsAiModelTier.is-quality {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.settingsAiModelSummary {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    color: var(--pdeffy-text-muted, #5c647a);
+}
+
+.settingsAiSpecs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.settingsAiSpec {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(16, 26, 58, 0.06);
+    color: var(--pdeffy-text, #101a3a);
+}
+
+.settingsAiSpec.is-ok {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.settingsAiCard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: var(--pdeffy-surface, #fff);
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+}
+
+.settingsAiRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.settingsAiBadge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #101a3a;
+}
+
+.settingsAiBadge.is-ready {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.settingsAiBadge.is-missing {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.settingsAiBadge.is-busy {
+    background: #dbeafe;
+    color: #1e3a8a;
+}
+
+.settingsAiDetail {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--pdeffy-text-muted, #5c647a);
+    line-height: 1.4;
+}
+
+.settingsAiActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.settingsAiProgressTrack {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(16, 26, 58, 0.08);
+    overflow: hidden;
+}
+
+.settingsAiProgressBar {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: var(--pdeffy-primary, #ffd91a);
+    transition: width 0.2s ease;
+}
+
+.settingsButtons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.settingsBtn {
+    min-height: 40px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    background: transparent;
+    color: var(--pdeffy-text, #101a3a);
+}
+
+.settingsBtn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.settingsBtn.save {
+    background: var(--pdeffy-primary, #ffd91a);
+    border-color: var(--pdeffy-primary, #ffd91a);
+}
+
+.settingsBtn.cancel {
+    background: transparent;
+}
+
+.settingsPageHeaderTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.settingsPageHeaderTop h1 {
+    margin: 0;
+}
+
+.settingsAboutLink {
+    appearance: none;
+    border: none;
+    background: none;
+    padding: 0;
+    color: var(--pdeffy-text-muted, #5c647a);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.settingsAboutLink:hover {
+    color: var(--pdeffy-text, #101a3a);
+}
+
+.settingsStatus {
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+.settingsStatus.success {
+    color: #1a7f37;
+}
+
+.settingsStatus.error {
+    color: #b42318;
+}
+
+.localModelsTable {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 16px;
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--pdeffy-surface, #fff);
+}
+
+.localModelsHead,
+.localModelsRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) 0.55fr 0.55fr minmax(0, 1fr);
+    gap: 8px;
+    align-items: center;
+    padding: 10px 12px;
+}
+
+.localModelsHead {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pdeffy-text-muted, #5c647a);
+    background: rgba(16, 26, 58, 0.04);
+    border-bottom: 1px solid var(--pdeffy-border, #e7e7e2);
+}
+
+.localModelsRow + .localModelsRow {
+    border-top: 1px solid var(--pdeffy-border, #e7e7e2);
+}
+
+.localModelsCellName {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.localModelsCellName strong {
+    font-size: 0.9rem;
+}
+
+.localModelsSub {
+    font-size: 0.78rem;
+    color: var(--pdeffy-text-muted, #5c647a);
+}
+
+.localModelsState {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.localModelsState.is-ok {
+    color: #1a7f37;
+}
+
+.localModelsState.is-missing {
+    color: #b42318;
+}
+
+.localModelsState.is-busy {
+    color: #854d0e;
+}
+
+.localModelsStateMuted {
+    font-weight: 500;
+    color: var(--pdeffy-text-muted, #5c647a);
+}
+
+.localModelsCellActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.settingsBtnCompact {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+}
+
+.settingsAiCardCompact {
+    margin-top: 4px;
+}
+
+.settingsProgressLabel {
+    margin: 0 0 6px;
+    font-size: 0.82rem;
+    color: var(--pdeffy-text-muted, #5c647a);
+}
+
+[data-theme='dark'] .settingsAiCard,
+[data-theme='dark'] .settingsPageWelcome {
+    background: var(--pdeffy-surface);
+    border-color: var(--pdeffy-border);
+}

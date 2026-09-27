@@ -1,5 +1,8 @@
 mod commands;
 
+#[cfg(feature = "ai")]
+mod ai;
+
 use tauri::menu::{MenuItemBuilder, MenuBuilder, SubmenuBuilder};
 #[cfg(not(target_os = "macos"))]
 use tauri::menu::PredefinedMenuItem;
@@ -76,7 +79,12 @@ pub fn run() {
         builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
     }
 
-    builder
+    #[cfg(feature = "ai")]
+    {
+        builder = builder.manage(ai::AiState::default());
+    }
+
+    let builder = builder
         .setup(|app| {
             let version = app.package_info().version.to_string();
             let window_title = format!("Pdeffy {version} — Reindal");
@@ -84,6 +92,21 @@ pub fn run() {
                 let _ = window.set_title(&window_title);
                 #[cfg(debug_assertions)]
                 let _ = window.open_devtools();
+
+                // Disable trackpad swipe back/forward (WKWebView).
+                #[cfg(target_os = "macos")]
+                {
+                    if let Err(err) = window.with_webview(|webview| {
+                        use objc2_web_kit::WKWebView;
+                        unsafe {
+                            let view: &WKWebView =
+                                &*(webview.inner() as *const WKWebView);
+                            view.setAllowsBackForwardNavigationGestures(false);
+                        }
+                    }) {
+                        eprintln!("[pdeffy] disable back-forward gestures: {err}");
+                    }
+                }
             }
 
             match build_app_menu(app) {
@@ -97,47 +120,130 @@ pub fn run() {
 
             Ok(())
         })
+        // Bounce browser back/forward navigations before page scripts run.
+        .on_page_load(|webview, _payload| {
+            let _ = webview.eval(
+                r#"(function(){
+  try {
+    var KEY = 'pdeffy.historyBounce';
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    var type = (nav && nav.type) || (performance.navigation && performance.navigation.type);
+    if (sessionStorage.getItem(KEY) === '1') { sessionStorage.removeItem(KEY); return; }
+    if (type === 'back_forward' || type === 2) {
+      sessionStorage.setItem(KEY, '1');
+      history.forward();
+      return;
+    }
+  } catch (e) {}
+  try { history.pushState({pdeffy:1}, '', location.href); } catch (e) {}
+})();"#,
+            );
+        })
         .on_menu_event(|app, event| {
             if event.id() == "pdeffy-about" {
                 let _ = app.emit("pdeffy-about", ());
             }
-        })
-        .invoke_handler(tauri::generate_handler![
-            commands::settings::get_pdf_metadata,
-            commands::settings::save_pdf_metadata,
-            commands::settings::get_language,
-            commands::settings::save_language,
-            commands::settings::check_first_launch,
-            commands::settings::get_warning_settings,
-            commands::settings::save_warning_settings,
-            commands::convert::convert_with_libreoffice,
-            commands::convert::convert_file_path,
-            commands::ghostscript::compress_with_ghostscript,
-            commands::ghostscript::protect_with_ghostscript,
-            commands::ghostscript::check_ghostscript_availability,
-            commands::engines::check_engines_availability,
-            commands::shell_ops::open_folder,
-            commands::shell_ops::open_file,
-            commands::shell_ops::open_external_url,
-            commands::shell_ops::set_file_readonly,
-            commands::shell_ops::get_downloads_path,
-            commands::shell_ops::get_temp_dir,
-            commands::shell_ops::write_file_bytes,
-            commands::shell_ops::read_file_bytes,
-            commands::shell_ops::mkdir_path,
-            commands::shell_ops::remove_path,
-            commands::shell_ops::path_exists,
-            commands::shell_ops::file_stat,
-            commands::dialog::dialog_backend_ready,
-            commands::pdf_ops::pdf_merge,
-            commands::pdf_ops::pdf_split_pages,
-            commands::pdf_ops::pdf_rotate,
-            commands::pdf_ops::pdf_delete_pages,
-            commands::pdf_ops::pdf_redact_true,
-            commands::pdf_ops::pdf_to_images_gs,
-            commands::pdf_ops::image_to_pdf,
-            commands::pdf_ops::zip_files,
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        });
+
+    #[cfg(feature = "ai")]
+    {
+        builder
+            .invoke_handler(tauri::generate_handler![
+                commands::settings::get_pdf_metadata,
+                commands::settings::save_pdf_metadata,
+                commands::settings::get_language,
+                commands::settings::save_language,
+                commands::settings::check_first_launch,
+                commands::settings::get_warning_settings,
+                commands::settings::save_warning_settings,
+                commands::convert::convert_with_libreoffice,
+                commands::convert::convert_file_path,
+                commands::ghostscript::compress_with_ghostscript,
+                commands::ghostscript::protect_with_ghostscript,
+                commands::ghostscript::check_ghostscript_availability,
+                commands::engines::check_engines_availability,
+                commands::shell_ops::open_folder,
+                commands::shell_ops::open_file,
+                commands::shell_ops::open_external_url,
+                commands::shell_ops::set_file_readonly,
+                commands::shell_ops::get_downloads_path,
+                commands::shell_ops::get_temp_dir,
+                commands::shell_ops::write_file_bytes,
+                commands::shell_ops::read_file_bytes,
+                commands::shell_ops::mkdir_path,
+                commands::shell_ops::remove_path,
+                commands::shell_ops::path_exists,
+                commands::shell_ops::file_stat,
+                commands::shell_ops::share_file,
+                commands::shell_ops::print_file,
+                commands::dialog::dialog_backend_ready,
+                commands::pdf_ops::pdf_merge,
+                commands::pdf_ops::pdf_split_pages,
+                commands::pdf_ops::pdf_rotate,
+                commands::pdf_ops::pdf_delete_pages,
+                commands::pdf_ops::pdf_redact_true,
+                commands::pdf_ops::pdf_to_images_gs,
+                commands::pdf_ops::image_to_pdf,
+                commands::pdf_ops::zip_files,
+                commands::ai::list_ai_models,
+                commands::ai::set_selected_model,
+                commands::ai::get_model_status,
+                commands::ai::download_model,
+                commands::ai::unload_model,
+                commands::ai::summarize_pdf,
+                commands::ai::anonymize_pdf,
+                commands::ai::get_ocr_status,
+                commands::ai::download_ocr_models,
+                commands::ai::get_ner_status,
+                commands::ai::download_ner_models,
+                commands::ai::unload_ner_model,
+            ])
+            .run(tauri::generate_context!())
+            .expect("error while running tauri application");
+    }
+
+    #[cfg(not(feature = "ai"))]
+    {
+        builder
+            .invoke_handler(tauri::generate_handler![
+                commands::settings::get_pdf_metadata,
+                commands::settings::save_pdf_metadata,
+                commands::settings::get_language,
+                commands::settings::save_language,
+                commands::settings::check_first_launch,
+                commands::settings::get_warning_settings,
+                commands::settings::save_warning_settings,
+                commands::convert::convert_with_libreoffice,
+                commands::convert::convert_file_path,
+                commands::ghostscript::compress_with_ghostscript,
+                commands::ghostscript::protect_with_ghostscript,
+                commands::ghostscript::check_ghostscript_availability,
+                commands::engines::check_engines_availability,
+                commands::shell_ops::open_folder,
+                commands::shell_ops::open_file,
+                commands::shell_ops::open_external_url,
+                commands::shell_ops::set_file_readonly,
+                commands::shell_ops::get_downloads_path,
+                commands::shell_ops::get_temp_dir,
+                commands::shell_ops::write_file_bytes,
+                commands::shell_ops::read_file_bytes,
+                commands::shell_ops::mkdir_path,
+                commands::shell_ops::remove_path,
+                commands::shell_ops::path_exists,
+                commands::shell_ops::file_stat,
+                commands::shell_ops::share_file,
+                commands::shell_ops::print_file,
+                commands::dialog::dialog_backend_ready,
+                commands::pdf_ops::pdf_merge,
+                commands::pdf_ops::pdf_split_pages,
+                commands::pdf_ops::pdf_rotate,
+                commands::pdf_ops::pdf_delete_pages,
+                commands::pdf_ops::pdf_redact_true,
+                commands::pdf_ops::pdf_to_images_gs,
+                commands::pdf_ops::image_to_pdf,
+                commands::pdf_ops::zip_files,
+            ])
+            .run(tauri::generate_context!())
+            .expect("error while running tauri application");
+    }
 }

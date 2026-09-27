@@ -1,0 +1,298 @@
+/* Assistente PDF — overrides on top of pdfEditor.css */
+
+body.assistentePdfPage.pdeffy-shell {
+    --pdf-props-w: 300px;
+}
+
+.assistenteHero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 12px 20px;
+    padding: 4px 0 12px;
+    border-bottom: 1px solid var(--pdeffy-border);
+    flex-shrink: 0;
+}
+
+.assistenteHeroText {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+.assistenteHeroTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--pdeffy-text);
+}
+
+.assistenteAiBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--pdeffy-blue) 18%, transparent);
+    color: var(--pdeffy-blue);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.assistenteHeroLead {
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+    color: var(--pdeffy-text-muted);
+}
+
+.assistentePrivacyBanner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--pdeffy-blue) 10%, var(--pdeffy-surface));
+    border: 1px solid color-mix(in srgb, var(--pdeffy-blue) 22%, var(--pdeffy-border));
+    color: var(--pdeffy-text);
+    font-size: 0.82rem;
+    flex: 1 1 240px;
+}
+
+.assistentePrivacyBanner img {
+    flex-shrink: 0;
+}
+
+.assistenteHeroActions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.assistenteTabs .pdfEditorToolTab {
+    flex: 1;
+    font-size: 0.82rem;
+}
+
+.assistentePanelBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: auto;
+}
+
+.assistentePanel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 4px 2px 12px;
+    min-height: 0;
+}
+
+.assistentePanel[hidden] {
+    display: none !important;
+}
+
+.assistentePanelTitle {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--pdeffy-text);
+}
+
+.assistentePanelLead {
+    margin: 0;
+    font-size: 0.84rem;
+    color: var(--pdeffy-text-muted);
+    line-height: 1.4;
+}
+
+.assistenteCategoryList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.assistenteCheck {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    color: var(--pdeffy-text);
+    cursor: pointer;
+}
+
+.assistenteCheck input {
+    accent-color: var(--pdeffy-primary);
+    width: 16px;
+    height: 16px;
+}
+
+.assistenteDetectBtn {
+    align-self: flex-start;
+}
+
+.assistenteDetectHeading {
+    margin: 8px 0 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--pdeffy-text);
+}
+
+.assistenteEntityList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: min(42vh, 360px);
+    overflow: auto;
+    padding-right: 2px;
+}
+
+.assistenteEntityCard {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--pdeffy-border);
+    background: var(--pdeffy-surface);
+}
+
+.assistenteEntityCard.is-ignored {
+    opacity: 0.55;
+}
+
+.assistenteEntityCard.is-active {
+    border-color: var(--pdeffy-primary);
+    box-shadow: 0 0 0 1px var(--pdeffy-primary);
+}
+
+.assistenteEntityValue {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--pdeffy-text);
+    word-break: break-word;
+}
+
+.assistenteEntityType {
+    font-size: 0.75rem;
+    color: var(--pdeffy-text-muted);
+}
+
+.assistenteEntityActions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+.assistenteEntityActions .pdeffy-btn {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    min-height: 0;
+}
+
+.assistentePrimaryBtn {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.assistenteTip {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--pdeffy-text-muted);
+}
+
+.assistenteNotice {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: var(--pdeffy-surface-muted, #f8f5eb);
+    border: 1px solid var(--pdeffy-border);
+    font-size: 0.84rem;
+}
+
+.assistenteSummaryText {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    border-radius: 10px;
+    border: 1px solid var(--pdeffy-border);
+    padding: 10px;
+    font: inherit;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    background: var(--pdeffy-surface);
+    color: var(--pdeffy-text);
+}
+
+.assistenteComingSoon {
+    padding: 16px;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px dashed var(--pdeffy-border);
+    color: var(--pdeffy-text-muted);
+    font-size: 0.9rem;
+}
+
+.assistenteAnonResult {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--pdeffy-border);
+}
+
+.assistenteAnonResult h4 {
+    margin: 0;
+    font-size: 0.88rem;
+}
+
+/* Entity highlights over the PDF canvas */
+.pdfEditorPreviewPanel {
+    position: relative;
+}
+
+.assistenteHighlightLayer {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+}
+
+.assistenteHl {
+    position: absolute;
+    border-radius: 3px;
+    background: color-mix(in srgb, #ff6b8a 35%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #ff6b8a 55%, transparent);
+}
+
+.assistenteHl.type-contact,
+.assistenteHl.type-email,
+.assistenteHl.type-telefono {
+    background: color-mix(in srgb, #ffd91a 40%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #e6c200 50%, transparent);
+}
+
+.assistenteHl.is-ignored {
+    opacity: 0.25;
+}
+
+@media (max-width: 960px) {
+    body.assistentePdfPage.pdeffy-shell {
+        --pdf-thumbs-w: 0px;
+        --pdf-props-w: min(100%, 320px);
+    }
+
+    .assistentePdfPage .pdfEditorPagesPanel {
+        display: none;
+    }
+}

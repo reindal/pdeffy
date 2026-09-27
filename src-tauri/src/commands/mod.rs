@@ -6,5 +6,9 @@ pub mod libreoffice;
 pub mod msoffice;
 pub mod pdf_excel;
 pub mod pdf_ops;
+pub mod print_pdf;
 pub mod settings;
 pub mod shell_ops;
+
+#[cfg(feature = "ai")]
+pub mod ai;

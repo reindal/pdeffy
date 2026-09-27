@@ -29,9 +29,8 @@
             const extraRot = pageState.rotation || 0;
             const totalRot = (baseRot + extraRot) % 360;
             const baseViewport = pdfPage.getViewport({ scale: 1, rotation: totalRot });
-            let targetWidth = containerWidth - 48;
-            if (targetWidth > 920) targetWidth = 920;
-            if (targetWidth < 280) targetWidth = 280;
+            // Fit-to-width baseline (no hard pixel cap — zoom must be able to exceed the viewport).
+            const targetWidth = Math.max(280, containerWidth - 48);
             const fitScale = targetWidth / baseViewport.width;
             return fitScale * (zoomPercent / 100);
         }
@@ -86,8 +85,23 @@
             return { wrap, canvas, overlay, canvasWrap };
         }
 
+        async function attachTextLayer(canvasWrap, canvas, pageState, meta) {
+            if (!meta?.pdfPage || !meta?.viewport) return;
+            if (typeof global.PdfEditorTextSelection?.afterPageRender === 'function') {
+                await global.PdfEditorTextSelection.afterPageRender(
+                    canvasWrap,
+                    canvas,
+                    meta.pdfPage,
+                    pageState,
+                    meta.viewport
+                );
+            }
+        }
+
         async function renderSingle(selectedPageId) {
             const token = ++renderToken;
+            const savedScrollTop = singleContainerEl.scrollTop;
+            const savedScrollLeft = singleContainerEl.scrollLeft;
             const active = getActive();
             singleContainerEl.innerHTML = '';
             scrollContainerEl.innerHTML = '';
@@ -105,7 +119,7 @@
             currentDisplayIndex = displayIndex;
 
             const pageState = active[displayIndex];
-            const { wrap, canvas } = buildPageFrame(pageState, displayIndex);
+            const { wrap, canvas, canvasWrap } = buildPageFrame(pageState, displayIndex);
             singleContainerEl.appendChild(wrap);
 
             const width = singleContainerEl.clientWidth || 800;
@@ -121,6 +135,10 @@
                 wrap.dataset.pdfWidth = String(baseVp.width);
                 wrap.dataset.pdfHeight = String(baseVp.height);
             }
+            await attachTextLayer(canvasWrap, canvas, pageState, meta);
+
+            singleContainerEl.scrollTop = savedScrollTop;
+            singleContainerEl.scrollLeft = savedScrollLeft;
 
             if (onPageInView) onPageInView(displayIndex, pageState.id);
             if (onAfterRender) onAfterRender();
@@ -128,6 +146,8 @@
 
         async function renderContinuous(selectedPageId) {
             const token = ++renderToken;
+            const savedScrollTop = scrollContainerEl.scrollTop;
+            const savedScrollLeft = scrollContainerEl.scrollLeft;
             singleContainerEl.innerHTML = '';
             singleContainerEl.style.display = 'none';
             scrollContainerEl.style.display = 'block';
@@ -144,7 +164,7 @@
 
             for (let i = 0; i < active.length; i++) {
                 const pageState = active[i];
-                const { wrap, canvas } = buildPageFrame(pageState, i);
+                const { wrap, canvas, canvasWrap } = buildPageFrame(pageState, i);
                 scrollContainerEl.appendChild(wrap);
 
                 const meta = await renderPageToCanvas(canvas, pageState, containerWidth);
@@ -159,9 +179,13 @@
                     wrap.dataset.pdfWidth = String(baseVp.width);
                     wrap.dataset.pdfHeight = String(baseVp.height);
                 }
+                await attachTextLayer(canvasWrap, canvas, pageState, meta);
             }
 
             setupIntersectionObserver(selectedPageId);
+            // Restore scroll — do not jump to page top after annotation edits.
+            scrollContainerEl.scrollTop = savedScrollTop;
+            scrollContainerEl.scrollLeft = savedScrollLeft;
             if (onAfterRender) onAfterRender();
         }
 
@@ -193,9 +217,7 @@
             );
 
             frames.forEach((f) => observer.observe(f));
-
-            const target = scrollContainerEl.querySelector(`[data-page-id="${selectedPageId}"]`);
-            if (target) target.scrollIntoView({ block: 'start' });
+            // Navigation uses scrollToPageId explicitly — avoid auto jump on every re-render.
         }
 
         async function render(selectedPageId) {

@@ -135,3 +135,104 @@ pub fn file_stat(path: String) -> Result<serde_json::Value, String> {
         "isDirectory": meta.is_dir(),
     }))
 }
+
+/// Share a file via the OS: Mail with attachment on macOS, email client elsewhere.
+#[tauri::command(rename = "share-file")]
+pub async fn share_file(
+    #[allow(unused_variables)] app: AppHandle,
+    #[allow(non_snake_case)] filePath: String,
+    title: Option<String>,
+) -> Result<serde_json::Value, String> {
+    let path = PathBuf::from(&filePath);
+    if !path.is_file() {
+        return Err(format!("File not found: {filePath}"));
+    }
+    let subject = title
+        .unwrap_or_else(|| {
+            path.file_name()
+                .map(|s| s.to_string_lossy().to_string())
+                .unwrap_or_else(|| "PDF".into())
+        })
+        .replace('"', "");
+
+    #[cfg(target_os = "macos")]
+    {
+        use std::process::Command;
+        let script = format!(
+            r#"on run
+  set theFile to POSIX file "{path}"
+  set theSubject to "{subject}"
+  try
+    tell application "Mail"
+      set newMessage to make new outgoing message with properties {{subject:theSubject, visible:true}}
+      tell newMessage
+        make new attachment with properties {{file name:theFile}} at after last paragraph
+      end tell
+      activate
+    end tell
+    return "mail"
+  on error
+    tell application "Finder"
+      reveal theFile
+      activate
+    end tell
+    return "finder"
+  end try
+end run"#,
+            path = filePath.replace('\\', "\\\\").replace('"', "\\\""),
+            subject = subject.replace('\\', "\\\\"),
+        );
+        let status = Command::new("osascript")
+            .arg("-e")
+            .arg(&script)
+            .status()
+            .map_err(|e| e.to_string())?;
+        if status.success() {
+            return Ok(serde_json::json!({ "success": true, "method": "mail" }));
+        }
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::process::Command;
+        // Outlook / default mail with attachment when available
+        let ps = format!(
+            r#"$p = '{}'; Start-Process ("mailto:?subject=" + [uri]::EscapeDataString('{}')); explorer.exe /select,$p"#,
+            filePath.replace('\'', "''"),
+            subject.replace('\'', "''"),
+        );
+        let _ = Command::new("powershell")
+            .args(["-NoProfile", "-Command", &ps])
+            .status();
+        return Ok(serde_json::json!({ "success": true, "method": "mailto" }));
+    }
+
+    // Generic fallback: open mailto + reveal parent folder
+    let encoded_subject = subject
+        .chars()
+        .map(|c| match c {
+            ' ' => "%20".to_string(),
+            c if c.is_ascii_alphanumeric() || "-._~".contains(c) => c.to_string(),
+            c => format!("%{:02X}", c as u8),
+        })
+        .collect::<String>();
+    let mailto = format!("mailto:?subject={encoded_subject}");
+    let _ = app.opener().open_url(mailto, None::<&str>);
+    if let Some(parent) = path.parent() {
+        let _ = app
+            .opener()
+            .open_path(parent.to_string_lossy().to_string(), None::<&str>);
+    }
+    Ok(serde_json::json!({ "success": true, "method": "mailto" }))
+}
+
+/// Open the system print dialog for a PDF (PDFKit on macOS).
+#[tauri::command(rename = "print-file")]
+pub async fn print_file(
+    app: AppHandle,
+    #[allow(non_snake_case)] filePath: String,
+    title: Option<String>,
+) -> Result<serde_json::Value, String> {
+    crate::commands::print_pdf::print_pdf_file(app, filePath, title)?;
+    Ok(serde_json::json!({ "success": true }))
+}

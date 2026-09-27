@@ -110,6 +110,10 @@ export function pdeffyRequireShim() {
         'PdfEditorPageThumbnails',
         'PdfEditorViewer',
         'PdfEditorTextSearch',
+        'PdfEditorTextSelection',
+        'PdfEditorAnonymizeHighlights',
+        'PdfEditorAiPanels',
+        'PdfEditorHistory',
         'PdfEditorCoords',
       ];
       for (const name of pdfEditorGlobals) {
@@ -124,6 +128,10 @@ export function pdeffyRequireShim() {
           (name === 'PdfEditorPageThumbnails' && id.includes('pageThumbnails')) ||
           (name === 'PdfEditorViewer' && id.includes('pdfViewer')) ||
           (name === 'PdfEditorTextSearch' && id.includes('textSearch')) ||
+          (name === 'PdfEditorTextSelection' && id.includes('textSelection')) ||
+          (name === 'PdfEditorAnonymizeHighlights' && id.includes('anonymizeHighlights')) ||
+          (name === 'PdfEditorAiPanels' && id.includes('aiPanels')) ||
+          (name === 'PdfEditorHistory' && id.includes('editHistory')) ||
           (name === 'PdfEditorCoords' && id.includes('coords'));
         if (definesSelf) continue;
         if (new RegExp(`\\b${name}\\b`).test(out)) {

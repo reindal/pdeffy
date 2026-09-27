@@ -8,9 +8,11 @@ const ICONS = {
   home: null,
   organize: null,
   convert: null,
-  edit: null,
-  recent: null,
-  settings: null,
+    edit: null,
+    open: null,
+    assistant: null,
+    recent: null,
+    settings: null,
   search: null,
   upload: null,
   merge: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 4v8a4 4 0 0 0 4 4"/><path d="M16 4v8a4 4 0 0 1-4 4"/><path d="M12 16v4"/></svg>`,
@@ -32,6 +34,8 @@ function resolveIcon(name, base = appBase()) {
     organize: () => navMaskIcon(base, 'organize.svg'),
     convert: () => navMaskIcon(base, 'convert.svg'),
     edit: () => navMaskIcon(base, 'edit.svg'),
+    open: () => navMaskIcon(base, 'open-pdf.svg'),
+    assistant: () => navMaskIcon(base, 'assistant.svg'),
     recent: () => navMaskIcon(base, 'recent.svg'),
     settings: () => navMaskIcon(base, 'settings.svg'),
     search: () => actionMaskIcon(base, 'search.svg'),
@@ -61,14 +65,29 @@ function appBase() {
 
 function detectNav() {
   const forced = document.body.dataset.nav;
-  if (forced) return forced;
+  if (forced) {
+        // Legacy edit/assistant ids map to the unified "Open PDF" entry.
+    if (forced === 'edit' || forced === 'assistant' || forced === 'open') return 'open';
+    return forced;
+  }
   const p = window.location.pathname.replace(/\\/g, '/').toLowerCase();
   if (p.endsWith('/index.html') || p.endsWith('/') || /\/pdeffy\/?$/.test(p)) return 'home';
   if (p.includes('/hubs/organize')) return 'organize';
   if (p.includes('/hubs/convert')) return 'convert';
-  if (p.includes('/hubs/edit') || p.includes('/pdfeditor/')) return 'edit';
+  if (
+    p.includes('/assistentepdf/') ||
+    p.includes('/hubs/edit') ||
+    p.includes('/pdfeditor/') ||
+    p.includes('/watermark/') ||
+    p.includes('/redact') ||
+    p.includes('/rotate') ||
+    p.includes('/delete')
+  ) {
+    return 'open';
+  }
   if (p.includes('/hubs/recent')) return 'recent';
-  if (p.includes('/merge/') || p.includes('/split/') || p.includes('/pdfgenerator/') || p.includes('/protectpdf/') || p.includes('/compresspdf/')) {
+  if (p.includes('/settings/')) return 'settings';
+  if (p.includes('/merge/') || p.includes('/split/') || p.includes('/pdfgenerator/') || p.includes('/protectpdf/') || p.includes('/compresspdf/') || p.includes('/summarizepdf/')) {
     return 'organize';
   }
   if (
@@ -85,9 +104,6 @@ function detectNav() {
     p.includes('/markdown')
   ) {
     return 'convert';
-  }
-  if (p.includes('/watermark/') || p.includes('/redact') || p.includes('/rotate') || p.includes('/delete')) {
-    return 'edit';
   }
   return 'home';
 }
@@ -124,11 +140,11 @@ function navItems(base) {
       iconHtml: resolveIcon('convert', base),
     },
     {
-      id: 'edit',
+      id: 'open',
       href: `${base}functionalities/pdfEditor/pdfEditor.html`,
-      labelKey: 'navEdit',
-      label: 'Modifica PDF',
-      iconHtml: resolveIcon('edit', base),
+      labelKey: 'navOpenPdf',
+      label: 'Apri PDF',
+      iconHtml: resolveIcon('open', base),
     },
     {
       id: 'recent',
@@ -158,10 +174,10 @@ function buildSidebar(base, active) {
       </a>
       <nav class="pdeffy-nav">${items}</nav>
       <div class="pdeffy-sidebar-footer">
-        <button type="button" class="pdeffy-nav-item" id="pdeffyOpenSettings" title="Impostazioni" aria-label="Impostazioni">
+        <a class="pdeffy-nav-item${active === 'settings' ? ' is-active' : ''}" id="pdeffyOpenSettings" href="${base}functionalities/settings/settings.html" data-nav-id="settings" title="Impostazioni" aria-label="Impostazioni">
           <span class="pdeffy-nav-icon">${resolveIcon('settings', base)}</span>
           <span class="pdeffy-nav-label langText" id="navSettings">Impostazioni</span>
-        </button>
+        </a>
       </div>
     </aside>`;
 }
@@ -182,9 +198,11 @@ function wrapBody() {
   main.className = 'pdeffy-main';
 
   const keepOnBody = new Set([
-    'settingsModal',
-    'settingsIcon',
     'pdfEditorPasswordModal',
+    'pdfEditorCommentModal',
+    'pdfEditorAttachmentsModal',
+    'pdfEditorSignaturesModal',
+    'pdfEditorCtxMenu',
     'pdeffyAboutModal',
     'peg-toast',
   ]);
@@ -204,11 +222,6 @@ function wrapBody() {
   if (sidebar) sidebar.after(main);
   else document.body.prepend(main);
 
-  document.getElementById('pdeffyOpenSettings')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('pdeffy:open-settings'));
-    const icon = document.getElementById('settingsIcon');
-    if (icon) icon.click();
-  });
 }
 
 /** Public helpers for hub pages */
@@ -257,6 +270,12 @@ export function getPdfEditorHref() {
   return `${appBase()}functionalities/pdfEditor/pdfEditor.html`;
 }
 
+/** Absolute Assistente PDF URL (AI mode of the editor). */
+export function getAssistentePdfHref(tab = 'anonymize') {
+  const tool = tab === 'summary' || tab === 'anonymize' ? tab : 'anonymize';
+  return `${appBase()}functionalities/pdfEditor/pdfEditor.html?mode=ai&tool=${encodeURIComponent(tool)}`;
+}
+
 /**
  * Open a recent PDF in the editor.
  * Stashes name/path and navigates; the editor reloads via path or IndexedDB cache.
@@ -275,7 +294,7 @@ export function openRecentInEditor(doc) {
     return true;
   }
 
-  window.location.href = getPdfEditorHref();
+    window.location.replace(getPdfEditorHref());
   return true;
 }
 
@@ -448,12 +467,150 @@ function wireAboutMenuEvent() {
   window.addEventListener('pdeffy:open-about', () => openAboutModal());
 }
 
+/**
+ * Desktop app UX: never leave the current page via browser back/forward.
+ * Cross-document Back reloads the previous page — bounce with history.forward().
+ * A session flag avoids looping when the forward itself is also type back_forward.
+ */
+function disableBrowserHistoryNavigation() {
+  if (window.__pdeffyNoBackInstalled) return;
+  window.__pdeffyNoBackInstalled = true;
+
+  const BOUNCE_KEY = 'pdeffy.historyBounce';
+
+  const isBackForwardNav = () => {
+    try {
+      const nav = performance.getEntriesByType?.('navigation')?.[0];
+      const type = nav?.type ?? performance.navigation?.type;
+      return type === 'back_forward' || type === 2;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const bounceIfBackForward = () => {
+    try {
+      if (sessionStorage.getItem(BOUNCE_KEY) === '1') {
+        sessionStorage.removeItem(BOUNCE_KEY);
+        return false;
+      }
+      if (!isBackForwardNav()) return false;
+      sessionStorage.setItem(BOUNCE_KEY, '1');
+      history.forward();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  bounceIfBackForward();
+  window.addEventListener(
+    'pageshow',
+    (e) => {
+      if (e.persisted) {
+        try {
+          if (sessionStorage.getItem(BOUNCE_KEY) === '1') {
+            sessionStorage.removeItem(BOUNCE_KEY);
+            return;
+          }
+          sessionStorage.setItem(BOUNCE_KEY, '1');
+          history.forward();
+        } catch (_) { /* ignore */ }
+        return;
+      }
+      bounceIfBackForward();
+    },
+    true
+  );
+
+  try {
+    history.pushState({ pdeffy: 1 }, '', location.href);
+  } catch (_) { /* ignore */ }
+
+  window.addEventListener('popstate', () => {
+    try {
+      history.pushState({ pdeffy: 1 }, '', location.href);
+    } catch (_) { /* ignore */ }
+  });
+
+  try {
+    history.back = () => {};
+    const go = history.go.bind(history);
+    history.go = (delta) => {
+      if (typeof delta === 'number' && delta < 0) return;
+      return go(delta);
+    };
+  } catch (_) { /* ignore */ }
+
+  try {
+    const loc = window.location;
+    const replace = loc.replace.bind(loc);
+    loc.assign = replace;
+    const desc = Object.getOwnPropertyDescriptor(Location.prototype, 'href');
+    if (desc?.set) {
+      Object.defineProperty(loc, 'href', {
+        configurable: true,
+        enumerable: true,
+        get: desc.get?.bind(loc),
+        set: (v) => replace(String(v)),
+      });
+    }
+  } catch (_) { /* ignore */ }
+
+  const blockSideButton = (e) => {
+    if (e.button === 3 || e.button === 4) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+  window.addEventListener('mouseup', blockSideButton, true);
+  window.addEventListener('auxclick', blockSideButton, true);
+  window.addEventListener(
+    'keydown',
+    (e) => {
+      const key = e.key;
+      if (
+        ((e.metaKey || e.altKey) &&
+          (key === '[' || key === ']' || key === 'ArrowLeft' || key === 'ArrowRight')) ||
+        (e.altKey && (key === 'Left' || key === 'Right'))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    true
+  );
+
+  document.addEventListener(
+    'click',
+    (e) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (e.button != null && e.button !== 0) return;
+      const a = e.target?.closest?.('a[href]');
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return;
+      const raw = a.getAttribute('href');
+      if (!raw || raw.startsWith('#') || raw.startsWith('mailto:') || raw.startsWith('tel:')) return;
+      let url;
+      try {
+        url = new URL(a.href, location.href);
+      } catch (_) {
+        return;
+      }
+      if (url.origin !== location.origin) return;
+      e.preventDefault();
+      if (url.href !== location.href) location.replace(url.href);
+    },
+    true
+  );
+}
+
 function boot() {
   ensureStylesheet();
   applyTheme(getTheme());
   wrapBody();
   ensureAboutModal();
   wireAboutMenuEvent();
+  disableBrowserHistoryNavigation();
   // Re-apply logo after sidebar inject
   applyTheme(getTheme());
   document.documentElement.classList.remove('pdeffy-booting');
@@ -485,6 +642,7 @@ export default {
   openRecentInEditor,
   consumeRecentOpenRequest,
   getPdfEditorHref,
+  getAssistentePdfHref,
   filterToolCards,
   wireHomeSearch,
   setSidebarCollapsed,

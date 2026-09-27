@@ -298,54 +298,62 @@ const StatusManager = (() => {
         const hasSingleFile = params.savePath !== undefined && !isDirectory;
 
         if (type === 'success') {
-            inner += `<br>`;
-
-            // If it's a zip, use savePath as the reference, otherwise use the first saved file
+            // Only show file/folder actions when we actually have an output path.
+            // Generic success messages (e.g. "entities detected") must not invent a folder link.
             const referencePath = hasMultipleFiles ? params.savedFiles[0] : params.savePath;
-            const sep = String(referencePath || '').includes('\\') ? '\\' : '/';
-            const folderPath = isDirectory
-                ? referencePath
-                : String(referencePath || '').substring(0, String(referencePath || '').lastIndexOf(sep));
+            const hasPath =
+                referencePath != null && String(referencePath).trim().length > 0;
 
-            const folderLabel = (typeof window.getMessage === 'function')
-                ? window.getMessage('statusOpenFolder')
-                : 'Open folder';
+            if (hasPath) {
+                inner += `<br>`;
 
-            if (hasMultipleFiles) {
-                const viewResultsLabel = (typeof window.getMessage === 'function')
-                    ? window.getMessage('statusViewResults')
-                    : 'View results';
+                const sep = String(referencePath).includes('\\') ? '\\' : '/';
+                const folderPath = isDirectory
+                    ? String(referencePath)
+                    : String(referencePath).substring(0, String(referencePath).lastIndexOf(sep));
 
-                inner += `
-                    <span 
-                        class="view-results-btn langText" 
-                        data-i18n="statusViewResults"
-                        style="cursor: pointer; text-decoration: underline; font-weight: 600;"
-                        data-files='${_escapeAttr(JSON.stringify(params.savedFiles))}'
-                    >${viewResultsLabel}</span>
-                    <span style="margin: 0 8px;">|</span>`;
-            } else if (hasSingleFile) {
-                const fileLabel = (typeof window.getMessage === 'function')
-                    ? window.getMessage('statusOpenFile')
-                    : 'Open file';
+                const folderLabel = (typeof window.getMessage === 'function')
+                    ? window.getMessage('statusOpenFolder')
+                    : 'Open folder';
 
-                inner += `
-                    <span 
-                        class="open-file-btn langText" 
-                        data-i18n="statusOpenFile"
-                        style="cursor: pointer; text-decoration: underline; font-weight: 600;"
-                        data-file="${_escapeAttr(params.savePath)}"
-                    >${fileLabel}</span>
-                    <span style="margin: 0 8px;">|</span>`;
+                if (hasMultipleFiles) {
+                    const viewResultsLabel = (typeof window.getMessage === 'function')
+                        ? window.getMessage('statusViewResults')
+                        : 'View results';
+
+                    inner += `
+                        <span 
+                            class="view-results-btn langText" 
+                            data-i18n="statusViewResults"
+                            style="cursor: pointer; text-decoration: underline; font-weight: 600;"
+                            data-files='${_escapeAttr(JSON.stringify(params.savedFiles))}'
+                        >${viewResultsLabel}</span>
+                        <span style="margin: 0 8px;">|</span>`;
+                } else if (hasSingleFile) {
+                    const fileLabel = (typeof window.getMessage === 'function')
+                        ? window.getMessage('statusOpenFile')
+                        : 'Open file';
+
+                    inner += `
+                        <span 
+                            class="open-file-btn langText" 
+                            data-i18n="statusOpenFile"
+                            style="cursor: pointer; text-decoration: underline; font-weight: 600;"
+                            data-file="${_escapeAttr(params.savePath)}"
+                        >${fileLabel}</span>
+                        <span style="margin: 0 8px;">|</span>`;
+                }
+
+                if (folderPath) {
+                    inner += `
+                        <span 
+                            class="open-folder-btn langText" 
+                            data-i18n="statusOpenFolder"
+                            style="cursor: pointer; text-decoration: underline;"
+                            data-folder="${_escapeAttr(folderPath)}"
+                        >${folderLabel}</span>`;
+                }
             }
-
-            inner += `
-                <span 
-                    class="open-folder-btn langText" 
-                    data-i18n="statusOpenFolder"
-                    style="cursor: pointer; text-decoration: underline;"
-                    data-folder="${_escapeAttr(folderPath)}"
-                >${folderLabel}</span>`;
         }
 
         el.innerHTML = inner;

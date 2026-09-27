@@ -4,6 +4,7 @@
  */
 
 import { actionMaskIcon, navMaskIcon, toolIconFileForPath, toolImg } from './icons.js';
+import { parseAcceptExtensions, wireTauriDropZone } from './filePicker.js';
 
 function appBase() {
   const path = window.location.pathname.replace(/\\/g, '/');
@@ -47,6 +48,17 @@ const TOOL_GUIDES = {
       'Seleziona il PDF da ottimizzare',
       'Scegli il livello di compressione preferito',
       'Scarica la versione più leggera',
+    ],
+  },
+  summarize: {
+    icon: 'summarize-pdf.svg',
+    accent: 'yellow',
+    title: 'Riassumi il PDF',
+    lead: 'Estrai il testo e genera un riassunto con un modello AI locale sul tuo PC.',
+    steps: [
+      'Scarica il modello locale (una sola volta)',
+      'Seleziona il PDF da riassumere',
+      'Leggi o copia il riassunto generato on-device',
     ],
   },
   protect: {
@@ -243,6 +255,8 @@ function detectToolId(pathname = location.pathname) {
   if (/\/merge\//.test(path)) return 'merge';
   if (/\/split\//.test(path)) return 'split';
   if (/\/compressPdf\//.test(path)) return 'compress';
+  if (/\/assistentePdf\//.test(path)) return 'assistant';
+  if (/\/summarizePdf\//.test(path)) return 'summarize';
   if (/\/protectPdf\//.test(path)) return 'protect';
   if (/\/pdfGenerator\//.test(path)) return 'template';
   if (/\/docxToPdf\//.test(path)) return 'docx';
@@ -335,7 +349,7 @@ function detectHub() {
   const nav = document.body.getAttribute('data-nav') || '';
   if (nav === 'organize' || nav === 'convert' || nav === 'edit') return nav;
   const path = location.pathname.replace(/\\/g, '/');
-  if (/\/(merge|split|compressPdf|protectPdf|pdfGenerator|rotatePdf)\//.test(path)) return 'organize';
+  if (/\/(merge|split|compressPdf|summarizePdf|assistentePdf|protectPdf|pdfGenerator|rotatePdf)\//.test(path)) return 'organize';
   if (/\/(docxToPdf|excelToPdf|powerPointToPdf|imageToPdf|markdownToPdf|pdfToDocx|pdfToExcel|pdfToPptx|pdfToImage|pdfToMarkdown)\//.test(path)) return 'convert';
   if (/\/(watermark|deletePages|redactPdf|pdfEditor)\//.test(path)) return 'edit';
   return 'default';
@@ -478,17 +492,29 @@ function restyleDropzones(root) {
         drop.classList.remove('is-dragover');
       });
     });
-    drop.addEventListener('drop', (e) => {
-      const files = e.dataTransfer?.files;
+
+    const assignDroppedFiles = (files) => {
       if (!files?.length) return;
       try {
         const dt = new DataTransfer();
         const max = input.multiple ? files.length : 1;
-        for (let i = 0; i < max; i++) dt.items.add(files[i]);
+        for (let i = 0; i < Math.min(max, files.length); i++) dt.items.add(files[i]);
         input.files = dt.files;
         input.dispatchEvent(new Event('change', { bubbles: true }));
       } catch (_) { /* some browsers block DataTransfer assignment */ }
+    };
+
+    // HTML5 fallback (browsers / non-Tauri). In Tauri, OS drops are intercepted.
+    drop.addEventListener('drop', (e) => {
+      assignDroppedFiles(e.dataTransfer?.files);
     });
+
+    // Tauri-native file drop (required inside the desktop webview).
+    const exts = parseAcceptExtensions(input.accept);
+    wireTauriDropZone(drop, {
+      acceptExtensions: exts.length ? exts : ['pdf'],
+      onFiles: (files) => assignDroppedFiles(files),
+    }).catch(() => { /* ignore */ });
   });
 }
 
@@ -505,6 +531,7 @@ function findSubtitleText(container, titleEl) {
     'mergePdfDesc',
     'splitPdfDesc',
     'compressPdfTileDesc',
+    'summarizePdfTileDesc',
     'protectPdfTileDesc',
     'docxToPdfDesc',
     'excelToPdfDesc',
