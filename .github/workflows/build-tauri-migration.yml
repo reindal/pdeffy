@@ -56,7 +56,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: .
-          tauriScript: npm run tauri
+          tauriScript: npm run
           args: build
 
       - name: Upload build artifacts
