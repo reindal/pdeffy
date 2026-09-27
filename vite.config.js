@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { readdirSync, statSync } from 'fs';
+import { readdirSync, statSync, cpSync, mkdirSync } from 'fs';
 import { pdeffyRequireShim } from './vite-plugin-pdeffy-shim.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -29,8 +29,23 @@ function collectHtmlPages(rootDir) {
 const root = __dirname;
 const input = collectHtmlPages(root);
 
+/** UI SVG/PNG live in repo assets/; Vite emits JS/CSS into dist/assets — merge both at build time. */
+function copyStaticUiAssets() {
+  return {
+    name: 'copy-static-ui-assets',
+    closeBundle() {
+      const from = resolve(root, 'assets');
+      const to = resolve(root, 'dist/assets');
+      mkdirSync(to, { recursive: true });
+      cpSync(from, to, { recursive: true, force: true });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [pdeffyRequireShim()],
+  // Tauri loads nested HTML from the bundle; relative URLs keep icons/scripts working on Windows.
+  base: './',
+  plugins: [pdeffyRequireShim(), copyStaticUiAssets()],
   clearScreen: false,
   server: {
     port: 1420,

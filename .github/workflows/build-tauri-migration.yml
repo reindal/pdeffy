@@ -14,14 +14,20 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    env:
+      # llama-cpp-sys-2 / ggml use std::filesystem (macOS 10.15+); GHA defaults to 10.13
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
 
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: macos-latest
+            tauriArgs: --features ai-metal
           - os: windows-latest
+            tauriArgs: ""
           - os: ubuntu-latest
+            tauriArgs: ""
 
     steps:
       - name: Check out Git repository
@@ -45,7 +51,11 @@ jobs:
             librsvg2-dev \
             patchelf \
             libgtk-3-dev \
-            libayatana-appindicator3-dev
+            libayatana-appindicator3-dev \
+            cmake \
+            build-essential \
+            clang \
+            libclang-dev
 
       - name: Install frontend dependencies
         run: npm install
@@ -56,6 +66,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: .
+          args: ${{ matrix.tauriArgs }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
