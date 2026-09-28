@@ -105,10 +105,6 @@ body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
     padding-bottom: 4px;
 }
 
-.pdfEditorTabNewBtn {
-    flex: 0 0 auto;
-}
-
 .pdfEditorDocumentTabs {
     display: flex;
     align-items: flex-end;
@@ -225,8 +221,25 @@ body.pdfEditorEditing .pdfEditorFileBarLeft .pdfEditorDirtyBadge {
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
-    padding: 0 12px 12px;
+    padding: 4px 12px 12px;
     background: #fffcf3;
+}
+
+.docInfoCertBackLink {
+    align-self: flex-start;
+    border: none;
+    background: transparent;
+    color: #52617a;
+    font: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 4px 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.docInfoCertBackLink:hover {
+    color: #101a3a;
 }
 
 body.pdfEditorDocInfoOpen .pdfEditorDocInfoPanel {
@@ -239,12 +252,12 @@ body.pdfEditorDocInfoOpen #pdfEditorAiSubTabs {
     display: none !important;
 }
 
-body.pdfEditorDocInfoOpen .pdfEditorInspectorHeader .pdfEditorInspectorTitle,
 body.pdfEditorDocInfoOpen .pdfEditorInspectorHeader .aiInspectorPrivacyBadge {
-    visibility: hidden;
-    height: 0;
-    margin: 0;
-    overflow: hidden;
+    display: none;
+}
+
+body.pdfEditorDocInfoOpen .pdfEditorPropsToggle {
+    display: none;
 }
 
 .docInfoShell {
@@ -1021,6 +1034,34 @@ body.pdfEditorEditing .pdfEditorFileBar:not(:has(#pdfEditorSignedBanner:not([hid
 
 .pdfEditorActionMenu button:hover {
     background: var(--pdf-cream);
+}
+
+.pdfEditorExportInMore {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pdfEditorExportInMore > button[role='menuitem'] {
+    width: 100%;
+}
+
+.pdfEditorExportSubmenuInMore {
+    position: static;
+    top: auto;
+    right: auto;
+    min-width: 0;
+    margin: 0 0 4px;
+    padding: 0 0 0 26px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.pdfEditorExportSubmenuInMore button {
+    font-size: 0.84rem;
+    padding: 6px 10px;
 }
 
 .pdfEditorSigSaved {

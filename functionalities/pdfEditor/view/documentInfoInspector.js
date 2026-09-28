@@ -123,12 +123,10 @@
         const nSig = extras.signatures?.length || 0;
         const agg = global.PdfEditorSignatureStatus?.aggregateSignatureUi(extras.signatures || []);
 
+        ctx.setDocInfoInspectorTitle?.('pdfEditorDocInfoTitle', 'Informazioni documento');
+
         panel.innerHTML = `
           <div class="docInfoShell">
-            <div class="docInfoHeaderRow">
-              <h3 class="docInfoTitle langText" data-i18n="pdfEditorDocInfoTitle">Informazioni documento</h3>
-              <button type="button" class="docInfoCloseBtn" id="docInfoCloseBtn" aria-label="${msg('pdfEditorDocInfoClose', 'Chiudi')}">×</button>
-            </div>
             <div class="docInfoTabs" role="tablist">
               <button type="button" role="tab" class="docInfoTabBtn ${activeInfoTab === 'properties' ? 'is-active' : ''}" data-tab="properties" aria-selected="${activeInfoTab === 'properties'}">
                 <span class="docInfoTabIcon" aria-hidden="true">${TAB_ICONS.properties}</span>
@@ -147,7 +145,6 @@
             <p class="docInfoFooterHint langText" data-i18n="pdfEditorDocInfoFooter" ${activeInfoTab === 'attachments' ? '' : 'hidden'}>Gli allegati fanno parte di questo PDF.</p>
           </div>`;
 
-        panel.querySelector('#docInfoCloseBtn')?.addEventListener('click', () => close(true));
         panel.querySelectorAll('.docInfoTabBtn').forEach((btn) => {
             btn.addEventListener('click', () => {
                 if (btn.disabled) return;
@@ -301,13 +298,11 @@
 
     function renderCertificateView(panel, extras) {
         const sig = (extras.signatures || []).find((s) => s.id === certViewSigId);
+        ctx.setDocInfoInspectorTitle?.('pdfEditorSigCertTitle', 'Certificato');
+
         panel.innerHTML = `
           <div class="docInfoShell">
-            <div class="docInfoHeaderRow">
-              <button type="button" class="docInfoBackBtn" id="docInfoCertBack">←</button>
-              <h3 class="docInfoTitle">${msg('pdfEditorSigCertTitle', 'Certificato')}</h3>
-              <button type="button" class="docInfoCloseBtn" id="docInfoCloseBtn">×</button>
-            </div>
+            <button type="button" class="docInfoCertBackLink" id="docInfoCertBack">← ${msg('pdfEditorDocInfoBack', 'Indietro')}</button>
             <div class="docInfoCertBody">
               <p class="docInfoCertNotice langText" data-i18n="pdfEditorSigCertNotice">I dati del certificato X.509 non sono estratti da Pdeffy. Di seguito i metadati disponibili nel dizionario firma.</p>
               <dl class="docInfoSigFields" id="docInfoCertFields"></dl>
@@ -317,7 +312,6 @@
             certViewSigId = null;
             render();
         });
-        panel.querySelector('#docInfoCloseBtn')?.addEventListener('click', () => close(true));
         const dl = panel.querySelector('#docInfoCertFields');
         if (!sig) {
             appendField(dl, msg('pdfEditorSigCertMissing', 'Firma'), msg('pdfEditorSigCertNotFound', 'Non trovata'));

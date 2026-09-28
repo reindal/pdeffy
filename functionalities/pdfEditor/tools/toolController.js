@@ -1949,6 +1949,7 @@
             getActiveTool: () => activeTool,
             getReturnInspectorLabel,
             restoreInspectorState,
+            refreshInspectorTitle: () => updateInspectorTitle(activeTool),
         };
     }
 

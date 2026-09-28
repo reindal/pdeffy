@@ -40,7 +40,6 @@
                     <div id="pdfEditorDocumentTabs" class="pdfEditorDocumentTabs" role="tablist" aria-label="Documenti aperti" hidden></div>
                 </div>
                 <div class="pdfEditorFileBarActions pdfEditorDocTabsRowActions">
-                    <button type="button" id="pdfEditorTabNew" class="pdeffy-btn pdeffy-btn-ghost pdfEditorActionBtn pdfEditorIconOnly pdfEditorTabNewBtn" hidden aria-label="Nuovo documento" title="Nuovo documento">+</button>
                     <button type="button" id="pdfEditorOpenFile" class="pdeffy-btn pdeffy-btn-ghost pdfEditorActionBtn">
                         <span class="pdfEditorActionIcon" data-icon="open-file.svg" aria-hidden="true"></span>
                         <span class="langText" data-i18n="pdfEditorOpenFile">Apri</span>
@@ -49,18 +48,10 @@
                         <span class="pdfEditorActionIcon" data-icon="save.svg" aria-hidden="true"></span>
                         <span class="langText" data-i18n="pdfEditorSave">Salva</span>
                     </button>
-                    <div class="pdfEditorActionMenuWrap">
-                        <button type="button" id="pdfEditorExportMenu" class="pdeffy-btn pdeffy-btn-primary pdfEditorActionBtn" disabled aria-haspopup="menu" aria-expanded="false">
-                            <span class="pdfEditorActionIcon" data-icon="export.svg" aria-hidden="true"></span>
-                            <span class="langText" data-i18n="pdfEditorExportMenu">Esporta</span>
-                        </button>
-                        <div id="pdfEditorExportMenuList" class="pdfEditorActionMenu" hidden role="menu">
-                            <button type="button" role="menuitem" data-export="docx" class="langText" id="pdfEditorExportDocx">Word (.docx)</button>
-                            <button type="button" role="menuitem" data-export="txt" class="langText" id="pdfEditorExportTxt">Testo (.txt)</button>
-                            <button type="button" role="menuitem" data-export="png" class="langText" id="pdfEditorExportPng">Immagini PNG</button>
-                            <button type="button" role="menuitem" data-export="jpg" class="langText" id="pdfEditorExportJpg">Immagini JPG</button>
-                        </div>
-                    </div>
+                    <button type="button" id="pdfEditorPrint" class="pdeffy-btn pdeffy-btn-primary pdfEditorActionBtn" disabled>
+                        <span class="pdfEditorActionIcon" data-icon="print.svg" aria-hidden="true"></span>
+                        <span class="langText" data-i18n="pdfEditorPrint">Stampa</span>
+                    </button>
                     <div class="pdfEditorActionMenuWrap">
                         <button type="button" id="pdfEditorFileMore" class="pdeffy-btn pdeffy-btn-ghost pdfEditorActionBtn pdfEditorIconOnly" disabled aria-haspopup="menu" aria-expanded="false" aria-label="Altre azioni file" title="Altro">
                             <span aria-hidden="true">⋯</span>
@@ -70,10 +61,18 @@
                                 <span class="pdfEditorActionIcon" data-icon="save-as.svg" aria-hidden="true"></span>
                                 <span class="langText" data-i18n="pdfEditorSaveAs">Salva con nome</span>
                             </button>
-                            <button type="button" role="menuitem" id="pdfEditorPrint">
-                                <span class="pdfEditorActionIcon" data-icon="print.svg" aria-hidden="true"></span>
-                                <span class="langText" data-i18n="pdfEditorPrint">Stampa</span>
-                            </button>
+                            <div class="pdfEditorExportInMore">
+                                <button type="button" role="menuitem" id="pdfEditorExportMenu" disabled aria-haspopup="menu" aria-expanded="false">
+                                    <span class="pdfEditorActionIcon" data-icon="export.svg" aria-hidden="true"></span>
+                                    <span class="langText" data-i18n="pdfEditorExportMenu">Esporta</span>
+                                </button>
+                                <div id="pdfEditorExportMenuList" class="pdfEditorActionMenu pdfEditorExportSubmenuInMore" hidden role="menu">
+                                    <button type="button" role="menuitem" data-export="docx" class="langText" id="pdfEditorExportDocx">Word (.docx)</button>
+                                    <button type="button" role="menuitem" data-export="txt" class="langText" id="pdfEditorExportTxt">Testo (.txt)</button>
+                                    <button type="button" role="menuitem" data-export="png" class="langText" id="pdfEditorExportPng">Immagini PNG</button>
+                                    <button type="button" role="menuitem" data-export="jpg" class="langText" id="pdfEditorExportJpg">Immagini JPG</button>
+                                </div>
+                            </div>
                             <button type="button" role="menuitem" id="pdfEditorShare">
                                 <span class="pdfEditorActionIcon" data-icon="share.svg" aria-hidden="true"></span>
                                 <span class="langText" data-i18n="pdfEditorShare">Condividi</span>

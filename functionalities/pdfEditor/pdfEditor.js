@@ -299,20 +299,33 @@ function closeDocumentSession(id) {
     }
 }
 
+function setDocInfoInspectorTitle(i18nKey, fallback) {
+    const titleEl = document.getElementById('pdfEditorInspectorTitle');
+    if (!titleEl) return;
+    titleEl.textContent = tMsg(i18nKey, fallback);
+    titleEl.classList.add('langText');
+    titleEl.setAttribute('data-i18n', i18nKey);
+}
+
 function setInspectorMode(mode) {
     const toolBodyEl = document.getElementById('pdfEditorToolBody');
     const panel = document.getElementById('pdfEditorDocInfoPanel');
     const aiSub = document.getElementById('pdfEditorAiSubTabs');
+    const propsToggle = document.getElementById('pdfEditorPropsToggle');
     if (mode === 'docinfo') {
         if (toolBodyEl) toolBodyEl.hidden = true;
         if (panel) panel.hidden = false;
         if (aiSub) aiSub.hidden = true;
+        if (propsToggle) propsToggle.hidden = true;
+        setDocInfoInspectorTitle('pdfEditorDocInfoTitle', 'Informazioni documento');
     } else {
         if (toolBodyEl) toolBodyEl.hidden = false;
         if (panel) {
             panel.hidden = true;
             panel.innerHTML = '';
         }
+        if (propsToggle) propsToggle.hidden = false;
+        if (toolController?.refreshInspectorTitle) toolController.refreshInspectorTitle();
     }
 }
 
@@ -327,8 +340,6 @@ function signatureUiForTab() {
 function syncDocumentTabs() {
     ensureDocumentUi();
     documentTabBar?.render();
-    const tabNew = document.getElementById('pdfEditorTabNew');
-    if (tabNew) tabNew.hidden = !document.body.classList.contains('pdfEditorEditing');
 }
 
 function openDocumentInfo(tab, returnFocusEl) {
@@ -380,11 +391,6 @@ function ensureDocumentUi() {
         });
     }
 
-    document.getElementById('pdfEditorTabNew')?.addEventListener('click', () => {
-        fileInput.dataset.pdeffyNewTab = '1';
-        fileInput.click();
-    });
-
     if (typeof PdfEditorDocumentInfo !== 'undefined') {
         PdfEditorDocumentInfo.bind({
             getActiveDocId: () => activeDocId,
@@ -409,6 +415,7 @@ function ensureDocumentUi() {
             saveAttachment,
             openAttachment: openAttachmentFromInspector,
             getDocumentMetadata: () => refreshDocumentMetadata(),
+            setDocInfoInspectorTitle: (key, fallback) => setDocInfoInspectorTitle(key, fallback),
         });
     }
 
@@ -800,6 +807,30 @@ function isTempEditPath(filePath) {
     return /pdeffy-edit-/i.test(name) || /pdeffy_in_/i.test(name);
 }
 
+function normalizeDocPath(filePath) {
+    if (!filePath) return '';
+    return String(filePath).replace(/\\/g, '/').toLowerCase();
+}
+
+function findSessionIdByFilePath(filePath) {
+    const key = normalizeDocPath(filePath);
+    if (!key) return null;
+    for (const session of documentSessions) {
+        if (
+            normalizeDocPath(session.filePath) === key ||
+            normalizeDocPath(session.lastSavedPath) === key
+        ) {
+            return session.id;
+        }
+    }
+    if (document.body.classList.contains('pdfEditorEditing') && activeDocId) {
+        if (normalizeDocPath(model.filePath) === key || normalizeDocPath(lastSavedPath) === key) {
+            return activeDocId;
+        }
+    }
+    return null;
+}
+
 function updateExportButton() {
     updateFileActions();
 }
@@ -823,13 +854,13 @@ function closeExportMenu() {
 
 function closeFileMoreMenu() {
     if (!fileMoreMenu || !fileMoreBtn) return;
+    closeExportMenu();
     fileMoreMenu.hidden = true;
     fileMoreBtn.setAttribute('aria-expanded', 'false');
 }
 
 function toggleExportMenu() {
     if (!exportMenu || !exportMenuBtn || exportMenuBtn.disabled) return;
-    closeFileMoreMenu();
     const open = exportMenu.hidden;
     exportMenu.hidden = !open;
     exportMenuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -867,13 +898,16 @@ function confirmRedactionFlattenIfNeeded() {
     return window.confirm(msg);
 }
 
-async function writePdfToPath(savePath, { quiet } = {}) {
+async function writePdfToPath(savePath, { quiet, adoptDocument = true } = {}) {
     const pdfBytes = await buildCurrentPdfBytes();
     await fs.writeFile(savePath, pdfBytes);
-    model.filePath = savePath;
-    lastSavedPath = savePath;
-    model.fileName = path.basename(savePath);
-    if (fileNameEl) fileNameEl.textContent = model.fileName;
+    if (adoptDocument) {
+        model.filePath = savePath;
+        lastSavedPath = savePath;
+        model.fileName = path.basename(savePath);
+        if (fileNameEl) fileNameEl.textContent = model.fileName;
+        clearDirty();
+    }
     if (!quiet) {
         StatusManager.show(STATUS, 'success', 'successPdfCreated', {
             filename: path.basename(savePath),
@@ -881,7 +915,8 @@ async function writePdfToPath(savePath, { quiet } = {}) {
         });
         setTimeout(() => CustomMetadataModule.reset(), 2000);
     }
-    clearDirty();
+    persistActiveSession();
+    syncDocumentTabs();
     return savePath;
 }
 
@@ -906,7 +941,11 @@ async function savePdfAs({ skipRedactConfirm = false } = {}) {
             StatusManager.show(STATUS, 'error', 'saveCancelled');
             return null;
         }
-        return await writePdfToPath(savePath);
+        const originPath =
+            model.filePath && !isTempEditPath(model.filePath) ? model.filePath : null;
+        const keepOriginTab =
+            originPath && normalizeDocPath(originPath) !== normalizeDocPath(savePath);
+        return await writePdfToPath(savePath, { adoptDocument: !keepOriginTab });
     } catch (err) {
         console.error('[pdfEditor] save as', err);
         StatusManager.show(STATUS, 'error', 'errorPrefix', { error: err.message || String(err) });
@@ -1812,8 +1851,6 @@ function resetWorkspace() {
     documentSessions = [];
     activeDocId = null;
     documentTabBar?.render();
-    const tabNew = document.getElementById('pdfEditorTabNew');
-    if (tabNew) tabNew.hidden = true;
     if (typeof PdfEditorTextSearch !== 'undefined') PdfEditorTextSearch.clear();
     PdfEditorDocumentModel.resetModel(model);
     selectedPageId = null;
@@ -2024,11 +2061,22 @@ async function openRecentDoc(doc) {
     try {
         document.getElementById('pdfEditorRecentError')?.setAttribute('hidden', '');
 
+        const targetPath = doc?.path || null;
+
         const { fileForRecentDoc } = await import('/src/ui/recentFiles.js');
         const resolved = await fileForRecentDoc(doc);
+        const resolvedPath = resolved?.path || targetPath;
+
+        if (resolvedPath && document.body.classList.contains('pdfEditorEditing')) {
+            const existingId = findSessionIdByFilePath(resolvedPath);
+            if (existingId) {
+                await activateDocumentSession(existingId);
+                return;
+            }
+        }
 
         if (resolved?.file && isPdfFile(resolved.file)) {
-            await loadPdfFile(resolved.file, resolved.path || doc.path || null);
+            await loadPdfFile(resolved.file, resolvedPath);
             return;
         }
 

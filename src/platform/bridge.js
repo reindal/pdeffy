@@ -88,8 +88,14 @@ export const ipcRenderer = {
           return safeInvoke('get-downloads-path');
         case 'open-folder':
           return safeInvoke('open-folder', { folderPath: payload });
-        case 'open-file':
+        case 'open-file-external':
           return safeInvoke('open-file', { filePath: payload });
+        case 'open-file': {
+          const filePath =
+            typeof payload === 'string' ? payload : payload?.filePath || payload?.path;
+          const { openFileInPdeffy } = await import('../ui/openInApp.js');
+          return openFileInPdeffy(filePath);
+        }
         case 'open-external-url':
           await openUrl(payload);
           return { success: true };
