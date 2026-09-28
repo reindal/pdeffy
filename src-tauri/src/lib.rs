@@ -20,6 +20,7 @@ fn dispatch_cli_pdf_paths(app: &tauri::AppHandle) {
 }
 
 fn handle_run_event(app: &tauri::AppHandle, event: RunEvent) {
+    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "android"))]
     if let RunEvent::Opened { urls } = event {
         for url in urls {
             if let Ok(path) = url.to_file_path() {
@@ -27,6 +28,8 @@ fn handle_run_event(app: &tauri::AppHandle, event: RunEvent) {
             }
         }
     }
+    #[cfg(not(any(target_os = "macos", target_os = "ios", target_os = "android")))]
+    let _ = (app, event);
 }
 
 fn build_app_menu(app: &tauri::App) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {

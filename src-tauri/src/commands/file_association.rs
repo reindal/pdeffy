@@ -66,6 +66,7 @@ mod macos {
 #[cfg(target_os = "windows")]
 mod windows {
     use std::os::windows::process::CommandExt;
+    use std::path::Path;
     use std::process::Command;
 
     const PROG_ID: &str = "Pdeffy.Pdf";
@@ -126,6 +127,7 @@ Set-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Classes\.pdf" -Name
 
 #[cfg(target_os = "linux")]
 mod linux {
+    use super::PDF_MIME;
     use std::process::Command;
 
     pub fn desktop_id() -> &'static str {
