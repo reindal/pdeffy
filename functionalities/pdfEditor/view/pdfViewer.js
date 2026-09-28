@@ -9,11 +9,14 @@
         const {
             scrollContainerEl,
             singleContainerEl,
-            model,
+            model: modelOption,
+            getModel,
             getPdfPage,
             onPageInView,
             onAfterRender,
         } = options;
+
+        const resolveModel = typeof getModel === 'function' ? getModel : () => modelOption;
 
         let viewMode = VIEW_SINGLE;
         let zoomPercent = 100;
@@ -21,7 +24,7 @@
         let renderToken = 0;
 
         function getActive() {
-            return global.PdfEditorDocumentModel.getActivePages(model);
+            return global.PdfEditorDocumentModel.getActivePages(resolveModel());
         }
 
         function computeScale(pdfPage, pageState, containerWidth) {

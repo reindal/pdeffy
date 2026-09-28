@@ -49,6 +49,419 @@ let documentExtras = {
     hasSignatures: false,
     isCertified: false,
 };
+/** @type {ReturnType<typeof PdfEditorDocumentTabBar.createDocumentTabBar>|null} */
+let documentTabBar = null;
+/** @type {string|null} */
+let activeDocId = null;
+/** @type {object[]} */
+let documentSessions = [];
+let sessionSwitchToken = 0;
+
+function emptyDocumentExtras() {
+    return {
+        attachments: [],
+        signatures: [],
+        hasAttachments: false,
+        hasSignatures: false,
+        isCertified: false,
+    };
+}
+
+function createSessionId() {
+    return `doc_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function createDocumentSession(id = createSessionId()) {
+    return {
+        id,
+        fileName: null,
+        filePath: null,
+        originalBuffer: null,
+        pdfPassword: null,
+        isEncrypted: false,
+        sourcePageCount: 0,
+        pages: [],
+        watermarks: [],
+        redactions: [],
+        signatures: [],
+        markups: [],
+        comments: [],
+        inks: [],
+        bookmarks: [],
+        formFields: [],
+        formValues: {},
+        formInitialValues: {},
+        manualFormFills: [],
+        acroFormPresent: false,
+        ocrText: '',
+        anonymizedText: '',
+        hasEmbeddedText: true,
+        viewerContentMode: 'pdf',
+        selectedPageId: null,
+        lastSavedPath: null,
+        documentExtras: emptyDocumentExtras(),
+        documentMetadata: null,
+        isDirty: false,
+    };
+}
+
+function getActiveSession() {
+    return documentSessions.find((s) => s.id === activeDocId) || null;
+}
+
+function destroyCurrentPdfDoc() {
+    try {
+        model.pdfJsDoc?.destroy?.();
+    } catch (_) {
+        /* ignore */
+    }
+}
+
+function prepareInspectorForDocumentSwitch() {
+    if (document.body.classList.contains('pdfEditorDocInfoOpen') && typeof PdfEditorDocumentInfo !== 'undefined') {
+        PdfEditorDocumentInfo.close(false);
+    }
+    setInspectorMode('tool');
+}
+
+function persistActiveSession() {
+    const session = getActiveSession();
+    if (!session || !model.originalBuffer) return;
+    session.fileName = model.fileName;
+    session.filePath = model.filePath;
+    session.originalBuffer = model.originalBuffer;
+    session.pdfPassword = model.pdfPassword;
+    session.isEncrypted = model.isEncrypted;
+    session.sourcePageCount = model.sourcePageCount;
+    session.pages = model.pages.map((p) => ({ ...p }));
+    session.watermarks = model.watermarks.map((x) => ({ ...x }));
+    session.redactions = model.redactions.map((x) => ({ ...x }));
+    session.signatures = model.signatures.map((x) => ({ ...x }));
+    session.markups = model.markups.map((x) => ({ ...x }));
+    session.comments = model.comments.map((x) => ({ ...x }));
+    session.inks = model.inks.map((x) => ({ ...x }));
+    session.bookmarks = model.bookmarks.map((x) => ({ ...x }));
+    session.formFields = model.formFields.map((x) => ({ ...x }));
+    session.formValues = { ...model.formValues };
+    session.formInitialValues = { ...model.formInitialValues };
+    session.manualFormFills = model.manualFormFills.map((x) => ({ ...x }));
+    session.acroFormPresent = model.acroFormPresent;
+    session.ocrText = model.ocrText;
+    session.anonymizedText = model.anonymizedText;
+    session.hasEmbeddedText = model.hasEmbeddedText;
+    session.viewerContentMode = model.viewerContentMode;
+    session.selectedPageId = selectedPageId;
+    session.lastSavedPath = lastSavedPath;
+    session.documentExtras = {
+        ...documentExtras,
+        attachments: [...(documentExtras.attachments || [])],
+        signatures: [...(documentExtras.signatures || [])],
+    };
+    session.isDirty = isDirty;
+    session.documentMetadata = model.documentMetadata || null;
+}
+
+function applySessionEditsToModel(session) {
+    model.fileName = session.fileName;
+    model.filePath = session.filePath;
+    model.originalBuffer = session.originalBuffer;
+    model.pdfPassword = session.pdfPassword;
+    model.isEncrypted = session.isEncrypted;
+    model.sourcePageCount = session.sourcePageCount;
+    model.pages = session.pages.map((p) => ({ ...p }));
+    model.watermarks = session.watermarks.map((x) => ({ ...x }));
+    model.redactions = session.redactions.map((x) => ({ ...x }));
+    model.signatures = session.signatures.map((x) => ({ ...x }));
+    model.markups = session.markups.map((x) => ({ ...x }));
+    model.comments = session.comments.map((x) => ({ ...x }));
+    model.inks = session.inks.map((x) => ({ ...x }));
+    model.bookmarks = session.bookmarks.map((x) => ({ ...x }));
+    model.formFields = session.formFields.map((x) => ({ ...x }));
+    model.formValues = { ...session.formValues };
+    model.formInitialValues = { ...session.formInitialValues };
+    model.manualFormFills = session.manualFormFills.map((x) => ({ ...x }));
+    model.acroFormPresent = session.acroFormPresent;
+    model.ocrText = session.ocrText;
+    model.anonymizedText = session.anonymizedText;
+    model.hasEmbeddedText = session.hasEmbeddedText;
+    model.viewerContentMode = session.viewerContentMode;
+    model.documentMetadata = session.documentMetadata || null;
+}
+
+function signatureUiForSession(session) {
+    const extras = session.documentExtras || emptyDocumentExtras();
+    if (!extras.hasSignatures || typeof PdfEditorSignatureStatus === 'undefined') return null;
+    const agg = PdfEditorSignatureStatus.aggregateSignatureUi(extras.signatures);
+    if (!agg) return null;
+    const label = tMsg(agg.labelKey, agg.fallback, agg.counts || {});
+    return { ...agg, tooltip: label };
+}
+
+function tabStateForSession(session) {
+    const extras = session.id === activeDocId ? documentExtras : session.documentExtras || emptyDocumentExtras();
+    const sigUi =
+        session.id === activeDocId ? signatureUiForTab() : signatureUiForSession(session);
+    return {
+        id: session.id,
+        active: session.id === activeDocId,
+        fileName: session.fileName || 'document.pdf',
+        attachmentsCount: extras.attachments?.length || 0,
+        signatureUi: sigUi,
+        signatureTooltip: sigUi?.tooltip || '',
+        dirty: session.id === activeDocId ? isDirty : !!session.isDirty,
+    };
+}
+
+async function activateDocumentSession(id) {
+    if (!id || id === activeDocId) return;
+    const token = ++sessionSwitchToken;
+    persistActiveSession();
+    const session = documentSessions.find((s) => s.id === id);
+    if (!session?.originalBuffer) return;
+
+    prepareInspectorForDocumentSwitch();
+    StatusManager.show(STATUS, 'processing', 'pdfEditorLoading');
+
+    try {
+        destroyCurrentPdfDoc();
+        PdfEditorDocumentModel.resetModel(model);
+        applySessionEditsToModel(session);
+        activeDocId = session.id;
+
+        const previewBuffer = session.originalBuffer.slice(0);
+        const { pdf, password } = await openPdfWithPassword(previewBuffer, session.pdfPassword || '');
+        if (token !== sessionSwitchToken) return;
+
+        model.pdfJsDoc = pdf;
+        model.pdfPassword = password || session.pdfPassword || null;
+        model.isEncrypted = !!model.pdfPassword || session.isEncrypted;
+        model.pdfJsPagesBySource.clear();
+
+        selectedPageId = session.selectedPageId;
+        const active = PdfEditorDocumentModel.getActivePages(model);
+        if (selectedPageId && !active.find((p) => p.id === selectedPageId)) {
+            selectedPageId = active[0]?.id ?? null;
+        }
+        lastSavedPath = session.lastSavedPath;
+        documentExtras = session.documentExtras || emptyDocumentExtras();
+        isDirty = session.isDirty;
+        if (fileNameEl) fileNameEl.textContent = model.fileName || '';
+
+        if (toolController) toolController.onDocumentLoaded();
+        await refreshUi();
+        await refreshDocumentExtras();
+        if (!model.documentMetadata) await refreshDocumentMetadata();
+        syncDocumentTabs();
+        updateFileActions();
+        StatusManager.hide(STATUS);
+        requestAnimationFrame(() => {
+            refreshUi();
+        });
+    } catch (err) {
+        console.error('[pdfEditor] activate session', err);
+        StatusManager.show(STATUS, 'error', 'errorPrefix', { error: err.message || String(err) });
+    }
+}
+
+function closeDocumentSession(id) {
+    const idx = documentSessions.findIndex((s) => s.id === id);
+    if (idx < 0) return;
+    const session = documentSessions[idx];
+    const dirty = id === activeDocId ? isDirty : !!session.isDirty;
+    if (dirty) {
+        if (
+            !window.confirm(
+                tMsg('pdfEditorTabCloseConfirmDirty', 'Chiudere il documento con modifiche non salvate?')
+            )
+        ) {
+            return;
+        }
+    } else if (!window.confirm(tMsg('pdfEditorTabCloseConfirm', 'Chiudere il documento?'))) {
+        return;
+    }
+
+    documentSessions.splice(idx, 1);
+    if (id === activeDocId) {
+        destroyCurrentPdfDoc();
+    }
+
+    if (!documentSessions.length) {
+        activeDocId = null;
+        resetWorkspace();
+        return;
+    }
+
+    if (id === activeDocId) {
+        const next = documentSessions[Math.min(idx, documentSessions.length - 1)];
+        activateDocumentSession(next.id);
+    } else {
+        syncDocumentTabs();
+    }
+}
+
+function setInspectorMode(mode) {
+    const toolBodyEl = document.getElementById('pdfEditorToolBody');
+    const panel = document.getElementById('pdfEditorDocInfoPanel');
+    const aiSub = document.getElementById('pdfEditorAiSubTabs');
+    if (mode === 'docinfo') {
+        if (toolBodyEl) toolBodyEl.hidden = true;
+        if (panel) panel.hidden = false;
+        if (aiSub) aiSub.hidden = true;
+    } else {
+        if (toolBodyEl) toolBodyEl.hidden = false;
+        if (panel) {
+            panel.hidden = true;
+            panel.innerHTML = '';
+        }
+    }
+}
+
+function signatureUiForTab() {
+    if (!documentExtras.hasSignatures || typeof PdfEditorSignatureStatus === 'undefined') return null;
+    const agg = PdfEditorSignatureStatus.aggregateSignatureUi(documentExtras.signatures);
+    if (!agg) return null;
+    const label = tMsg(agg.labelKey, agg.fallback, agg.counts || {});
+    return { ...agg, tooltip: label };
+}
+
+function syncDocumentTabs() {
+    ensureDocumentUi();
+    documentTabBar?.render();
+    const tabNew = document.getElementById('pdfEditorTabNew');
+    if (tabNew) tabNew.hidden = !document.body.classList.contains('pdfEditorEditing');
+}
+
+function openDocumentInfo(tab, returnFocusEl) {
+    ensureDocumentUi();
+    if (typeof PdfEditorDocumentInfo === 'undefined') return;
+    const infoTab =
+        tab === 'signatures' ? 'signatures' : tab === 'properties' ? 'properties' : 'attachments';
+    PdfEditorDocumentInfo.open({
+        docId: activeDocId,
+        tab: infoTab,
+        returnFocusEl,
+    });
+    setInspectorMode('docinfo');
+    document.body.classList.remove('pdfEditorPropsCollapsed');
+}
+
+window.__pdfEditorOpenSelectInspector = function openSelectInspector() {
+    if (!model.pdfJsDoc) return;
+    openDocumentInfo('properties');
+};
+
+function ensureDocumentUi() {
+    if (ensureDocumentUi._done) return;
+    ensureDocumentUi._done = true;
+
+    const tabsEl = document.getElementById('pdfEditorDocumentTabs');
+    if (typeof PdfEditorDocumentTabBar !== 'undefined' && tabsEl) {
+        documentTabBar = PdfEditorDocumentTabBar.createDocumentTabBar({
+            getContainer: () => tabsEl,
+            getTabState: () => ({
+                tabs: documentSessions.filter((s) => s.originalBuffer).map((s) => tabStateForSession(s)),
+            }),
+            onActivateTab: (tabId) => {
+                activateDocumentSession(tabId);
+            },
+            onCloseTab: (tabId) => {
+                closeDocumentSession(tabId);
+            },
+            onOpenAttachments: async (tabId, el) => {
+                if (tabId !== activeDocId) await activateDocumentSession(tabId);
+                if (toolController?.switchTool) toolController.switchTool('select', { skipDocInfo: true });
+                openDocumentInfo('attachments', el || document.activeElement);
+            },
+            onOpenSignatures: async (tabId, el) => {
+                if (tabId !== activeDocId) await activateDocumentSession(tabId);
+                if (toolController?.switchTool) toolController.switchTool('select', { skipDocInfo: true });
+                openDocumentInfo('signatures', el || document.activeElement);
+            },
+        });
+    }
+
+    document.getElementById('pdfEditorTabNew')?.addEventListener('click', () => {
+        fileInput.dataset.pdeffyNewTab = '1';
+        fileInput.click();
+    });
+
+    if (typeof PdfEditorDocumentInfo !== 'undefined') {
+        PdfEditorDocumentInfo.bind({
+            getActiveDocId: () => activeDocId,
+            getDocumentExtras: () => documentExtras,
+            getActiveTool: () => toolController?.getActiveTool?.() || 'select',
+            getToolBodyHtml: () => toolBody?.innerHTML || '',
+            getToolBodyScroll: () => toolBody?.scrollTop || 0,
+            getReturnInspectorLabel: () => toolController?.getReturnInspectorLabel?.() || tMsg('pdfEditorReturnSelect', 'Torna a Seleziona'),
+            setInspectorMode: (mode) => {
+                if (mode === 'docinfo') setInspectorMode('docinfo');
+                else {
+                    document.body.classList.remove('pdfEditorDocInfoOpen');
+                    setInspectorMode('tool');
+                    if (toolController?.getActiveTool) {
+                        const t = toolController.getActiveTool();
+                        const aiSub = document.getElementById('pdfEditorAiSubTabs');
+                        if (aiSub) aiSub.hidden = !['ai', 'summary', 'anonymize', 'questions'].includes(t);
+                    }
+                }
+            },
+            restoreInspectorState: (saved) => toolController?.restoreInspectorState?.(saved),
+            saveAttachment,
+            openAttachment: openAttachmentFromInspector,
+            getDocumentMetadata: () => refreshDocumentMetadata(),
+        });
+    }
+
+    document.getElementById('pdfEditorMenuDocProps')?.addEventListener('click', () => {
+        closeFileMoreMenu();
+        if (toolController?.switchTool) toolController.switchTool('select');
+        else openDocumentInfo('properties');
+    });
+}
+
+async function refreshDocumentMetadata() {
+    if (!model.pdfJsDoc || typeof PdfEditorDocumentMetadata === 'undefined') {
+        model.documentMetadata = null;
+        return null;
+    }
+    const active = PdfEditorDocumentModel.getActivePages(model);
+    try {
+        model.documentMetadata = await PdfEditorDocumentMetadata.inspectPdfMetadata(model.pdfJsDoc, {
+            fileName: model.fileName,
+            filePath: model.filePath,
+            byteLength: model.originalBuffer?.byteLength || 0,
+            pageCount: model.pdfJsDoc.numPages,
+            activePageCount: active.length,
+            isEncrypted: model.isEncrypted,
+            acroFormPresent: model.acroFormPresent,
+            hasEmbeddedText: model.hasEmbeddedText,
+        });
+    } catch (err) {
+        console.warn('[pdfEditor] document metadata', err);
+        model.documentMetadata = null;
+    }
+    const session = getActiveSession();
+    if (session) session.documentMetadata = model.documentMetadata;
+    return model.documentMetadata;
+}
+
+async function openAttachmentFromInspector(att) {
+    if (!att?.content?.length) return;
+    if (att.mime === 'application/pdf' || /\.pdf$/i.test(att.filename || '')) {
+        if (model.originalBuffer && hasUnsavedChanges()) {
+            const confirmMsg = tMsg(
+                'pdfEditorConfirmDiscard',
+                'Scartare le modifiche non salvate e aprire un altro PDF?'
+            );
+            if (!window.confirm(confirmMsg)) return;
+        }
+        const blob = new Blob([att.content], { type: 'application/pdf' });
+        const file = new File([blob], att.filename || 'attachment.pdf', { type: 'application/pdf' });
+        await loadPdfFile(file, null, { newTab: true });
+        return;
+    }
+    await viewAttachment(att);
+}
 
 function tMsg(key, fallback, params) {
     if (typeof window.getMessage === 'function') {
@@ -124,6 +537,8 @@ function updateDocumentExtrasUi() {
             bannerText.textContent = tMsg(key, fallback, { count: nSig });
         }
     }
+    syncDocumentTabs();
+    if (typeof PdfEditorDocumentInfo !== 'undefined') PdfEditorDocumentInfo.refresh();
 }
 
 async function refreshDocumentExtras() {
@@ -259,15 +674,13 @@ function renderSignaturesList() {
 }
 
 function showAttachmentsModal() {
-    renderAttachmentsList();
-    openModal('pdfEditorAttachmentsModal');
-    document.getElementById('pdfEditorAttachmentsBtn')?.setAttribute('aria-expanded', 'true');
+    toolController?.switchTool?.('select', { skipDocInfo: true });
+    openDocumentInfo('attachments');
 }
 
 function showSignaturesModal() {
-    renderSignaturesList();
-    openModal('pdfEditorSignaturesModal');
-    document.getElementById('pdfEditorSignaturesBtn')?.setAttribute('aria-expanded', 'true');
+    toolController?.switchTool?.('select', { skipDocInfo: true });
+    openDocumentInfo('signatures');
 }
 
 async function saveAttachment(att) {
@@ -308,6 +721,7 @@ async function viewAttachment(att) {
 function wireDocumentExtrasUi() {
     if (wireDocumentExtrasUi._done) return;
     wireDocumentExtrasUi._done = true;
+    ensureDocumentUi();
 
     document.getElementById('pdfEditorAttachmentsBtn')?.addEventListener('click', () => {
         showAttachmentsModal();
@@ -368,6 +782,8 @@ function hasUnsavedChanges() {
 function markDirty() {
     isDirty = true;
     updateFileActions();
+    persistActiveSession();
+    syncDocumentTabs();
 }
 
 window.__pdfEditorMarkDirty = markDirty;
@@ -375,6 +791,7 @@ window.__pdfEditorMarkDirty = markDirty;
 function clearDirty() {
     isDirty = false;
     updateFileActions();
+    syncDocumentTabs();
 }
 
 function isTempEditPath(filePath) {
@@ -1123,8 +1540,8 @@ function formatCommentMeta(comment) {
 window.__pdfEditorGetCommentAuthor = resolveCommentAuthor;
 window.__pdfEditorFormatCommentMeta = formatCommentMeta;
 
-async function openPdfWithPassword(previewBuffer) {
-    let password = '';
+async function openPdfWithPassword(previewBuffer, knownPassword = '') {
+    let password = knownPassword || '';
     let attempt = 0;
 
     while (attempt < 5) {
@@ -1149,18 +1566,50 @@ async function openPdfWithPassword(previewBuffer) {
     );
 }
 
-async function loadPdfFile(file, filePath = null) {
+async function loadPdfFile(file, filePath = null, options = {}) {
     StatusManager.show(STATUS, 'processing', 'pdfEditorLoading');
 
     try {
+        prepareInspectorForDocumentSwitch();
+
+        const alreadyEditing = document.body.classList.contains('pdfEditorEditing');
+        const forceNewTab = options.newTab === true || fileInput.dataset.pdeffyNewTab === '1';
+        try {
+            delete fileInput.dataset.pdeffyNewTab;
+        } catch (_) {
+            /* ignore */
+        }
+        const openNewTab = forceNewTab || (alreadyEditing && options.replaceActive !== true);
+
+        if (openNewTab && alreadyEditing) {
+            persistActiveSession();
+            const session = createDocumentSession();
+            documentSessions.push(session);
+            activeDocId = session.id;
+            destroyCurrentPdfDoc();
+            PdfEditorDocumentModel.resetModel(model);
+            selectedPageId = null;
+            lastSavedPath = null;
+            documentExtras = emptyDocumentExtras();
+            isDirty = false;
+        } else if (!documentSessions.length) {
+            const session = createDocumentSession(createSessionId());
+            documentSessions.push(session);
+            activeDocId = session.id;
+            destroyCurrentPdfDoc();
+            PdfEditorDocumentModel.resetModel(model);
+        } else if (!openNewTab) {
+            persistActiveSession();
+            destroyCurrentPdfDoc();
+            PdfEditorDocumentModel.resetModel(model);
+        }
+
         const buffer = await file.arrayBuffer();
         // Keep a dedicated copy for export; PDF.js may detach the buffer used for preview.
         const exportBuffer = buffer.slice(0);
         const previewBuffer = buffer.slice(0);
 
         const { pdf, password } = await openPdfWithPassword(previewBuffer);
-
-        PdfEditorDocumentModel.resetModel(model);
         model.originalBuffer = exportBuffer;
         model.fileName = file.name;
         model.filePath = null;
@@ -1266,7 +1715,7 @@ async function loadPdfFile(file, filePath = null) {
         if (!thumbsApi) {
             thumbsApi = PdfEditorPageThumbnails.createPageThumbnails({
                 containerEl: thumbsContainer,
-                model,
+                getModel: () => model,
                 onPageSelect,
                 onModelChange,
                 getPdfPage,
@@ -1277,7 +1726,7 @@ async function loadPdfFile(file, filePath = null) {
             viewerApi = PdfEditorViewer.createPdfViewer({
                 scrollContainerEl: viewerScroll,
                 singleContainerEl: viewerSingle,
-                model,
+                getModel: () => model,
                 getPdfPage,
                 onPageInView,
                 onAfterRender: () => {
@@ -1329,6 +1778,12 @@ async function loadPdfFile(file, filePath = null) {
 
         await refreshUi();
         await refreshDocumentExtras();
+        await refreshDocumentMetadata();
+        persistActiveSession();
+        syncDocumentTabs();
+        requestAnimationFrame(() => {
+            refreshUi();
+        });
         StatusManager.hide(STATUS);
         fileInput.value = '';
         try {
@@ -1347,6 +1802,18 @@ async function loadPdfFile(file, filePath = null) {
 }
 
 function resetWorkspace() {
+    if (document.body.classList.contains('pdfEditorDocInfoOpen') && typeof PdfEditorDocumentInfo !== 'undefined') {
+        PdfEditorDocumentInfo.close(false);
+    }
+    setInspectorMode('tool');
+    documentSessions.forEach((s) => {
+        if (s.id === activeDocId) destroyCurrentPdfDoc();
+    });
+    documentSessions = [];
+    activeDocId = null;
+    documentTabBar?.render();
+    const tabNew = document.getElementById('pdfEditorTabNew');
+    if (tabNew) tabNew.hidden = true;
     if (typeof PdfEditorTextSearch !== 'undefined') PdfEditorTextSearch.clear();
     PdfEditorDocumentModel.resetModel(model);
     selectedPageId = null;
@@ -1445,6 +1912,9 @@ document.addEventListener('keydown', (e) => {
         closeFileMoreMenu();
         closeAttachmentsModal();
         closeSignaturesModal();
+        if (document.body.classList.contains('pdfEditorDocInfoOpen') && typeof PdfEditorDocumentInfo !== 'undefined') {
+            PdfEditorDocumentInfo.close(true);
+        }
     }
 });
 

@@ -3,10 +3,31 @@ mod commands;
 #[cfg(feature = "ai")]
 mod ai;
 
+use std::path::PathBuf;
+
 use tauri::menu::{MenuItemBuilder, MenuBuilder, SubmenuBuilder};
 #[cfg(not(target_os = "macos"))]
 use tauri::menu::PredefinedMenuItem;
-use tauri::{Emitter, Manager};
+use tauri::{Emitter, Manager, RunEvent};
+
+fn dispatch_cli_pdf_paths(app: &tauri::AppHandle) {
+    for arg in std::env::args_os().skip(1) {
+        let path = PathBuf::from(arg);
+        if path.is_file() {
+            commands::file_association::dispatch_opened_pdf(app, &path);
+        }
+    }
+}
+
+fn handle_run_event(app: &tauri::AppHandle, event: RunEvent) {
+    if let RunEvent::Opened { urls } = event {
+        for url in urls {
+            if let Ok(path) = url.to_file_path() {
+                commands::file_association::dispatch_opened_pdf(app, &path);
+            }
+        }
+    }
+}
 
 fn build_app_menu(app: &tauri::App) -> tauri::Result<tauri::menu::Menu<tauri::Wry>> {
     let about = MenuItemBuilder::with_id("pdeffy-about", "About Pdeffy").build(app)?;
@@ -118,6 +139,8 @@ pub fn run() {
                 Err(err) => eprintln!("[pdeffy] failed to build application menu: {err}"),
             }
 
+            dispatch_cli_pdf_paths(app.handle());
+
             Ok(())
         })
         // Bounce browser back/forward navigations before page scripts run.
@@ -156,6 +179,8 @@ pub fn run() {
                 commands::settings::check_first_launch,
                 commands::settings::get_warning_settings,
                 commands::settings::save_warning_settings,
+                commands::file_association::get_default_pdf_app,
+                commands::file_association::set_default_pdf_app,
                 commands::convert::convert_with_libreoffice,
                 commands::convert::convert_file_path,
                 commands::ghostscript::compress_with_ghostscript,
@@ -198,8 +223,9 @@ pub fn run() {
                 commands::ai::download_ner_models,
                 commands::ai::unload_ner_model,
             ])
-            .run(tauri::generate_context!())
-            .expect("error while running tauri application");
+            .build(tauri::generate_context!())
+            .expect("error while building tauri application")
+            .run(|app, event| handle_run_event(&app, event));
     }
 
     #[cfg(not(feature = "ai"))]
@@ -213,6 +239,8 @@ pub fn run() {
                 commands::settings::check_first_launch,
                 commands::settings::get_warning_settings,
                 commands::settings::save_warning_settings,
+                commands::file_association::get_default_pdf_app,
+                commands::file_association::set_default_pdf_app,
                 commands::convert::convert_with_libreoffice,
                 commands::convert::convert_file_path,
                 commands::ghostscript::compress_with_ghostscript,
@@ -243,7 +271,8 @@ pub fn run() {
                 commands::pdf_ops::image_to_pdf,
                 commands::pdf_ops::zip_files,
             ])
-            .run(tauri::generate_context!())
-            .expect("error while running tauri application");
+            .build(tauri::generate_context!())
+            .expect("error while building tauri application")
+            .run(|app, event| handle_run_event(&app, event));
     }
 }

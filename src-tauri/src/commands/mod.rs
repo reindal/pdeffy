@@ -9,6 +9,7 @@ pub mod pdf_ops;
 pub mod print_pdf;
 pub mod settings;
 pub mod shell_ops;
+pub mod file_association;
 
 #[cfg(feature = "ai")]
 pub mod ai;

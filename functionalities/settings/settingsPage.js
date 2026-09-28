@@ -8,6 +8,7 @@ const themeSelector = document.getElementById('themeSelector');
 const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 const settingsStatus = document.getElementById('settingsStatus');
 const firstLaunchIntro = document.getElementById('firstLaunchIntro');
+const defaultPdfAppCheckbox = document.getElementById('defaultPdfAppCheckbox');
 const modelListEl = document.getElementById('settingsAiModelList');
 const downloadBtn = document.getElementById('downloadModelBtn');
 const unloadBtn = document.getElementById('unloadModelBtn');
@@ -244,6 +245,13 @@ async function loadSettings() {
   if (themeSelector) {
     themeSelector.value = readStoredTheme();
   }
+  if (defaultPdfAppCheckbox) {
+    try {
+      defaultPdfAppCheckbox.checked = await ipcRenderer.invoke('get-default-pdf-app');
+    } catch (_) {
+      defaultPdfAppCheckbox.checked = false;
+    }
+  }
 }
 
 async function refreshModelStatus() {
@@ -362,6 +370,9 @@ saveSettingsBtn?.addEventListener('click', async () => {
 
   try {
     await ipcRenderer.invoke('save-pdf-metadata', metadata);
+    if (defaultPdfAppCheckbox) {
+      await ipcRenderer.invoke('set-default-pdf-app', defaultPdfAppCheckbox.checked);
+    }
     const theme = themeSelector?.value === 'dark' ? 'dark' : 'light';
     await applyThemeSafe(theme);
 

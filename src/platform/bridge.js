@@ -115,6 +115,10 @@ export const ipcRenderer = {
           return safeInvoke('save-language', { language: payload });
         case 'check-first-launch':
           return safeInvoke('check-first-launch');
+        case 'get-default-pdf-app':
+          return safeInvoke('get-default-pdf-app');
+        case 'set-default-pdf-app':
+          return safeInvoke('set-default-pdf-app', { enabled: !!payload });
         case 'get-warning-settings':
           return safeInvoke('get-warning-settings');
         case 'save-warning-settings':

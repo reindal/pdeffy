@@ -34,8 +34,33 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "fileAssociations": [
+      {
+        "ext": ["pdf"],
+        "mimeType": "application/pdf",
+        "contentTypes": ["com.adobe.pdf"],
+        "name": "PDF Document",
+        "description": "PDF Document",
+        "role": "Viewer",
+        "rank": "Alternate"
+      }
+    ],
     "resources": {
-      "../resources/ghostscript/win": "ghostscript/win"
+      "../resources/ghostscript/win": "ghostscript/win",
+      "resources/pdf-document.ico": "pdf-document.ico"
+    },
+    "linux": {
+      "deb": {
+        "desktopTemplate": "linux/pdeffy.desktop.hbs"
+      },
+      "rpm": {
+        "desktopTemplate": "linux/pdeffy.desktop.hbs"
+      }
+    },
+    "windows": {
+      "nsis": {
+        "installerHooks": "./windows/installer-hooks.nsh"
+      }
     }
   }
 }

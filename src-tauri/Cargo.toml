@@ -46,6 +46,8 @@ ort = { version = "2.0.0-rc.9", optional = true, default-features = false, featu
 tokenizers = { version = "0.21", optional = true, default-features = false, features = ["onig"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
+core-foundation = "0.10"
+core-foundation-sys = "0.8"
 objc2 = "0.6"
 objc2-app-kit = { version = "0.3", features = ["NSPrintInfo", "NSPrintOperation"] }
 objc2-foundation = { version = "0.3", features = ["NSObject", "NSString", "NSURL"] }

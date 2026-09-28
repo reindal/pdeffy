@@ -61,7 +61,7 @@ body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
     background: #fffef6;
 }
 
-/* EditorMain ≈ grid: FileBar 72 | Toolbar 56 | Workspace 1fr */
+/* EditorMain ≈ grid: DocTabs | FileBar 72 | Toolbar 56 | Workspace 1fr */
 .pdfEditorWorkspace {
     display: none;
     min-width: 0;
@@ -69,10 +69,474 @@ body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
     flex: 1;
     height: 100%;
     overflow: hidden;
-    background: var(--pdf-cream);
-    grid-template-rows: auto 56px minmax(0, 1fr);
+    background: #fffcf3;
+    grid-template-rows: auto auto 56px minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr);
     position: relative;
+}
+
+.pdfEditorDocTabsRow {
+    grid-row: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+    padding: 8px 12px 0;
+    background: #fffcf3;
+    border-bottom: 1px solid #e7e7e2;
+    min-width: 0;
+}
+
+.pdfEditorDocTabsStrip {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+.pdfEditorDocTabsRowActions {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 4px;
+}
+
+.pdfEditorTabNewBtn {
+    flex: 0 0 auto;
+}
+
+.pdfEditorDocumentTabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    min-height: 36px;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.pdfEditorDocumentTabs[hidden] {
+    display: none !important;
+}
+
+.document-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: min(320px, 42vw);
+    min-width: 0;
+    padding: 6px 6px 6px 8px;
+    border: 1px solid #e7e7e2;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: #fff;
+    color: #101a3a;
+}
+
+.document-tab.is-active {
+    box-shadow: inset 0 -2px 0 #ffd91a;
+    z-index: 1;
+}
+
+.document-tab__activate {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    flex: 1 1 auto;
+    border: none;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    padding: 4px 2px;
+    text-align: left;
+}
+
+.document-tab__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.document-tab__attachments,
+.document-tab__signature,
+.document-tab__close {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0 4px;
+    border: none;
+    background: transparent;
+    color: #52617a;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.document-tab__attachments:hover,
+.document-tab__signature:hover,
+.document-tab__close:hover {
+    background: #f3f2ed;
+    color: #101a3a;
+}
+
+.document-tab__signature.is-invalid {
+    color: #ff4d67;
+}
+
+.document-tab__signature.is-warning {
+    color: #ff922b;
+}
+
+.document-tab__signature.is-unknown {
+    color: #52617a;
+}
+
+.document-tab__dirty {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #52617a;
+}
+
+body.pdfEditorEditing .pdfEditorFileBarLeft .pdfEditorMetaChip,
+body.pdfEditorEditing .pdfEditorFileBarLeft .fileName,
+body.pdfEditorEditing .pdfEditorFileBarLeft .pdfEditorDirtyBadge {
+    display: none !important;
+}
+
+.pdfEditorDocInfoPanel {
+    display: none;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 12px 12px;
+    background: #fffcf3;
+}
+
+body.pdfEditorDocInfoOpen .pdfEditorDocInfoPanel {
+    display: flex;
+    flex-direction: column;
+}
+
+body.pdfEditorDocInfoOpen #pdfEditorToolBody,
+body.pdfEditorDocInfoOpen #pdfEditorAiSubTabs {
+    display: none !important;
+}
+
+body.pdfEditorDocInfoOpen .pdfEditorInspectorHeader .pdfEditorInspectorTitle,
+body.pdfEditorDocInfoOpen .pdfEditorInspectorHeader .aiInspectorPrivacyBadge {
+    visibility: hidden;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.docInfoShell {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.docInfoHeaderRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.docInfoTitle {
+    flex: 1;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 650;
+    color: #101a3a;
+}
+
+.docInfoBackBtn,
+.docInfoCloseBtn {
+    min-width: 36px;
+    min-height: 36px;
+    border: none;
+    background: transparent;
+    color: #101a3a;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.docInfoBackBtn:hover,
+.docInfoCloseBtn:hover {
+    background: #fff;
+}
+
+.docInfoMetaSections {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.docInfoMetaSectionTitle {
+    margin: 0 0 8px;
+    font-size: 0.78rem;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #52617a;
+}
+
+.docInfoMetaFields dd {
+    word-break: break-word;
+}
+
+.docInfoMetaFields dd.docInfoMetaMissing {
+    color: #52617a;
+}
+
+.docInfoReturnLink {
+    align-self: flex-start;
+    border: none;
+    background: transparent;
+    color: #52617a;
+    font: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 4px 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.docInfoTabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.docInfoTabBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    min-height: 36px;
+    padding: 6px 6px;
+    border-radius: 8px;
+    border: 1px solid #e7e7e2;
+    background: #fff;
+    color: #101a3a;
+    font: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+.docInfoTabLabel {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.docInfoTabIcon {
+    flex-shrink: 0;
+    display: inline-flex;
+}
+
+.docInfoTabBtn.is-active {
+    border-color: #101a3a;
+}
+
+.docInfoTabBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.docInfoContent {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #e7e7e2;
+    border-radius: 8px;
+    padding: 12px;
+    scrollbar-width: thin;
+}
+
+.docInfoListLead {
+    margin: 0 0 10px;
+    font-size: 0.88rem;
+    color: #52617a;
+}
+
+.docInfoAttachmentRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 56px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e7e7e2;
+}
+
+.docInfoAttachmentRow:last-child {
+    border-bottom: none;
+}
+
+.docInfoAttachmentMain {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+
+.docInfoFileIcon {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #f3f2ed;
+    color: #101a3a;
+    font-size: 0.62rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.docInfoAttachmentName {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #101a3a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.docInfoAttachmentMeta {
+    font-size: 0.78rem;
+    color: #52617a;
+}
+
+.docInfoAttachmentActions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.docInfoActionBtn {
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid #e7e7e2;
+    background: #fff;
+    color: #101a3a;
+    font: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.docInfoActionBtn:hover {
+    background: #f3f2ed;
+}
+
+.docInfoEmptyTitle {
+    margin: 0 0 6px;
+    font-weight: 600;
+    color: #101a3a;
+}
+
+.docInfoEmptyHint,
+.docInfoFooterHint,
+.docInfoCertNotice {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #52617a;
+}
+
+.docInfoSigSummary {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e7e7e2;
+    font-size: 0.88rem;
+}
+
+.docInfoSigSummary.is-invalid {
+    border-color: #ff4d67;
+    color: #ff4d67;
+}
+
+.docInfoSigSummary.is-warning {
+    border-color: #ff922b;
+    color: #101a3a;
+}
+
+.docInfoSigSummary.is-unknown {
+    color: #52617a;
+}
+
+.docInfoSigBlock {
+    border-top: 1px solid #e7e7e2;
+    padding: 8px 0;
+}
+
+.docInfoSigSummaryRow {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.88rem;
+}
+
+.docInfoSigFields {
+    margin: 8px 0 0;
+    display: grid;
+    grid-template-columns: minmax(0, 42%) 1fr;
+    gap: 4px 10px;
+    font-size: 0.82rem;
+}
+
+.docInfoSigFields dt {
+    color: #52617a;
+    margin: 0;
+}
+
+.docInfoSigFields dd {
+    margin: 0;
+    color: #101a3a;
+}
+
+.docInfoSigState.invalid {
+    color: #ff4d67;
+}
+
+.docInfoSigState.warning {
+    color: #ff922b;
+}
+
+.docInfoSigState.unknown {
+    color: #52617a;
 }
 
 .pdfEditorWorkspace.visible {
@@ -101,8 +565,26 @@ body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
     pointer-events: auto;
 }
 
+body.pdfEditorEditing .pdfEditorFileBar {
+    grid-row: 2;
+    min-height: 0;
+    padding: 0 24px 8px;
+    background: #fffcf3;
+    border-bottom: none;
+}
+
+body.pdfEditorEditing .pdfEditorFileBar:has(#pdfEditorSignedBanner:not([hidden])) {
+    min-height: auto;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--pdf-border);
+}
+
+body.pdfEditorEditing .pdfEditorFileBar:not(:has(#pdfEditorSignedBanner:not([hidden]))) {
+    display: none;
+}
+
 .pdfEditorFileBar {
-    grid-row: 1;
+    grid-row: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -392,7 +874,7 @@ body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
 }
 
 .pdfEditorEditingToolbar {
-    grid-row: 2;
+    grid-row: 3;
     min-width: 0;
     height: 56px;
     box-sizing: border-box;
@@ -575,7 +1057,7 @@ body.pdfEditorPage.pdfEditorEditing .pdfEditorContainer {
 }
 
 .pdfEditorMain {
-    grid-row: 3;
+    grid-row: 4;
     min-width: 0;
     min-height: 0;
     display: grid;

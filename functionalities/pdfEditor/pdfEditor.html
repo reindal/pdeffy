@@ -35,25 +35,12 @@
         </section>
 
         <div id="pdfEditorWorkspace" class="pdfEditorWorkspace">
-            <!-- FileCommandBar (row 1) — sibling of EditingToolbar, not a parent -->
-            <div class="pdfEditorFileBar">
-                <div class="pdfEditorFileBarLeft">
-                    <span id="pdfEditorFileName" class="fileName"></span>
-                    <span id="pdfEditorDirtyBadge" class="pdfEditorDirtyBadge langText" data-i18n="pdfEditorDirty" hidden>Modificato</span>
-                    <button type="button" id="pdfEditorAttachmentsBtn" class="pdfEditorMetaChip" hidden aria-haspopup="dialog" aria-expanded="false" title="Allegati">
-                        <span class="pdfEditorMetaChipIcon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.7 19.78a5.25 5.25 0 0 1-7.43-7.43l9.9-9.9a3.5 3.5 0 0 1 4.95 4.95l-9.9 9.9a1.75 1.75 0 0 1-2.47-2.48l8.49-8.48"/></svg>
-                        </span>
-                        <span id="pdfEditorAttachmentsCount" class="pdfEditorMetaChipCount">0</span>
-                    </button>
-                    <button type="button" id="pdfEditorSignaturesBtn" class="pdfEditorMetaChip pdfEditorSigChip" hidden aria-haspopup="dialog" aria-expanded="false" title="Firme digitali">
-                        <span class="pdfEditorMetaChipIcon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 14.5 8.5 20.5 9.2 16 13.4 17.2 19.5 12 16.6 6.8 19.5 8 13.4 3.5 9.2 9.5 8.5 12 3Z"/></svg>
-                        </span>
-                        <span class="langText" id="pdfEditorSignaturesChipLabel" data-i18n="pdfEditorSignedChip">Firmato</span>
-                    </button>
+            <div class="pdfEditorDocTabsRow">
+                <div class="pdfEditorDocTabsStrip">
+                    <div id="pdfEditorDocumentTabs" class="pdfEditorDocumentTabs" role="tablist" aria-label="Documenti aperti" hidden></div>
                 </div>
-                <div class="pdfEditorFileBarActions">
+                <div class="pdfEditorFileBarActions pdfEditorDocTabsRowActions">
+                    <button type="button" id="pdfEditorTabNew" class="pdeffy-btn pdeffy-btn-ghost pdfEditorActionBtn pdfEditorIconOnly pdfEditorTabNewBtn" hidden aria-label="Nuovo documento" title="Nuovo documento">+</button>
                     <button type="button" id="pdfEditorOpenFile" class="pdeffy-btn pdeffy-btn-ghost pdfEditorActionBtn">
                         <span class="pdfEditorActionIcon" data-icon="open-file.svg" aria-hidden="true"></span>
                         <span class="langText" data-i18n="pdfEditorOpenFile">Apri</span>
@@ -91,8 +78,28 @@
                                 <span class="pdfEditorActionIcon" data-icon="share.svg" aria-hidden="true"></span>
                                 <span class="langText" data-i18n="pdfEditorShare">Condividi</span>
                             </button>
+                            <button type="button" role="menuitem" id="pdfEditorMenuDocProps" class="langText" data-i18n="pdfEditorMenuDocProps">Proprietà documento</button>
                         </div>
                     </div>
+                </div>
+            </div>
+            <!-- FileCommandBar — banner / legacy filename when not editing -->
+            <div class="pdfEditorFileBar">
+                <div class="pdfEditorFileBarLeft">
+                    <span id="pdfEditorFileName" class="fileName"></span>
+                    <span id="pdfEditorDirtyBadge" class="pdfEditorDirtyBadge langText" data-i18n="pdfEditorDirty" hidden>Modificato</span>
+                    <button type="button" id="pdfEditorAttachmentsBtn" class="pdfEditorMetaChip" hidden aria-haspopup="dialog" aria-expanded="false" title="Allegati">
+                        <span class="pdfEditorMetaChipIcon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.7 19.78a5.25 5.25 0 0 1-7.43-7.43l9.9-9.9a3.5 3.5 0 0 1 4.95 4.95l-9.9 9.9a1.75 1.75 0 0 1-2.47-2.48l8.49-8.48"/></svg>
+                        </span>
+                        <span id="pdfEditorAttachmentsCount" class="pdfEditorMetaChipCount">0</span>
+                    </button>
+                    <button type="button" id="pdfEditorSignaturesBtn" class="pdfEditorMetaChip pdfEditorSigChip" hidden aria-haspopup="dialog" aria-expanded="false" title="Firme digitali">
+                        <span class="pdfEditorMetaChipIcon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 14.5 8.5 20.5 9.2 16 13.4 17.2 19.5 12 16.6 6.8 19.5 8 13.4 3.5 9.2 9.5 8.5 12 3Z"/></svg>
+                        </span>
+                        <span class="langText" id="pdfEditorSignaturesChipLabel" data-i18n="pdfEditorSignedChip">Firmato</span>
+                    </button>
                 </div>
 
                 <div id="pdfEditorSignedBanner" class="pdfEditorSignedBanner" hidden>
@@ -292,6 +299,7 @@
                         <button type="button" class="pdfEditorAiSubTab ai-tool-tab langText" data-tool="questions" data-i18n="pdfEditorToolQuestions" data-active="false" role="tab" aria-selected="false" disabled title="Disponibile prossimamente" id="pdfEditorAiTabQuestions">Domande</button>
                     </div>
                     <div id="pdfEditorToolBody" class="pdfEditorToolBody"></div>
+                    <div id="pdfEditorDocInfoPanel" class="pdfEditorDocInfoPanel" hidden></div>
                 </aside>
             </div>
         </div>
@@ -381,6 +389,10 @@
     <script type="module" src="./view/anonymizeHighlights.js"></script>
     <script type="module" src="./view/textSelection.js"></script>
     <script type="module" src="./view/pdfDocumentExtras.js"></script>
+    <script type="module" src="./view/signatureStatus.js"></script>
+    <script type="module" src="./view/documentTabBar.js"></script>
+    <script type="module" src="./view/pdfDocumentMetadata.js"></script>
+    <script type="module" src="./view/documentInfoInspector.js"></script>
     <script type="module" src="./view/formFields.js"></script>
     <script type="module" src="./tools/anonymizePanel.js"></script>
     <script type="module" src="./tools/aiPanels.js"></script>

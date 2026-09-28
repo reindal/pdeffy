@@ -620,6 +620,14 @@ function boot() {
   import('./toolWorkspace.js')
     .then((m) => m.enhanceToolWorkspace?.())
     .catch(() => { /* ignore */ });
+  import('@tauri-apps/api/event')
+    .then(({ listen }) =>
+      listen('pdeffy-open-pdf', (event) => {
+        const detail = event.payload || {};
+        openRecentInEditor({ path: detail.path, name: detail.name });
+      })
+    )
+    .catch(() => { /* ignore */ });
   if (typeof window.applyLanguage === 'function') {
     try {
       window.applyLanguage();

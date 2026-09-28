@@ -175,7 +175,7 @@
             }
         }
 
-        function switchTool(tool) {
+        function switchTool(tool, options = {}) {
             // Persist live watermark preview before leaving the watermark panel.
             if (activeTool === 'watermark' && tool !== 'watermark') {
                 if (commitWatermarkDraft()) {
@@ -185,6 +185,15 @@
 
             if (tool === 'ai') tool = aiPanels.resolveEntryTool();
             if (tool === 'text') tool = 'form';
+
+            if (
+                tool !== 'select' &&
+                typeof document !== 'undefined' &&
+                document.body.classList.contains('pdfEditorDocInfoOpen') &&
+                typeof global.PdfEditorDocumentInfo !== 'undefined'
+            ) {
+                global.PdfEditorDocumentInfo.close(false);
+            }
 
             activeTool = tool;
             syncTabButtons(tool);
@@ -240,6 +249,12 @@
             });
             PdfEditorOverlayManager.syncOverlays(model, viewerApi);
             if (typeof onExportStateChange === 'function') onExportStateChange();
+
+            if (tool === 'select' && !options.skipDocInfo) {
+                if (typeof global.__pdfEditorOpenSelectInspector === 'function') {
+                    global.__pdfEditorOpenSelectInspector();
+                }
+            }
         }
 
         /** Update overlays/lists without rebuilding the viewer (preserves scroll). */
@@ -1896,7 +1911,45 @@
             switchTool(initial);
         }
 
-        return { initTabs, onViewerRendered, switchTool, onDocumentLoaded, commitWatermarkDraft };
+        const RETURN_LABEL_KEYS = {
+            ai: ['pdfEditorReturnAi', 'Torna ad Assistente AI'],
+            summary: ['pdfEditorReturnAi', 'Torna ad Assistente AI'],
+            anonymize: ['pdfEditorReturnAi', 'Torna ad Assistente AI'],
+            watermark: ['pdfEditorReturnWatermark', 'Torna a Filigrana'],
+            redact: ['pdfEditorReturnRedact', 'Torna a Censura'],
+            select: ['pdfEditorReturnSelect', 'Torna a Seleziona'],
+            signature: ['pdfEditorReturnSignature', 'Torna a Firma'],
+            form: ['pdfEditorReturnForm', 'Torna a Moduli'],
+            draw: ['pdfEditorReturnDraw', 'Torna a Disegno'],
+            comment: ['pdfEditorReturnComment', 'Torna a Commenti'],
+        };
+
+        function getReturnInspectorLabel() {
+            const entry = RETURN_LABEL_KEYS[activeTool] || RETURN_LABEL_KEYS.select;
+            return msg(entry[0], entry[1]);
+        }
+
+        function restoreInspectorState(saved) {
+            if (!saved) return;
+            const tool = saved.previousInspectorType || 'select';
+            if (panels[tool] || aiPanels.isAiTool(tool)) switchTool(tool, { skipDocInfo: true });
+            if (toolBodyEl && typeof saved.previousScrollPosition === 'number') {
+                requestAnimationFrame(() => {
+                    toolBodyEl.scrollTop = saved.previousScrollPosition;
+                });
+            }
+        }
+
+        return {
+            initTabs,
+            onViewerRendered,
+            switchTool,
+            onDocumentLoaded,
+            commitWatermarkDraft,
+            getActiveTool: () => activeTool,
+            getReturnInspectorLabel,
+            restoreInspectorState,
+        };
     }
 
     global.PdfEditorToolController = { createToolController };

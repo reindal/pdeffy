@@ -7,12 +7,15 @@
     function createPageThumbnails(options) {
         const {
             containerEl,
-            model,
+            model: modelOption,
+            getModel,
             onPageSelect,
             onModelChange,
             getPdfPage,
             onSelectionChange,
         } = options;
+
+        const resolveModel = typeof getModel === 'function' ? getModel : () => modelOption;
 
         let draggedOrderIndex = null;
         /** @type {Set<string>} */
@@ -21,7 +24,7 @@
         let multiSelectMode = false;
 
         function getActive() {
-            return global.PdfEditorDocumentModel.getActivePages(model);
+            return global.PdfEditorDocumentModel.getActivePages(resolveModel());
         }
 
         function msg(key, fallback) {
@@ -145,7 +148,7 @@
             const ids = getSelectedPageIds();
             if (!ids.length) return;
             if (typeof global.__pdfEditorBeforeEdit === 'function') global.__pdfEditorBeforeEdit();
-            ids.forEach((id) => global.PdfEditorDocumentModel.rotatePage(model, id, delta));
+            ids.forEach((id) => global.PdfEditorDocumentModel.rotatePage(resolveModel(), id, delta));
             onModelChange();
         }
 
@@ -157,7 +160,7 @@
             if (typeof global.__pdfEditorBeforeEdit === 'function') global.__pdfEditorBeforeEdit();
             let failed = false;
             ids.forEach((id) => {
-                const ok = global.PdfEditorDocumentModel.togglePageDeleted(model, id);
+                const ok = global.PdfEditorDocumentModel.togglePageDeleted(resolveModel(), id);
                 if (!ok) failed = true;
             });
             if (failed && typeof StatusManager !== 'undefined') {
@@ -232,7 +235,7 @@
                 const targetIndex = parseInt(item.dataset.orderIndex, 10);
                 if (draggedOrderIndex !== null && draggedOrderIndex !== targetIndex) {
                     if (typeof global.__pdfEditorBeforeEdit === 'function') global.__pdfEditorBeforeEdit();
-                    global.PdfEditorDocumentModel.reorderPages(model, draggedOrderIndex, targetIndex);
+                    global.PdfEditorDocumentModel.reorderPages(resolveModel(), draggedOrderIndex, targetIndex);
                     onModelChange();
                 }
             });

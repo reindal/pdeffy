@@ -5,5 +5,8 @@ fn main() {
         std::env::set_var("MACOSX_DEPLOYMENT_TARGET", "11.0");
     }
 
+    #[cfg(target_os = "macos")]
+    println!("cargo:rustc-link-lib=framework=ApplicationServices");
+
     tauri_build::build()
 }
