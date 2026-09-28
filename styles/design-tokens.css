@@ -49,8 +49,10 @@
   --pdeffy-space-10: 40px;
   --pdeffy-space-12: 48px;
 
-  --pdeffy-sidebar-width: 224px;
-  --pdeffy-sidebar-collapsed-width: 64px;
+  --pdeffy-sidebar-width: 220px;
+  --pdeffy-sidebar-collapsed-width: 72px;
+  --pdeffy-sidebar-brand-header: #101b3c;
+  --pdeffy-sidebar-border: #e2e6ed;
   --pdeffy-editor-thumbnails-width: 160px;
   --pdeffy-editor-properties-width: 280px;
   --pdeffy-topbar-height: 64px;

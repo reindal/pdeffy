@@ -32,14 +32,6 @@ export function toolImg(base, file, alt = '') {
   return `<img src="${svgPath(base, `pdf-tools/${file}`)}" alt="${alt}" aria-hidden="${alt ? 'false' : 'true'}">`;
 }
 
-export function logoWordmark(base) {
-  return svgPath(base, 'logo/pdeffy-wordmark.svg');
-}
-
-export function logoMark(base) {
-  return svgPath(base, 'logo/pdeffy-mark.svg');
-}
-
 export const TOOL_ICON_FILE = {
   merge: 'merge-pdf.svg',
   split: 'split-pdf.svg',

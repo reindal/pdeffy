@@ -1,7 +1,6 @@
 use std::path::Path;
 use tauri::{AppHandle, Emitter, Manager};
 
-const PDF_MIME: &str = "application/pdf";
 const PDF_UTI: &str = "com.adobe.pdf";
 
 #[cfg(target_os = "macos")]
@@ -127,8 +126,9 @@ Set-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Classes\.pdf" -Name
 
 #[cfg(target_os = "linux")]
 mod linux {
-    use super::PDF_MIME;
     use std::process::Command;
+
+    const PDF_MIME: &str = "application/pdf";
 
     pub fn desktop_id() -> &'static str {
         "com.reindal.pdeffy.desktop"

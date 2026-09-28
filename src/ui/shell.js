@@ -2,6 +2,8 @@
  * App shell: persistent sidebar + shared navigation for multi-page HTML.
  */
 import { actionMaskIcon, navMaskIcon } from './icons.js';
+import sidebarWordmarkUrl from '../../assets/pdeffy-flat-light.svg?url';
+import sidebarMarkUrl from '../../src-tauri/icons/128x128.png?url';
 
 const ICONS = {
   mark: `<svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="3" y="2" width="16" height="20" rx="3" fill="#FFD91A"/><rect x="9" y="6" width="16" height="20" rx="3" fill="#3478F6"/><path d="M14 12h6M14 16h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>`,
@@ -169,9 +171,12 @@ function buildSidebar(base, active) {
 
   return `
     <aside class="pdeffy-sidebar" aria-label="Primary">
-      <a class="pdeffy-sidebar-brand" href="${base}index.html" title="Pdeffy">
-        <img class="pdeffy-sidebar-logo" src="${logoSrcForTheme(getTheme(), base)}" alt="pdeffy" data-pdeffy-logo data-icon-light="${base}assets/pdeffy-flat-dark.png" data-icon-dark="${base}assets/pdeffy-flat-light.png">
-      </a>
+      <div class="pdeffy-sidebar-top">
+        <a class="pdeffy-sidebar-brand" href="${base}index.html" title="Pdeffy" aria-expanded="true" aria-label="Pdeffy, riduci barra laterale">
+          <img class="pdeffy-sidebar-logo pdeffy-sidebar-logo--wordmark" src="${sidebarWordmarkUrl}" alt="" decoding="async">
+          <img class="pdeffy-sidebar-logo pdeffy-sidebar-logo--mark" src="${sidebarMarkUrl}" alt="" decoding="async">
+        </a>
+      </div>
       <nav class="pdeffy-nav">${items}</nav>
       <div class="pdeffy-sidebar-footer">
         <a class="pdeffy-nav-item${active === 'settings' ? ' is-active' : ''}" id="pdeffyOpenSettings" href="${base}functionalities/settings/settings.html" data-nav-id="settings" title="Impostazioni" aria-label="Impostazioni">
@@ -221,7 +226,7 @@ function wrapBody() {
   const sidebar = document.querySelector('.pdeffy-sidebar');
   if (sidebar) sidebar.after(main);
   else document.body.prepend(main);
-
+  wireSidebarBrandToggle();
 }
 
 /** Public helpers for hub pages */
@@ -353,8 +358,46 @@ export function wireHomeSearch(input) {
   input.addEventListener('input', () => filterToolCards(input.value));
 }
 
+function syncSidebarBrandAria() {
+  const brand = document.querySelector('.pdeffy-sidebar-brand');
+  if (!brand) return;
+  const collapsed = document.body.classList.contains('pdeffy-sidebar-collapsed');
+  const editing = document.body.classList.contains('pdfEditorEditing');
+  brand.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  if (editing) {
+    brand.setAttribute('aria-label', 'Pdeffy');
+  } else {
+    brand.setAttribute(
+      'aria-label',
+      collapsed ? 'Pdeffy, espandi barra laterale' : 'Pdeffy, riduci barra laterale'
+    );
+  }
+}
+
+function wireSidebarBrandToggle() {
+  const brand = document.querySelector('.pdeffy-sidebar-brand');
+  if (!brand || brand.dataset.pdeffyBrandToggleWired) return;
+  brand.dataset.pdeffyBrandToggleWired = '1';
+  syncSidebarBrandAria();
+  brand.addEventListener('click', (e) => {
+    if (document.body.classList.contains('pdfEditorEditing')) {
+      e.preventDefault();
+      setSidebarCollapsed(true);
+      return;
+    }
+    e.preventDefault();
+    setSidebarCollapsed(!document.body.classList.contains('pdeffy-sidebar-collapsed'));
+  });
+  const ariaObserver = new MutationObserver(() => syncSidebarBrandAria());
+  ariaObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+
 export function setSidebarCollapsed(collapsed) {
+  if (!collapsed && document.body.classList.contains('pdfEditorEditing')) {
+    return;
+  }
   document.body.classList.toggle('pdeffy-sidebar-collapsed', !!collapsed);
+  syncSidebarBrandAria();
 }
 
 export function getTheme() {

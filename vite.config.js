@@ -31,6 +31,7 @@ const input = collectHtmlPages(root);
 
 /** UI SVG/PNG live in repo assets/; Vite emits JS/CSS into dist/assets — merge both at build time. */
 function copyStaticUiAssets() {
+  const sidebarMarkSrc = resolve(root, 'src-tauri/icons/128x128.png');
   return {
     name: 'copy-static-ui-assets',
     closeBundle() {
@@ -38,6 +39,8 @@ function copyStaticUiAssets() {
       const to = resolve(root, 'dist/assets');
       mkdirSync(to, { recursive: true });
       cpSync(from, to, { recursive: true, force: true });
+      mkdirSync(resolve(to, 'icons'), { recursive: true });
+      cpSync(sidebarMarkSrc, resolve(to, 'icons/128x128.png'), { force: true });
     },
   };
 }

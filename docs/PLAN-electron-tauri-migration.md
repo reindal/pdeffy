@@ -298,7 +298,6 @@ Preferire SVG in struttura tipo:
 
 ```
 src/assets/
-  logo/     pdeffy-logo.svg, pdeffy-mark.svg
   icons/    home, organize, convert, edit, recent, settings, merge, split, …
   illustrations/  pdf-friendly.svg, empty-recent.svg
 ```
