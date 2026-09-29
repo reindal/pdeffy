@@ -647,6 +647,22 @@ function disableBrowserHistoryNavigation() {
   );
 }
 
+async function installPdfOpenRouting() {
+  const { invoke } = await import('@tauri-apps/api/core');
+  const { listen } = await import('@tauri-apps/api/event');
+
+  const pending = await invoke('take-pending-pdf-opens');
+  if (Array.isArray(pending) && pending.length) {
+    const last = pending[pending.length - 1];
+    openRecentInEditor({ path: last.path, name: last.name });
+  }
+
+  await listen('pdeffy-open-pdf', (event) => {
+    const detail = event.payload || {};
+    openRecentInEditor({ path: detail.path, name: detail.name });
+  });
+}
+
 function boot() {
   ensureStylesheet();
   applyTheme(getTheme());
@@ -663,14 +679,7 @@ function boot() {
   import('./toolWorkspace.js')
     .then((m) => m.enhanceToolWorkspace?.())
     .catch(() => { /* ignore */ });
-  import('@tauri-apps/api/event')
-    .then(({ listen }) =>
-      listen('pdeffy-open-pdf', (event) => {
-        const detail = event.payload || {};
-        openRecentInEditor({ path: detail.path, name: detail.name });
-      })
-    )
-    .catch(() => { /* ignore */ });
+  installPdfOpenRouting().catch(() => { /* ignore */ });
   if (typeof window.applyLanguage === 'function') {
     try {
       window.applyLanguage();

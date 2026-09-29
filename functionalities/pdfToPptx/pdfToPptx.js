@@ -1,5 +1,6 @@
 var { ipcRenderer } = require('electron');
 const path = require('path');
+import { pdeffyConvertPdfToOffice } from '../pdfLayoutConvert.js';
 const STATUS = '#status';
 
 const form = document.getElementById('pdfToPptxForm');
@@ -32,7 +33,6 @@ form.addEventListener('submit', async function(e) {
 
     try {
         // Get final metadata from module
-        const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
         const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
         const defaultPath = path.join(downloadsPath, selectedFile.name.replace('.pdf', '.pptx'));
 
@@ -48,13 +48,12 @@ form.addEventListener('submit', async function(e) {
 
         StatusManager.show(STATUS, 'processing', 'processing');
 
-        await ipcRenderer.invoke('convert-with-libreoffice', {
-            fileData: arrayBuffer,
-            fileName: selectedFile.name,
-            outputPath: outputPath,
-            format: 'pptx',
-            metadata: finalMetadata
-        });
+        await pdeffyConvertPdfToOffice(
+            arrayBuffer,
+            selectedFile.name,
+            outputPath,
+            'pptx'
+        );
 
         StatusManager.show(STATUS, 'success', 'successPdfConverted', {
             format: 'PPTX',

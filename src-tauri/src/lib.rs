@@ -1,9 +1,9 @@
 mod commands;
+mod converters;
+mod pdf_to_office;
 
 #[cfg(feature = "ai")]
 mod ai;
-
-use std::path::PathBuf;
 
 use tauri::menu::{MenuItemBuilder, MenuBuilder, SubmenuBuilder};
 #[cfg(not(target_os = "macos"))]
@@ -11,12 +11,7 @@ use tauri::menu::PredefinedMenuItem;
 use tauri::{Emitter, Manager, RunEvent};
 
 fn dispatch_cli_pdf_paths(app: &tauri::AppHandle) {
-    for arg in std::env::args_os().skip(1) {
-        let path = PathBuf::from(arg);
-        if path.is_file() {
-            commands::file_association::dispatch_opened_pdf(app, &path);
-        }
-    }
+    commands::file_association::dispatch_open_file_args(app, &std::env::args().collect::<Vec<_>>());
 }
 
 fn handle_run_event(app: &tauri::AppHandle, event: RunEvent) {
@@ -91,7 +86,16 @@ fn build_app_menu(app: &tauri::App) -> tauri::Result<tauri::menu::Menu<tauri::Wr
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     #[allow(unused_mut)]
-    let mut builder = tauri::Builder::default()
+    let mut builder = tauri::Builder::default();
+
+    #[cfg(desktop)]
+    {
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            commands::file_association::dispatch_open_file_args(app, &argv);
+        }));
+    }
+
+    builder = builder
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
@@ -180,12 +184,20 @@ pub fn run() {
                 commands::settings::get_language,
                 commands::settings::save_language,
                 commands::settings::check_first_launch,
+                commands::settings::complete_first_launch,
                 commands::settings::get_warning_settings,
                 commands::settings::save_warning_settings,
                 commands::file_association::get_default_pdf_app,
                 commands::file_association::set_default_pdf_app,
+                commands::file_association::take_pending_pdf_opens,
                 commands::convert::convert_with_libreoffice,
                 commands::convert::convert_file_path,
+                commands::convert_office::convert_office_to_pdf,
+                commands::convert_office::list_office_pdf_backends,
+                commands::convert_office::get_office_pdf_backend,
+                commands::convert_office::save_office_pdf_backend,
+                commands::pdf_to_office::convert_pdf_to_office,
+                commands::pdf_to_office::list_pdf_export_backends,
                 commands::ghostscript::compress_with_ghostscript,
                 commands::ghostscript::protect_with_ghostscript,
                 commands::ghostscript::check_ghostscript_availability,
@@ -240,12 +252,20 @@ pub fn run() {
                 commands::settings::get_language,
                 commands::settings::save_language,
                 commands::settings::check_first_launch,
+                commands::settings::complete_first_launch,
                 commands::settings::get_warning_settings,
                 commands::settings::save_warning_settings,
                 commands::file_association::get_default_pdf_app,
                 commands::file_association::set_default_pdf_app,
+                commands::file_association::take_pending_pdf_opens,
                 commands::convert::convert_with_libreoffice,
                 commands::convert::convert_file_path,
+                commands::convert_office::convert_office_to_pdf,
+                commands::convert_office::list_office_pdf_backends,
+                commands::convert_office::get_office_pdf_backend,
+                commands::convert_office::save_office_pdf_backend,
+                commands::pdf_to_office::convert_pdf_to_office,
+                commands::pdf_to_office::list_pdf_export_backends,
                 commands::ghostscript::compress_with_ghostscript,
                 commands::ghostscript::protect_with_ghostscript,
                 commands::ghostscript::check_ghostscript_availability,

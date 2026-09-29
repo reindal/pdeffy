@@ -6,6 +6,23 @@ const StatusManager = (() => {
         try { return require('electron').ipcRenderer; } catch (_) { return null; }
     }
 
+    function _isPdfOutput(filePath) {
+        const normalized = String(filePath || '').trim().replace(/\\/g, '/');
+        const base = normalized.split('/').pop() || '';
+        return /\.pdf$/i.test(base);
+    }
+
+    /** PDF → editor Pdeffy; altri formati → app di sistema. */
+    function _openOutputFile(filePath) {
+        const ipc = _getIpc();
+        if (!ipc || !filePath) return;
+        if (_isPdfOutput(filePath)) {
+            ipc.invoke('open-file', filePath);
+        } else {
+            ipc.invoke('open-file-external', filePath);
+        }
+    }
+
     // Modal elements references
     let modalOverlay = null;
     let modalGrid = null;
@@ -259,10 +276,7 @@ const StatusManager = (() => {
             border-radius: 4px;
             cursor: pointer;
         `;
-            openBtn.onclick = () => {
-                const ipc = _getIpc();
-                if (ipc) ipc.invoke('open-file', filePath);
-            };
+            openBtn.onclick = () => _openOutputFile(filePath);
 
             card.appendChild(previewBox);
             card.appendChild(nameLabel);
@@ -374,9 +388,7 @@ const StatusManager = (() => {
         const fileBtn = el.querySelector('.open-file-btn');
         if (fileBtn) {
             fileBtn.addEventListener('click', () => {
-                const file = fileBtn.dataset.file;
-                const ipc = _getIpc();
-                if (ipc) ipc.invoke('open-file', file);
+                _openOutputFile(fileBtn.dataset.file);
             });
         }
 

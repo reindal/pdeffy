@@ -19,7 +19,6 @@ function openSettingsPage(query = '') {
 }
 
 window.addEventListener('load', () => {
-    // Legacy floating gear (hidden in shell) — keep as navigation fallback.
     document.getElementById('settingsIcon')?.addEventListener('click', () => {
         if (!isSettingsPage()) openSettingsPage();
     });
@@ -28,16 +27,13 @@ window.addEventListener('load', () => {
         if (!isSettingsPage()) openSettingsPage();
     });
 
-    if (!isSettingsPage()) {
-        showFirstLaunchExperience();
-    }
+    showFirstLaunchExperience();
 });
 
 async function showFirstLaunchExperience() {
     try {
-        const isFirstLaunch = await ipcRenderer.invoke('check-first-launch');
-        if (!isFirstLaunch) return;
-        openSettingsPage('welcome=1');
+        const mod = await import('./functionalities/setup/setupWizardModal.js');
+        await mod.initSetupWizardIfNeeded();
     } catch (error) {
         console.error('Error handling first-launch experience:', error);
     }

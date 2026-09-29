@@ -1,27 +1,88 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::OnceLock;
 
-pub fn find_soffice_path() -> Option<PathBuf> {
+static INSTALL_SOFFICE: OnceLock<Option<PathBuf>> = OnceLock::new();
+
+/// Windows console launcher: avoids splash screens and modal dialogs from `soffice.exe`.
+fn resolve_soffice_launcher(candidate: &Path) -> PathBuf {
     #[cfg(target_os = "windows")]
     {
-        let candidates = [
-            r"C:\Program Files\LibreOffice\program\soffice.exe",
-            r"C:\Program Files (x86)\LibreOffice\program\soffice.exe",
+        let file_name = candidate
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("");
+        if file_name.eq_ignore_ascii_case("soffice.exe")
+            || file_name.eq_ignore_ascii_case("soffice.com")
+        {
+            if let Some(parent) = candidate.parent() {
+                let com = parent.join("soffice.com");
+                if com.is_file() {
+                    return com;
+                }
+            }
+        }
+    }
+    candidate.to_path_buf()
+}
+
+#[cfg(target_os = "windows")]
+fn configure_soffice_command(cmd: &mut Command) {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+    cmd.creation_flags(CREATE_NO_WINDOW);
+}
+
+#[cfg(not(target_os = "windows"))]
+fn configure_soffice_command(_cmd: &mut Command) {}
+
+#[cfg(target_os = "windows")]
+fn program_dir_has_soffice(program_dir: &Path) -> Option<PathBuf> {
+    let com = program_dir.join("soffice.com");
+    if com.is_file() {
+        return Some(com);
+    }
+    let exe = program_dir.join("soffice.exe");
+    if exe.is_file() {
+        return Some(resolve_soffice_launcher(&exe));
+    }
+    let bin = program_dir.join("soffice");
+    if bin.is_file() {
+        return Some(bin);
+    }
+    None
+}
+
+/// Returns a path if LibreOffice binaries appear to be installed (no health check).
+#[allow(dead_code)]
+pub fn find_soffice_path() -> Option<PathBuf> {
+    find_soffice_install_path().map(|p| resolve_soffice_launcher(&p))
+}
+
+fn find_soffice_install_path() -> Option<PathBuf> {
+    #[cfg(target_os = "windows")]
+    {
+        let program_dirs = [
+            PathBuf::from(r"C:\Program Files\LibreOffice\program"),
+            PathBuf::from(r"C:\Program Files (x86)\LibreOffice\program"),
         ];
-        for candidate in candidates {
-            let path = PathBuf::from(candidate);
-            if path.exists() {
-                return Some(path);
+        for dir in program_dirs {
+            if let Some(launcher) = program_dir_has_soffice(&dir) {
+                return Some(launcher);
             }
         }
         if let Ok(output) = Command::new("where").arg("soffice").output() {
             if output.status.success() {
                 let text = String::from_utf8_lossy(&output.stdout);
-                if let Some(first) = text.lines().next() {
-                    let path = PathBuf::from(first.trim());
-                    if path.exists() {
-                        return Some(path);
+                for line in text.lines() {
+                    let trimmed = line.trim();
+                    if trimmed.is_empty() {
+                        continue;
+                    }
+                    let path = PathBuf::from(trimmed);
+                    if path.is_file() {
+                        return Some(resolve_soffice_launcher(&path));
                     }
                 }
             }
@@ -78,6 +139,74 @@ pub fn find_soffice_path() -> Option<PathBuf> {
     }
 }
 
+#[allow(dead_code)]
+fn verify_soffice_works(soffice: &Path) -> bool {
+    let profile_dir = std::env::temp_dir().join(format!(
+        "pdeffy_lo_probe_{}",
+        uuid::Uuid::new_v4()
+    ));
+    if fs::create_dir_all(&profile_dir).is_err() {
+        return false;
+    }
+
+    let env_flag = profile_env_flag(&profile_dir);
+    let mut cmd = Command::new(soffice);
+    configure_soffice_command(&mut cmd);
+    let output = cmd
+        .arg(&env_flag)
+        .args([
+            "--headless",
+            "--invisible",
+            "--nologo",
+            "--nodefault",
+            "--norestore",
+            "--version",
+        ])
+        .output();
+
+    let _ = fs::remove_dir_all(&profile_dir);
+
+    match output {
+        Ok(out) if out.status.success() => true,
+        Ok(out) => {
+            let stderr = String::from_utf8_lossy(&out.stderr);
+            let stdout = String::from_utf8_lossy(&out.stdout);
+            eprintln!(
+                "[LibreOffice] Health check failed (exit {:?}): {stderr}{stdout}",
+                out.status.code()
+            );
+            false
+        }
+        Err(e) => {
+            eprintln!("[LibreOffice] Health check could not run: {e}");
+            false
+        }
+    }
+}
+
+/// Cached launcher path (binary presence only — no subprocess probe).
+pub fn find_soffice_install_launcher() -> Option<PathBuf> {
+    INSTALL_SOFFICE
+        .get_or_init(|| {
+            find_soffice_install_path().map(|path| resolve_soffice_launcher(&path))
+        })
+        .clone()
+}
+
+pub fn is_libreoffice_installed() -> bool {
+    find_soffice_install_launcher().is_some()
+}
+
+/// Alias for engine checks: fast path detection, no health probe at startup.
+pub fn is_libreoffice_usable() -> bool {
+    is_libreoffice_installed()
+}
+
+#[allow(dead_code)]
+pub fn find_working_soffice_path() -> Option<PathBuf> {
+    find_soffice_install_launcher()
+}
+
 fn path_to_file_url(path: &Path) -> String {
     let normalized = path.to_string_lossy().replace('\\', "/");
     // Encode spaces and other reserved characters for LibreOffice -env:UserInstallation
@@ -121,7 +250,14 @@ fn profile_env_flag(profile_dir: &Path) -> String {
 fn run_soffice(soffice: &Path, profile_dir: &Path, args: &[&str]) -> Result<(), String> {
     let env_flag = profile_env_flag(profile_dir);
     let mut cmd = Command::new(soffice);
-    cmd.arg(&env_flag).arg("--headless");
+    configure_soffice_command(&mut cmd);
+    cmd.arg(&env_flag).args([
+        "--headless",
+        "--invisible",
+        "--nologo",
+        "--nodefault",
+        "--norestore",
+    ]);
     for arg in args {
         cmd.arg(arg);
     }
@@ -132,7 +268,18 @@ fn run_soffice(soffice: &Path, profile_dir: &Path, args: &[&str]) -> Result<(), 
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!("LibreOffice conversion failed: {stderr}"));
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let detail = if stderr.trim().is_empty() {
+            stdout.trim()
+        } else {
+            stderr.trim()
+        };
+        let hint = if detail.to_ascii_lowercase().contains("bootstrap") {
+            " L'installazione di LibreOffice sembra danneggiata: reinstalla LibreOffice da libreoffice.org oppure usa Microsoft Word."
+        } else {
+            ""
+        };
+        return Err(format!("LibreOffice conversion failed: {detail}.{hint}"));
     }
     Ok(())
 }
@@ -234,7 +381,15 @@ pub fn convert_with_libreoffice_engine(
     output_path: &Path,
     format: &str,
 ) -> Result<(), String> {
-    let soffice = find_soffice_path().ok_or_else(|| "LibreOffice installation not found.".to_string())?;
+    let soffice = find_soffice_install_launcher().ok_or_else(|| {
+        if find_soffice_install_path().is_some() {
+            "LibreOffice è installato ma non risponde (installazione danneggiata o incompleta). \
+             Reinstalla LibreOffice oppure installa Microsoft Word per la conversione DOCX→PDF."
+                .to_string()
+        } else {
+            "LibreOffice non trovato. Installa LibreOffice oppure Microsoft Word.".to_string()
+        }
+    })?;
     let output_dir = output_path
         .parent()
         .ok_or_else(|| "Invalid output path.".to_string())?;

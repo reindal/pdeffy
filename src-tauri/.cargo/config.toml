@@ -3,3 +3,11 @@
 [env]
 MACOSX_DEPLOYMENT_TARGET = { value = "11.0", force = true }
 CMAKE_OSX_DEPLOYMENT_TARGET = { value = "11.0", force = true }
+
+# Large debug binaries (llama.cpp + AI) exceed Apple's 16MB compact-unwind limit.
+# DWARF unwinding still works; this silences ld's __eh_frame warning (Rust 1.97+).
+[target.aarch64-apple-darwin]
+rustflags = ["-C", "link-arg=-Wl,-no_compact_unwind"]
+
+[target.x86_64-apple-darwin]
+rustflags = ["-C", "link-arg=-Wl,-no_compact_unwind"]

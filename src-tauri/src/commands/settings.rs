@@ -27,6 +27,44 @@ struct FirstLaunchMarker {
     completed_at: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct OfficePdfBackendSettings {
+    #[serde(default = "default_office_pdf_backend")]
+    preferred_backend: String,
+}
+
+fn default_office_pdf_backend() -> String {
+    "auto".to_string()
+}
+
+pub fn get_office_pdf_backend(app: &AppHandle) -> Result<String, String> {
+    let path = settings_path(app, "office-pdf-backend.json")?;
+    if path.exists() {
+        if let Some(data) = read_json_file::<OfficePdfBackendSettings>(&path) {
+            return Ok(data.preferred_backend);
+        }
+    }
+    Ok(default_office_pdf_backend())
+}
+
+pub fn save_office_pdf_backend(app: &AppHandle, backend: &str) -> Result<(), String> {
+    let normalized = backend.trim().to_ascii_lowercase();
+    let allowed = ["auto", "office2pdf", "libreoffice"];
+    if !allowed.contains(&normalized.as_str()) {
+        return Err(format!(
+            "Backend non valido: {backend}. Valori ammessi: auto, office2pdf, libreoffice."
+        ));
+    }
+    let path = settings_path(app, "office-pdf-backend.json")?;
+    write_json_file(
+        &path,
+        &OfficePdfBackendSettings {
+            preferred_backend: normalized,
+        },
+    )
+}
+
 fn app_data_dir(app: &AppHandle) -> Result<PathBuf, String> {
     app.path()
         .app_data_dir()
@@ -98,17 +136,19 @@ pub fn save_language(app: AppHandle, language: String) -> Result<serde_json::Val
 #[tauri::command(rename = "check-first-launch")]
 pub fn check_first_launch(app: AppHandle) -> Result<bool, String> {
     let path = settings_path(&app, "first-launch-complete.json")?;
-    if path.exists() {
-        return Ok(false);
-    }
+    Ok(!path.exists())
+}
 
-    let marker = FirstLaunchMarker {
-        completed_at: chrono::Utc::now().to_rfc3339(),
-    };
-    if write_json_file(&path, &marker).is_err() {
-        return Ok(false);
+#[tauri::command(rename = "complete-first-launch")]
+pub fn complete_first_launch(app: AppHandle) -> Result<serde_json::Value, String> {
+    let path = settings_path(&app, "first-launch-complete.json")?;
+    if !path.exists() {
+        let marker = FirstLaunchMarker {
+            completed_at: chrono::Utc::now().to_rfc3339(),
+        };
+        write_json_file(&path, &marker)?;
     }
-    Ok(true)
+    Ok(serde_json::json!({ "success": true }))
 }
 
 #[tauri::command(rename = "get-warning-settings")]

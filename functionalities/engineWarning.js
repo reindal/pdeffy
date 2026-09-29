@@ -1,25 +1,46 @@
 var { ipcRenderer } = require('electron');
 
 document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const { hasLibreOffice, hasMSOffice } = await ipcRenderer.invoke('check-engines-availability');
-        
-        // Identify the exact tool being used based on the current URL
-        const currentUrl = window.location.href.toLowerCase();
-        let featureId = 'unknown';
-        if (currentUrl.includes('pdftodocx')) featureId = 'pdftodocx';
-        else if (currentUrl.includes('pdftopptx')) featureId = 'pdftopptx';
+  try {
+    const engines = await ipcRenderer.invoke('check-engines-availability');
+    const { hasLibreOffice, hasMSOffice } = engines;
+    const hasOffice2Pdf = engines.hasOffice2Pdf !== false;
+    const hasPdfLayout = engines.hasPdfLayoutExport !== false;
 
-        const isPdfToOfficeFormat = featureId === 'pdftodocx' || featureId === 'pdftopptx';
+    const currentUrl = window.location.href.toLowerCase();
 
-        // ==========================================
-        // CRITICAL ERROR 
-        // ==========================================
-        if (!hasLibreOffice && !hasMSOffice) {
-            const submitBtn = document.querySelector('.submitBtn');
-            if (submitBtn) submitBtn.disabled = true;
+    const isPdfToDocx = currentUrl.includes('pdftodocx');
+    const isPdfToPptx = currentUrl.includes('pdftopptx');
+    const isPdfToExcel = currentUrl.includes('pdftoexcel');
+    const isPdfToOffice = isPdfToDocx || isPdfToPptx || isPdfToExcel;
 
-            const modalHTML = `
+    const isOfficeToPdf =
+      currentUrl.includes('docxtopdf') ||
+      currentUrl.includes('exceltopdf') ||
+      currentUrl.includes('powerpointtopdf') ||
+      currentUrl.includes('pdfgenerator');
+
+    if (!isPdfToOffice && !isOfficeToPdf) return;
+
+    const builtInCovers =
+      (isOfficeToPdf && hasOffice2Pdf) || (isPdfToOffice && hasPdfLayout);
+
+    if (builtInCovers) {
+      return;
+    }
+
+    let featureId = 'unknown';
+    if (isPdfToDocx) featureId = 'pdftodocx';
+    else if (isPdfToPptx) featureId = 'pdftopptx';
+    else if (isPdfToExcel) featureId = 'pdftoexcel';
+
+    const isPdfToOfficeLoPath = isPdfToOffice && !hasPdfLayout;
+
+    if (!hasLibreOffice && !hasMSOffice) {
+      const submitBtn = document.querySelector('.submitBtn');
+      if (submitBtn) submitBtn.disabled = true;
+
+      const modalHTML = `
                 <div id="engineWarningOverlay" class="engine-overlay">
                     <div class="engine-modal critical">
                         <h2 class="langText" data-i18n="engineWarningCriticalTitle">Missing Requirements</h2>
@@ -28,31 +49,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </div>
             `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-            if (typeof changeLanguage === 'function' && window.currentLanguage) {
-                changeLanguage(window.currentLanguage);
-            }
+      if (typeof changeLanguage === 'function' && window.currentLanguage) {
+        changeLanguage(window.currentLanguage);
+      }
 
-            // Redirect the user back to the main menu upon clicking the button
-            document.getElementById('closeEngineWarning').addEventListener('click', () => {
-                window.location.replace('../../index.html');
-            });
-            return; // Halt execution to prevent displaying any other UI elements
-        }
+      document.getElementById('closeEngineWarning').addEventListener('click', () => {
+        window.location.replace('../../index.html');
+      });
+      return;
+    }
 
-        // ==========================================
-        // INFO WARNING (With per-feature checkbox)
-        // ==========================================
-        if (hasLibreOffice && !hasMSOffice && isPdfToOfficeFormat) {
-            
-            // Check the backend to see if the user previously dismissed this warning FOR THIS SPECIFIC FEATURE
-            const warningSettings = await ipcRenderer.invoke('get-warning-settings');
-            if (warningSettings[featureId]) {
-                return; // If set to true, abort and do not render the modal. The user proceeds normally.
-            }
+    if (hasLibreOffice && !hasMSOffice && isPdfToOfficeLoPath) {
+      const warningSettings = await ipcRenderer.invoke('get-warning-settings');
+      if (warningSettings[featureId]) {
+        return;
+      }
 
-            const modalHTML = `
+      const modalHTML = `
                 <div id="engineWarningOverlay" class="engine-overlay">
                     <div class="engine-modal info">
                         <h2 class="langText" data-i18n="engineWarningInfoTitle">Conversion Quality Notice</h2>
@@ -67,27 +82,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </div>
             `;
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
+      document.body.insertAdjacentHTML('beforeend', modalHTML);
 
-            if (typeof changeLanguage === 'function' && window.currentLanguage) {
-                changeLanguage(window.currentLanguage);
-            }
+      if (typeof changeLanguage === 'function' && window.currentLanguage) {
+        changeLanguage(window.currentLanguage);
+      }
 
-            document.getElementById('closeEngineWarning').addEventListener('click', async () => {
-                const checkbox = document.getElementById('dontShowAgainCheck');
-                
-                // If the user checked the box, notify the backend to persist this preference in the JSON file
-                if (checkbox && checkbox.checked) {
-                    await ipcRenderer.invoke('save-warning-settings', featureId);
-                }
-                
-                // Close the modal overlay
-                const overlay = document.getElementById('engineWarningOverlay');
-                if (overlay) overlay.remove();
-            });
+      document.getElementById('closeEngineWarning').addEventListener('click', async () => {
+        const checkbox = document.getElementById('dontShowAgainCheck');
+
+        if (checkbox && checkbox.checked) {
+          await ipcRenderer.invoke('save-warning-settings', featureId);
         }
 
-    } catch (error) {
-        console.error("[Engine Checker] Error verifying conversion engines:", error);
+        const overlay = document.getElementById('engineWarningOverlay');
+        if (overlay) overlay.remove();
+      });
     }
+  } catch (error) {
+    console.error('[Engine Checker] Error verifying conversion engines:', error);
+  }
 });

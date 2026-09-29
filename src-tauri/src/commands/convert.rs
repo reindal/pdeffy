@@ -1,3 +1,4 @@
+use super::convert_office;
 use super::libreoffice;
 use super::msoffice;
 use super::pdf_excel;
@@ -5,6 +6,7 @@ use super::settings::PdfMetadata;
 use serde::Deserialize;
 use std::fs;
 use std::path::{Path, PathBuf};
+use tauri::AppHandle;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 
@@ -25,18 +27,20 @@ fn default_format() -> String {
 
 #[tauri::command(rename = "convert-with-libreoffice")]
 pub async fn convert_with_libreoffice(
+    app: AppHandle,
     #[allow(non_snake_case)] fileData: Vec<u8>,
     #[allow(non_snake_case)] fileName: String,
     #[allow(non_snake_case)] outputPath: String,
     format: Option<String>,
     metadata: Option<PdfMetadata>,
 ) -> Result<serde_json::Value, String> {
-    convert_inner(fileData, fileName, outputPath, format, metadata)
+    convert_inner(&app, fileData, fileName, outputPath, format, metadata)
 }
 
 /// Path-based conversion (frontend already wrote the input file).
 #[tauri::command(rename = "convert-file-path")]
 pub async fn convert_file_path(
+    app: AppHandle,
     #[allow(non_snake_case)] inputPath: String,
     #[allow(non_snake_case)] outputPath: String,
     format: Option<String>,
@@ -54,12 +58,24 @@ pub async fn convert_file_path(
 
     // Prefer converting the existing file in place (no second IPC copy).
     let format = format.unwrap_or_else(default_format).to_lowercase();
-    let result = convert_existing_file(&input, &file_name, &outputPath, &format, metadata.as_ref());
+    let result = convert_existing_file(
+        &app,
+        &input,
+        &file_name,
+        &outputPath,
+        &format,
+        metadata.as_ref(),
+    );
     let _ = fs::remove_file(&input);
     result
 }
 
+fn is_office_to_pdf(input_ext: &str, format: &str) -> bool {
+    format == "pdf" && matches!(input_ext, ".docx" | ".xlsx" | ".pptx")
+}
+
 fn convert_existing_file(
+    app: &AppHandle,
     input_path: &Path,
     file_name: &str,
     output_path_str: &str,
@@ -84,16 +100,36 @@ fn convert_existing_file(
     };
     let is_pdf = input_ext.eq_ignore_ascii_case(".pdf");
 
-    let mut conversion_success = false;
+    if is_office_to_pdf(&input_ext, format) {
+        let (backend_used, warnings) = convert_office::convert_office_file_to_pdf_path(
+            app,
+            input_path,
+            &output_path,
+            None,
+        )?;
+        if let Some(metadata) = metadata {
+            apply_metadata(&output_path, format, metadata)?;
+        }
+        return Ok(serde_json::json!({
+            "success": true,
+            "backendUsed": backend_used,
+            "warnings": warnings,
+        }));
+    }
 
-    let can_use_msoffice = cfg!(target_os = "windows")
-        && ((is_pdf && (format == "docx" || format == "pptx"))
-            || ((input_ext == ".docx" || input_ext == ".pptx") && format == "pdf"));
+    let mut conversion_success = false;
+    let mut ms_office_error: Option<String> = None;
+
+    let can_use_msoffice =
+        cfg!(target_os = "windows") && is_pdf && (format == "docx" || format == "pptx");
 
     if can_use_msoffice {
         match msoffice::convert_with_msoffice(input_path, &output_path, format, &input_ext) {
             Ok(()) => conversion_success = true,
-            Err(e) => eprintln!("[Conversion] MS Office failed: {e}"),
+            Err(e) => {
+                eprintln!("[Conversion] MS Office failed: {e}");
+                ms_office_error = Some(e);
+            }
         }
     }
 
@@ -112,7 +148,11 @@ fn convert_existing_file(
     }
 
     if !conversion_success {
-        libreoffice::convert_with_libreoffice_engine(input_path, &output_path, format)?;
+        if let Err(lo_err) =
+            libreoffice::convert_with_libreoffice_engine(input_path, &output_path, format)
+        {
+            return Err(conversion_failure_message(ms_office_error.as_deref(), &lo_err));
+        }
     }
 
     if let Some(metadata) = metadata {
@@ -129,7 +169,28 @@ fn convert_existing_file(
     Ok(serde_json::json!({ "success": true }))
 }
 
+fn conversion_failure_message(ms_office_error: Option<&str>, libreoffice_error: &str) -> String {
+    let mut parts = vec![libreoffice_error.to_string()];
+    if let Some(ms) = ms_office_error {
+        parts.push(format!("Microsoft Word: {ms}"));
+    }
+    if msoffice::is_msoffice_installed() {
+        parts.push(
+            "Word è installato ma la conversione non è riuscita; verifica che Word si apra \
+             normalmente oppure reinstalla LibreOffice."
+                .into(),
+        );
+    } else {
+        parts.push(
+            "Installa Microsoft Word oppure una copia funzionante di LibreOffice (libreoffice.org)."
+                .into(),
+        );
+    }
+    parts.join(" ")
+}
+
 fn convert_inner(
+    app: &AppHandle,
     file_data: Vec<u8>,
     file_name: String,
     output_path_str: String,
@@ -186,16 +247,37 @@ fn convert_inner(
     };
     let is_pdf = input_ext.eq_ignore_ascii_case(".pdf");
 
-    let mut conversion_success = false;
+    if is_office_to_pdf(&input_ext, &format) {
+        let (backend_used, warnings) = convert_office::convert_office_file_to_pdf_path(
+            app,
+            &temp_input,
+            &output_path,
+            None,
+        )?;
+        let _ = fs::remove_file(&temp_input);
+        if let Some(metadata) = payload.metadata.as_ref() {
+            apply_metadata(&output_path, &format, metadata)?;
+        }
+        return Ok(serde_json::json!({
+            "success": true,
+            "backendUsed": backend_used,
+            "warnings": warnings,
+        }));
+    }
 
-    let can_use_msoffice = cfg!(target_os = "windows")
-        && ((is_pdf && (format == "docx" || format == "pptx"))
-            || ((input_ext == ".docx" || input_ext == ".pptx") && format == "pdf"));
+    let mut conversion_success = false;
+    let mut ms_office_error: Option<String> = None;
+
+    let can_use_msoffice =
+        cfg!(target_os = "windows") && is_pdf && (format == "docx" || format == "pptx");
 
     if can_use_msoffice {
         match msoffice::convert_with_msoffice(&temp_input, &output_path, &format, &input_ext) {
             Ok(()) => conversion_success = true,
-            Err(e) => eprintln!("[Conversion] MS Office failed: {e}"),
+            Err(e) => {
+                eprintln!("[Conversion] MS Office failed: {e}");
+                ms_office_error = Some(e);
+            }
         }
     }
 
@@ -212,11 +294,15 @@ fn convert_inner(
     }
 
     if !conversion_success {
-        libreoffice::convert_with_libreoffice_engine(&temp_input, &output_path, &format)
-            .map_err(|e| {
-                let _ = fs::remove_file(&temp_input);
-                e
-            })?;
+        if let Err(lo_err) =
+            libreoffice::convert_with_libreoffice_engine(&temp_input, &output_path, &format)
+        {
+            let _ = fs::remove_file(&temp_input);
+            return Err(conversion_failure_message(
+                ms_office_error.as_deref(),
+                &lo_err,
+            ));
+        }
     }
 
     let _ = fs::remove_file(&temp_input);
@@ -381,7 +467,9 @@ mod tests {
         assert!(input.exists(), "run from repo with _test_doc.docx");
         let out = temp_dir().join(format!("pdeffy_test_{}.pdf", uuid::Uuid::new_v4()));
         let data = fs::read(&input).unwrap();
+        let app = tauri::test::mock_app();
         let result = convert_inner(
+            &app.handle(),
             data,
             "test.docx".into(),
             out.to_string_lossy().to_string(),

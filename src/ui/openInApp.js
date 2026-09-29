@@ -1,7 +1,7 @@
 /**
  * Open outputs inside Pdeffy when possible (PDF → editor). Non-PDF uses the OS default app.
  */
-import { openPath } from '@tauri-apps/plugin-opener';
+import { invoke } from '@tauri-apps/api/core';
 import { openRecentInEditor } from './shell.js';
 
 export function isPdfFilePath(filePath) {
@@ -27,12 +27,8 @@ export async function openFileInPdeffy(filePath) {
     return { success: true, inApp: true };
   }
 
-  try {
-    await openPath(path);
-    return { success: true, inApp: false };
-  } catch (err) {
-    throw err instanceof Error ? err : new Error(String(err));
-  }
+  await invoke('open-file', { filePath: path });
+  return { success: true, inApp: false };
 }
 
 export default { openFileInPdeffy, isPdfFilePath };

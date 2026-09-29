@@ -200,54 +200,72 @@ async function handleFormSubmit(e) {
             const gsCheck = await ipcRenderer.invoke('check-ghostscript-availability');
             if (gsCheck && gsCheck.hasGhostscript) {
                 let outputPath;
+                let savedFiles = [];
                 if (saveAsZip) {
                     outputPath = await ipcRenderer.invoke('show-save-dialog', {
                         defaultPath: path.join(downloadsPath, `${originalFileName}.zip`),
                         filters: [{ name: 'ZIP Files', extensions: ['zip'] }]
                     });
-                } else {
-                    outputPath = await ipcRenderer.invoke('show-save-dialog', {
-                        defaultPath: path.join(downloadsPath, `${originalFileName}.${format}`),
-                        filters: [{ name: format.toUpperCase() + ' Files', extensions: [format] }]
-                    });
-                }
-                if (!outputPath) {
-                    StatusManager.show(STATUS, 'error', 'saveCancelled');
-                    submitBtn.disabled = false;
-                    return;
-                }
-
-                const outDir = saveAsZip ? path.dirname(outputPath) : path.dirname(outputPath);
-                const workDir = path.join(outDir, `.pdeffy_img_${Date.now()}`);
-                const tempPdf = path.join(workDir, selectedFile.name);
-                await fs.mkdir(workDir, { recursive: true });
-                await fs.writeFile(tempPdf, new Uint8Array(await selectedFile.arrayBuffer()));
-
-                const result = await ipcRenderer.invoke('pdf-to-images-gs', {
-                    path: tempPdf,
-                    outputDir: workDir,
-                    format,
-                    dpi: 144,
-                });
-
-                const files = (result && result.files) || [];
-                if (saveAsZip) {
-                    await ipcRenderer.invoke('zip-files', { paths: files, output: outputPath });
-                } else {
-                    const baseName = path.basename(outputPath, `.${format}`);
-                    for (let i = 0; i < files.length; i++) {
-                        const dest = path.join(outDir, `${baseName}_${i + 1}.${format}`);
-                        const bytes = await fs.readFile(files[i]);
-                        await fs.writeFile(dest, new Uint8Array(bytes));
+                    if (!outputPath) {
+                        StatusManager.show(STATUS, 'error', 'saveCancelled');
+                        submitBtn.disabled = false;
+                        return;
                     }
+
+                    const workDir = path.join(path.dirname(outputPath), `.pdeffy_img_${Date.now()}`);
+                    const tempPdf = path.join(workDir, selectedFile.name);
+                    await fs.mkdir(workDir, { recursive: true });
+                    await fs.writeFile(tempPdf, new Uint8Array(await selectedFile.arrayBuffer()));
+
+                    const result = await ipcRenderer.invoke('pdf-to-images-gs', {
+                        path: tempPdf,
+                        outputDir: workDir,
+                        format,
+                        dpi: 144,
+                    });
+                    const files = (result && result.files) || [];
+                    await ipcRenderer.invoke('zip-files', { paths: files, output: outputPath });
+                    savedFiles = [outputPath];
+                } else {
+                    const pickedDir = await ipcRenderer.invoke('show-open-dialog', {
+                        title: (typeof window.getMessage === 'function')
+                            ? window.getMessage('pdfToImagePickFolderTitle')
+                            : 'Scegli cartella di destinazione',
+                        defaultPath: downloadsPath,
+                        properties: ['openDirectory', 'createDirectory'],
+                    });
+                    if (!pickedDir) {
+                        StatusManager.show(STATUS, 'error', 'saveCancelled');
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                    outputPath = typeof pickedDir === 'string' ? pickedDir : pickedDir;
+
+                    const tempDir = await ipcRenderer.invoke('get-temp-dir');
+                    const tempPdf = path.join(tempDir, `pdeffy_in_${Date.now()}_${selectedFile.name}`);
+                    await fs.writeFile(tempPdf, new Uint8Array(await selectedFile.arrayBuffer()));
+
+                    const conv = await ipcRenderer.invoke('convert-pdf-to-office', {
+                        inputPath: tempPdf,
+                        outputPath,
+                        format,
+                        imageDpi: 144,
+                        imageOutputMode: 'folder',
+                        fileNamePrefix: originalFileName,
+                    });
+                    try {
+                        await fs.unlink(tempPdf);
+                    } catch (_) { /* ignore */ }
+
+                    savedFiles = (conv && conv.savedFiles) || [];
                 }
 
                 StatusManager.show(STATUS, 'success', 'successConverted', {
-                    count: files.length || numPages,
+                    count: savedFiles.length || numPages,
                     format: saveAsZip ? 'ZIP' : format.toUpperCase(),
                     filename: path.basename(outputPath),
                     savePath: outputPath,
-                    savedFiles: files,
+                    savedFiles,
                 });
                 submitBtn.disabled = false;
                 return;
@@ -324,38 +342,40 @@ async function handleFormSubmit(e) {
             });
 
         } else {
-            // Save as image dialog
-            outputPath = await ipcRenderer.invoke('show-save-dialog', {
-                defaultPath: path.join(downloadsPath, `${originalFileName}.${format}`),
-                filters: [{ name: format.toUpperCase() + ' Files', extensions: [format] }]
+            const outputFolder = await ipcRenderer.invoke('show-open-dialog', {
+                title: (typeof window.getMessage === 'function')
+                    ? window.getMessage('pdfToImagePickFolderTitle')
+                    : 'Scegli cartella di destinazione',
+                defaultPath: downloadsPath,
+                properties: ['openDirectory', 'createDirectory'],
             });
 
-            if (!outputPath) {
+            if (!outputFolder) {
                 StatusManager.show(STATUS, 'error', 'saveCancelled');
                 submitBtn.disabled = false;
                 return;
             }
 
-            const outputFolder = path.dirname(outputPath);
-            const baseName = path.basename(outputPath, `.${format}`);
-            
-            // Array to store the paths of the generated images
+            const folder = typeof outputFolder === 'string' ? outputFolder : outputFolder;
             const generatedFiles = [];
 
-            // Save all image files
             for (let i = 0; i < imageFiles.length; i++) {
-                const finalPath = path.join(outputFolder, `${baseName}_${i + 1}.${format}`);
+                const finalPath = path.join(
+                    folder,
+                    imageFiles.length === 1
+                        ? `${originalFileName}.${format}`
+                        : `${originalFileName}_${String(i + 1).padStart(3, '0')}.${format}`
+                );
                 await fs.writeFile(finalPath, imageFiles[i]);
                 generatedFiles.push(finalPath);
             }
-            
-            // Send the array to StatusManager (it will ignore it if saveAsZip was true)
+
             StatusManager.show(STATUS, 'success', 'successConverted', {
                 count: numPages,
                 format: format.toUpperCase(),
-                filename: path.basename(outputPath),
-                savePath: outputPath,
-                savedFiles: generatedFiles 
+                filename: path.basename(folder),
+                savePath: folder,
+                savedFiles: generatedFiles,
             });
         }
 

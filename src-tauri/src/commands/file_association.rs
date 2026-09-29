@@ -1,5 +1,53 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, Manager};
+
+#[derive(Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OpenPdfPayload {
+    pub path: String,
+    pub name: String,
+}
+
+static PENDING_PDF_OPENS: Mutex<Vec<OpenPdfPayload>> = Mutex::new(Vec::new());
+
+/// Normalize a process argument that may be a quoted file path (Windows shell).
+pub fn normalize_open_file_arg(arg: &str) -> Option<PathBuf> {
+    let trimmed = arg.trim().trim_matches('"');
+    if trimmed.is_empty() || trimmed.starts_with('-') {
+        return None;
+    }
+    let path = PathBuf::from(trimmed);
+    if path.is_file() {
+        Some(path)
+    } else {
+        None
+    }
+}
+
+fn enqueue_open_pdf(payload: OpenPdfPayload) {
+    if let Ok(mut queue) = PENDING_PDF_OPENS.lock() {
+        if !queue.iter().any(|p| p.path == payload.path) {
+            queue.push(payload);
+        }
+    }
+}
+
+#[tauri::command(rename = "take-pending-pdf-opens")]
+pub fn take_pending_pdf_opens() -> Vec<OpenPdfPayload> {
+    PENDING_PDF_OPENS
+        .lock()
+        .map(|mut q| std::mem::take(&mut *q))
+        .unwrap_or_default()
+}
+
+fn focus_main_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.unminimize();
+        let _ = window.set_focus();
+    }
+}
 
 const PDF_UTI: &str = "com.adobe.pdf";
 
@@ -224,8 +272,21 @@ pub fn dispatch_opened_pdf(app: &AppHandle, path: &Path) {
         .unwrap_or("document.pdf")
         .to_string();
     let path_str = path.display().to_string();
-    let payload = serde_json::json!({ "path": path_str, "name": name });
+    let payload = OpenPdfPayload {
+        path: path_str,
+        name,
+    };
+    enqueue_open_pdf(payload.clone());
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.emit("pdeffy-open-pdf", payload);
+    }
+    focus_main_window(app);
+}
+
+pub fn dispatch_open_file_args(app: &AppHandle, args: &[String]) {
+    for arg in args.iter().skip(1) {
+        if let Some(path) = normalize_open_file_arg(arg) {
+            dispatch_opened_pdf(app, &path);
+        }
     }
 }

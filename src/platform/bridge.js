@@ -88,8 +88,11 @@ export const ipcRenderer = {
           return safeInvoke('get-downloads-path');
         case 'open-folder':
           return safeInvoke('open-folder', { folderPath: payload });
-        case 'open-file-external':
-          return safeInvoke('open-file', { filePath: payload });
+        case 'open-file-external': {
+          const filePath =
+            typeof payload === 'string' ? payload : payload?.filePath || payload?.path;
+          return safeInvoke('open-file', { filePath });
+        }
         case 'open-file': {
           const filePath =
             typeof payload === 'string' ? payload : payload?.filePath || payload?.path;
@@ -121,6 +124,8 @@ export const ipcRenderer = {
           return safeInvoke('save-language', { language: payload });
         case 'check-first-launch':
           return safeInvoke('check-first-launch');
+        case 'complete-first-launch':
+          return safeInvoke('complete-first-launch');
         case 'get-default-pdf-app':
           return safeInvoke('get-default-pdf-app');
         case 'set-default-pdf-app':
@@ -217,6 +222,26 @@ export const ipcRenderer = {
           return safeInvoke('pdf_redact_true', payload);
         case 'pdf-to-images-gs':
           return safeInvoke('pdf_to_images_gs', payload);
+        case 'convert-pdf-to-office': {
+          const {
+            inputPath,
+            outputPath,
+            format,
+            backend,
+            imageDpi,
+            imageOutputMode,
+            fileNamePrefix,
+          } = payload || {};
+          return safeInvoke('convert-pdf-to-office', {
+            inputPath,
+            outputPath,
+            format,
+            backend,
+            imageDpi,
+            imageOutputMode,
+            fileNamePrefix,
+          });
+        }
         case 'image-to-pdf-native': {
           const { imagePaths, output } = payload || {};
           return safeInvoke('image_to_pdf', {

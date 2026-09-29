@@ -566,10 +566,6 @@ window.addEventListener('languageChanged', () => {
   refreshNerStatus();
 });
 
-if (new URLSearchParams(window.location.search).has('welcome') && firstLaunchIntro) {
-  firstLaunchIntro.hidden = false;
-}
-
 window.dispatchEvent(new Event('settingsUIReady'));
 loadSettings();
 loadModels().then(() => refreshModelStatus());
