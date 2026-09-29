@@ -71,14 +71,14 @@ body.pdeffy-sidebar-collapsed .pdeffy-sidebar {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    min-height: 112px;
-    padding: 0 22px;
+    min-height: 0;
+    padding: 20px 22px 18px;
     background: var(--pdeffy-sidebar-brand-header, #101b3c);
 }
 
 body.pdeffy-sidebar-collapsed .pdeffy-sidebar-top {
     min-height: 0;
-    padding: 21px 0 0;
+    padding: 20px 0 12px;
     background: var(--pdeffy-color-surface, #ffffff);
     align-items: center;
 }
@@ -91,9 +91,12 @@ html[data-theme="dark"] body.pdeffy-sidebar-collapsed .pdeffy-sidebar-top {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    flex: 1;
-    min-height: 112px;
+    flex: 0 0 auto;
+    width: 100%;
+    height: 40px;
+    min-height: 0;
     margin: 0;
+    line-height: 0;
     text-decoration: none;
     color: inherit;
     background: transparent;
@@ -107,9 +110,10 @@ html[data-theme="dark"] body.pdeffy-sidebar-collapsed .pdeffy-sidebar-top {
 }
 
 body.pdeffy-sidebar-collapsed .pdeffy-sidebar-brand {
+    width: 40px;
+    height: 40px;
     min-height: 0;
     justify-content: center;
-    width: 100%;
     padding: 0;
 }
 
@@ -120,10 +124,11 @@ body.pdeffy-sidebar-collapsed .pdeffy-sidebar-brand {
 }
 
 .pdeffy-sidebar-logo--wordmark {
-    width: min(158px, 100%);
-    max-width: 100%;
-    height: auto;
-    max-height: 72px;
+    width: auto;
+    max-width: min(158px, 100%);
+    height: 40px;
+    max-height: 40px;
+    flex: 0 0 auto;
     object-fit: contain;
     object-position: left center;
 }
@@ -132,8 +137,11 @@ body.pdeffy-sidebar-collapsed .pdeffy-sidebar-brand {
     display: none;
     width: 40px;
     height: 40px;
+    max-width: 40px;
+    max-height: 40px;
     flex: 0 0 40px;
     object-fit: contain;
+    vertical-align: top;
 }
 
 body.pdeffy-sidebar-collapsed .pdeffy-sidebar-logo--wordmark {

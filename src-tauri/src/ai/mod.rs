@@ -13,6 +13,7 @@ pub mod engine;
 pub mod error;
 pub mod functions;
 pub mod ocr;
+mod pdf_extract_safe;
 pub mod pdf_text;
 pub mod progress;
 

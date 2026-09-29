@@ -73,8 +73,14 @@ pub fn globalize_chunk_entities(chunk: TextChunk<'_>, local: Vec<ChunkEntity>) -
             if e.local_end <= e.local_start {
                 return None;
             }
+            if e.local_end > chunk.text.len() {
+                return None;
+            }
             let start = chunk.start.checked_add(e.local_start)?;
             let end = chunk.start.checked_add(e.local_end)?;
+            if end > chunk.end {
+                return None;
+            }
             Some(GlobalEntity {
                 start,
                 end,

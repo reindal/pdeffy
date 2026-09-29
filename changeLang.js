@@ -504,8 +504,12 @@ const languages = {
 
         metadataTitle: "Title:",
         metadataDescription: "Description:",
+        metadataAuthor: "Author:",
+        metadataCompany: "Company:",
         metadataTitlePlaceholder: "Enter document title",
         metadataDescriptionPlaceholder: "Enter document description",
+        metadataAuthorInput: "Enter author name",
+        metadataCompanyInput: "Enter company name",
 
         // PDF to Image
         pdfToImageHeader: "PDF to Image",
@@ -1711,8 +1715,12 @@ const languages = {
 
         metadataTitle: "Titolo:",
         metadataDescription: "Descrizione:",
+        metadataAuthor: "Autore:",
+        metadataCompany: "Azienda:",
         metadataTitlePlaceholder: "Inserisci titolo documento",
         metadataDescriptionPlaceholder: "Inserisci descrizione documento",
+        metadataAuthorInput: "Inserisci il nome dell'autore",
+        metadataCompanyInput: "Inserisci il nome dell'azienda",
 
         // PDF to Image
         pdfToImageHeader: "PDF a Immagine",
@@ -2829,8 +2837,12 @@ const languages = {
 
         metadataTitle: "Tytuł:",
         metadataDescription: "Opis:",
+        metadataAuthor: "Autor:",
+        metadataCompany: "Firma:",
         metadataTitlePlaceholder: "Wprowadź tytuł dokumentu",
         metadataDescriptionPlaceholder: "Wprowadź opis dokumentu",
+        metadataAuthorInput: "Wpisz nazwisko autora",
+        metadataCompanyInput: "Wpisz nazwę firmy",
 
         // PDF to Image
         pdfToImageHeader: "PDF do Obrazów",
@@ -3794,8 +3806,12 @@ const languages = {
 
         metadataTitle: "Título:",
         metadataDescription: "Descripción:",
+        metadataAuthor: "Autor:",
+        metadataCompany: "Empresa:",
         metadataTitlePlaceholder: "Ingrese el título del documento",
         metadataDescriptionPlaceholder: "Ingrese la descripción del documento",
+        metadataAuthorInput: "Introduzca el nombre del autor",
+        metadataCompanyInput: "Introduzca el nombre de la empresa",
 
         // PDF to Image
         pdfToImageHeader: "PDF a imagen",

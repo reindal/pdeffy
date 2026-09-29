@@ -27,6 +27,15 @@ fn escape_ps_single_quoted(value: &str) -> String {
     value.replace('\'', "''")
 }
 
+/// Word COM expects absolute native paths (backslashes on Windows).
+#[cfg(target_os = "windows")]
+fn path_for_com(path: &Path) -> String {
+    path.canonicalize()
+        .unwrap_or_else(|_| path.to_path_buf())
+        .to_string_lossy()
+        .replace('/', "\\")
+}
+
 #[cfg(target_os = "windows")]
 pub fn convert_with_msoffice(
     input_path: &Path,
@@ -35,8 +44,8 @@ pub fn convert_with_msoffice(
     input_ext: &str,
 ) -> Result<(), String> {
     let route = format!("{input_ext}_to_{format}");
-    let input = escape_ps_single_quoted(&input_path.to_string_lossy());
-    let output = escape_ps_single_quoted(&output_path.to_string_lossy());
+    let input = escape_ps_single_quoted(&path_for_com(input_path));
+    let output = escape_ps_single_quoted(&path_for_com(output_path));
 
     let ps_script = match route.as_str() {
         ".pdf_to_docx" => format!(
@@ -121,7 +130,22 @@ try {{
         let stderr = String::from_utf8_lossy(&output.stderr);
         return Err(format!("MS Office conversion failed: {stderr}"));
     }
-    Ok(())
+
+    if output_path.is_file() {
+        return Ok(());
+    }
+
+    // Word sometimes writes next to the source DOCX with the same stem.
+    let sibling = input_path.with_extension("pdf");
+    if sibling.is_file() && sibling != output_path {
+        fs::rename(&sibling, output_path).map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+
+    Err(format!(
+        "MS Office reported success but the PDF was not found at {}",
+        output_path.display()
+    ))
 }
 
 #[cfg(not(target_os = "windows"))]

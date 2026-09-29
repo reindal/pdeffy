@@ -18,9 +18,7 @@ pub fn extract_and_normalize(app: &AppHandle, app_data: &Path, path: &Path) -> R
         )));
     }
 
-    let raw = pdf_extract::extract_text(path).map_err(|e| {
-        AiError::PdfUnreadable(format!("pdf-extract failed: {e}"))
-    })?;
+    let raw = super::pdf_extract_safe::extract_text(path)?;
 
     let cleaned = normalize_text(&raw);
     if !cleaned.trim().is_empty() {

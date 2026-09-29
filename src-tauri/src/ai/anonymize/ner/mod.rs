@@ -7,6 +7,7 @@ mod gliner_infer;
 mod gliner_onnx;
 
 use chunking::{chunk_text, dedupe_global_entities, globalize_chunk_entities, GlobalEntity};
+use config::NER_PACK_SIZE_LABEL;
 use crate::ai::anonymize::types::TextSpan;
 use crate::ai::error::AiError;
 use crate::ai::progress::{emit_progress, AiProgress};
@@ -29,32 +30,13 @@ pub struct NerStatus {
 pub fn status(app_data: &Path, downloading: bool) -> NerStatus {
     let downloaded = is_downloaded(app_data);
     let dir = ner_pack_dir(app_data);
-    let bytes: u64 = if downloaded {
-        std::fs::read_dir(&dir)
-            .into_iter()
-            .flatten()
-            .filter_map(|e| e.ok())
-            .filter_map(|e| e.metadata().ok())
-            .map(|m| m.len())
-            .sum()
-    } else {
-        0
-    };
-    let size_label = if bytes >= 1_000_000 {
-        format!("~{:.0} MB", bytes as f64 / 1_000_000.0)
-    } else if downloaded {
-        format!("{bytes} B")
-    } else {
-        "~200 MB".into()
-    };
-
     NerStatus {
         pack_id: NER_PACK_ID.to_string(),
         downloaded,
         loaded: NerEngine::session_loaded(),
         downloading,
         path: downloaded.then(|| dir.display().to_string()),
-        size_label,
+        size_label: NER_PACK_SIZE_LABEL.to_string(),
         detail: if downloaded {
             "GLiNER pack ready for name/org/address detection.".into()
         } else {

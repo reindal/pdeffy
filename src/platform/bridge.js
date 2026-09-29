@@ -143,11 +143,15 @@ export const ipcRenderer = {
           const tempDir = await safeInvoke('get-temp-dir');
           const safeName = String(fileName || 'input.bin').replace(/[/\\]/g, '_');
           const inputPath = path.join(tempDir, `pdeffy_in_${Date.now()}_${safeName}`);
+          const outPath =
+            typeof outputPath === 'string' && /^[A-Za-z]:\//.test(outputPath)
+              ? outputPath.replace(/\//g, '\\')
+              : outputPath;
           await safeInvoke('write-file-bytes', { path: inputPath, contents: bytes });
           try {
             return await safeInvoke('convert-file-path', {
               inputPath,
-              outputPath,
+              outputPath: outPath,
               format: format || 'pdf',
               metadata: metadata || null,
             });

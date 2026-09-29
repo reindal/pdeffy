@@ -329,11 +329,28 @@ function onAiProgress(payload) {
           : target === 'ocr'
             ? msg('localModelsProgressOcr', 'Download RapidOCR…')
             : msg('localModelsProgressSummarize', 'Download modello riassunto…');
-      if (progressLabel) progressLabel.textContent = progressMsg;
-      setBadge(msg('summarizeBadgeDownloading', 'Download…'), 'is-busy');
-      detail.textContent = total
+      const line = total
         ? `${progressMsg} ${formatBytes(payload.downloaded)} / ${formatBytes(total)} (${pct}%)`
         : `${progressMsg} ${formatBytes(payload.downloaded)}`;
+      if (progressLabel) progressLabel.textContent = progressMsg;
+      if (target === 'ner') {
+        if (nerDetail) nerDetail.textContent = line;
+        if (nerBadge) {
+          nerBadge.textContent = msg('summarizeBadgeDownloading', 'Download…');
+          nerBadge.className = 'settingsAiBadge is-busy';
+        }
+        setLocalState(nerDiskEl, diskState(false, true).text, diskState(false, true).kind);
+      } else if (target === 'ocr') {
+        if (ocrDetail) ocrDetail.textContent = line;
+        if (ocrBadge) {
+          ocrBadge.textContent = msg('summarizeBadgeDownloading', 'Download…');
+          ocrBadge.className = 'settingsAiBadge is-busy';
+        }
+        setLocalState(ocrDiskEl, diskState(false, true).text, diskState(false, true).kind);
+      } else {
+        setBadge(msg('summarizeBadgeDownloading', 'Download…'), 'is-busy');
+        if (detail) detail.textContent = line;
+      }
       break;
     }
     case 'loading':

@@ -1,8 +1,9 @@
 // Module to handle the injection, retrieval, and reset of custom metadata in the UI
 const CustomMetadataModule = {
-    
+    _defaultMetadata: null,
+
     // Inject the metadata HTML elements right above the submit button
-    init: function() {
+    init: function () {
         const submitBtn = document.getElementById('submitBtn');
         if (!submitBtn) return;
 
@@ -18,6 +19,14 @@ const CustomMetadataModule = {
                 <span class="langText" id="addCustomMetadata">Add custom metadata properties</span>
             </label>
             <div id="metadataFields" class="metadataFields">
+                <div class="formGroup">
+                    <label for="metadataAuthorInput" class="langText" id="metadataAuthor">Author:</label>
+                    <input type="text" id="metadataAuthorInput" class="langTextPlaceholder" placeholder="Enter author name" autocomplete="name">
+                </div>
+                <div class="formGroup">
+                    <label for="metadataCompanyInput" class="langText" id="metadataCompany">Company:</label>
+                    <input type="text" id="metadataCompanyInput" class="langTextPlaceholder" placeholder="Enter company name" autocomplete="organization">
+                </div>
                 <div class="formGroup">
                     <label for="metadataTitleInput" class="langText" id="metadataTitle">Title:</label>
                     <input type="text" id="metadataTitleInput" class="langTextPlaceholder" placeholder="Enter document title">
@@ -35,18 +44,52 @@ const CustomMetadataModule = {
         // Bind the change event to toggle the visibility of the input fields
         const checkbox = document.getElementById('addMetadataCheckbox');
         const fieldsDiv = document.getElementById('metadataFields');
-        
-        checkbox.addEventListener('change', function() {
+
+        checkbox.addEventListener('change', function () {
             if (this.checked) {
                 fieldsDiv.classList.add('visible');
+                CustomMetadataModule.applyDefaultAuthorCompany();
             } else {
                 fieldsDiv.classList.remove('visible');
             }
         });
+
+        this._wireAuthorCompanyEditTracking();
+        this.prefillFromSettings();
+    },
+
+    async prefillFromSettings() {
+        try {
+            const { ipcRenderer } = await import('../src/platform/electron.js');
+            this._defaultMetadata = await ipcRenderer.invoke('get-pdf-metadata');
+            this.applyDefaultAuthorCompany();
+        } catch (_) {
+            /* ignore — defaults stay empty until settings load */
+        }
+    },
+
+    applyDefaultAuthorCompany() {
+        const authorInput = document.getElementById('metadataAuthorInput');
+        const companyInput = document.getElementById('metadataCompanyInput');
+        const author = this._defaultMetadata?.author || '';
+        const company = this._defaultMetadata?.company || '';
+        if (authorInput && !authorInput.dataset.userEdited) authorInput.value = author;
+        if (companyInput && !companyInput.dataset.userEdited) companyInput.value = company;
+    },
+
+    _wireAuthorCompanyEditTracking() {
+        for (const id of ['metadataAuthorInput', 'metadataCompanyInput']) {
+            const el = document.getElementById(id);
+            if (!el || el.dataset.pdeffyMetaWired) continue;
+            el.dataset.pdeffyMetaWired = '1';
+            el.addEventListener('input', () => {
+                el.dataset.userEdited = '1';
+            });
+        }
     },
 
     // Author + optional company, e.g. "Mario Rossi — Reindal"
-    formatAuthorField: function(author, company) {
+    formatAuthorField: function (author, company) {
         const a = String(author || '').trim();
         const c = String(company || '').trim();
         if (a && c) return `${a} — ${c}`;
@@ -54,7 +97,7 @@ const CustomMetadataModule = {
     },
 
     // Apply metadata to a pdf-lib PDFDocument
-    applyToPdfDoc: function(pdfDoc, metadata) {
+    applyToPdfDoc: function (pdfDoc, metadata) {
         if (!pdfDoc || !metadata) return;
         const author = this.formatAuthorField(metadata.author, metadata.company);
         if (author) pdfDoc.setAuthor(author);
@@ -64,22 +107,27 @@ const CustomMetadataModule = {
         if (typeof pdfDoc.setProducer === 'function') pdfDoc.setProducer('Pdeffy');
     },
 
-    // Always include settings author/company; title/description only when the user fills them.
-    getFinalMetadata: async function(ipcRenderer) {
+    // Settings author/company by default; per-tool overrides when the metadata panel is enabled.
+    getFinalMetadata: async function (ipcRenderer) {
         const globalMetadata = await ipcRenderer.invoke('get-pdf-metadata');
+        this._defaultMetadata = globalMetadata;
 
         const finalMetadata = {
             author: globalMetadata.author || '',
             company: globalMetadata.company || '',
             title: '',
-            subject: ''
+            subject: '',
         };
 
         const checkbox = document.getElementById('addMetadataCheckbox');
+        const authorInput = document.getElementById('metadataAuthorInput');
+        const companyInput = document.getElementById('metadataCompanyInput');
         const titleInput = document.getElementById('metadataTitleInput');
         const descInput = document.getElementById('metadataDescriptionInput');
 
         if (checkbox && checkbox.checked) {
+            if (authorInput) finalMetadata.author = authorInput.value.trim();
+            if (companyInput) finalMetadata.company = companyInput.value.trim();
             const customTitle = titleInput ? titleInput.value.trim() : '';
             const customDesc = descInput ? descInput.value.trim() : '';
             if (customTitle) finalMetadata.title = customTitle;
@@ -90,18 +138,27 @@ const CustomMetadataModule = {
     },
 
     // Reset the custom metadata inputs to their default state after processing
-    reset: function() {
+    reset: function () {
         const checkbox = document.getElementById('addMetadataCheckbox');
         const fieldsDiv = document.getElementById('metadataFields');
+        const authorInput = document.getElementById('metadataAuthorInput');
+        const companyInput = document.getElementById('metadataCompanyInput');
         const titleInput = document.getElementById('metadataTitleInput');
         const descInput = document.getElementById('metadataDescriptionInput');
 
-        // Clear values and hide the input container
         if (titleInput) titleInput.value = '';
         if (descInput) descInput.value = '';
+        if (authorInput) {
+            authorInput.dataset.userEdited = '';
+            authorInput.value = this._defaultMetadata?.author || '';
+        }
+        if (companyInput) {
+            companyInput.dataset.userEdited = '';
+            companyInput.value = this._defaultMetadata?.company || '';
+        }
         if (checkbox) checkbox.checked = false;
         if (fieldsDiv) fieldsDiv.classList.remove('visible');
-    }
+    },
 };
 
 // ES modules don't share scope — expose for page scripts (Electron used a shared classic scope).

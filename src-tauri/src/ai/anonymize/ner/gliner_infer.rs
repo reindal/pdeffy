@@ -274,7 +274,7 @@ impl GlinerRuntime {
 #[cfg(not(feature = "ner-onnx"))]
 impl GlinerRuntime {
     pub fn load(_pack_dir: &Path) -> Result<Self, AiError> {
-        Err(AiError::NotImplemented("ner-onnx feature disabled"))
+        Err(AiError::Message("ner-onnx feature disabled".into()))
     }
 
     pub fn predict(

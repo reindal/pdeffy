@@ -38,9 +38,6 @@ pub enum AiError {
     #[error("NER model pack is not downloaded yet. Open Settings and download GLiNER.")]
     NerNotDownloaded,
 
-    #[error("AI function '{0}' is not implemented yet.")]
-    NotImplemented(&'static str),
-
     #[error("AI engine is busy.")]
     Busy,
 }

@@ -1,4 +1,4 @@
-use super::config::{pack_subdir, NER_ASSETS};
+use super::config::{pack_subdir, NER_ASSETS, NER_PACK_EXPECTED_BYTES};
 use crate::ai::error::AiError;
 use crate::ai::progress::{emit_progress, AiProgress};
 use std::fs::{self, File};
@@ -88,20 +88,25 @@ pub fn download_pack(app: &AppHandle, app_data: &Path) -> Result<PathBuf, AiErro
     let dir = ner_pack_dir(app_data);
     fs::create_dir_all(&dir).map_err(|e| AiError::Download(e.to_string()))?;
 
-    let pack_bytes: u64 = NER_ASSETS.iter().map(|a| a.min_bytes).sum();
     let mut downloaded_total: u64 = 0;
 
     emit_progress(
         app,
         AiProgress::Download {
             downloaded: 0,
-            total: Some(pack_bytes),
+            total: Some(NER_PACK_EXPECTED_BYTES),
         },
     );
 
     for asset in NER_ASSETS {
         let dest = dir.join(asset.filename);
-        download_one(app, &dest, asset, &mut downloaded_total, pack_bytes)?;
+        download_one(
+            app,
+            &dest,
+            asset,
+            &mut downloaded_total,
+            NER_PACK_EXPECTED_BYTES,
+        )?;
     }
 
     emit_progress(app, AiProgress::Ready);

@@ -3,6 +3,12 @@
 /// Hugging Face repo with pre-exported ONNX (multilingual v2.1).
 pub const NER_PACK_ID: &str = "gliner_multi-v2.1-onnx";
 
+/// User-facing download size (matches settings copy: GLiNER · ~200 MB).
+pub const NER_PACK_SIZE_LABEL: &str = "~200 MB";
+
+/// Progress bar total (~200 MiB); ONNX + tokenizer assets are ~183–200 MB on disk.
+pub const NER_PACK_EXPECTED_BYTES: u64 = 200 * 1024 * 1024;
+
 /// One file in the on-disk NER pack.
 #[derive(Debug, Clone, Copy)]
 pub struct NerAsset {

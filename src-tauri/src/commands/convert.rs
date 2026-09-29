@@ -91,8 +91,9 @@ fn convert_existing_file(
             || ((input_ext == ".docx" || input_ext == ".pptx") && format == "pdf"));
 
     if can_use_msoffice {
-        if msoffice::convert_with_msoffice(input_path, &output_path, format, &input_ext).is_ok() {
-            conversion_success = true;
+        match msoffice::convert_with_msoffice(input_path, &output_path, format, &input_ext) {
+            Ok(()) => conversion_success = true,
+            Err(e) => eprintln!("[Conversion] MS Office failed: {e}"),
         }
     }
 
@@ -192,8 +193,9 @@ fn convert_inner(
             || ((input_ext == ".docx" || input_ext == ".pptx") && format == "pdf"));
 
     if can_use_msoffice {
-        if msoffice::convert_with_msoffice(&temp_input, &output_path, &format, &input_ext).is_ok() {
-            conversion_success = true;
+        match msoffice::convert_with_msoffice(&temp_input, &output_path, &format, &input_ext) {
+            Ok(()) => conversion_success = true,
+            Err(e) => eprintln!("[Conversion] MS Office failed: {e}"),
         }
     }
 
