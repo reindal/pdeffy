@@ -317,6 +317,7 @@
         model.ocrText = '';
         model.anonymizedText = '';
         model.hasEmbeddedText = true;
+        model.textSelectionWeak = false;
         model.viewerContentMode = 'pdf';
     }
 

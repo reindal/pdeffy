@@ -278,12 +278,14 @@
             'pdfEditorMetaNo',
             'No'
         );
-        if (ctx.hasEmbeddedText === false) {
+        if (ctx.hasEmbeddedText === false || ctx.textSelectionWeak === true) {
             pushField(
                 pdfFields,
                 'pdfEditorMetaTextLayer',
                 'Testo selezionabile',
-                'Limitato (probabilmente solo immagini)'
+                ctx.hasEmbeddedText === false
+                    ? 'Limitato (probabilmente solo immagini)'
+                    : 'Limitato (selezione per area)'
             );
         } else if (ctx.hasEmbeddedText === true) {
             pushBool(

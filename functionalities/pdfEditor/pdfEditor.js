@@ -96,6 +96,7 @@ function createDocumentSession(id = createSessionId()) {
         ocrText: '',
         anonymizedText: '',
         hasEmbeddedText: true,
+        textSelectionWeak: false,
         viewerContentMode: 'pdf',
         selectedPageId: null,
         lastSavedPath: null,
@@ -149,6 +150,7 @@ function persistActiveSession() {
     session.ocrText = model.ocrText;
     session.anonymizedText = model.anonymizedText;
     session.hasEmbeddedText = model.hasEmbeddedText;
+    session.textSelectionWeak = model.textSelectionWeak;
     session.viewerContentMode = model.viewerContentMode;
     session.selectedPageId = selectedPageId;
     session.lastSavedPath = lastSavedPath;
@@ -184,6 +186,7 @@ function applySessionEditsToModel(session) {
     model.ocrText = session.ocrText;
     model.anonymizedText = session.anonymizedText;
     model.hasEmbeddedText = session.hasEmbeddedText;
+    model.textSelectionWeak = session.textSelectionWeak === true;
     model.viewerContentMode = session.viewerContentMode;
     model.documentMetadata = session.documentMetadata || null;
 }
@@ -442,6 +445,7 @@ async function refreshDocumentMetadata() {
             isEncrypted: model.isEncrypted,
             acroFormPresent: model.acroFormPresent,
             hasEmbeddedText: model.hasEmbeddedText,
+            textSelectionWeak: model.textSelectionWeak === true,
         });
     } catch (err) {
         console.warn('[pdfEditor] document metadata', err);
@@ -1708,6 +1712,7 @@ async function loadPdfFile(file, filePath = null, options = {}) {
         } catch (_) { /* ignore */ }
 
         model.hasEmbeddedText = true;
+        model.textSelectionWeak = false;
         model.ocrText = '';
         model.anonymizedText = '';
         model.anonDualView = false;
@@ -2296,7 +2301,11 @@ document.getElementById('pdfEditorPanTool')?.addEventListener('click', () => {
     document.body.classList.toggle('pdfEditorPanning', panEnabled);
 });
 
-if (typeof window.PdfEditorTextSelection !== 'undefined') {
+(function initPdfTextSelection() {
+    if (typeof window.PdfEditorTextSelection === 'undefined') {
+        queueMicrotask(initPdfTextSelection);
+        return;
+    }
     window.PdfEditorTextSelection.init({
         model,
         getPdfPage,
@@ -2306,10 +2315,16 @@ if (typeof window.PdfEditorTextSelection !== 'undefined') {
                 PdfEditorOverlayManager.syncOverlays(model, viewerApi);
             }
             if (toolController) toolController.onViewerRendered?.();
+            if (model.textSelectionWeak) {
+                refreshDocumentMetadata().catch(() => {});
+                if (viewerApi && selectedPageId) {
+                    viewerApi.render(selectedPageId).catch(() => {});
+                }
+            }
         },
         isPanActive: () => panEnabled,
     });
-}
+})();
 
 (function wirePanDrag() {
     let dragging = false;

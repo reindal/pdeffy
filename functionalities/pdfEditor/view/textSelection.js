@@ -28,7 +28,35 @@
     }
 
     function isScan() {
-        return modelRef?.hasEmbeddedText === false;
+        return (
+            modelRef?.hasEmbeddedText === false ||
+            modelRef?.textSelectionWeak === true
+        );
+    }
+
+    /** @returns {{ withText: number, hitable: number, ratio: number }} */
+    function measureTextLayer(layer) {
+        const spans = layer.querySelectorAll('span[role="presentation"]');
+        let withText = 0;
+        let hitable = 0;
+        spans.forEach((s) => {
+            const t = s.textContent || '';
+            if (!t.trim()) return;
+            withText += 1;
+            const r = s.getBoundingClientRect();
+            if (r.width >= 1 && r.height >= 1) hitable += 1;
+        });
+        return {
+            withText,
+            hitable,
+            ratio: withText > 0 ? hitable / withText : 0,
+        };
+    }
+
+    function markTextSelectionWeak() {
+        if (!modelRef || modelRef.textSelectionWeak) return;
+        modelRef.textSelectionWeak = true;
+        onChange?.();
     }
 
     function showMenu(clientX, clientY, selection, { allowCopy, allowUnderline }) {
@@ -153,6 +181,7 @@
 
         // Ensure layout so clientWidth is valid when CSS scales the canvas.
         await new Promise((r) => requestAnimationFrame(r));
+        await new Promise((r) => requestAnimationFrame(r));
 
         canvasWrap.querySelector('.pdfEditorTextLayer')?.remove();
 
@@ -160,22 +189,26 @@
         layer.className = 'textLayer pdfEditorTextLayer';
         layer.dataset.pageId = pageState.id;
 
-        const cssW = canvas.clientWidth || viewport.width;
-        const cssScale = cssW / (viewport.width || cssW || 1);
-        const scale = viewport.scale * cssScale;
-        const layerViewport = pdfPage.getViewport({
-            scale,
-            rotation: viewport.rotation,
-        });
+        const vpW = viewport.width || 1;
+        const cssW = canvas.clientWidth || vpW;
+        const cssH = canvas.clientHeight || viewport.height || 1;
+        const cssScale = cssW / vpW;
+        const layerViewport =
+            Math.abs(cssScale - 1) < 0.002
+                ? viewport
+                : pdfPage.getViewport({
+                      scale: viewport.scale * cssScale,
+                      rotation: viewport.rotation,
+                  });
+        const totalScale = layerViewport.scale;
 
         // pdf.js TextLayer + viewer CSS depend on these custom properties.
-        layer.style.setProperty('--scale-factor', String(scale));
+        layer.style.setProperty('--scale-factor', String(totalScale));
         layer.style.setProperty('--user-unit', '1');
-        layer.style.setProperty('--total-scale-factor', String(scale));
+        layer.style.setProperty('--total-scale-factor', String(totalScale));
         layer.style.setProperty('--scale-round-x', '1px');
         layer.style.setProperty('--scale-round-y', '1px');
 
-        // Above search/overlay so the cursor hits transparent text spans.
         canvasWrap.appendChild(layer);
 
         try {
@@ -187,14 +220,22 @@
             });
             await textLayer.render();
 
-            // If setLayerDimensions used calc() sizes, also pin to canvas box for safety.
-            if (canvas.clientWidth > 0) {
-                layer.style.width = `${canvas.clientWidth}px`;
-                layer.style.height = `${canvas.clientHeight}px`;
+            await new Promise((r) => requestAnimationFrame(r));
+            const { withText, hitable, ratio } = measureTextLayer(layer);
+            if (withText > 0 && ratio < 0.12) {
+                console.warn('[pdfEditor] text layer weak', { withText, hitable, ratio });
+                layer.remove();
+                markTextSelectionWeak();
+                return;
+            }
+            if (cssW > 0 && cssH > 0) {
+                layer.style.width = `${cssW}px`;
+                layer.style.height = `${cssH}px`;
             }
         } catch (err) {
             console.warn('[pdfEditor] text layer', err);
             layer.remove();
+            markTextSelectionWeak();
         }
     }
 

@@ -1504,6 +1504,12 @@ body.pdfEditorAiAnonymizeTab .pdfEditorInspector .pdfEditorToolBody {
     --scale-round-y: 1px;
 }
 
+/* Select tool: text layer above overlay (WKWebView often misses hits through overlay). */
+body:not(.pdfEditorToolCapture):not(.pdfEditorPanning) .pdfEditorTextLayer,
+body:not(.pdfEditorToolCapture):not(.pdfEditorPanning) .textLayer.pdfEditorTextLayer {
+    z-index: 11;
+}
+
 .pdfEditorTextLayer > :not(.markedContent),
 .pdfEditorTextLayer .markedContent span:not(.markedContent),
 .pdfEditorTextLayer span,
