@@ -209,6 +209,7 @@ function wrapBody() {
     'pdfEditorSignaturesModal',
     'pdfEditorCtxMenu',
     'pdeffyAboutModal',
+    'setup-wizard-host',
     'peg-toast',
   ]);
 

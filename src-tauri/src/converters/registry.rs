@@ -1,6 +1,6 @@
 use super::{
-    BackendOutput, ConversionError, LibreOfficeBackend, Office2PdfBackend, OfficeFormat,
-    OfficeToPdfConverter,
+    docx_has_header_or_footer, BackendOutput, ConversionError, LibreOfficeBackend,
+    Office2PdfBackend, OfficeFormat, OfficeToPdfConverter,
 };
 use serde::Serialize;
 use std::path::Path;
@@ -50,11 +50,29 @@ impl ActiveBackend {
     }
 }
 
-fn backend_by_id(id: BackendChoice) -> Result<ActiveBackend, ConversionError> {
+/// In `auto` mode, DOCX with headers/footers use LibreOffice when installed (layout fidelity).
+fn resolve_auto_backend(input_path: &Path, format: OfficeFormat) -> BackendChoice {
+    if format == OfficeFormat::Docx
+        && docx_has_header_or_footer(input_path)
+        && libreoffice().is_available()
+    {
+        BackendChoice::LibreOffice
+    } else {
+        BackendChoice::Office2Pdf
+    }
+}
+
+fn backend_by_id(
+    id: BackendChoice,
+    input_path: &Path,
+    format: OfficeFormat,
+) -> Result<ActiveBackend, ConversionError> {
+    let id = match id {
+        BackendChoice::Auto => resolve_auto_backend(input_path, format),
+        other => other,
+    };
     match id {
-        BackendChoice::Office2Pdf | BackendChoice::Auto => Ok(ActiveBackend::Office2Pdf(
-            office2pdf(),
-        )),
+        BackendChoice::Office2Pdf => Ok(ActiveBackend::Office2Pdf(office2pdf())),
         BackendChoice::LibreOffice => {
             let b = libreoffice();
             if !b.is_available() {
@@ -62,6 +80,7 @@ fn backend_by_id(id: BackendChoice) -> Result<ActiveBackend, ConversionError> {
             }
             Ok(ActiveBackend::LibreOffice(b))
         }
+        BackendChoice::Auto => Ok(ActiveBackend::Office2Pdf(office2pdf())),
     }
 }
 
@@ -90,28 +109,41 @@ pub fn convert_office_to_pdf(
     format: OfficeFormat,
     choice: BackendChoice,
 ) -> Result<ConversionResult, ConversionError> {
-    let backend = backend_by_id(choice)?;
+    let mut extra_warnings = Vec::new();
+    if choice == BackendChoice::Auto
+        && format == OfficeFormat::Docx
+        && docx_has_header_or_footer(input_path)
+        && !libreoffice().is_available()
+    {
+        extra_warnings.push(
+            "Il documento ha intestazione o piè di pagina: installa LibreOffice per un layout \
+             più fedele (motore interno attivo)."
+                .to_string(),
+        );
+    }
+
+    let backend = backend_by_id(choice, input_path, format)?;
     let name = backend.as_trait().name();
     let output = backend.as_trait().convert(input_path, format)?;
-    Ok(map_output(output, name))
+    Ok(map_output(output, name, extra_warnings))
 }
 
-fn map_output(output: BackendOutput, backend_used: &str) -> ConversionResult {
+fn map_output(
+    output: BackendOutput,
+    backend_used: &str,
+    mut extra_warnings: Vec<String>,
+) -> ConversionResult {
+    extra_warnings.extend(output.warnings);
     ConversionResult {
         pdf_bytes: output.pdf_bytes,
         backend_used: backend_used.to_string(),
-        warnings: output.warnings,
+        warnings: extra_warnings,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn auto_defaults_to_office2pdf_id() {
-        assert!(BackendChoice::Auto.resolves_to_office2pdf());
-    }
 
     #[test]
     fn parse_backend_aliases() {

@@ -49,21 +49,29 @@
 }
 
 .settingsPage select,
-.settingsFormGroup input {
+.settingsPage .settingsFormGroup input {
     width: 100%;
     max-width: 100%;
-    padding: 10px 12px;
+    min-height: var(--pdeffy-control-height, 2.625rem);
+    height: var(--pdeffy-control-height, 2.625rem);
+    padding: 0 12px;
     border: 1px solid var(--pdeffy-border, #e7e7e2);
     border-radius: 10px;
     font-size: 14px;
+    line-height: 1.35;
     box-sizing: border-box;
     background: var(--pdeffy-surface, #fff);
     color: var(--pdeffy-text, #101a3a);
     font-family: inherit;
 }
 
+.settingsPage select {
+    padding-right: 2.25rem;
+    cursor: pointer;
+}
+
 .settingsPage select:focus,
-.settingsFormGroup input:focus {
+.settingsPage .settingsFormGroup input:focus {
     outline: none;
     border-color: var(--pdeffy-primary, #ffd91a);
 }

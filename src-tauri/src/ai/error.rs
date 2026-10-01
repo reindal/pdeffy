@@ -20,7 +20,7 @@ pub enum AiError {
     #[error("PDF could not be parsed or has no extractable text: {0}")]
     PdfUnreadable(String),
 
-    #[error("No extractable text in this PDF (scanned/image-only). OCR is not available yet.")]
+    #[error("No extractable text in this PDF (embedded text and OCR found nothing readable).")]
     PdfNoText,
 
     #[error("Download failed: {0}")]
@@ -51,7 +51,8 @@ impl AiError {
             }
             Self::ModelMissing => "Model file is missing or incomplete. Download it again from Settings.".into(),
             Self::PdfNoText => {
-                "This PDF has no extractable text (it may be scanned). OCR is not available yet."
+                "This PDF has no readable text. If it is scanned, check that Ghostscript is installed \
+                 and try again; otherwise the pages may be blank or unreadable."
                     .into()
             }
             Self::OcrNotDownloaded => {

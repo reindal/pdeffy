@@ -29,6 +29,8 @@ body.pdeffy-shell {
     display: flex;
     min-height: 100vh;
     overflow-x: hidden;
+    /* Banda header sidebar (padding + logo 40px) — allineamento titolo home */
+    --pdeffy-sidebar-top-block-height: 78px;
 }
 
 body.pdeffy-shell > .backLink,
@@ -768,7 +770,7 @@ body.pdeffy-editor-mode .pdeffy-main > main {
 /* —— Home hero —— */
 .pdeffy-home-hero {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
     gap: clamp(28px, 3.5vw, 56px);
     margin-bottom: 26px;
@@ -781,7 +783,13 @@ body.pdeffy-editor-mode .pdeffy-main > main {
 }
 
 .pdeffy-home-hero h1 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    min-height: calc(var(--pdeffy-sidebar-top-block-height, 78px) - var(--pdeffy-space-5, 20px));
     margin: 0 0 20px;
+    padding: 0;
+    box-sizing: border-box;
     font-size: clamp(1.95rem, 2.6vw, 2.55rem);
     font-weight: 750;
     letter-spacing: -0.03em;
@@ -1080,22 +1088,36 @@ body.pdeffy-shell #settingsIcon.settingsIcon {
 }
 
 .settingsFormGroup input,
+.settingsContent select#settingsLanguageSelector,
 .settingsContent select#languageSelector,
-.settingsContent select#themeSelector {
+.settingsContent select#themeSelector,
+.settingsPage select {
     width: 100%;
-    padding: 10px 12px;
+    min-height: var(--pdeffy-control-height, 2.625rem);
+    height: var(--pdeffy-control-height, 2.625rem);
+    padding: 0 12px;
     border: 1px solid var(--pdeffy-border, #e7e7e2);
     border-radius: 10px;
     font-size: 14px;
+    line-height: 1.35;
     box-sizing: border-box;
     background: var(--pdeffy-surface, #fff);
     color: var(--pdeffy-text, #101a3a);
     font-family: inherit;
 }
 
+.settingsContent select#settingsLanguageSelector,
+.settingsContent select#languageSelector,
+.settingsContent select#themeSelector,
+.settingsPage select {
+    padding-right: 2.25rem;
+}
+
 .settingsFormGroup input:focus,
+.settingsContent select#settingsLanguageSelector:focus,
 .settingsContent select#languageSelector:focus,
-.settingsContent select#themeSelector:focus {
+.settingsContent select#themeSelector:focus,
+.settingsPage select:focus {
     outline: none;
     border-color: var(--pdeffy-primary, #ffd91a);
 }

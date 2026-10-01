@@ -23,6 +23,7 @@
     --pdeffy-radius-card: var(--pdeffy-radius-lg);
     --pdeffy-radius-btn: var(--pdeffy-radius-sm);
     --pdeffy-radius-input: var(--pdeffy-radius-sm);
+    --pdeffy-control-height: 2.625rem;
 
     --pdeffy-shadow: var(--pdeffy-shadow-sm);
     --pdeffy-shadow-hover: var(--pdeffy-shadow-md);

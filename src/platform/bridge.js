@@ -120,8 +120,11 @@ export const ipcRenderer = {
           return safeInvoke('save-pdf-metadata', { metadata: payload });
         case 'get-language':
           return safeInvoke('get-language');
-        case 'save-language':
-          return safeInvoke('save-language', { language: payload });
+        case 'save-language': {
+          const language =
+            typeof payload === 'string' ? payload : payload?.language || payload?.lang;
+          return safeInvoke('save-language', { language });
+        }
         case 'check-first-launch':
           return safeInvoke('check-first-launch');
         case 'complete-first-launch':

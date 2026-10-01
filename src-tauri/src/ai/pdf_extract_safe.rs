@@ -46,9 +46,7 @@ fn lopdf_plain_text(bytes: &[u8]) -> Result<String, AiError> {
         }
     }
 
-    if parts.is_empty() {
-        return Err(AiError::PdfNoText);
-    }
+    // Empty string lets `pdf_text::extract_and_normalize` run RapidOCR on scanned PDFs.
     Ok(parts.join("\n"))
 }
 

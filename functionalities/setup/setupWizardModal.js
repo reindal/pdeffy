@@ -5,7 +5,8 @@ import { listen } from '@tauri-apps/api/event';
 
 const { ipcRenderer } = require('electron');
 
-const STEP_COUNT = 8;
+const STEP_COUNT = 7;
+const LIBREOFFICE_DOWNLOAD_URL = 'https://www.libreoffice.org/';
 /** @type {HTMLElement | null} */
 let overlay = null;
 /** @type {ReturnType<typeof buildWizard> | null} */
@@ -40,13 +41,34 @@ function logoSrc() {
   return base;
 }
 
+function setupWizardStylesheetHref() {
+  const rel = `${wizardAssetBase()}setupWizard.css`;
+  try {
+    return new URL(rel, window.location.href).href;
+  } catch (_) {
+    return rel;
+  }
+}
+
+const SETUP_WIZARD_OVERLAY_INLINE =
+  'position:fixed;inset:0;z-index:200000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(8,12,24,0.82);';
+
 function ensureStylesheet() {
   if (document.querySelector('link[data-pdeffy-setup-wizard]')) return;
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = `${wizardAssetBase()}setupWizard.css`;
+  link.href = setupWizardStylesheetHref();
   link.setAttribute('data-pdeffy-setup-wizard', '1');
   document.head.appendChild(link);
+}
+
+function mountWizardRoot() {
+  const host = document.createElement('div');
+  host.id = 'setup-wizard-host';
+  host.style.cssText =
+    'position:fixed;inset:0;z-index:200000;margin:0;padding:0;width:100%;height:100%;pointer-events:auto;';
+  document.body.appendChild(host);
+  return host;
 }
 
 function formatBytes(n) {
@@ -54,6 +76,89 @@ function formatBytes(n) {
   if (n >= 1073741824) return `${(n / 1073741824).toFixed(2)} GB`;
   if (n >= 1048576) return `${(n / 1048576).toFixed(1)} MB`;
   return `${Math.round(n / 1024)} KB`;
+}
+
+function modelI18nSuffix(id) {
+  return String(id || '').replace(/[^a-zA-Z0-9]+/g, '_');
+}
+
+function modelSummary(model) {
+  const key = `aiModelSummary_${modelI18nSuffix(model.id)}`;
+  return msg(key, model.summary || '');
+}
+
+function modelLanguages(model) {
+  const key = `aiModelLang_${modelI18nSuffix(model.id)}`;
+  return msg(key, model.languages || '');
+}
+
+function tierLabel(tier) {
+  if (tier === 'light') return msg('aiModelTierLight', 'Light');
+  if (tier === 'recommended') return msg('aiModelTierRecommended', 'Recommended');
+  if (tier === 'quality') return msg('aiModelTierQuality', 'Quality');
+  return tier || '';
+}
+
+function speedLabel(speed) {
+  if (speed === 'fast') return msg('aiModelSpeedFast', 'Fast');
+  if (speed === 'balanced') return msg('aiModelSpeedBalanced', 'Balanced');
+  if (speed === 'quality') return msg('aiModelSpeedQuality', 'Higher quality');
+  return speed || '';
+}
+
+function fillName(template, name) {
+  return String(template || '').replace(/\{name\}/g, name || '');
+}
+
+function updateModelHint(w, model) {
+  if (!w.modelHint || !model) return;
+  w.modelHint.textContent = fillName(
+    msg(
+      'setupWizardModelHint',
+      'Choose and download {name} for PDF summaries. Required to finish setup.'
+    ),
+    model.displayName
+  );
+}
+
+function renderModelDetail(w, model) {
+  if (!w.modelDetail) return;
+  w.modelDetail.innerHTML = '';
+  if (!model) return;
+
+  const head = document.createElement('div');
+  head.className = 'setupWizardModelDetailHead';
+  const tier = document.createElement('span');
+  tier.className = `setupWizardModelTier is-${model.tier || 'balanced'}`;
+  tier.textContent = tierLabel(model.tier);
+  head.append(tier);
+
+  const summary = document.createElement('p');
+  summary.className = 'setupWizardModelSummary';
+  summary.textContent = modelSummary(model);
+
+  const specs = document.createElement('div');
+  specs.className = 'setupWizardModelSpecs';
+  const chips = [
+    `${msg('aiModelSpecParams', 'Params')}: ${model.params}`,
+    `${msg('aiModelSpecQuant', 'Quant')}: ${model.quant}`,
+    `${msg('aiModelSpecSize', 'Size')}: ${model.sizeLabel}`,
+    `${msg('aiModelSpecRam', 'RAM')}: ${model.ramLabel}`,
+    `${msg('aiModelSpecCtx', 'Context')}: ${model.nCtx}`,
+    `${msg('aiModelSpecSpeed', 'Speed')}: ${speedLabel(model.speed)}`,
+    modelLanguages(model),
+    model.downloaded
+      ? msg('aiModelSpecDownloaded', 'Downloaded')
+      : msg('aiModelSpecNotDownloaded', 'Not downloaded'),
+  ];
+  for (const [i, label] of chips.entries()) {
+    const chip = document.createElement('span');
+    chip.className = `setupWizardModelSpec${model.downloaded && i === chips.length - 1 ? ' is-ok' : ''}`;
+    chip.textContent = label;
+    specs.appendChild(chip);
+  }
+
+  w.modelDetail.append(head, summary, specs);
 }
 
 async function applyThemeSafe(theme) {
@@ -71,9 +176,9 @@ async function applyThemeSafe(theme) {
 
 function buildWizardMarkup() {
   return `
-<div class="setupWizardOverlay" id="setupWizardOverlay" role="dialog" aria-modal="true" aria-labelledby="setupWizardWelcomeTitle">
+<div class="setupWizardOverlay" id="setupWizardOverlay" role="dialog" aria-modal="true" aria-labelledby="setupWizardWelcomeTitle" style="${SETUP_WIZARD_OVERLAY_INLINE}">
   <div class="setupWizardCard" id="setupWizardCard">
-    <p class="setupWizardStepCounter langText" id="setupWizardStepCounter" data-i18n="setupWizardStepCounter">1 / 8</p>
+    <p class="setupWizardStepCounter langText" id="setupWizardStepCounter" data-i18n="setupWizardStepCounter">1 / 7</p>
     <div class="setupWizardProgress" id="setupWizardProgress" aria-hidden="true"></div>
 
     <section class="setupWizardStep is-active" data-step="0">
@@ -83,49 +188,48 @@ function buildWizardMarkup() {
     </section>
 
     <section class="setupWizardStep" data-step="1" hidden>
-      <h2 class="langText" id="setupWizardLangTitle">Lingua</h2>
-      <p class="setupWizardHint langText" id="setupWizardLangHint"></p>
-      <select id="languageSelector" class="setupWizardSelect setupWizardLanguageSelect" aria-label="Language">
-        <option value="en">🇬🇧 English</option>
-        <option value="it">🇮🇹 Italiano</option>
-        <option value="pl">🇵🇱 Polski</option>
-        <option value="es">🇪🇸 Español</option>
-      </select>
+      <h2 class="langText" id="setupWizardPreferencesTitle">Preferenze</h2>
+      <p class="setupWizardHint langText" id="setupWizardPreferencesHint"></p>
+      <div class="setupWizardPrefBlock">
+        <p class="setupWizardPrefLabel langText" id="setupWizardLangTitle">Lingua</p>
+        <select id="setupWizardLanguageSelect" data-pdeffy-language-select class="setupWizardSelect setupWizardLanguageSelect" aria-label="Language">
+          <option value="en">English</option>
+          <option value="it">Italiano</option>
+          <option value="pl">Polski</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
+      <div class="setupWizardPrefBlock">
+        <p class="setupWizardPrefLabel langText" id="setupWizardThemeTitle">Tema</p>
+        <div class="setupWizardThemeGrid" role="radiogroup">
+          <button type="button" class="setupWizardThemeOption is-selected" data-theme-value="light">
+            <span class="setupWizardThemePreview setupWizardThemePreviewLight"></span>
+            <span class="langText" id="themeOptionLight">Chiaro</span>
+          </button>
+          <button type="button" class="setupWizardThemeOption" data-theme-value="dark">
+            <span class="setupWizardThemePreview setupWizardThemePreviewDark"></span>
+            <span class="langText" id="themeOptionDark">Scuro</span>
+          </button>
+        </div>
+      </div>
+      <div class="setupWizardPrefBlock setupWizardPrefBlockLast">
+        <p class="setupWizardPrefLabel langText" id="setupWizardPdfTitle">PDF e metadati</p>
+        <label class="setupWizardCheckboxRow">
+          <input type="checkbox" id="setupDefaultPdfAppCheckbox">
+          <span class="langText" id="settingsDefaultPdfCheckbox"></span>
+        </label>
+        <div class="setupWizardField">
+          <label for="setupMetaAuthor" class="langText" id="authorLabel">Autore</label>
+          <input type="text" id="setupMetaAuthor" class="setupWizardInput langTextPlaceholder" placeholder="">
+        </div>
+        <div class="setupWizardField">
+          <label for="setupMetaCompany" class="langText" id="companyLabel">Azienda</label>
+          <input type="text" id="setupMetaCompany" class="setupWizardInput langTextPlaceholder" placeholder="">
+        </div>
+      </div>
     </section>
 
     <section class="setupWizardStep" data-step="2" hidden>
-      <h2 class="langText" id="setupWizardThemeTitle">Tema</h2>
-      <p class="setupWizardHint langText" id="setupWizardThemeHint"></p>
-      <div class="setupWizardThemeGrid" role="radiogroup">
-        <button type="button" class="setupWizardThemeOption is-selected" data-theme-value="light">
-          <span class="setupWizardThemePreview setupWizardThemePreviewLight"></span>
-          <span class="langText" id="themeOptionLight">Chiaro</span>
-        </button>
-        <button type="button" class="setupWizardThemeOption" data-theme-value="dark">
-          <span class="setupWizardThemePreview setupWizardThemePreviewDark"></span>
-          <span class="langText" id="themeOptionDark">Scuro</span>
-        </button>
-      </div>
-    </section>
-
-    <section class="setupWizardStep" data-step="3" hidden>
-      <h2 class="langText" id="setupWizardPdfTitle">PDF e metadati</h2>
-      <p class="setupWizardHint langText" id="setupWizardPdfHint"></p>
-      <label class="setupWizardCheckboxRow">
-        <input type="checkbox" id="setupDefaultPdfAppCheckbox">
-        <span class="langText" id="settingsDefaultPdfCheckbox"></span>
-      </label>
-      <div class="setupWizardField">
-        <label for="setupMetaAuthor" class="langText" id="authorLabel">Autore</label>
-        <input type="text" id="setupMetaAuthor" class="setupWizardInput langTextPlaceholder" placeholder="">
-      </div>
-      <div class="setupWizardField">
-        <label for="setupMetaCompany" class="langText" id="companyLabel">Azienda</label>
-        <input type="text" id="setupMetaCompany" class="setupWizardInput langTextPlaceholder" placeholder="">
-      </div>
-    </section>
-
-    <section class="setupWizardStep" data-step="4" hidden>
       <h2 class="langText" id="setupWizardOcrTitle">OCR scansioni</h2>
       <p class="setupWizardHint langText" id="setupWizardOcrHint"></p>
       <p class="setupWizardDownloadStatus" id="setupOcrStatus"></p>
@@ -137,10 +241,11 @@ function buildWizardMarkup() {
       </button>
     </section>
 
-    <section class="setupWizardStep" data-step="5" hidden>
+    <section class="setupWizardStep" data-step="3" hidden>
       <h2 class="langText" id="setupWizardModelTitle">Modello riassunti</h2>
-      <p class="setupWizardHint langText" id="setupWizardModelHint"></p>
+      <p class="setupWizardHint" id="setupWizardModelHint"></p>
       <select id="setupModelSelect" class="setupWizardSelect" aria-label="AI model"></select>
+      <div class="setupWizardModelDetail" id="setupModelDetail" aria-live="polite"></div>
       <p class="setupWizardDownloadStatus" id="setupModelStatus"></p>
       <div class="setupWizardProgressTrack" id="setupModelProgressTrack" hidden>
         <div class="setupWizardProgressBar" id="setupModelProgressBar"></div>
@@ -150,7 +255,7 @@ function buildWizardMarkup() {
       </button>
     </section>
 
-    <section class="setupWizardStep" data-step="6" hidden>
+    <section class="setupWizardStep" data-step="4" hidden>
       <h2 class="langText" id="setupWizardNerTitle">Anonimizzazione</h2>
       <p class="setupWizardHint langText" id="setupWizardNerHint"></p>
       <p class="setupWizardDownloadStatus" id="setupNerStatus"></p>
@@ -162,7 +267,17 @@ function buildWizardMarkup() {
       </button>
     </section>
 
-    <section class="setupWizardStep" data-step="7" hidden>
+    <section class="setupWizardStep" data-step="5" hidden>
+      <h2 class="langText" id="setupWizardLibreOfficeTitle">Conversioni Office</h2>
+      <p class="setupWizardHint langText" id="setupWizardLibreOfficeHint"></p>
+      <p class="setupWizardDownloadStatus" id="setupLoStatus"></p>
+      <p class="setupWizardHint setupWizardLoLater langText" id="setupWizardLibreOfficeLater"></p>
+      <button type="button" class="setupWizardBtn setupWizardBtnSecondary" id="setupLoOpenBtn">
+        <span class="langText" id="setupWizardLibreOfficeDownloadBtn">Scarica LibreOffice</span>
+      </button>
+    </section>
+
+    <section class="setupWizardStep" data-step="6" hidden>
       <h2 class="langText" id="setupWizardDoneTitle">Tutto pronto</h2>
       <p class="setupWizardLead langText" id="setupWizardDoneLead"></p>
     </section>
@@ -208,10 +323,14 @@ function buildWizard(root) {
     modelProgressTrack: root.querySelector('#setupModelProgressTrack'),
     modelProgressBar: root.querySelector('#setupModelProgressBar'),
     modelDownloadBtn: root.querySelector('#setupModelDownloadBtn'),
+    modelHint: root.querySelector('#setupWizardModelHint'),
+    modelDetail: root.querySelector('#setupModelDetail'),
     nerStatus: root.querySelector('#setupNerStatus'),
     nerProgressTrack: root.querySelector('#setupNerProgressTrack'),
     nerProgressBar: root.querySelector('#setupNerProgressBar'),
     nerDownloadBtn: root.querySelector('#setupNerDownloadBtn'),
+    loStatus: root.querySelector('#setupLoStatus'),
+    loOpenBtn: root.querySelector('#setupLoOpenBtn'),
   };
 }
 
@@ -284,8 +403,8 @@ function createController(w) {
     try {
       models = await ipcRenderer.invoke('list-ai-models');
       const sel = w.modelSelect;
-      if (sel && (sel.options.length === 0 || sel.options.length !== models.length)) {
-        const prev = sel.value;
+      const prev = sel?.value;
+      if (sel) {
         sel.innerHTML = '';
         for (const m of models) {
           const opt = document.createElement('option');
@@ -293,28 +412,40 @@ function createController(w) {
           opt.textContent = `${m.displayName} (${m.sizeLabel})`;
           sel.appendChild(opt);
         }
-        if (prev && models.some((m) => m.id === prev)) sel.value = prev;
+        selectedModelId =
+          (prev && models.some((m) => m.id === prev) ? prev : null) ||
+          models.find((m) => m.selected)?.id ||
+          models[0]?.id;
+        if (selectedModelId) sel.value = selectedModelId;
       }
-      selectedModelId = sel?.value || models.find((m) => m.selected)?.id || models[0]?.id;
-      if (sel && selectedModelId) sel.value = selectedModelId;
 
       const id = sel?.value || selectedModelId;
-      const status = await ipcRenderer.invoke('get-model-status');
       const model = models.find((m) => m.id === id) || models[0];
-      const downloaded =
-        !!model?.downloaded ||
-        (!!status.downloaded && (!id || status.modelId === id));
-      const downloading = !!status.downloading;
+      updateModelHint(w, model);
+      renderModelDetail(w, model);
+
+      const status = await ipcRenderer.invoke('get-model-status');
+      const downloading = !!status.downloading && (!id || status.modelId === id);
+      const downloaded = !!model?.downloaded;
 
       w.modelDownloadBtn.hidden = downloaded && !downloading;
       w.modelDownloadBtn.disabled = downloading;
       if (downloading) {
-        w.modelStatus.textContent = msg('summarizeModelDownloading', 'Download del modello in corso…');
+        w.modelStatus.textContent = fillName(
+          msg('setupWizardModelDownloading', 'Downloading {name}…'),
+          model?.displayName
+        );
       } else if (downloaded) {
-        w.modelStatus.textContent = msg('setupWizardDownloadReady', 'Download completato.');
+        w.modelStatus.textContent = fillName(
+          msg('setupWizardModelDownloadReady', '{name} is ready.'),
+          model?.displayName
+        );
         w.modelProgressTrack.hidden = true;
       } else if (model) {
-        w.modelStatus.textContent = msg('summarizeModelMissing', 'Scarica il modello GGUF una sola volta.');
+        w.modelStatus.textContent = fillName(
+          msg('setupWizardModelDownloadPrompt', 'Download {name} to continue.'),
+          model.displayName
+        );
       }
       return downloaded;
     } catch (err) {
@@ -345,11 +476,42 @@ function createController(w) {
     }
   }
 
+  async function refreshLibreOfficeStep() {
+    try {
+      const engines = await ipcRenderer.invoke('check-engines-availability');
+      const hasLo = !!engines?.hasLibreOffice;
+      const hasWord = !!engines?.hasMSOffice;
+      if (hasLo) {
+        w.loStatus.textContent = msg(
+          'setupWizardLibreOfficeInstalled',
+          'LibreOffice è installato: le conversioni possono essere più fedeli al layout originale.'
+        );
+        if (w.loOpenBtn) w.loOpenBtn.hidden = true;
+      } else if (hasWord) {
+        w.loStatus.textContent = msg(
+          'setupWizardWordInstalled',
+          'Microsoft Word è installato: puoi usarlo per conversioni Office con layout più fedele.'
+        );
+        if (w.loOpenBtn) w.loOpenBtn.hidden = true;
+      } else {
+        w.loStatus.textContent = msg(
+          'setupWizardLibreOfficeMissing',
+          'LibreOffice non è installato. Pdeffy converte già Word/Excel/PowerPoint con il motore integrato; LibreOffice migliora layout e piè di pagina.'
+        );
+        if (w.loOpenBtn) w.loOpenBtn.hidden = false;
+      }
+    } catch (err) {
+      w.loStatus.textContent = err?.message || String(err);
+      if (w.loOpenBtn) w.loOpenBtn.hidden = false;
+    }
+  }
+
   async function onStepEnter(index) {
     setError(w, '');
-    if (index === 4) await refreshOcrStep();
-    if (index === 5) await refreshModelStep();
-    if (index === 6) await refreshNerStep();
+    if (index === 2) await refreshOcrStep();
+    if (index === 3) await refreshModelStep();
+    if (index === 4) await refreshNerStep();
+    if (index === 5) await refreshLibreOfficeStep();
     updateNextButtonState(index);
   }
 
@@ -387,21 +549,21 @@ function createController(w) {
   }
 
   async function validateBeforeLeave(index) {
-    if (index === 4) {
+    if (index === 2) {
       const ok = await refreshOcrStep();
       if (!ok) {
         setError(w, msg('setupWizardMustDownload', 'Completa il download per continuare.'));
         return false;
       }
     }
-    if (index === 5) {
+    if (index === 3) {
       const ok = await refreshModelStep();
       if (!ok) {
         setError(w, msg('setupWizardMustDownload', 'Completa il download per continuare.'));
         return false;
       }
     }
-    if (index === 6) {
+    if (index === 4) {
       const ok = await refreshNerStep();
       if (!ok) {
         setError(w, msg('setupWizardMustDownload', 'Completa il download per continuare.'));
@@ -432,7 +594,7 @@ function createController(w) {
       await persistSettings();
       await ipcRenderer.invoke('complete-first-launch');
       document.body.classList.remove('setup-wizard-locked');
-      overlay?.remove();
+      document.getElementById('setup-wizard-host')?.remove();
       overlay = null;
       wizard = null;
     } catch (err) {
@@ -526,6 +688,7 @@ function createController(w) {
 
   w.modelSelect?.addEventListener('change', async () => {
     selectedModelId = w.modelSelect.value;
+    setError(w, '');
     try {
       await ipcRenderer.invoke('set-selected-model', selectedModelId);
     } catch (_) { /* ignore */ }
@@ -546,19 +709,25 @@ function createController(w) {
 
   w.backBtn?.addEventListener('click', () => showStep(stepIndex - 1));
 
+  w.loOpenBtn?.addEventListener('click', () => {
+    ipcRenderer.invoke('open-external-url', LIBREOFFICE_DOWNLOAD_URL).catch((err) => {
+      setError(w, err?.message || String(err));
+    });
+  });
+
   w.nextBtn?.addEventListener('click', async () => {
     if (stepIndex === 1) {
-      const sel = document.getElementById('languageSelector');
+      const sel = document.getElementById('setupWizardLanguageSelect');
       if (sel?.value) {
         await ipcRenderer.invoke('save-language', sel.value);
         window.currentLanguage = sel.value;
         if (typeof window.changeLanguage === 'function') window.changeLanguage(sel.value);
       }
+      await applyThemeSafe(selectedTheme);
     }
     if (stepIndex < STEP_COUNT - 1) {
       const ok = await validateBeforeLeave(stepIndex);
       if (!ok) return;
-      if (stepIndex === 2) await applyThemeSafe(selectedTheme);
       showStep(stepIndex + 1);
       return;
     }
@@ -575,6 +744,12 @@ function createController(w) {
         w.nextBtn.textContent = window.getMessage(w.nextBtn.dataset.i18n);
       }
       updateCounter(w, stepIndex);
+      if (stepIndex === 3) {
+        const id = w.modelSelect?.value || selectedModelId;
+        const model = models.find((m) => m.id === id) || models[0];
+        updateModelHint(w, model);
+        renderModelDetail(w, model);
+      }
     },
   };
 }
@@ -605,9 +780,7 @@ export async function initSetupWizardIfNeeded() {
   ensureStylesheet();
   blockDismiss();
 
-  const host = document.createElement('div');
-  host.id = 'setup-wizard-host';
-  document.body.appendChild(host);
+  const host = mountWizardRoot();
   wizard = buildWizard(host);
   overlay = wizard.overlay;
 

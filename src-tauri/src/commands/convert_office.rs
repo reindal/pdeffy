@@ -1,9 +1,11 @@
 use crate::converters::{
     convert_office_to_pdf as run_conversion, effective_backend_choice, list_available_backends,
-    ConversionResult, OfficeFormat,
+    BackendChoice, ConversionResult, OfficeFormat,
 };
+#[cfg(target_os = "windows")]
+use crate::commands::{libreoffice, msoffice};
 use crate::commands::settings;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tauri::AppHandle;
 
 #[tauri::command(rename = "convert-office-to-pdf")]
@@ -49,6 +51,48 @@ pub fn save_office_pdf_backend(
     Ok(serde_json::json!({ "success": true }))
 }
 
+/// Word/LibreOffice preserve header/footer layout better than the built-in engine.
+fn try_word_for_docx_header_footer(
+    input_path: &Path,
+    output_path: &Path,
+    format: OfficeFormat,
+    choice: BackendChoice,
+) -> Result<Option<(String, Vec<String>)>, String> {
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = (input_path, output_path, format, choice);
+        return Ok(None);
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        use crate::converters::docx_has_header_or_footer;
+
+        if choice != BackendChoice::Auto || format != OfficeFormat::Docx {
+            return Ok(None);
+        }
+        if !docx_has_header_or_footer(input_path) {
+            return Ok(None);
+        }
+        if libreoffice::is_libreoffice_usable() {
+            return Ok(None);
+        }
+        if !msoffice::is_msoffice_installed() {
+            return Ok(None);
+        }
+        if let Some(parent) = output_path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        match msoffice::convert_with_msoffice(input_path, output_path, "pdf", ".docx") {
+            Ok(()) => Ok(Some(("microsoft-word".into(), Vec::new()))),
+            Err(e) => {
+                eprintln!("[Conversion] Word DOCX→PDF (header/footer) failed: {e}");
+                Ok(None)
+            }
+        }
+    }
+}
+
 /// Used from `convert-file-path` when writing PDF to disk.
 pub fn convert_office_file_to_pdf_path(
     app: &AppHandle,
@@ -60,6 +104,10 @@ pub fn convert_office_file_to_pdf_path(
         .ok_or_else(|| "Formato Office non supportato.".to_string())?;
     let persisted = settings::get_office_pdf_backend(app)?;
     let choice = effective_backend_choice(Some(&persisted), backend_override);
+
+    if let Some(word_result) = try_word_for_docx_header_footer(input_path, output_path, format, choice)? {
+        return Ok(word_result);
+    }
 
     let result = run_conversion(input_path, format, choice).map_err(|e| e.user_message())?;
 

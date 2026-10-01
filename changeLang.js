@@ -1,8 +1,79 @@
 ﻿var { ipcRenderer } = require('electron');
-window.currentLanguage = 'en';
+
+const LANGUAGE_CHOICES = [
+    { value: 'en', code: 'EN', emoji: '🇬🇧', labelKey: 'languageNativeEn' },
+    { value: 'it', code: 'IT', emoji: '🇮🇹', labelKey: 'languageNativeIt' },
+    { value: 'pl', code: 'PL', emoji: '🇵🇱', labelKey: 'languageNativePl' },
+    { value: 'es', code: 'ES', emoji: '🇪🇸', labelKey: 'languageNativeEs' },
+];
+
+function languageSelectSupportsEmojiFlags() {
+    try {
+        if (/Windows/i.test(navigator.userAgent || '')) return false;
+    } catch (_) { /* ignore */ }
+    return true;
+}
+
+function languageOptionLabel(choice) {
+    const name =
+        languages.en[choice.labelKey] ||
+        choice.labelKey;
+    if (languageSelectSupportsEmojiFlags()) {
+        return `${choice.emoji} ${name}`;
+    }
+    return `${choice.code} — ${name}`;
+}
+
+function populateLanguageSelect(select) {
+    if (!select) return;
+    const prev = select.value;
+    select.innerHTML = '';
+    for (const choice of LANGUAGE_CHOICES) {
+        const opt = document.createElement('option');
+        opt.value = choice.value;
+        opt.textContent = languageOptionLabel(choice);
+        select.appendChild(opt);
+    }
+    if (prev && LANGUAGE_CHOICES.some((c) => c.value === prev)) {
+        select.value = prev;
+    }
+}
+
+async function resolveSavedLanguage() {
+    try {
+        const fromDisk = await ipcRenderer.invoke('get-language');
+        if (fromDisk) return fromDisk;
+    } catch (_) { /* ignore */ }
+    return window.currentLanguage || 'en';
+}
+
+async function wireLanguageSelect(select) {
+    if (!select) return;
+    populateLanguageSelect(select);
+    const savedLang = await resolveSavedLanguage();
+    window.currentLanguage = savedLang;
+    select.value = savedLang;
+    if (select.dataset.pdeffyLangWired === '1') return;
+    select.dataset.pdeffyLangWired = '1';
+    select.addEventListener('change', async (event) => {
+        const selectedLang = event.target.value;
+        await ipcRenderer.invoke('save-language', selectedLang);
+        window.currentLanguage = selectedLang;
+        changeLanguage(selectedLang);
+        document.querySelectorAll('[data-pdeffy-language-select]').forEach((el) => {
+            if (el === select) return;
+            populateLanguageSelect(el);
+            el.value = selectedLang;
+        });
+    });
+}
 
 const languages = {
     en: {
+        languageNativeEn: "English",
+        languageNativeIt: "Italiano",
+        languageNativePl: "Polski",
+        languageNativeEs: "Español",
         languageText: "Language",
         welcomeText: "Smart PDF tools",
         navHome: "Home",
@@ -1094,15 +1165,24 @@ const languages = {
         firstLaunchIntroTitle: "Welcome to PDF Converter",
         firstLaunchIntroText: "Quick setup: choose your language and default PDF metadata. These settings are reused when creating files.",
         setupWizardWelcomeTitle: "Welcome to Pdeffy",
-        setupWizardWelcomeLead: "In a few steps you’ll set language, appearance, and PDF preferences. You can change these anytime in Settings.",
+        setupWizardWelcomeLead: "Download local AI packs, then optional LibreOffice for sharper Office conversions. You can change everything later in Settings.",
+        setupWizardPreferencesTitle: "Preferences",
+        setupWizardPreferencesHint: "Language, theme, and optional default PDF metadata.",
         setupWizardLangTitle: "Language",
         setupWizardLangHint: "Choose the interface language.",
         setupWizardThemeTitle: "Theme",
         setupWizardThemeHint: "Pick the look you prefer. You can switch later.",
         setupWizardPdfTitle: "PDF & metadata",
         setupWizardPdfHint: "Optional: set Pdeffy as the default PDF app and default metadata for new files.",
+        setupWizardLibreOfficeTitle: "Office conversions (optional)",
+        setupWizardLibreOfficeHint: "For more faithful layout (headers, footers, complex PDF→Word), install LibreOffice — free from libreoffice.org.",
+        setupWizardLibreOfficeMissing: "LibreOffice is not installed. Pdeffy already converts Office files with its built-in engine; LibreOffice improves layout fidelity.",
+        setupWizardLibreOfficeInstalled: "LibreOffice is installed — you can use it for higher-fidelity conversions.",
+        setupWizardWordInstalled: "Microsoft Word is installed — you can use it for higher-fidelity Office conversions.",
+        setupWizardLibreOfficeLater: "You can skip this step and install LibreOffice later; Pdeffy works without it.",
+        setupWizardLibreOfficeDownloadBtn: "Open libreoffice.org",
         setupWizardDoneTitle: "You’re all set",
-        setupWizardDoneLead: "Initial setup is complete. You can change language, theme, and models anytime in Settings.",
+        setupWizardDoneLead: "Setup is complete. Language, theme, models, and conversion engines can be changed anytime in Settings.",
         setupWizardStartBtn: "Get started",
         setupWizardNextBtn: "Next",
         setupWizardBackBtn: "Back",
@@ -1111,7 +1191,10 @@ const languages = {
         setupWizardOcrTitle: "Scan OCR",
         setupWizardOcrHint: "Download RapidOCR (~15–25 MB) to read text from scanned PDFs. Required to finish setup.",
         setupWizardModelTitle: "Summary model",
-        setupWizardModelHint: "Choose and download a local Qwen model for PDF summaries. Required to finish setup.",
+        setupWizardModelHint: "Choose and download {name} for PDF summaries. Required to finish setup.",
+        setupWizardModelDownloadPrompt: "Download {name} to continue.",
+        setupWizardModelDownloading: "Downloading {name}…",
+        setupWizardModelDownloadReady: "{name} is ready.",
         setupWizardNerTitle: "Anonymization",
         setupWizardNerHint: "Download GLiNER (~200 MB) to detect names and organizations when anonymizing. Required to finish setup.",
         setupWizardMustDownload: "Complete the download before continuing.",
@@ -1212,6 +1295,10 @@ const languages = {
         clearPageTitle: "Clear all redactions on this page"
     },
     it: {
+        languageNativeEn: "English",
+        languageNativeIt: "Italiano",
+        languageNativePl: "Polski",
+        languageNativeEs: "Español",
         languageText: "Lingua",
         welcomeText: "Strumenti PDF intelligenti",
         navHome: "Inicio",
@@ -2324,15 +2411,24 @@ const languages = {
         firstLaunchIntroTitle: "Benvenuto in PDF Converter",
         firstLaunchIntroText: "Configurazione rapida: scegli lingua e metadati PDF predefiniti. Queste impostazioni verranno riutilizzate alla creazione dei file.",
         setupWizardWelcomeTitle: "Benvenuto in Pdeffy",
-        setupWizardWelcomeLead: "In pochi passaggi configuri lingua, aspetto e preferenze PDF. Potrai modificarle sempre dalle Impostazioni.",
+        setupWizardWelcomeLead: "Scarichi i modelli locali e, se vuoi, LibreOffice per conversioni Office più fedeli. Potrai modificare tutto dalle Impostazioni.",
+        setupWizardPreferencesTitle: "Preferenze",
+        setupWizardPreferencesHint: "Lingua, tema chiaro/scuro e metadati PDF opzionali.",
         setupWizardLangTitle: "Lingua",
         setupWizardLangHint: "Scegli la lingua dell’interfaccia.",
         setupWizardThemeTitle: "Tema",
         setupWizardThemeHint: "Scegli l’aspetto che preferisci. Puoi cambiarlo in qualsiasi momento.",
         setupWizardPdfTitle: "PDF e metadati",
         setupWizardPdfHint: "Opzionale: imposta Pdeffy come app predefinita per i PDF e i metadati usati quando crei nuovi file.",
+        setupWizardLibreOfficeTitle: "Conversioni Office (opzionale)",
+        setupWizardLibreOfficeHint: "Per un layout più fedele (intestazioni, piè di pagina, PDF→Word complessi), installa LibreOffice — gratuito su libreoffice.org.",
+        setupWizardLibreOfficeMissing: "LibreOffice non è installato. Pdeffy converte già i file Office con il motore integrato; LibreOffice migliora la resa del layout.",
+        setupWizardLibreOfficeInstalled: "LibreOffice è installato: puoi usarlo per conversioni più fedeli.",
+        setupWizardWordInstalled: "Microsoft Word è installato: puoi usarlo per conversioni Office più fedeli.",
+        setupWizardLibreOfficeLater: "Puoi saltare questo passaggio e installare LibreOffice in seguito; Pdeffy funziona anche senza.",
+        setupWizardLibreOfficeDownloadBtn: "Apri libreoffice.org",
         setupWizardDoneTitle: "Tutto pronto",
-        setupWizardDoneLead: "La configurazione iniziale è completa. Puoi cambiare lingua, tema e modelli dalle Impostazioni.",
+        setupWizardDoneLead: "Configurazione completata. Lingua, tema, modelli e motori di conversione si cambiano dalle Impostazioni.",
         setupWizardStartBtn: "Inizia",
         setupWizardNextBtn: "Avanti",
         setupWizardBackBtn: "Indietro",
@@ -2341,7 +2437,10 @@ const languages = {
         setupWizardOcrTitle: "OCR scansioni",
         setupWizardOcrHint: "Scarica RapidOCR (~15–25 MB) per leggere il testo nei PDF scansionati. Necessario per completare la configurazione.",
         setupWizardModelTitle: "Modello riassunti",
-        setupWizardModelHint: "Scegli e scarica un modello Qwen locale per i riassunti PDF. Necessario per completare la configurazione.",
+        setupWizardModelHint: "Scegli e scarica {name} per i riassunti PDF. Necessario per completare la configurazione.",
+        setupWizardModelDownloadPrompt: "Scarica {name} per continuare.",
+        setupWizardModelDownloading: "Download di {name} in corso…",
+        setupWizardModelDownloadReady: "{name} è pronto.",
         setupWizardNerTitle: "Anonimizzazione",
         setupWizardNerHint: "Scarica GLiNER (~200 MB) per rilevare persone e organizzazioni in anonimizzazione. Necessario per completare la configurazione.",
         setupWizardMustDownload: "Completa il download per continuare.",
@@ -2439,6 +2538,10 @@ const languages = {
         clearPageTitle: "Elimina tutte le censure su questa pagina"
     },
     pl: {
+        languageNativeEn: "English",
+        languageNativeIt: "Italiano",
+        languageNativePl: "Polski",
+        languageNativeEs: "Español",
         languageText: "Język",
         welcomeText: "Inteligentne narzędzia PDF",
         navHome: "Start",
@@ -3330,15 +3433,24 @@ const languages = {
         firstLaunchIntroTitle: "Witamy w PDF Converter",
         firstLaunchIntroText: "Szybka konfiguracja: wybierz jezyk i domyslne metadane PDF. Te ustawienia beda ponownie uzywane przy tworzeniu plikow.",
         setupWizardWelcomeTitle: "Witamy w Pdeffy",
-        setupWizardWelcomeLead: "W kilku krokach ustawisz jezyk, wyglad i preferencje PDF. Mozesz je zmienic w Ustawieniach.",
+        setupWizardWelcomeLead: "Pobierzesz lokalne modele AI i opcjonalnie LibreOffice dla wierniejszych konwersji Office. Wszystko zmienisz w Ustawieniach.",
+        setupWizardPreferencesTitle: "Preferencje",
+        setupWizardPreferencesHint: "Jezyk, motyw jasny/ciemny i opcjonalne metadane PDF.",
         setupWizardLangTitle: "Jezyk",
         setupWizardLangHint: "Wybierz jezyk interfejsu.",
         setupWizardThemeTitle: "Motyw",
         setupWizardThemeHint: "Wybierz wyglad. Mozesz go zmienic pozniej.",
         setupWizardPdfTitle: "PDF i metadane",
         setupWizardPdfHint: "Opcjonalnie: ustaw Pdeffy jako domyslna aplikacje PDF i metadane nowych plikow.",
+        setupWizardLibreOfficeTitle: "Konwersje Office (opcjonalnie)",
+        setupWizardLibreOfficeHint: "Dla wierniejszego ukladu (naglowki, stopki, PDF→Word) zainstaluj LibreOffice — bezplatnie z libreoffice.org.",
+        setupWizardLibreOfficeMissing: "LibreOffice nie jest zainstalowany. Pdeffy juz konwertuje pliki Office silnikiem wbudowanym; LibreOffice poprawia wiernosc ukladu.",
+        setupWizardLibreOfficeInstalled: "LibreOffice jest zainstalowany — mozesz uzywac go do wierniejszych konwersji.",
+        setupWizardWordInstalled: "Microsoft Word jest zainstalowany — mozesz uzywac go do wierniejszych konwersji Office.",
+        setupWizardLibreOfficeLater: "Mozesz pominac ten krok i zainstalowac LibreOffice pozniej; Pdeffy dziala bez niego.",
+        setupWizardLibreOfficeDownloadBtn: "Otworz libreoffice.org",
         setupWizardDoneTitle: "Gotowe",
-        setupWizardDoneLead: "Konfiguracja poczatkowa zakonczona. Jezyk, motyw i modele mozesz zmienic w Ustawieniach.",
+        setupWizardDoneLead: "Konfiguracja zakonczona. Jezyk, motyw, modele i silniki konwersji zmienisz w Ustawieniach.",
         setupWizardStartBtn: "Zacznij",
         setupWizardNextBtn: "Dalej",
         setupWizardBackBtn: "Wstecz",
@@ -3347,7 +3459,10 @@ const languages = {
         setupWizardOcrTitle: "OCR skanow",
         setupWizardOcrHint: "Pobierz RapidOCR (~15–25 MB), aby odczytywac tekst ze skanow PDF. Wymagane do ukonczenia konfiguracji.",
         setupWizardModelTitle: "Model podsumowan",
-        setupWizardModelHint: "Wybierz i pobierz lokalny model Qwen do podsumowan PDF. Wymagane do ukonczenia konfiguracji.",
+        setupWizardModelHint: "Wybierz i pobierz {name} do podsumowan PDF. Wymagane do ukonczenia konfiguracji.",
+        setupWizardModelDownloadPrompt: "Pobierz {name}, aby kontynuowac.",
+        setupWizardModelDownloading: "Pobieranie {name}…",
+        setupWizardModelDownloadReady: "{name} jest gotowy.",
         setupWizardNerTitle: "Anonimizacja",
         setupWizardNerHint: "Pobierz GLiNER (~200 MB) do wykrywania nazw i organizacji. Wymagane do ukonczenia konfiguracji.",
         setupWizardMustDownload: "Dokoncz pobieranie, aby kontynuowac.",
@@ -3445,6 +3560,10 @@ const languages = {
         clearPageTitle: "Usuń wszystkie cenzury z tej strony"
     },
     es: {
+        languageNativeEn: "English",
+        languageNativeIt: "Italiano",
+        languageNativePl: "Polski",
+        languageNativeEs: "Español",
         languageText: "Idioma",
         welcomeText: "Herramientas PDF inteligentes",
         navHome: "Inicio",
@@ -4318,15 +4437,24 @@ const languages = {
         firstLaunchIntroTitle: "Bienvenido a PDF Converter",
         firstLaunchIntroText: "Configuracion rapida: elige idioma y metadatos PDF por defecto. Estos ajustes se reutilizaran al crear archivos.",
         setupWizardWelcomeTitle: "Bienvenido a Pdeffy",
-        setupWizardWelcomeLead: "En unos pasos configuras idioma, apariencia y preferencias PDF. Puedes cambiarlas en Ajustes.",
+        setupWizardWelcomeLead: "Descargaras modelos locales y, si quieres, LibreOffice para conversiones Office mas fieles. Todo se cambia en Ajustes.",
+        setupWizardPreferencesTitle: "Preferencias",
+        setupWizardPreferencesHint: "Idioma, tema claro/oscuro y metadatos PDF opcionales.",
         setupWizardLangTitle: "Idioma",
         setupWizardLangHint: "Elige el idioma de la interfaz.",
         setupWizardThemeTitle: "Tema",
         setupWizardThemeHint: "Elige el aspecto que prefieras. Puedes cambiarlo despues.",
         setupWizardPdfTitle: "PDF y metadatos",
         setupWizardPdfHint: "Opcional: Pdeffy como app predeterminada para PDF y metadatos de archivos nuevos.",
+        setupWizardLibreOfficeTitle: "Conversiones Office (opcional)",
+        setupWizardLibreOfficeHint: "Para un layout mas fiel (encabezados, pies de pagina, PDF→Word), instala LibreOffice — gratis en libreoffice.org.",
+        setupWizardLibreOfficeMissing: "LibreOffice no esta instalado. Pdeffy ya convierte Office con el motor integrado; LibreOffice mejora la fidelidad del layout.",
+        setupWizardLibreOfficeInstalled: "LibreOffice esta instalado: puedes usarlo para conversiones mas fieles.",
+        setupWizardWordInstalled: "Microsoft Word esta instalado: puedes usarlo para conversiones Office mas fieles.",
+        setupWizardLibreOfficeLater: "Puedes omitir este paso e instalar LibreOffice mas tarde; Pdeffy funciona sin el.",
+        setupWizardLibreOfficeDownloadBtn: "Abrir libreoffice.org",
         setupWizardDoneTitle: "Todo listo",
-        setupWizardDoneLead: "La configuracion inicial esta completa. Puedes cambiar idioma, tema y modelos en Ajustes.",
+        setupWizardDoneLead: "Configuracion completa. Idioma, tema, modelos y motores de conversion se cambian en Ajustes.",
         setupWizardStartBtn: "Empezar",
         setupWizardNextBtn: "Siguiente",
         setupWizardBackBtn: "Atras",
@@ -4335,7 +4463,10 @@ const languages = {
         setupWizardOcrTitle: "OCR de escaneos",
         setupWizardOcrHint: "Descarga RapidOCR (~15–25 MB) para leer texto en PDF escaneados. Obligatorio para terminar la configuracion.",
         setupWizardModelTitle: "Modelo de resumenes",
-        setupWizardModelHint: "Elige y descarga un modelo Qwen local para resumir PDF. Obligatorio para terminar la configuracion.",
+        setupWizardModelHint: "Elige y descarga {name} para resumir PDF. Obligatorio para terminar la configuracion.",
+        setupWizardModelDownloadPrompt: "Descarga {name} para continuar.",
+        setupWizardModelDownloading: "Descargando {name}…",
+        setupWizardModelDownloadReady: "{name} esta listo.",
         setupWizardNerTitle: "Anonimizacion",
         setupWizardNerHint: "Descarga GLiNER (~200 MB) para detectar personas y organizaciones. Obligatorio para terminar la configuracion.",
         setupWizardMustDownload: "Completa la descarga antes de continuar.",
@@ -4482,31 +4613,34 @@ function getMessage(key, params = {}) {
 
 window.addEventListener('DOMContentLoaded', async () => {
     try {
-        const savedLang = await ipcRenderer.invoke('get-language');
-        window.currentLanguage = savedLang || 'en';
-        changeLanguage(window.currentLanguage);
+        const savedLang = await resolveSavedLanguage();
+        window.currentLanguage = savedLang;
+        changeLanguage(savedLang);
     } catch (_) {
         changeLanguage(window.currentLanguage || 'en');
     }
 });
 
 window.addEventListener('settingsUIReady', async () => {
-    const selector = document.getElementById('languageSelector');
-    if (!selector) return;
+    const selectors = document.querySelectorAll('[data-pdeffy-language-select]');
+    if (!selectors.length) {
+        const legacy = document.getElementById('settingsLanguageSelector');
+        if (legacy) await wireLanguageSelect(legacy);
+        return;
+    }
+    for (const select of selectors) {
+        await wireLanguageSelect(select);
+    }
+});
 
-    const savedLang = window.currentLanguage || (await ipcRenderer.invoke('get-language'));
-    selector.value = savedLang;
-    changeLanguage(savedLang);
-
-    if (selector.dataset.wired === '1') return;
-    selector.dataset.wired = '1';
-    selector.addEventListener('change', async (event) => {
-        const selectedLang = event.target.value;
-        await ipcRenderer.invoke('save-language', selectedLang);
-        window.currentLanguage = selectedLang;
-        changeLanguage(selectedLang);
+window.addEventListener('languageChanged', () => {
+    document.querySelectorAll('[data-pdeffy-language-select]').forEach((select) => {
+        populateLanguageSelect(select);
+        if (window.currentLanguage) select.value = window.currentLanguage;
     });
 });
 
 window.getMessage = getMessage;
 window.changeLanguage = changeLanguage;
+window.pdeffyWireLanguageSelect = wireLanguageSelect;
+window.pdeffyPopulateLanguageSelect = populateLanguageSelect;

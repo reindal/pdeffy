@@ -1,11 +1,15 @@
+mod docx_hf_detect;
 mod libreoffice_backend;
 mod office2pdf_backend;
 mod registry;
 
+pub(crate) use docx_hf_detect::docx_has_header_or_footer;
+
 pub use libreoffice_backend::LibreOfficeBackend;
 pub use office2pdf_backend::Office2PdfBackend;
 pub use registry::{
-    convert_office_to_pdf, effective_backend_choice, list_available_backends, ConversionResult,
+    convert_office_to_pdf, effective_backend_choice, list_available_backends, BackendChoice,
+    ConversionResult,
 };
 
 use std::path::Path;
