@@ -361,6 +361,8 @@ const languages = {
         pdfEditorPagesHelp: "Use the page list to reorder, rotate, or delete pages.",
         pdfEditorComingSoon: "Coming in a future update",
         pdfEditorLoading: "Loading document...",
+        pdfEditorTextAreaHint:
+            "This PDF uses area selection: drag on the page to select text, then copy or highlight.",
         pdfEditorNoPagesLeft: "You must keep at least one page",
         pdfEditorExport: "Export PDF",
         pdfEditorRedactHint: "Draw a rectangle on the page preview, or use Add box.",
@@ -1612,6 +1614,8 @@ const languages = {
         pdfEditorPagesHelp: "Usa l'elenco pagine per riordinare, ruotare o eliminare.",
         pdfEditorComingSoon: "Disponibile in un prossimo aggiornamento",
         pdfEditorLoading: "Caricamento documento...",
+        pdfEditorTextAreaHint:
+            "In questo PDF seleziona il testo trascinando un'area sulla pagina, poi copia o evidenzia.",
         pdfEditorNoPagesLeft: "Devi lasciare almeno una pagina",
         pdfEditorExport: "Esporta PDF",
         pdfEditorRedactHint: "Disegna un rettangolo sull'anteprima della pagina, oppure usa Aggiungi riquadro.",
@@ -2774,6 +2778,8 @@ const languages = {
         pdfEditorPagesHelp: "Użyj listy stron, aby zmienić kolejność, obrócić lub usunąć.",
         pdfEditorComingSoon: "Wkrótce w kolejnej aktualizacji",
         pdfEditorLoading: "Ładowanie dokumentu...",
+        pdfEditorTextAreaHint:
+            "W tym PDF zaznacz tekst, przeciągając obszar na stronie, a następnie kopiuj lub podświetl.",
         pdfEditorNoPagesLeft: "Musisz zostawić co najmniej jedną stronę",
         pdfEditorExport: "Eksportuj PDF",
         pdfEditorRedactHint: "Narysuj prostokąt na podglądzie strony lub użyj przycisku Dodaj pole.",
@@ -3789,6 +3795,8 @@ const languages = {
         pdfEditorPagesHelp: "Usa la lista de páginas para reordenar, rotar o eliminar.",
         pdfEditorComingSoon: "Próximamente en una actualización",
         pdfEditorLoading: "Cargando documento...",
+        pdfEditorTextAreaHint:
+            "En este PDF selecciona texto arrastrando un área en la página y luego copia o resalta.",
         pdfEditorNoPagesLeft: "Debes dejar al menos una página",
         pdfEditorExport: "Exportar PDF",
         pdfEditorRedactHint: "Dibuja un rectángulo en la vista previa o usa Añadir caja.",

@@ -5,6 +5,8 @@
 (function (global) {
     let modelRef = null;
     let onChange = null;
+    let getPdfPageRef = null;
+    let onTextSelectionWeak = null;
     let isPanActive = () => false;
     let wired = false;
 
@@ -56,7 +58,94 @@
     function markTextSelectionWeak() {
         if (!modelRef || modelRef.textSelectionWeak) return;
         modelRef.textSelectionWeak = true;
+        onTextSelectionWeak?.();
         onChange?.();
+    }
+
+    async function measureTextLayerWithRetry(layer, attempts = 4) {
+        let last = measureTextLayer(layer);
+        for (let i = 1; i < attempts; i += 1) {
+            if (last.withText === 0 || last.ratio >= 0.12) return last;
+            await new Promise((r) => requestAnimationFrame(r));
+            last = measureTextLayer(layer);
+        }
+        return last;
+    }
+
+    function viewportForWrap(pdfPage, pageState, canvasWrap) {
+        const canvas = canvasWrap.querySelector('canvas');
+        const frame = canvasWrap.closest('.pdfEditorPageFrame');
+        const pdfW = parseFloat(frame?.dataset.pdfWidth);
+        const totalRot = ((pdfPage.rotate || 0) + (pageState.rotation || 0)) % 360;
+        if (canvas?.width && pdfW > 0) {
+            return pdfPage.getViewport({ scale: canvas.width / pdfW, rotation: totalRot });
+        }
+        return pdfPage.getViewport({ scale: 1, rotation: totalRot });
+    }
+
+    function itemRectInViewport(item, viewport) {
+        const pdfjsLib = global.pdfjsLib || global.window?.pdfjsLib;
+        if (!pdfjsLib?.Util || !item.transform) return null;
+        const tx = pdfjsLib.Util.transform(viewport.transform, item.transform);
+        const fontHeight = Math.hypot(tx[2], tx[3]) || 12;
+        const totalWidth = (item.width || 0) * (viewport.scale || 1);
+        return {
+            left: tx[4],
+            top: tx[5] - fontHeight * 0.85,
+            width: Math.max(totalWidth, 4),
+            height: Math.max(fontHeight * 1.2, 10),
+        };
+    }
+
+    function rectsOverlap(a, b) {
+        return (
+            a.left < b.left + b.width &&
+            a.left + a.width > b.left &&
+            a.top < b.top + b.height &&
+            a.top + a.height > b.top
+        );
+    }
+
+    async function extractTextInNormRect(pageId, normRect, canvasWrap) {
+        if (!getPdfPageRef || !modelRef?.pages) return '';
+        const pageState = modelRef.pages.find((p) => p.id === pageId);
+        if (!pageState) return '';
+        const pdfPage = await getPdfPageRef(pageState.sourceIndex);
+        if (!pdfPage) return '';
+
+        const viewport = viewportForWrap(pdfPage, pageState, canvasWrap);
+        const sel = {
+            left: normRect.x * viewport.width,
+            top: normRect.y * viewport.height,
+            width: normRect.width * viewport.width,
+            height: normRect.height * viewport.height,
+        };
+
+        const tc = await pdfPage.getTextContent();
+        const hits = [];
+        (tc.items || []).forEach((item) => {
+            if (item.str == null || item.str === '') return;
+            const ir = itemRectInViewport(item, viewport);
+            if (!ir || !rectsOverlap(sel, ir)) return;
+            hits.push({ top: ir.top, left: ir.left, str: item.str });
+        });
+        hits.sort((a, b) => (a.top - b.top) || (a.left - b.left));
+        return hits.map((h) => h.str).join(' ').replace(/\s+/g, ' ').trim();
+    }
+
+    async function showAreaSelectionMenu(clientX, clientY, pageId, normRect, wrap) {
+        let text = '';
+        if (modelRef?.hasEmbeddedText !== false) {
+            try {
+                text = await extractTextInNormRect(pageId, normRect, wrap);
+            } catch (_) {
+                text = '';
+            }
+        }
+        showMenu(clientX, clientY, { pageId, text, rects: [normRect] }, {
+            allowCopy: Boolean(text.trim()),
+            allowUnderline: false,
+        });
     }
 
     function showMenu(clientX, clientY, selection, { allowCopy, allowUnderline }) {
@@ -191,7 +280,6 @@
 
         const vpW = viewport.width || 1;
         const cssW = canvas.clientWidth || vpW;
-        const cssH = canvas.clientHeight || viewport.height || 1;
         const cssScale = cssW / vpW;
         const layerViewport =
             Math.abs(cssScale - 1) < 0.002
@@ -220,17 +308,12 @@
             });
             await textLayer.render();
 
-            await new Promise((r) => requestAnimationFrame(r));
-            const { withText, hitable, ratio } = measureTextLayer(layer);
+            const { withText, hitable, ratio } = await measureTextLayerWithRetry(layer);
             if (withText > 0 && ratio < 0.12) {
                 console.warn('[pdfEditor] text layer weak', { withText, hitable, ratio });
                 layer.remove();
                 markTextSelectionWeak();
                 return;
-            }
-            if (cssW > 0 && cssH > 0) {
-                layer.style.width = `${cssW}px`;
-                layer.style.height = `${cssH}px`;
             }
         } catch (err) {
             console.warn('[pdfEditor] text layer', err);
@@ -282,10 +365,7 @@
                 width: pr.width / (wrapRect.width || 1),
                 height: pr.height / (wrapRect.height || 1),
             };
-            showMenu(e.clientX, e.clientY, { pageId, text: '', rects: [rect] }, {
-                allowCopy: false,
-                allowUnderline: false,
-            });
+            showAreaSelectionMenu(e.clientX, e.clientY, pageId, rect, wrap);
             return;
         }
 
@@ -389,10 +469,7 @@
             width: pr.width / (wrapRect.width || 1),
             height: pr.height / (wrapRect.height || 1),
         };
-        showMenu(e.clientX, e.clientY, { pageId: drag.pageId, text: '', rects: [norm] }, {
-            allowCopy: false,
-            allowUnderline: false,
-        });
+        showAreaSelectionMenu(e.clientX, e.clientY, drag.pageId, norm, drag.wrap);
     }
 
     function wire() {
@@ -427,6 +504,8 @@
     function init(opts) {
         modelRef = opts.model;
         onChange = opts.onChange;
+        getPdfPageRef = opts.getPdfPage || null;
+        onTextSelectionWeak = opts.onTextSelectionWeak || null;
         isPanActive = opts.isPanActive || (() => false);
         wire();
     }

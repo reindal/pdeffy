@@ -1738,6 +1738,9 @@ async function loadPdfFile(file, filePath = null, options = {}) {
         try {
             const meta = await pdf.getMetadata();
             model.acroFormPresent = !!meta?.info?.IsAcroFormPresent;
+            if (model.hasEmbeddedText !== false && isLikelyMisalignedTextLayerPdf(meta?.info)) {
+                model.textSelectionWeak = true;
+            }
         } catch (_) {
             model.acroFormPresent = false;
         }
@@ -1829,6 +1832,13 @@ async function loadPdfFile(file, filePath = null, options = {}) {
             refreshUi();
         });
         StatusManager.hide(STATUS);
+        if (model.textSelectionWeak) {
+            try {
+                StatusManager.show(STATUS, 'processing', 'pdfEditorTextAreaHint');
+            } catch (_) {
+                /* ignore */
+            }
+        }
         fileInput.value = '';
         try {
             delete fileInput.dataset.pdeffyPaths;
@@ -2322,6 +2332,13 @@ document.getElementById('pdfEditorPanTool')?.addEventListener('click', () => {
                 }
             }
         },
+        onTextSelectionWeak: () => {
+            try {
+                StatusManager.show(STATUS, 'processing', 'pdfEditorTextAreaHint');
+            } catch (_) {
+                /* ignore */
+            }
+        },
         isPanActive: () => panEnabled,
     });
 })();
@@ -2394,6 +2411,14 @@ async function probeEmbeddedText(pdf) {
         }
     }
     return chars > 20;
+}
+
+/** Microsoft "Print To PDF" often misaligns pdf.js TextLayer in WKWebView — use area selection. */
+function isLikelyMisalignedTextLayerPdf(info) {
+    const label = String(info?.Producer || info?.Creator || '').toLowerCase();
+    if (!label) return false;
+    if (label.includes('print to pdf')) return true;
+    return label.includes('microsoft') && label.includes('pdf');
 }
 
 function updateOcrViewTabs() {
