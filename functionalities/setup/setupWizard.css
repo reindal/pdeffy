@@ -28,21 +28,39 @@ body.setup-wizard-locked .pdeffy-main {
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
-    background: rgba(8, 12, 24, 0.82);
+    background: rgba(8, 12, 24, 0.88);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .setupWizardOverlay {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(8, 12, 24, 0.94);
+    }
 }
 
 .setupWizardCard {
     background: var(--pdeffy-surface, #fff);
-    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    border: 2px solid var(--pdeffy-border, #c5cad6);
     border-radius: 18px;
     padding: 28px 26px 22px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
     width: 100%;
     max-width: 540px;
     max-height: min(90vh, 720px);
     overflow-y: auto;
     box-sizing: border-box;
+    color: var(--pdeffy-text, #101a3a);
+}
+
+.setupWizardStep[hidden] {
+    display: none !important;
+}
+
+.setupWizardStep.is-active {
+    display: block;
 }
 
 .setupWizardStepCounter {
@@ -234,7 +252,7 @@ body.setup-wizard-locked .pdeffy-main {
     min-height: var(--pdeffy-control-height, 2.625rem);
     height: var(--pdeffy-control-height, 2.625rem);
     padding: 0 12px;
-    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    border: 1px solid var(--pdeffy-border, #b8beca);
     border-radius: 10px;
     font-size: 14px;
     line-height: 1.35;
@@ -242,6 +260,7 @@ body.setup-wizard-locked .pdeffy-main {
     background: var(--pdeffy-bg, #fffcf3);
     color: var(--pdeffy-text, #101a3a);
     font-family: inherit;
+    box-shadow: inset 0 0 0 1px rgba(16, 26, 58, 0.04);
 }
 
 .setupWizardSelect {
@@ -364,4 +383,17 @@ body.setup-wizard-locked .pdeffy-main {
 
 html[data-theme="dark"] .setupWizardLogo {
     filter: brightness(0) invert(1);
+}
+
+html[data-theme="dark"] .setupWizardCard {
+    background: var(--pdeffy-surface, #1a2030);
+    border-color: var(--pdeffy-border, #3a4258);
+    color: var(--pdeffy-text, #eef1f8);
+}
+
+html[data-theme="dark"] .setupWizardSelect,
+html[data-theme="dark"] .setupWizardInput {
+    background: var(--pdeffy-bg, #12151f);
+    border-color: var(--pdeffy-border, #4a5268);
+    color: var(--pdeffy-text, #eef1f8);
 }

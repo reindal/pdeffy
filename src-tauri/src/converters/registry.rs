@@ -1,6 +1,6 @@
 use super::{
-    docx_has_header_or_footer, BackendOutput, ConversionError, LibreOfficeBackend,
-    Office2PdfBackend, OfficeFormat, OfficeToPdfConverter,
+    docx_has_graphical_header_footer, docx_has_header_or_footer, BackendOutput, ConversionError,
+    LibreOfficeBackend, Office2PdfBackend, OfficeFormat, OfficeToPdfConverter,
 };
 use serde::Serialize;
 use std::path::Path;
@@ -50,16 +50,17 @@ impl ActiveBackend {
     }
 }
 
-/// In `auto` mode, DOCX with headers/footers use LibreOffice when installed (layout fidelity).
+/// In `auto` mode, DOCX with headers/footers prefer external engines (Word on Windows is handled
+/// in `convert_office_file_to_pdf_path` before this runs; here LibreOffice beats the built-in).
 fn resolve_auto_backend(input_path: &Path, format: OfficeFormat) -> BackendChoice {
-    if format == OfficeFormat::Docx
-        && docx_has_header_or_footer(input_path)
-        && libreoffice().is_available()
-    {
-        BackendChoice::LibreOffice
-    } else {
-        BackendChoice::Office2Pdf
+    if format == OfficeFormat::Docx {
+        let rich_hf = docx_has_header_or_footer(input_path)
+            || docx_has_graphical_header_footer(input_path);
+        if rich_hf && libreoffice().is_available() {
+            return BackendChoice::LibreOffice;
+        }
     }
+    BackendChoice::Office2Pdf
 }
 
 fn backend_by_id(

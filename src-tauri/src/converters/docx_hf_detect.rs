@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::BufReader;
+use std::io::{BufReader, Read};
 use std::path::Path;
 
 use zip::read::ZipArchive;
@@ -24,6 +24,49 @@ pub fn docx_has_header_or_footer(path: &Path) -> bool {
             return true;
         }
         if name.starts_with("word/footer") && name.ends_with(".xml") {
+            return true;
+        }
+    }
+    false
+}
+
+fn part_has_graphics(data: &[u8]) -> bool {
+    let hay = String::from_utf8_lossy(data).to_ascii_lowercase();
+    hay.contains("wp:drawing")
+        || hay.contains("w:drawing")
+        || hay.contains("w:pict")
+        || hay.contains("v:shape")
+        || hay.contains("v:imagedata")
+        || hay.contains("a:blip")
+        || hay.contains("pic:pic")
+}
+
+/// Footer/header con immagini, linee o forme — il motore interno e spesso LibreOffice li perdono.
+pub fn docx_has_graphical_header_footer(path: &Path) -> bool {
+    let file = match File::open(path) {
+        Ok(f) => f,
+        Err(_) => return false,
+    };
+    let mut archive = match ZipArchive::new(BufReader::new(file)) {
+        Ok(a) => a,
+        Err(_) => return false,
+    };
+
+    for i in 0..archive.len() {
+        let Ok(mut entry) = archive.by_index(i) else {
+            continue;
+        };
+        let name = entry.name();
+        let is_hf = (name.starts_with("word/header") || name.starts_with("word/footer"))
+            && name.ends_with(".xml");
+        if !is_hf {
+            continue;
+        }
+        let mut buf = Vec::new();
+        if entry.read_to_end(&mut buf).is_err() {
+            continue;
+        }
+        if part_has_graphics(&buf) {
             return true;
         }
     }

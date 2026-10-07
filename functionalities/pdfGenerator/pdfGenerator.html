@@ -41,26 +41,36 @@
                 </div>
 
                 <div class="formGroup step-margin">
-                    <label for="baseFileName" id="pdfByTemplateNameLabel" class="langText">Prefisso file (con placeholder):</label>
+                    <label for="baseFileName" id="pdfByTemplateNameLabel" class="langText">Prefisso nome file:</label>
                     <input type="text" id="baseFileName" class="textInput langTextPlaceholder"
-                        placeholder="es. Ricevuta-{{AZIENDA}}-{{MESE}}" required>
-                    <p class="fieldHint langText" id="pdfByTemplateNameHint">Usa {{NOME_COLONNA}} per inserire valori dalle intestazioni Excel. Caratteri non validi nel nome file verranno sostituiti.</p>
+                        placeholder="" autocomplete="off">
+                    <div id="namePatternChips" class="pdfgen-chips" hidden aria-live="polite"></div>
+                    <p class="fieldHint langText" id="pdfByTemplateNameHint">Clicca le colonne per inserire i placeholder, scrivi un prefisso libero, oppure lascia vuoto per file1, file2…</p>
                 </div>
 
                 <div class="formGroup step-margin">
-                    <label for="groupByField" id="pdfByTemplateGroupLabel" class="langText">Raggruppa PDF per campo Excel:</label>
-                    <select id="groupByField" class="textInput selectInput">
-                        <option value="" class="langText" id="pdfByTemplateGroupNone">Nessun raggruppamento</option>
-                    </select>
-                    <p class="fieldHint langText" id="pdfByTemplateGroupHint">Se scelto, i PDF vengono messi in sottocartelle con il valore del campo (anche dentro lo ZIP).</p>
+                    <span class="pdfgen-section-label langText" id="pdfByTemplateGroupLevelsLabel">Sottocartelle (più livelli)</span>
+                    <ol id="groupLevelsList" class="pdfgen-levels-list" aria-labelledby="pdfByTemplateGroupLevelsLabel"></ol>
+                    <div class="pdfgen-level-add">
+                        <select id="groupLevelPick" class="textInput selectInput" aria-label="Campo livello">
+                            <option value="">—</option>
+                        </select>
+                        <button type="button" id="groupLevelAddBtn" class="pdfgen-secondary-btn"><span class="langText" id="pdfByTemplateGroupAddLevel">Aggiungi livello</span></button>
+                    </div>
+                    <p class="fieldHint langText" id="pdfByTemplateGroupLevelsHint">Ogni livello crea una sottocartella (es. AZIENDA/MESE/nome.pdf). Ordine dall’alto verso il basso.</p>
                 </div>
 
-                <div class="formGroup step-margin pdfgen-zip-row">
+                <div class="formGroup step-margin pdfgen-options-stack">
                     <label class="pdfgen-check-label" for="createZipCheckbox">
-                        <input type="checkbox" id="createZipCheckbox" checked>
+                        <input type="checkbox" id="createZipCheckbox">
                         <span class="langText" id="pdfByTemplateZipLabel">Crea file ZIP</span>
                     </label>
-                    <p class="fieldHint langText" id="pdfByTemplateZipHint">Se disattivato, scegli una cartella: verrà creata pdeffy_nomemodello con i PDF (e le sottocartelle di raggruppamento).</p>
+                    <p class="fieldHint langText" id="pdfByTemplateZipHint">Se disattivato, scegli una cartella: verrà creata pdeffy_nomemodello con i PDF (e le sottocartelle).</p>
+                    <label class="pdfgen-check-label pdfgen-check-spaced" for="keepDocxCheckbox">
+                        <input type="checkbox" id="keepDocxCheckbox">
+                        <span class="langText" id="pdfByTemplateKeepDocxLabel">Genera anche file Word (.docx)</span>
+                    </label>
+                    <p class="fieldHint langText" id="pdfByTemplateKeepDocxHint">I documenti Word compilati restano nella cartella di destinazione (o nello ZIP) oltre ai PDF.</p>
                 </div>
 
                 <button type="submit" class="submitBtn" id="submitBtn">
@@ -70,11 +80,23 @@
 
             <div id="status" class="status"></div>
 
-            <div id="progressContainer" class="progress-wrapper hidden">
+            <div id="progressContainer" class="progress-wrapper hidden" aria-hidden="true">
                 <div class="progress-track">
                     <div id="progressBar" class="progress-fill"></div>
                 </div>
                 <div id="progressText" class="progress-text">0 / 0</div>
+            </div>
+
+            <div id="pdfGenProgressModal" class="pdfGenProgressModal" hidden role="dialog" aria-modal="true"
+                aria-labelledby="pdfGenProgressTitle">
+                <div class="pdfGenProgressDialog">
+                    <h2 id="pdfGenProgressTitle" class="langText" data-i18n="pdfByTemplateProgressTitle">Generazione in corso</h2>
+                    <p id="pdfGenProgressDetail" class="pdfGenProgressDetail">Preparazione…</p>
+                    <div class="pdfGenProgressTrack">
+                        <div id="pdfGenProgressBar" class="pdfGenProgressFill"></div>
+                    </div>
+                    <p id="pdfGenProgressCount" class="pdfGenProgressCount">0 / 0</p>
+                </div>
             </div>
 
             <a href="../../index.html" class="backLink langText" id="backLink">← Back to main page</a>

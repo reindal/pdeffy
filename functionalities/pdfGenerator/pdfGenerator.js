@@ -12,8 +12,12 @@ const form = document.getElementById('pdfGeneratorForm');
 const docxInput = document.getElementById('docxTemplate');
 const excelInput = document.getElementById('excelData');
 const baseFileNameInput = document.getElementById('baseFileName');
-const groupByFieldSelect = document.getElementById('groupByField');
+const namePatternChips = document.getElementById('namePatternChips');
+const groupLevelsList = document.getElementById('groupLevelsList');
+const groupLevelPick = document.getElementById('groupLevelPick');
+const groupLevelAddBtn = document.getElementById('groupLevelAddBtn');
 const createZipCheckbox = document.getElementById('createZipCheckbox');
+const keepDocxCheckbox = document.getElementById('keepDocxCheckbox');
 const submitBtn = document.getElementById('submitBtn');
 const submitLabel = document.getElementById('pdfByTemplateSubmitBtn');
 
@@ -22,19 +26,64 @@ const excelInfo = document.getElementById('excelInfo');
 const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressText = document.getElementById('progressText');
+const progressModal = document.getElementById('pdfGenProgressModal');
+const progressModalBar = document.getElementById('pdfGenProgressBar');
+const progressModalCount = document.getElementById('pdfGenProgressCount');
+const progressModalDetail = document.getElementById('pdfGenProgressDetail');
 
 let selectedDocxFile = null;
 let selectedExcelFile = null;
 let excelHeaders = [];
+/** @type {string[]} */
+let groupLevels = [];
 
-function msg(key, fallback) {
+function msg(key, fallback, params) {
   if (typeof window.getMessage === 'function') {
     try {
-      const m = window.getMessage(key);
-      if (m) return m;
+      const m = window.getMessage(key, params || {});
+      if (m && m !== key) return m;
     } catch (_) { /* ignore */ }
   }
+  if (params && fallback) {
+    let out = fallback;
+    Object.keys(params).forEach((p) => {
+      out = out.split(`{${p}}`).join(String(params[p] ?? ''));
+    });
+    return out;
+  }
   return fallback;
+}
+
+/** Keep header/footer parts and media from the template after docxtemplater render. */
+async function preserveTemplateHeaderFooter(templateBytes, renderedBytes) {
+  const tpl = await JSZip.loadAsync(templateBytes);
+  const out = await JSZip.loadAsync(renderedBytes);
+  const paths = [];
+  tpl.forEach((relPath, file) => {
+    if (file.dir) return;
+    if (
+      /^word\/(header|footer)\d+\.xml$/i.test(relPath) ||
+      /^word\/_rels\/(header|footer)\d+\.xml\.rels$/i.test(relPath) ||
+      relPath.startsWith('word/media/') ||
+      relPath.startsWith('word/theme/') ||
+      relPath === 'word/fontTable.xml'
+    ) {
+      paths.push(relPath);
+    }
+  });
+  for (const relPath of paths) {
+    const entry = tpl.file(relPath);
+    if (entry) out.file(relPath, await entry.async('nodebuffer'));
+  }
+  return out.generate({ type: 'uint8array', compression: 'DEFLATE' });
+}
+
+function bytesForWrite(data) {
+  if (data instanceof ArrayBuffer) return new Uint8Array(data);
+  if (ArrayBuffer.isView(data)) {
+    return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  }
+  return new Uint8Array(data);
 }
 
 function sanitizeFilePart(value) {
@@ -43,27 +92,135 @@ function sanitizeFilePart(value) {
 }
 
 function applyNamePattern(pattern, rowData, fallbackIndex) {
-  let name = String(pattern || 'Document').trim() || 'Document';
-  name = name.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_, key) => {
+  const raw = String(pattern ?? '').trim();
+  if (!raw) {
+    return `file${fallbackIndex}`;
+  }
+  let name = raw.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_, key) => {
     const k = String(key).trim();
     const val = rowData[k];
     if (val == null || val === '') return sanitizeFilePart(k);
     return sanitizeFilePart(val);
   });
   name = sanitizeFilePart(name).replace(/_+/g, '_');
-  if (!name || name === 'item') name = `Document_${fallbackIndex}`;
+  if (!name || name === 'item') name = `file${fallbackIndex}`;
   return name;
 }
 
-function groupFolderForRow(rowData, groupField) {
-  if (!groupField) return '';
-  const val = rowData[groupField];
-  return sanitizeFilePart(val == null || val === '' ? '_vuoto' : val);
+function groupFolderForRow(rowData, levels) {
+  if (!levels || !levels.length) return '';
+  return levels
+    .map((field) => {
+      const val = rowData[field];
+      return sanitizeFilePart(val == null || val === '' ? '_vuoto' : val);
+    })
+    .join('/');
+}
+
+function insertPlaceholderToken(header) {
+  if (!baseFileNameInput || !header) return;
+  const token = `{{${header}}}`;
+  const input = baseFileNameInput;
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? start;
+  const before = input.value.slice(0, start);
+  const after = input.value.slice(end);
+  input.value = `${before}${token}${after}`;
+  const pos = start + token.length;
+  input.setSelectionRange(pos, pos);
+  input.focus();
+}
+
+function renderNamePatternChips(headers) {
+  if (!namePatternChips) return;
+  namePatternChips.innerHTML = '';
+  if (!headers.length) {
+    namePatternChips.hidden = true;
+    return;
+  }
+  namePatternChips.hidden = false;
+  headers.forEach((h) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pdfgen-chip';
+    btn.textContent = h;
+    btn.title = `{{${h}}}`;
+    btn.addEventListener('click', () => insertPlaceholderToken(h));
+    namePatternChips.appendChild(btn);
+  });
+}
+
+function renderGroupLevelsList() {
+  if (!groupLevelsList) return;
+  groupLevelsList.innerHTML = '';
+  groupLevels.forEach((field, index) => {
+    const li = document.createElement('li');
+    const label = document.createElement('span');
+    label.textContent = `${index + 1}. ${field}`;
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'pdfgen-level-remove';
+    removeBtn.setAttribute('aria-label', msg('pdfByTemplateGroupRemoveLevel', 'Remove level'));
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', () => {
+      groupLevels.splice(index, 1);
+      renderGroupLevelsList();
+    });
+    li.appendChild(label);
+    li.appendChild(removeBtn);
+    groupLevelsList.appendChild(li);
+  });
+}
+
+function resetGroupLevelPick(headers = []) {
+  if (!groupLevelPick) return;
+  const prev = groupLevelPick.value;
+  groupLevelPick.innerHTML = '';
+  const empty = document.createElement('option');
+  empty.value = '';
+  empty.textContent = '—';
+  groupLevelPick.appendChild(empty);
+  headers.forEach((h) => {
+    const opt = document.createElement('option');
+    opt.value = h;
+    opt.textContent = h;
+    groupLevelPick.appendChild(opt);
+  });
+  if (prev && headers.includes(prev)) groupLevelPick.value = prev;
 }
 
 function docxBaseStem(file) {
   const n = file?.name || 'modello';
   return sanitizeFilePart(n.replace(/\.docx$/i, '') || 'modello');
+}
+
+function showProgressModal(current, total, options) {
+  if (!progressModal) return;
+  progressModal.hidden = false;
+  document.body.classList.add('pdfgen-busy');
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+  if (progressModalBar) progressModalBar.style.width = `${pct}%`;
+  if (progressModalCount) progressModalCount.textContent = `${current} / ${total}`;
+  if (progressModalDetail) {
+    if (options?.batchPhase) {
+      progressModalDetail.textContent = msg(
+        'pdfByTemplateBatchConverting',
+        'Converting all documents to PDF (single session)…'
+      );
+    } else {
+      progressModalDetail.textContent = msg('generatingItem', 'Generating PDF {current} of {total}...', {
+        current,
+        total,
+      });
+    }
+  }
+}
+
+function hideProgressModal() {
+  if (!progressModal) return;
+  progressModal.hidden = true;
+  document.body.classList.remove('pdfgen-busy');
+  if (progressModalBar) progressModalBar.style.width = '0%';
 }
 
 function updateSubmitLabel() {
@@ -74,24 +231,12 @@ function updateSubmitLabel() {
     : msg('pdfByTemplateSubmitFolder', 'Genera PDF in cartella');
 }
 
-function resetGroupSelect(headers = []) {
+function resetExcelColumnUi(headers = []) {
   excelHeaders = headers;
-  if (!groupByFieldSelect) return;
-  const prev = groupByFieldSelect.value;
-  groupByFieldSelect.innerHTML = '';
-  const none = document.createElement('option');
-  none.value = '';
-  none.id = 'pdfByTemplateGroupNone';
-  none.className = 'langText';
-  none.textContent = msg('pdfByTemplateGroupNone', 'Nessun raggruppamento');
-  groupByFieldSelect.appendChild(none);
-  headers.forEach((h) => {
-    const opt = document.createElement('option');
-    opt.value = h;
-    opt.textContent = h;
-    groupByFieldSelect.appendChild(opt);
-  });
-  if (prev && headers.includes(prev)) groupByFieldSelect.value = prev;
+  renderNamePatternChips(headers);
+  resetGroupLevelPick(headers);
+  groupLevels = groupLevels.filter((f) => headers.includes(f));
+  renderGroupLevelsList();
 }
 
 async function loadExcelHeaders(file) {
@@ -102,9 +247,17 @@ async function loadExcelHeaders(file) {
   const headers = rows.length
     ? Object.keys(rows[0])
     : (XLSX.utils.sheet_to_json(worksheet, { header: 1 })[0] || []).map(String);
-  resetGroupSelect(headers.filter(Boolean));
+  resetExcelColumnUi(headers.filter(Boolean));
   return { workbook, rows };
 }
+
+groupLevelAddBtn?.addEventListener('click', () => {
+  const field = groupLevelPick?.value;
+  if (!field || groupLevels.includes(field)) return;
+  groupLevels.push(field);
+  renderGroupLevelsList();
+  if (groupLevelPick) groupLevelPick.value = '';
+});
 
 docxInput.addEventListener('change', function (e) {
   if (e.target.files.length > 0) {
@@ -121,7 +274,7 @@ excelInput.addEventListener('change', async function (e) {
       await loadExcelHeaders(selectedExcelFile);
     } catch (err) {
       console.warn('[pdfGenerator] header parse failed', err);
-      resetGroupSelect([]);
+      resetExcelColumnUi([]);
     }
   }
 });
@@ -133,9 +286,10 @@ form.addEventListener('submit', async function (e) {
   e.preventDefault();
   if (!selectedDocxFile || !selectedExcelFile) return;
 
-  const namePattern = baseFileNameInput.value.trim() || 'Document';
-  const groupField = groupByFieldSelect?.value || '';
+  const namePattern = baseFileNameInput.value.trim();
   const createZip = !!createZipCheckbox?.checked;
+  const keepDocx = !!keepDocxCheckbox?.checked;
+  const folderLevels = [...groupLevels];
 
   try {
     StatusManager.show(STATUS, 'processing', 'readingExcel');
@@ -147,8 +301,7 @@ form.addEventListener('submit', async function (e) {
     if (excelData.length === 0) {
       throw new Error(msg('errorEmptyExcel', 'Excel file is empty'));
     }
-    resetGroupSelect(Object.keys(excelData[0] || {}));
-    if (groupField) groupByFieldSelect.value = groupField;
+    resetExcelColumnUi(Object.keys(excelData[0] || {}));
 
     const downloadsPath = await ipcRenderer.invoke('get-downloads-path');
     let zipOutputPath = null;
@@ -176,16 +329,25 @@ form.addEventListener('submit', async function (e) {
     submitBtn.disabled = true;
     progressContainer.style.display = 'block';
     progressContainer.classList.remove('hidden');
+    showProgressModal(0, excelData.length);
 
     const finalMetadata = await CustomMetadataModule.getFinalMetadata(ipcRenderer);
     const finalZip = createZip ? new JSZip() : null;
     const docxBufferBase = await selectedDocxFile.arrayBuffer();
 
-    const workParent = createZip ? path.dirname(zipOutputPath) : outputRootDir;
-    const sessionTempDir = path.join(workParent, `.pdfgen-${Date.now()}`);
-    await fs.mkdir(sessionTempDir, { recursive: true });
+    const sessionId = Date.now();
+    const workRoot = createZip ? path.dirname(zipOutputPath) : outputRootDir;
+    const sessionTempDir = workRoot;
+    const tempName = (base) => `~pdeffy_${sessionId}_${base}`;
+
+    const templateDocxPath = path.join(sessionTempDir, tempName('_template.docx'));
+    await fs.writeFile(templateDocxPath, bytesForWrite(docxBufferBase));
 
     const usedNames = new Map();
+    /** @type {{ inputPath: string, outputPath: string }[]} */
+    const batchJobs = [];
+    /** @type {{ currentFileName: string, groupFolder: string, tempPdfPath: string, tempDocxPath: string }[]} */
+    const generatedFiles = [];
 
     for (let i = 0; i < excelData.length; i++) {
       const rowData = excelData[i];
@@ -194,7 +356,7 @@ form.addEventListener('submit', async function (e) {
       usedNames.set(currentFileName, count);
       if (count > 1) currentFileName = `${currentFileName}_${count}`;
 
-      const groupFolder = groupFolderForRow(rowData, groupField);
+      const groupFolder = groupFolderForRow(rowData, folderLevels);
 
       StatusManager.show(STATUS, 'processing', 'generatingItem', {
         current: i + 1,
@@ -202,6 +364,7 @@ form.addEventListener('submit', async function (e) {
       });
       progressBar.style.width = `${(i / excelData.length) * 100}%`;
       progressText.textContent = `${i} / ${excelData.length}`;
+      showProgressModal(i + 1, excelData.length);
 
       const zip = new PizZip(docxBufferBase);
       const doc = new Docxtemplater(zip, {
@@ -214,40 +377,68 @@ form.addEventListener('submit', async function (e) {
       });
 
       doc.render(rowData);
-      const generatedDocxBuffer = doc.getZip().generate({ type: 'uint8array' });
-      const tempPdfPath = path.join(sessionTempDir, `${currentFileName}.pdf`);
+      let generatedDocxBuffer = doc.getZip().generate({ type: 'uint8array' });
+      try {
+        generatedDocxBuffer = await preserveTemplateHeaderFooter(docxBufferBase, generatedDocxBuffer);
+      } catch (err) {
+        console.warn('[pdfGenerator] preserve header/footer', err);
+      }
+      const tempDocxPath = path.join(sessionTempDir, tempName(`${currentFileName}.docx`));
+      const tempPdfPath = path.join(sessionTempDir, tempName(`${currentFileName}.pdf`));
+      await fs.writeFile(tempDocxPath, bytesForWrite(generatedDocxBuffer));
+      batchJobs.push({ inputPath: tempDocxPath, outputPath: tempPdfPath });
+      generatedFiles.push({ currentFileName, groupFolder, tempPdfPath, tempDocxPath });
+    }
 
-      await ipcRenderer.invoke('convert-with-libreoffice', {
-        fileData: generatedDocxBuffer,
-        fileName: `temp_${i}.docx`,
-        outputPath: tempPdfPath,
-        format: 'pdf',
-        metadata: finalMetadata,
-      });
+    StatusManager.show(STATUS, 'processing', 'pdfByTemplateBatchConverting');
+    showProgressModal(0, excelData.length, { batchPhase: true, workRoot });
+
+    await ipcRenderer.invoke('batch-convert-docx-to-pdf', {
+      templatePath: templateDocxPath,
+      jobs: batchJobs,
+      metadata: finalMetadata,
+    });
+
+    for (let i = 0; i < generatedFiles.length; i++) {
+      const { currentFileName, groupFolder, tempPdfPath, tempDocxPath } = generatedFiles[i];
+
+      showProgressModal(i + 1, excelData.length);
+      progressBar.style.width = `${((i + 1) / excelData.length) * 100}%`;
+      progressText.textContent = `${i + 1} / ${excelData.length}`;
 
       const pdfBytes = await fs.readFile(tempPdfPath);
+      const docxRelPath = groupFolder
+        ? `${groupFolder}/${currentFileName}.docx`
+        : `${currentFileName}.docx`;
       const pdfRelPath = groupFolder
         ? `${groupFolder}/${currentFileName}.pdf`
         : `${currentFileName}.pdf`;
 
       if (createZip) {
         finalZip.file(pdfRelPath, pdfBytes);
+        if (keepDocx) {
+          const docxBytes = await fs.readFile(tempDocxPath);
+          finalZip.file(docxRelPath, docxBytes);
+        }
       } else {
         if (groupFolder) {
           await fs.mkdir(path.join(outputRootDir, groupFolder), { recursive: true });
         }
         await fs.writeFile(path.join(outputRootDir, pdfRelPath), pdfBytes);
+        if (keepDocx) {
+          const docxBytes = await fs.readFile(tempDocxPath);
+          await fs.writeFile(path.join(outputRootDir, docxRelPath), docxBytes);
+        }
       }
 
       try {
         await fs.unlink(tempPdfPath);
+        await fs.unlink(tempDocxPath);
       } catch (_) { /* ignore */ }
-
-      progressBar.style.width = `${((i + 1) / excelData.length) * 100}%`;
-      progressText.textContent = `${i + 1} / ${excelData.length}`;
     }
 
     let savePath;
+    showProgressModal(excelData.length, excelData.length);
     if (createZip) {
       StatusManager.show(STATUS, 'processing', 'savingZip');
       const zipContent = await finalZip.generateAsync({ type: 'uint8array' });
@@ -259,12 +450,8 @@ form.addEventListener('submit', async function (e) {
     }
 
     try {
-      await fs.rm(sessionTempDir);
-    } catch (_) {
-      try {
-        await fs.rmdir(sessionTempDir);
-      } catch (__) { /* ignore */ }
-    }
+      await fs.unlink(templateDocxPath);
+    } catch (_) { /* ignore */ }
 
     StatusManager.show(STATUS, 'success', createZip ? 'successGeneration' : 'successGenerationFolder', {
       savePath,
@@ -277,12 +464,16 @@ form.addEventListener('submit', async function (e) {
       selectedExcelFile = null;
       docxInfo.textContent = '';
       excelInfo.textContent = '';
+      hideProgressModal();
       progressContainer.style.display = 'none';
       progressBar.style.width = '0%';
-      createZipCheckbox.checked = true;
+      createZipCheckbox.checked = false;
+      if (keepDocxCheckbox) keepDocxCheckbox.checked = false;
       if (baseFileNameInput) baseFileNameInput.value = '';
+      groupLevels = [];
+      renderGroupLevelsList();
       updateSubmitLabel();
-      resetGroupSelect([]);
+      resetExcelColumnUi([]);
       CustomMetadataModule.reset();
       if (typeof window.applyLanguage === 'function') {
         try { window.applyLanguage(); } catch (_) { /* ignore */ }
@@ -292,6 +483,7 @@ form.addEventListener('submit', async function (e) {
     console.error('Error in Generator process:', error);
     StatusManager.show(STATUS, 'error', 'errorPrefix', { error: error.message });
   } finally {
+    hideProgressModal();
     submitBtn.disabled = false;
   }
 });

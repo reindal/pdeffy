@@ -321,7 +321,7 @@ fn convert_inner(
     Ok(serde_json::json!({ "success": true }))
 }
 
-fn apply_metadata(path: &Path, format: &str, metadata: &PdfMetadata) -> Result<(), String> {
+pub(crate) fn apply_metadata(path: &Path, format: &str, metadata: &PdfMetadata) -> Result<(), String> {
     match format {
         "pdf" => inject_pdf_metadata(path, metadata),
         "docx" | "pptx" => inject_openxml_metadata(path, metadata),

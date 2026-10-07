@@ -69,6 +69,107 @@
     padding-right: 36px;
 }
 
+.pdfgen-section-label {
+    display: block;
+    font-weight: 600;
+    color: var(--reindalDark);
+    margin-bottom: 8px;
+}
+
+.pdfgen-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.pdfgen-chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--reindalGrayLight);
+    background: var(--reindalExtraLight);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.pdfgen-chip:hover {
+    border-color: var(--reindalYellow);
+    background: color-mix(in srgb, var(--reindalYellow) 25%, #fff);
+}
+
+.pdfgen-levels-list {
+    list-style: none;
+    margin: 0 0 10px;
+    padding: 0;
+    min-height: 4px;
+}
+
+.pdfgen-levels-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    background: var(--reindalExtraLight);
+    border: 1px solid var(--reindalGrayLight);
+    font-size: 0.9rem;
+}
+
+.pdfgen-level-remove {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--reindalGray);
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.pdfgen-level-remove:hover {
+    color: var(--reindalDark);
+    background: color-mix(in srgb, var(--reindalGrayLight) 40%, transparent);
+}
+
+.pdfgen-level-add {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.pdfgen-level-add select {
+    flex: 1;
+}
+
+.pdfgen-secondary-btn {
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 2px solid var(--reindalDark);
+    background: var(--reindalLight);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pdfgen-secondary-btn:hover {
+    background: var(--reindalYellow);
+}
+
+.pdfgen-options-stack {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--pdeffy-border, var(--reindalGrayLight));
+    background: color-mix(in srgb, var(--pdeffy-surface, #fff) 88%, var(--pdeffy-primary, #ffd91a));
+}
+
+.pdfgen-check-spaced {
+    margin-top: 14px;
+}
+
 .pdfgen-zip-row {
     padding: 12px 14px;
     border-radius: 12px;
@@ -154,4 +255,71 @@
     margin-top: 5px;
     font-size: 0.9em;
     color: var(--reindalGray);
+}
+
+.pdfGenProgressModal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+    background: rgba(8, 12, 24, 0.72);
+}
+
+.pdfGenProgressModal[hidden] {
+    display: none !important;
+}
+
+.pdfGenProgressDialog {
+    width: min(420px, 100%);
+    padding: 24px 22px;
+    border-radius: 16px;
+    border: 2px solid var(--pdeffy-border, var(--reindalGrayLight));
+    background: var(--pdeffy-surface, var(--reindalLight));
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.35);
+    color: var(--pdeffy-text, var(--reindalDark));
+}
+
+.pdfGenProgressDialog h2 {
+    margin: 0 0 10px;
+    font-size: 1.15rem;
+    text-align: center;
+}
+
+.pdfGenProgressDetail {
+    margin: 0 0 16px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    text-align: center;
+    white-space: pre-line;
+    color: var(--pdeffy-text-muted, var(--reindalGray));
+}
+
+.pdfGenProgressTrack {
+    height: 12px;
+    border-radius: 8px;
+    background: var(--reindalGrayLight);
+    overflow: hidden;
+}
+
+.pdfGenProgressFill {
+    height: 100%;
+    width: 0%;
+    border-radius: 8px;
+    background: var(--pdeffy-primary, var(--reindalYellow));
+    transition: width 0.2s ease;
+}
+
+.pdfGenProgressCount {
+    margin: 10px 0 0;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+body.pdfgen-busy {
+    overflow: hidden;
 }

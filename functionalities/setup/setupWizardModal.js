@@ -51,7 +51,10 @@ function setupWizardStylesheetHref() {
 }
 
 const SETUP_WIZARD_OVERLAY_INLINE =
-  'position:fixed;inset:0;z-index:200000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(8,12,24,0.82);';
+  'position:fixed;inset:0;z-index:200000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(8,12,24,0.88);';
+
+const SETUP_WIZARD_CARD_INLINE =
+  'background:#ffffff;color:#101a3a;border:2px solid #c5cad6;border-radius:18px;padding:28px 26px 22px;box-sizing:border-box;width:100%;max-width:540px;max-height:min(90vh,720px);overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.45);';
 
 function ensureStylesheet() {
   if (document.querySelector('link[data-pdeffy-setup-wizard]')) return;
@@ -177,7 +180,7 @@ async function applyThemeSafe(theme) {
 function buildWizardMarkup() {
   return `
 <div class="setupWizardOverlay" id="setupWizardOverlay" role="dialog" aria-modal="true" aria-labelledby="setupWizardWelcomeTitle" style="${SETUP_WIZARD_OVERLAY_INLINE}">
-  <div class="setupWizardCard" id="setupWizardCard">
+  <div class="setupWizardCard" id="setupWizardCard" style="${SETUP_WIZARD_CARD_INLINE}">
     <p class="setupWizardStepCounter langText" id="setupWizardStepCounter" data-i18n="setupWizardStepCounter">1 / 7</p>
     <div class="setupWizardProgress" id="setupWizardProgress" aria-hidden="true"></div>
 

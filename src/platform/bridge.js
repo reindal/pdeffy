@@ -86,6 +86,10 @@ export const ipcRenderer = {
         }
         case 'get-downloads-path':
           return safeInvoke('get-downloads-path');
+        case 'get-documents-path':
+          return safeInvoke('get-documents-path');
+        case 'get-word-staging-path':
+          return safeInvoke('get-word-staging-path');
         case 'open-folder':
           return safeInvoke('open-folder', { folderPath: payload });
         case 'open-file-external': {
@@ -141,6 +145,17 @@ export const ipcRenderer = {
           return safeInvoke('check-engines-availability');
         case 'check-ghostscript-availability':
           return safeInvoke('check-ghostscript-availability');
+        case 'batch-convert-docx-to-pdf': {
+          const { templatePath, jobs, metadata } = payload || {};
+          if (!Array.isArray(jobs) || jobs.length === 0) {
+            throw new Error('No conversion jobs specified.');
+          }
+          return safeInvoke('batch-convert-docx-to-pdf', {
+            templatePath: templatePath || null,
+            jobs,
+            metadata: metadata || null,
+          });
+        }
         case 'convert-with-libreoffice': {
           // Write input to a temp path via Rust std::fs, then convert by path
           // (ArrayBuffer does not deserialize reliably to Vec<u8> over IPC).

@@ -66,6 +66,29 @@ pub fn get_downloads_path(app: AppHandle) -> Result<String, String> {
         .map_err(|e| e.to_string())
 }
 
+#[tauri::command(rename = "get-documents-path")]
+pub fn get_documents_path(app: AppHandle) -> Result<String, String> {
+    app.path()
+        .document_dir()
+        .map(|p| p.to_string_lossy().to_string())
+        .map_err(|e| e.to_string())
+}
+
+/// macOS: folder where Word reads/writes during batch PDF (user may grant access once).
+#[cfg(target_os = "macos")]
+#[tauri::command(rename = "get-word-staging-path")]
+pub fn get_word_staging_path() -> Result<String, String> {
+    let dir = crate::commands::msoffice::word_mac_staging_dir();
+    std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir.to_string_lossy().to_string())
+}
+
+#[cfg(not(target_os = "macos"))]
+#[tauri::command(rename = "get-word-staging-path")]
+pub fn get_word_staging_path() -> Result<String, String> {
+    Ok(String::new())
+}
+
 #[tauri::command(rename = "get-temp-dir")]
 pub fn get_temp_dir() -> Result<String, String> {
     Ok(std::env::temp_dir().to_string_lossy().to_string())

@@ -72,7 +72,9 @@ fn find_soffice_install_path() -> Option<PathBuf> {
                 return Some(launcher);
             }
         }
-        if let Ok(output) = Command::new("where").arg("soffice").output() {
+        let mut where_cmd = Command::new("where");
+        configure_soffice_command(&mut where_cmd);
+        if let Ok(output) = where_cmd.arg("soffice").output() {
             if output.status.success() {
                 let text = String::from_utf8_lossy(&output.stdout);
                 for line in text.lines() {
@@ -251,6 +253,10 @@ fn run_soffice(soffice: &Path, profile_dir: &Path, args: &[&str]) -> Result<(), 
     let env_flag = profile_env_flag(profile_dir);
     let mut cmd = Command::new(soffice);
     configure_soffice_command(&mut cmd);
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    {
+        cmd.env("SAL_USE_VCLPLUGIN", "svp");
+    }
     cmd.arg(&env_flag).args([
         "--headless",
         "--invisible",
@@ -372,6 +378,64 @@ pub fn convert_pdf_to_docx(
         fs::rename(&generated, output_path).map_err(|e| e.to_string())?;
     } else if !output_path.exists() {
         return Err("LibreOffice process finished, but the expected DOCX file was not found.".into());
+    }
+    Ok(())
+}
+
+/// Convert many DOCX files in a single LibreOffice process (one profile, no repeated splash).
+pub fn batch_convert_docx_to_pdf(jobs: &[(PathBuf, PathBuf)]) -> Result<(), String> {
+    if jobs.is_empty() {
+        return Ok(());
+    }
+    let soffice = find_soffice_install_launcher().ok_or_else(|| {
+        "LibreOffice non trovato. Installa LibreOffice oppure Microsoft Word.".to_string()
+    })?;
+
+    let output_dir = jobs[0]
+        .0
+        .parent()
+        .ok_or_else(|| "Percorso DOCX non valido.".to_string())?;
+    for (input, output) in jobs {
+        if input.parent() != Some(output_dir) || output.parent() != Some(output_dir) {
+            return Err(
+                "Batch LibreOffice: tutti i file devono stare nella stessa cartella.".into(),
+            );
+        }
+        if !input.is_file() {
+            return Err(format!("File DOCX mancante: {}", input.display()));
+        }
+    }
+
+    let profile_dir = output_dir.join(format!(".lo_batch_{}", uuid::Uuid::new_v4()));
+    fs::create_dir_all(&profile_dir).map_err(|e| e.to_string())?;
+
+    let mut args: Vec<String> = vec!["--convert-to".into(), "pdf".into()];
+    for (input, _) in jobs {
+        args.push(input.to_string_lossy().into());
+    }
+    args.push("--outdir".into());
+    args.push(output_dir.to_string_lossy().into());
+
+    let arg_refs: Vec<&str> = args.iter().map(String::as_str).collect();
+    let result = run_soffice(&soffice, &profile_dir, &arg_refs);
+    let _ = fs::remove_dir_all(&profile_dir);
+    result?;
+
+    for (input, output) in jobs {
+        let stem = input
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("output");
+        let generated = output_dir.join(format!("{stem}.pdf"));
+        if generated.is_file() && generated != *output {
+            fs::rename(&generated, output).map_err(|e| e.to_string())?;
+        }
+        if !output.is_file() {
+            return Err(format!(
+                "LibreOffice non ha prodotto il PDF atteso: {}",
+                output.display()
+            ));
+        }
     }
     Ok(())
 }

@@ -1,9 +1,13 @@
+mod docx_footer_stamp;
 mod docx_hf_detect;
+mod docx_preserve_hf;
 mod libreoffice_backend;
 mod office2pdf_backend;
 mod registry;
 
-pub(crate) use docx_hf_detect::docx_has_header_or_footer;
+pub(crate) use docx_hf_detect::{docx_has_graphical_header_footer, docx_has_header_or_footer};
+pub(crate) use docx_footer_stamp::stamp_graphical_footer_from_template;
+pub(crate) use docx_preserve_hf::merge_header_footer_from_template;
 
 pub use libreoffice_backend::LibreOfficeBackend;
 pub use office2pdf_backend::Office2PdfBackend;
