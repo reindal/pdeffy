@@ -74,28 +74,22 @@ jobs:
         env:
           TAG: ${{ github.ref_name }}
         run: |
-          set -euo pipefail
+          set -eu
           # Tag v1.11.0-final → version string 1.11.0-final
           VERSION="${TAG#v}"
           mkdir -p named
+          first() { find installers -type f "$@" 2>/dev/null | head -n1 || true; }
           # Windows: prefer Setup.exe / .exe; Electron Forge Squirrel typically produces .exe
-          if EXE=$(find installers -type f -iname '*.exe' ! -iname '*nupkg*' | head -n1); then
-            cp "$EXE" "named/Pdeffy-${VERSION}-x64-setup.exe"
-          fi
-          if MSI=$(find installers -type f -iname '*.msi' | head -n1); then
-            cp "$MSI" "named/Pdeffy-${VERSION}-x64.msi"
-          fi
-          # macOS
-          if DMG=$(find installers -type f -iname '*.dmg' | head -n1); then
-            cp "$DMG" "named/Pdeffy-${VERSION}-macos.dmg"
-          fi
-          # Linux
-          if DEB=$(find installers -type f -iname '*.deb' | head -n1); then
-            cp "$DEB" "named/Pdeffy-${VERSION}-amd64.deb"
-          fi
-          if APPIMAGE=$(find installers -type f -iname '*.AppImage' | head -n1); then
-            cp "$APPIMAGE" "named/Pdeffy-${VERSION}-x86_64.AppImage"
-          fi
+          EXE=$(first -iname '*.exe' ! -iname '*nupkg*')
+          if [ -n "$EXE" ]; then cp "$EXE" "named/Pdeffy-${VERSION}-x64-setup.exe"; fi
+          MSI=$(first -iname '*.msi')
+          if [ -n "$MSI" ]; then cp "$MSI" "named/Pdeffy-${VERSION}-x64.msi"; fi
+          DMG=$(first -iname '*.dmg')
+          if [ -n "$DMG" ]; then cp "$DMG" "named/Pdeffy-${VERSION}-macos.dmg"; fi
+          DEB=$(first -iname '*.deb')
+          if [ -n "$DEB" ]; then cp "$DEB" "named/Pdeffy-${VERSION}-amd64.deb"; fi
+          APPIMAGE=$(first -iname '*.AppImage')
+          if [ -n "$APPIMAGE" ]; then cp "$APPIMAGE" "named/Pdeffy-${VERSION}-x86_64.AppImage"; fi
           echo "Named assets:"
           ls -la named || true
           test -n "$(ls -A named 2>/dev/null)" || { echo "No installer assets to publish"; exit 1; }
