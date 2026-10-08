@@ -28,6 +28,7 @@ https://github.com/reindal/pdeffy/archive/refs/tags/v1.11.0-final.tar.gz
 ```text
 https://github.com/reindal/pdeffy/releases/download/v2.0.0/Pdeffy-2.0.0-x64-setup.exe
 https://github.com/reindal/pdeffy/releases/download/v2.0.0/Pdeffy-2.0.0-x64.msi
+https://github.com/reindal/pdeffy/releases/download/v2.0.0/Pdeffy-2.0.0-x64.msix
 https://github.com/reindal/pdeffy/releases/download/v2.0.0/Pdeffy-2.0.0-macos.dmg
 https://github.com/reindal/pdeffy/releases/download/v2.0.0/Pdeffy-2.0.0-amd64.deb
 ```
@@ -40,6 +41,7 @@ https://github.com/reindal/pdeffy/releases/download/v2.0.0/Pdeffy-2.0.0-amd64.de
 |----------|----------|
 | Windows x64 setup | `Pdeffy-{VERSION}-x64-setup.exe` |
 | Windows x64 MSI (if built) | `Pdeffy-{VERSION}-x64.msi` |
+| Windows x64 MSIX (Store) | `Pdeffy-{VERSION}-x64.msix` |
 | macOS | `Pdeffy-{VERSION}-macos.dmg` |
 | Linux deb | `Pdeffy-{VERSION}-amd64.deb` |
 | Linux AppImage (if built) | `Pdeffy-{VERSION}-x86_64.AppImage` |
@@ -57,4 +59,6 @@ https://github.com/reindal/pdeffy/releases/download/v2.0.0/Pdeffy-2.0.0-amd64.de
 
 ## Store notes
 
-Microsoft Store / Mac App Store packages are often built separately (MSIX / notarized PKG). GitHub MSI/DMG/EXE URLs remain the canonical **versioned direct-download** links for sideload, QA, and partner forms that accept a package URL.
+- **Microsoft Store (MSIX):** built in the same Windows CI job as MSI; see [docs/msix.md](msix.md). Upload to Partner Center is still manual.
+- GitHub MSI/DMG/EXE URLs remain the canonical **versioned direct-download** links for sideload and QA.
+- Mac App Store packaging is not automated yet.

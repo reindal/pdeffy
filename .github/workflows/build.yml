@@ -71,6 +71,45 @@ jobs:
           projectPath: .
           args: ${{ matrix.tauriArgs }}
 
+      # MSIX for Microsoft Store (unsigned). Reuses the Windows x64 Tauri release binary;
+      # does not replace MSI/NSIS. Partner Center Identity overrides via secrets (optional).
+      - name: Package Windows MSIX (Store)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        env:
+          MSIX_PACKAGE_IDENTITY_NAME: ${{ secrets.MSIX_PACKAGE_IDENTITY_NAME }}
+          MSIX_PUBLISHER: ${{ secrets.MSIX_PUBLISHER }}
+          MSIX_PUBLISHER_DISPLAY_NAME: ${{ secrets.MSIX_PUBLISHER_DISPLAY_NAME }}
+        run: |
+          ./scripts/package-msix.ps1 `
+            -ReleaseDir "src-tauri/target/release" `
+            -OutDir "src-tauri/target/release/bundle/msix" `
+            -RepoRoot "${{ github.workspace }}"
+
+      # Optional local/sideload signing only. Not required for Store upload (Partner Center signs).
+      # Set MSIX_SIGNING_CERT (+ password) to enable; leave unset to ship unsigned MSIX.
+      - name: Sign MSIX (optional)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        env:
+          MSIX_SIGNING_CERT: ${{ secrets.MSIX_SIGNING_CERT }}
+          MSIX_SIGNING_CERT_PASSWORD: ${{ secrets.MSIX_SIGNING_CERT_PASSWORD }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:MSIX_SIGNING_CERT)) {
+            Write-Host "MSIX_SIGNING_CERT not set — leaving MSIX unsigned (OK for Store upload)."
+            exit 0
+          }
+          $msix = Get-ChildItem "src-tauri/target/release/bundle/msix/*.msix" | Select-Object -First 1
+          if (-not $msix) { throw "No .msix found to sign" }
+          $pfx = Join-Path $env:RUNNER_TEMP "msix-sign.pfx"
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:MSIX_SIGNING_CERT))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+            Sort-Object FullName -Descending | Select-Object -First 1
+          if (-not $signtool) { throw "signtool.exe not found" }
+          & $signtool.FullName sign /fd SHA256 /f $pfx /p $env:MSIX_SIGNING_CERT_PASSWORD $msix.FullName
+          if ($LASTEXITCODE -ne 0) { throw "signtool failed" }
+          Remove-Item $pfx -Force -ErrorAction SilentlyContinue
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -109,6 +148,8 @@ jobs:
           if [ -n "$EXE" ]; then cp "$EXE" "named/Pdeffy-${VERSION}-x64-setup.exe"; fi
           MSI=$(first -iname '*.msi')
           if [ -n "$MSI" ]; then cp "$MSI" "named/Pdeffy-${VERSION}-x64.msi"; fi
+          MSIX=$(first -iname '*.msix')
+          if [ -n "$MSIX" ]; then cp "$MSIX" "named/Pdeffy-${VERSION}-x64.msix"; fi
           DMG=$(first -iname '*.dmg')
           if [ -n "$DMG" ]; then cp "$DMG" "named/Pdeffy-${VERSION}-macos.dmg"; fi
           DEB=$(first -iname '*.deb')
@@ -137,6 +178,7 @@ jobs:
           |----------|-----|
           | Windows x64 (setup) | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-x64-setup.exe |
           | Windows x64 (MSI) | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-x64.msi |
+          | Windows x64 (MSIX, Store) | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-x64.msix |
           | macOS | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-macos.dmg |
           | Linux amd64 | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-amd64.deb |
 

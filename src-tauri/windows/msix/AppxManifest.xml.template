@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <!--
+    Identity values MUST come from Microsoft Partner Center (Product identity).
+    Placeholders below are substituted by scripts/package-msix.ps1 from
+    identity.placeholders.json and/or GitHub Secrets. Do not invent CN= values.
+  -->
+  <Identity
+    Name="{{PACKAGE_IDENTITY_NAME}}"
+    Publisher="{{PUBLISHER}}"
+    Version="{{VERSION_QUAD}}"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Pdeffy</DisplayName>
+    <PublisherDisplayName>{{PUBLISHER_DISPLAY_NAME}}</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>Pdeffy — local PDF tools by Reindal. Merge, convert, edit, and automate PDFs with privacy by design.</Description>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.22621.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="it-it" />
+    <Resource Language="fr-fr" />
+    <Resource Language="de-de" />
+    <Resource Language="es-es" />
+    <Resource Language="pl-pl" />
+  </Resources>
+
+  <Applications>
+    <Application
+      Id="Pdeffy"
+      Executable="Pdeffy.exe"
+      EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Pdeffy"
+        Description="Local PDF tools by Reindal"
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile
+          Wide310x150Logo="Assets\Wide310x150Logo.png"
+          Square310x310Logo="Assets\Square310x310Logo.png"
+          Square71x71Logo="Assets\Square71x71Logo.png" />
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
