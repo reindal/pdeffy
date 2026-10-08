@@ -8,7 +8,7 @@
 
 | Line | Release | Notes |
 |------|---------|--------|
-| **2.x (Tauri)** | [Latest `v2.*` on Releases](https://github.com/reindal/pdeffy/releases) | Current product — see [docs/releases.md](docs/releases.md) for store-style URLs |
+| **2.x (Tauri)** | [Latest `v2.*` on Releases](https://github.com/reindal/pdeffy/releases) | Current product — see [docs/releases.md](docs/releases.md) for store-style URLs; Microsoft Store MSIX: [docs/msix.md](docs/msix.md) |
 | **1.x (Electron, frozen)** | **[v1.11.0-final](https://github.com/reindal/pdeffy/releases/tag/v1.11.0-final)** | Final 1.x source + installers; patches only on `release/1.x` |
 
 ---

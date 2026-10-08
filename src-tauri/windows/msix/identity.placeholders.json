@@ -1,0 +1,6 @@
+{
+  "comment": "Replace these placeholders with values from Microsoft Partner Center → Product identity. CI can also override via GitHub Secrets (see docs/msix.md).",
+  "packageIdentityName": "Reindal.Pdeffy",
+  "publisher": "CN=6F46E5B0-2377-47EB-A8B1-AB0990E9BA99",
+  "publisherDisplayName": "Reindal"
+}
