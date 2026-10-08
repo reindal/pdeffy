@@ -1,5 +1,7 @@
 # pdeffy
 
+> **Electron 1.x freeze:** The final 1.x release is **[v1.11.0-final](https://github.com/reindal/pdeffy/releases/tag/v1.11.0-final)** (source + installers). Critical patches only on branch `release/1.x`. See [docs/releases.md](docs/releases.md) for stable download URLs. **Pdeffy 2.0** (Tauri) continues on `dev` / `main` after migration.
+
 **pdeffy** is a lightweight, locally installed desktop application designed for advanced PDF manipulation.  
 Built with performance, usability, and flexibility in mind, it empowers users to manage and transform PDF documents efficiently — all without relying on external cloud services.
 
