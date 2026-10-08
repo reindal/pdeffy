@@ -46,10 +46,15 @@ fn escape_ps_single_quoted(value: &str) -> String {
 /// Word COM expects absolute native paths (backslashes on Windows).
 #[cfg(target_os = "windows")]
 fn path_for_com(path: &Path) -> String {
-    path.canonicalize()
+    let raw = path
+        .canonicalize()
         .unwrap_or_else(|_| path.to_path_buf())
         .to_string_lossy()
-        .replace('/', "\\")
+        .replace('/', "\\");
+    // Strip Windows extended-length prefix; Word COM often rejects \\?\ paths.
+    raw.strip_prefix(r"\\?\")
+        .unwrap_or(&raw)
+        .to_string()
 }
 
 #[cfg(target_os = "windows")]
@@ -375,28 +380,39 @@ pub fn batch_convert_docx_to_pdf(jobs: &[(PathBuf, PathBuf)]) -> Result<(), Stri
         }
     }
 
-    let mut pairs = String::new();
-    for (input, output) in jobs {
-        let inp = escape_ps_single_quoted(&path_for_com(input));
-        let out = escape_ps_single_quoted(&path_for_com(output));
-        pairs.push_str(&format!("@('{}','{}'),", inp, out));
-    }
+    // Join without a trailing comma — PowerShell rejects `$jobs = @(@(...),)` (MissingExpressionAfterToken).
+    let pairs = jobs
+        .iter()
+        .map(|(input, output)| {
+            let inp = escape_ps_single_quoted(&path_for_com(input));
+            let out = escape_ps_single_quoted(&path_for_com(output));
+            format!("@('{inp}','{out}')")
+        })
+        .collect::<Vec<_>>()
+        .join(",");
 
     let ps_script = format!(
-        r#"$word = New-Object -ComObject Word.Application
+        r#"$ErrorActionPreference = 'Stop'
+$word = New-Object -ComObject Word.Application
 $word.Visible = $false
 $word.DisplayAlerts = 0
 $jobs = @({pairs})
 try {{
   foreach ($job in $jobs) {{
-    $doc = $word.Documents.Open($job[0])
-    $doc.SaveAs([ref]$job[1], [ref]17)
-    $doc.Close()
+    $doc = $null
+    try {{
+      $doc = $word.Documents.Open([string]$job[0], $false, $true)
+      $null = $doc.SaveAs([ref]([string]$job[1]), [ref]17)
+    }} finally {{
+      if ($doc -ne $null) {{ $doc.Close([ref]$false) | Out-Null }}
+    }}
   }}
   $word.Quit()
+  [System.Runtime.InteropServices.Marshal]::ReleaseComObject($word) | Out-Null
   exit 0
 }} catch {{
-  if ($word) {{ $word.Quit() }}
+  Write-Error $_.Exception.Message
+  if ($word) {{ try {{ $word.Quit() }} catch {{}} }}
   exit 1
 }}"#
     );
@@ -424,7 +440,10 @@ try {{
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!("MS Office batch conversion failed: {stderr}"));
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        return Err(format!(
+            "MS Office batch conversion failed: {stderr}{stdout}"
+        ));
     }
 
     for (_, output) in jobs {

@@ -338,7 +338,8 @@ form.addEventListener('submit', async function (e) {
     const sessionId = Date.now();
     const workRoot = createZip ? path.dirname(zipOutputPath) : outputRootDir;
     const sessionTempDir = workRoot;
-    const tempName = (base) => `~pdeffy_${sessionId}_${base}`;
+    // Avoid "~" prefix: Windows/Word treat "~*" as lock/temp owner files and confuse Explorer.
+    const tempName = (base) => `_pdeffy_${sessionId}_${base}`;
 
     const templateDocxPath = path.join(sessionTempDir, tempName('_template.docx'));
     await fs.writeFile(templateDocxPath, bytesForWrite(docxBufferBase));
