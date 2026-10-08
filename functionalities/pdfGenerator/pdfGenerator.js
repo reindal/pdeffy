@@ -225,10 +225,7 @@ function hideProgressModal() {
 
 function updateSubmitLabel() {
   if (!submitLabel) return;
-  const zip = createZipCheckbox?.checked;
-  submitLabel.textContent = zip
-    ? msg('pdfByTemplateSubmitBtn', 'Genera PDF in ZIP')
-    : msg('pdfByTemplateSubmitFolder', 'Genera PDF in cartella');
+  submitLabel.textContent = msg('pdfByTemplateSubmitBtn', 'Genera files PDF');
 }
 
 function resetExcelColumnUi(headers = []) {
