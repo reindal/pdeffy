@@ -4,6 +4,13 @@
 
 **Version 2.0** is a major technological and functional step beyond the **1.x** line: the same practical spirit as the original project, with architecture, performance, and scope fully renewed by **[Reindal S.r.l.](https://www.reindal.com)**’s in-house team (Reggio Emilia, Italy).
 
+### Downloads
+
+| Line | Release | Notes |
+|------|---------|--------|
+| **2.x (Tauri)** | [Latest `v2.*` on Releases](https://github.com/reindal/pdeffy/releases) | Current product — see [docs/releases.md](docs/releases.md) for store-style URLs |
+| **1.x (Electron, frozen)** | **[v1.11.0-final](https://github.com/reindal/pdeffy/releases/tag/v1.11.0-final)** | Final 1.x source + installers; patches only on `release/1.x` |
+
 ---
 
 ## From Electron 1.x to Tauri 2.0
@@ -163,7 +170,7 @@ The **1.x** journey is still acknowledged: a concrete example of how internation
 2. Create a feature branch (`feat/…`)  
 3. Open a pull request with a clear description  
 
-Active development branch: `feat/tauri-migration` — integration toward stable 2.x releases.
+Active development: `dev` → `main`. Frozen Electron line: `release/1.x` / tag `v1.11.0-final`.
 
 ---
 

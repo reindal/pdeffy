@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+      - dev
+    tags:
+      - "v2.*"
   pull_request:
     branches:
       - main
@@ -80,7 +83,10 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Publish only on semver tags (stable store URLs). No rolling "latest" overwrite.
+    if: startsWith(github.ref, 'refs/tags/v2.')
+    permissions:
+      contents: write
 
     steps:
       - name: Download all artifacts
@@ -91,22 +97,68 @@ jobs:
       - name: List downloaded artifacts (debug)
         run: find installers -type f | head -100
 
-      - name: Upload to Latest Release
+      - name: Rename artifacts for store-style URLs
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          mkdir -p named
+          if EXE=$(find installers -type f -iname '*.exe' ! -iname '*nupkg*' | head -n1); then
+            cp "$EXE" "named/Pdeffy-${VERSION}-x64-setup.exe"
+          fi
+          if MSI=$(find installers -type f -iname '*.msi' | head -n1); then
+            cp "$MSI" "named/Pdeffy-${VERSION}-x64.msi"
+          fi
+          if DMG=$(find installers -type f -iname '*.dmg' | head -n1); then
+            cp "$DMG" "named/Pdeffy-${VERSION}-macos.dmg"
+          fi
+          if DEB=$(find installers -type f -iname '*.deb' | head -n1); then
+            cp "$DEB" "named/Pdeffy-${VERSION}-amd64.deb"
+          fi
+          if APPIMAGE=$(find installers -type f -iname '*.AppImage' | head -n1); then
+            cp "$APPIMAGE" "named/Pdeffy-${VERSION}-x86_64.AppImage"
+          fi
+          if RPM=$(find installers -type f -iname '*.rpm' | head -n1); then
+            cp "$RPM" "named/Pdeffy-${VERSION}-x86_64.rpm"
+          fi
+          echo "Named assets:"
+          ls -la named || true
+          test -n "$(ls -A named 2>/dev/null)" || { echo "No installer assets to publish"; exit 1; }
+
+      - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
         run: |
-          ASSETS=$(find installers -type f \( -name "*.dmg" -o -name "*.app.tar.gz" -o -name "*.msi" -o -name "*.exe" -o -name "*.deb" -o -name "*.AppImage" -o -name "*.rpm" \) | tr '\n' ' ')
-          if [ -z "$ASSETS" ]; then
-            echo "No installer assets found"
-            exit 0
-          fi
-          if gh release view latest --repo ${{ github.repository }} &>/dev/null; then
-            gh release upload latest --repo ${{ github.repository }} --clobber $ASSETS
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          NOTES="$(cat <<EOF
+          Pdeffy **${VERSION}** (Tauri 2.x).
+
+          ## Downloads (stable URLs)
+
+          | Platform | URL |
+          |----------|-----|
+          | Windows x64 (setup) | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-x64-setup.exe |
+          | Windows x64 (MSI) | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-x64.msi |
+          | macOS | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-macos.dmg |
+          | Linux amd64 | https://github.com/${{ github.repository }}/releases/download/${TAG}/Pdeffy-${VERSION}-amd64.deb |
+
+          Source archives are attached automatically by GitHub.
+
+          Frozen Electron 1.x: [v1.11.0-final](https://github.com/${{ github.repository }}/releases/tag/v1.11.0-final).  
+          Naming conventions: [docs/releases.md](https://github.com/${{ github.repository }}/blob/${TAG}/docs/releases.md).
+          EOF
+          )"
+          ASSETS=(named/*)
+          if gh release view "$TAG" --repo "${{ github.repository }}" &>/dev/null; then
+            gh release upload "$TAG" --repo "${{ github.repository }}" --clobber "${ASSETS[@]}"
+            gh release edit "$TAG" --repo "${{ github.repository }}" --notes "$NOTES" || true
           else
-            gh release create latest \
-              --repo ${{ github.repository }} \
-              --title "Latest Build" \
-              --prerelease \
-              --notes "Auto-updated Tauri build on push to main" \
-              $ASSETS
+            gh release create "$TAG" \
+              --repo "${{ github.repository }}" \
+              --title "Pdeffy ${VERSION}" \
+              --notes "$NOTES" \
+              "${ASSETS[@]}"
           fi
