@@ -4,7 +4,6 @@ use crate::converters::{
     merge_header_footer_from_template, stamp_graphical_footer_from_template, BackendChoice,
     ConversionResult, OfficeFormat,
 };
-#[cfg(any(target_os = "windows", target_os = "macos"))]
 use crate::commands::msoffice;
 use crate::commands::{convert, libreoffice, settings};
 use crate::commands::settings::PdfMetadata;

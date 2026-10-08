@@ -31,6 +31,9 @@ pub fn is_msoffice_installed() -> bool {
 }
 
 #[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
+use std::path::PathBuf;
+
+#[cfg(all(not(target_os = "windows"), not(target_os = "macos")))]
 pub fn is_msoffice_installed() -> bool {
     false
 }
