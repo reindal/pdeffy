@@ -525,7 +525,7 @@ async function refreshNerStatus() {
       nerBadge.className = 'settingsAiBadge is-missing';
       nerDetail.textContent = msg(
         'settingsNerMissing',
-        'Scarica il pack GLiNER (~200 MB) per rilevare persone e organizzazioni.'
+        'Scarica il pack GLiNER (~350 MB) per rilevare persone e organizzazioni.'
       );
     }
   } catch (err) {

@@ -28,7 +28,7 @@ body.setup-wizard-locked .pdeffy-main {
     justify-content: center;
     padding: 20px;
     box-sizing: border-box;
-    background: rgba(8, 12, 24, 0.88);
+    background: rgb(16 26 58 / 0.45);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -37,22 +37,27 @@ body.setup-wizard-locked .pdeffy-main {
     .setupWizardOverlay {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
-        background: rgba(8, 12, 24, 0.94);
+        background: rgb(16 26 58 / 0.72);
     }
+}
+
+.setupWizardCard [hidden] {
+    display: none !important;
 }
 
 .setupWizardCard {
     background: var(--pdeffy-surface, #fff);
-    border: 2px solid var(--pdeffy-border, #c5cad6);
-    border-radius: 18px;
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    border-radius: var(--pdeffy-radius-lg, 18px);
     padding: 28px 26px 22px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    box-shadow: var(--pdeffy-shadow-md, 0 18px 48px rgb(16 26 58 / 0.12));
     width: 100%;
     max-width: 540px;
     max-height: min(90vh, 720px);
     overflow-y: auto;
     box-sizing: border-box;
     color: var(--pdeffy-text, #101a3a);
+    font-family: var(--font-primary, inherit);
 }
 
 .setupWizardStep[hidden] {
@@ -64,24 +69,28 @@ body.setup-wizard-locked .pdeffy-main {
 }
 
 .setupWizardStepCounter {
-    margin: 0 0 8px;
-    text-align: center;
-    font-size: 0.82rem;
-    color: var(--pdeffy-text-muted, #5c647a);
+    margin: 0 0 10px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pdeffy-text-muted, #52617a);
 }
 
 .setupWizardDownloadStatus {
     margin: 0 0 12px;
     font-size: 0.9rem;
     line-height: 1.45;
-    color: var(--pdeffy-text-muted, #5c647a);
-    text-align: center;
+    color: var(--pdeffy-text-muted, #52617a);
+    text-align: left;
 }
 
 .setupWizardProgressTrack {
     height: 8px;
-    border-radius: 4px;
-    background: var(--pdeffy-border, #e7e7e2);
+    border-radius: 999px;
+    background: var(--pdeffy-color-surface-muted, #f8f5eb);
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
     margin-bottom: 14px;
     overflow: hidden;
 }
@@ -93,23 +102,36 @@ body.setup-wizard-locked .pdeffy-main {
     transition: width 0.15s ease;
 }
 
-.setupWizardBtnSecondary {
-    display: block;
-    width: 100%;
-    margin-bottom: 8px;
-    padding: 10px 16px;
-    border-radius: 10px;
+.setupWizardBtn {
+    min-height: 40px;
+    padding: 8px 18px;
+    border-radius: var(--pdeffy-radius-pill, 999px);
     border: 1px solid var(--pdeffy-border, #e7e7e2);
-    background: var(--pdeffy-bg, #fffcf3);
-    color: var(--pdeffy-text, #101a3a);
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
+    background: transparent;
+    color: var(--pdeffy-text, #101a3a);
 }
 
-.setupWizardBtnSecondary:disabled {
+.setupWizardBtn:disabled {
     opacity: 0.55;
     cursor: wait;
+}
+
+.setupWizardBtnBlock {
+    display: block;
+    width: 100%;
+    margin: 0 0 4px;
+}
+
+.setupWizardBtnSecondary {
+    background: var(--pdeffy-surface, #fff);
+}
+
+.setupWizardBtnSecondary:hover:not(:disabled) {
+    border-color: var(--pdeffy-border-strong, #ccd2df);
 }
 
 .setupWizardLanguageSelect {
@@ -143,7 +165,7 @@ body.setup-wizard-locked .pdeffy-main {
     margin: 14px 0 12px;
     padding: 12px 14px;
     border: 1px solid var(--pdeffy-border, #e7e7e2);
-    border-radius: 12px;
+    border-radius: var(--pdeffy-radius-md, 14px);
     background: var(--pdeffy-bg, #fffcf3);
     text-align: left;
 }
@@ -155,13 +177,13 @@ body.setup-wizard-locked .pdeffy-main {
 .setupWizardModelTier {
     display: inline-block;
     padding: 2px 10px;
-    border-radius: 999px;
+    border-radius: var(--pdeffy-radius-pill, 999px);
     font-size: 0.72rem;
     font-weight: 650;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    background: var(--pdeffy-border, #e7e7e2);
-    color: var(--pdeffy-text-muted, #5c647a);
+    background: var(--pdeffy-color-surface-muted, #f8f5eb);
+    color: var(--pdeffy-text-muted, #52617a);
 }
 
 .setupWizardModelTier.is-recommended {
@@ -173,7 +195,7 @@ body.setup-wizard-locked .pdeffy-main {
     margin: 0 0 10px;
     font-size: 0.88rem;
     line-height: 1.45;
-    color: var(--pdeffy-text-muted, #5c647a);
+    color: var(--pdeffy-text-muted, #52617a);
 }
 
 .setupWizardModelSpecs {
@@ -183,31 +205,34 @@ body.setup-wizard-locked .pdeffy-main {
 }
 
 .setupWizardModelSpec {
+    display: inline-flex;
+    align-items: center;
     font-size: 0.75rem;
+    line-height: 1.3;
     padding: 4px 8px;
-    border-radius: 8px;
+    border-radius: var(--pdeffy-radius-sm, 10px);
     background: var(--pdeffy-surface, #fff);
     border: 1px solid var(--pdeffy-border, #e7e7e2);
     color: var(--pdeffy-text, #101a3a);
 }
 
 .setupWizardModelSpec.is-ok {
-    border-color: #2e7d4a;
-    color: #2e7d4a;
+    border-color: #1a7f37;
+    color: #1a7f37;
 }
 
 .setupWizardProgress {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 8px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .setupWizardDot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--pdeffy-border, #d8d8d0);
+    background: var(--pdeffy-border, #e7e7e2);
     transition: background 0.2s, transform 0.2s;
 }
 
@@ -217,28 +242,34 @@ body.setup-wizard-locked .pdeffy-main {
 }
 
 .setupWizardDot.is-done {
-    background: var(--pdeffy-text-muted, #5c647a);
+    background: var(--pdeffy-text-muted, #52617a);
 }
 
 .setupWizardStep h1,
 .setupWizardStep h2 {
-    margin: 0 0 10px;
-    font-size: 1.45rem;
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+    font-weight: 650;
     color: var(--pdeffy-text, #101a3a);
-    text-align: center;
+    text-align: left;
 }
 
 .setupWizardStep h2 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
+}
+
+.setupWizardStep[data-step="0"] h1,
+.setupWizardStep[data-step="0"] .setupWizardLead {
+    text-align: center;
 }
 
 .setupWizardLead,
 .setupWizardHint {
-    margin: 0 0 20px;
-    font-size: 0.95rem;
+    margin: 0 0 18px;
+    font-size: 0.92rem;
     line-height: 1.5;
-    color: var(--pdeffy-text-muted, #5c647a);
-    text-align: center;
+    color: var(--pdeffy-text-muted, #52617a);
+    text-align: left;
 }
 
 .setupWizardLogo {
@@ -252,15 +283,14 @@ body.setup-wizard-locked .pdeffy-main {
     min-height: var(--pdeffy-control-height, 2.625rem);
     height: var(--pdeffy-control-height, 2.625rem);
     padding: 0 12px;
-    border: 1px solid var(--pdeffy-border, #b8beca);
-    border-radius: 10px;
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    border-radius: var(--pdeffy-radius-sm, 10px);
     font-size: 14px;
     line-height: 1.35;
     box-sizing: border-box;
     background: var(--pdeffy-bg, #fffcf3);
     color: var(--pdeffy-text, #101a3a);
     font-family: inherit;
-    box-shadow: inset 0 0 0 1px rgba(16, 26, 58, 0.04);
 }
 
 .setupWizardSelect {
@@ -272,6 +302,7 @@ body.setup-wizard-locked .pdeffy-main {
 .setupWizardInput:focus {
     outline: none;
     border-color: var(--pdeffy-primary, #ffd91a);
+    box-shadow: var(--pdeffy-shadow-focus, 0 0 0 4px rgb(255 217 26 / 0.32));
 }
 
 .setupWizardThemeGrid {
@@ -286,11 +317,12 @@ body.setup-wizard-locked .pdeffy-main {
     align-items: center;
     gap: 10px;
     padding: 14px 12px;
-    border: 2px solid var(--pdeffy-border, #e7e7e2);
-    border-radius: 14px;
-    background: transparent;
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    border-radius: var(--pdeffy-radius-md, 14px);
+    background: var(--pdeffy-bg, #fffcf3);
     cursor: pointer;
     font-size: 0.95rem;
+    font-weight: 600;
     color: var(--pdeffy-text, #101a3a);
     font-family: inherit;
     transition: border-color 0.15s, box-shadow 0.15s;
@@ -335,7 +367,25 @@ body.setup-wizard-locked .pdeffy-main {
     display: block;
     margin-bottom: 6px;
     font-size: 0.88rem;
-    color: var(--pdeffy-text-muted, #5c647a);
+    color: var(--pdeffy-text-muted, #52617a);
+}
+
+.setupWizardNotice {
+    margin: 4px 0 0;
+    padding: 12px 14px;
+    border-radius: var(--pdeffy-radius-md, 14px);
+    border: 1px solid var(--pdeffy-border, #e7e7e2);
+    background: var(--pdeffy-color-surface-muted, #f8f5eb);
+    color: var(--pdeffy-text, #101a3a);
+    font-size: 0.88rem;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.setupWizardNotice.is-error {
+    border-color: color-mix(in srgb, var(--pdeffy-red, #ff4d67) 40%, var(--pdeffy-border, #e7e7e2));
+    background: color-mix(in srgb, var(--pdeffy-red, #ff4d67) 10%, var(--pdeffy-surface, #fff));
+    color: var(--pdeffy-text, #101a3a);
 }
 
 .setupWizardActions {
@@ -343,57 +393,43 @@ body.setup-wizard-locked .pdeffy-main {
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    margin-top: 28px;
-    padding-top: 8px;
-}
-
-.setupWizardBtn {
-    padding: 11px 20px;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    font-family: inherit;
+    margin-top: 22px;
+    padding-top: 4px;
 }
 
 .setupWizardBtnPrimary {
     margin-left: auto;
     background: var(--pdeffy-primary, #ffd91a);
+    border-color: var(--pdeffy-primary, #ffd91a);
     color: #101a3a;
 }
 
-.setupWizardBtnPrimary:disabled {
-    opacity: 0.6;
-    cursor: wait;
+.setupWizardBtnPrimary:hover:not(:disabled) {
+    background: var(--pdeffy-primary-hover, #f2c900);
+    border-color: var(--pdeffy-primary-hover, #f2c900);
+}
+
+.setupWizardBtnBlock.setupWizardBtnPrimary {
+    margin-left: 0;
 }
 
 .setupWizardBtnGhost {
     background: transparent;
-    color: var(--pdeffy-text-muted, #5c647a);
-    text-decoration: underline;
+    border-color: transparent;
+    color: var(--pdeffy-text-muted, #52617a);
+    text-decoration: none;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
-.setupWizardError {
-    margin: 12px 0 0;
-    font-size: 0.88rem;
-    color: #c0392b;
-    text-align: center;
+.setupWizardBtnGhost:hover:not(:disabled) {
+    color: var(--pdeffy-text, #101a3a);
 }
 
 html[data-theme="dark"] .setupWizardLogo {
     filter: brightness(0) invert(1);
 }
 
-html[data-theme="dark"] .setupWizardCard {
-    background: var(--pdeffy-surface, #1a2030);
-    border-color: var(--pdeffy-border, #3a4258);
-    color: var(--pdeffy-text, #eef1f8);
-}
-
-html[data-theme="dark"] .setupWizardSelect,
-html[data-theme="dark"] .setupWizardInput {
-    background: var(--pdeffy-bg, #12151f);
-    border-color: var(--pdeffy-border, #4a5268);
-    color: var(--pdeffy-text, #eef1f8);
+html[data-theme="dark"] .setupWizardOverlay {
+    background: rgb(0 0 0 / 0.55);
 }
