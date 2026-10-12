@@ -1,5 +1,6 @@
 //! RapidOCR (PP-OCRv6 tiny) — downloadable on-device OCR for scanned PDFs.
 
+use crate::ai::download::stream_first_available;
 use crate::ai::error::AiError;
 use crate::ai::progress::{emit_progress, AiProgress};
 use crate::commands::ghostscript::{self, find_ghostscript_path};
@@ -19,6 +20,25 @@ pub const OCR_MAX_PAGES: usize = 8;
 
 /// Rasterization DPI for OCR.
 pub const OCR_DPI: u32 = 150;
+
+/// Same filenames `rapidocr-core` expects under `ocr/ppocrv6-tiny/`.
+const OCR_FALLBACKS: &[(&str, &str, u64)] = &[
+    (
+        "PP-OCRv6_det_tiny.onnx",
+        "https://pdeffy.reindal.com/downloads/rapidocr/PP-OCRv6_det_tiny.onnx",
+        100_000,
+    ),
+    (
+        "PP-OCRv6_rec_tiny.onnx",
+        "https://pdeffy.reindal.com/downloads/rapidocr/PP-OCRv6_rec_tiny.onnx",
+        100_000,
+    ),
+    (
+        "ppocrv6_tiny_dict.txt",
+        "https://pdeffy.reindal.com/downloads/rapidocr/ppocrv6_tiny_dict.txt",
+        100,
+    ),
+];
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -105,12 +125,67 @@ pub fn download_models(app: &AppHandle, app_data: &Path) -> Result<PathBuf, AiEr
     );
 
     let cache = ModelCache::new(&dir);
-    cache
-        .ensure_model_set_for_pipeline(set, PipelineConfig::without_cls(), ModelDownloadMode::Missing)
-        .map_err(|e| AiError::Download(format!("RapidOCR download failed: {e}")))?;
+    if let Err(primary) =
+        cache.ensure_model_set_for_pipeline(set, PipelineConfig::without_cls(), ModelDownloadMode::Missing)
+    {
+        eprintln!("[pdeffy] RapidOCR primary download failed: {primary}");
+        if let Err(fallback) = download_ocr_fallback(app, &dir) {
+            return Err(AiError::Download(format!(
+                "RapidOCR download failed: {primary}; {fallback}"
+            )));
+        }
+        if let Err(verify) = cache.ensure_model_set_for_pipeline(
+            set,
+            PipelineConfig::without_cls(),
+            ModelDownloadMode::Missing,
+        ) {
+            if !ocr_fallback_present(&dir) {
+                return Err(AiError::Download(format!(
+                    "RapidOCR download failed: {primary}; {verify}"
+                )));
+            }
+            eprintln!("[pdeffy] using RapidOCR fallback files ({verify})");
+        }
+    }
 
     emit_progress(app, AiProgress::Ready);
     Ok(dir)
+}
+
+/// Place the three PP-OCRv6 tiny files from the self-hosted mirror.
+/// `rapidocr-core` only downloads its own ModelScope URLs, but `Missing` mode
+/// keeps files that are already in the cache directory.
+fn download_ocr_fallback(app: &AppHandle, dir: &Path) -> Result<(), AiError> {
+    let mut got_total: u64 = 0;
+    for (filename, url, min_bytes) in OCR_FALLBACKS {
+        let dest = dir.join(filename);
+        let partial = dir.join(format!("{filename}.partial"));
+        let n = stream_first_available(&[url], &partial, *min_bytes, filename, |got, _| {
+            emit_progress(
+                app,
+                AiProgress::Download {
+                    downloaded: got_total + got,
+                    total: None,
+                },
+            );
+        })?;
+        if dest.exists() {
+            let _ = fs::remove_file(&dest);
+        }
+        fs::rename(&partial, &dest).map_err(|e| AiError::Download(e.to_string()))?;
+        got_total += n;
+    }
+    Ok(())
+}
+
+fn ocr_fallback_present(dir: &Path) -> bool {
+    OCR_FALLBACKS.iter().all(|(filename, _, min_bytes)| {
+        let path = dir.join(filename);
+        path.is_file()
+            && fs::metadata(&path)
+                .map(|meta| meta.len() >= *min_bytes)
+                .unwrap_or(false)
+    })
 }
 
 fn build_ocr(app_data: &Path) -> Result<RapidOcr, AiError> {

@@ -25,6 +25,8 @@ pub struct ModelDef {
     pub display_name: &'static str,
     pub filename: &'static str,
     pub url: &'static str,
+    /// Used when `url` cannot be reached.
+    pub fallback_url: &'static str,
     pub expected_bytes: u64,
     /// Approximate parameter count, e.g. "3.8B".
     pub params: &'static str,
@@ -82,6 +84,7 @@ pub const MODELS: &[ModelDef] = &[
         display_name: "Qwen2.5 1.5B Instruct",
         filename: "Qwen2.5-1.5B-Instruct-Q4_K_M.gguf",
         url: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+        fallback_url: "https://pdeffy.reindal.com/downloads/model/qwen2.5-1.5b-instruct-q4_k_m.gguf",
         expected_bytes: 1_120_000_000,
         params: "1.5B",
         quant: "Q4_K_M",
@@ -98,6 +101,7 @@ pub const MODELS: &[ModelDef] = &[
         display_name: "Phi-4 mini Instruct",
         filename: "Phi-4-mini-instruct-Q4_K_M.gguf",
         url: "https://huggingface.co/unsloth/Phi-4-mini-instruct-GGUF/resolve/main/Phi-4-mini-instruct-Q4_K_M.gguf",
+        fallback_url: "https://pdeffy.reindal.com/downloads/model/Phi-4-mini-instruct-Q4_K_M.gguf",
         expected_bytes: 2_500_000_000,
         params: "3.8B",
         quant: "Q4_K_M",
@@ -114,6 +118,7 @@ pub const MODELS: &[ModelDef] = &[
         display_name: "Llama 3.2 3B Instruct",
         filename: "llama-3.2-3b-instruct-q4_k_m.gguf",
         url: "https://huggingface.co/hugging-quants/Llama-3.2-3B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-3b-instruct-q4_k_m.gguf",
+        fallback_url: "https://pdeffy.reindal.com/downloads/model/llama-3.2-3b-instruct-q4_k_m.gguf",
         expected_bytes: 2_020_000_000,
         params: "3B",
         quant: "Q4_K_M",

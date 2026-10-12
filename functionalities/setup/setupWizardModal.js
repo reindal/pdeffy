@@ -1,7 +1,9 @@
 /**
- * Modale di prima configurazione: obbligatoria fino al completamento.
+ * First-launch wizard. It stays up until the user finishes, but OCR, the
+ * summary model, and GLiNER can be skipped and downloaded later in Settings.
  */
 import { listen } from '@tauri-apps/api/event';
+import './setupWizard.css';
 
 const { ipcRenderer } = require('electron');
 
@@ -22,15 +24,6 @@ function msg(key, fallback) {
   return fallback || key;
 }
 
-function wizardAssetBase() {
-  const path = window.location.pathname.replace(/\\/g, '/');
-  const idx = path.indexOf('/functionalities/');
-  if (idx === -1) return './functionalities/setup/';
-  const after = path.slice(idx + '/functionalities/'.length);
-  const depth = after.split('/').filter(Boolean).length;
-  return `${'../'.repeat(depth)}setup/`;
-}
-
 function logoSrc() {
   const path = window.location.pathname.replace(/\\/g, '/');
   const idx = path.indexOf('/functionalities/');
@@ -39,30 +32,6 @@ function logoSrc() {
       ? './assets/pdeffy-flat-light.svg'
       : `${'../'.repeat(path.slice(idx + '/functionalities/'.length).split('/').filter(Boolean).length + 1)}assets/pdeffy-flat-light.svg`;
   return base;
-}
-
-function setupWizardStylesheetHref() {
-  const rel = `${wizardAssetBase()}setupWizard.css`;
-  try {
-    return new URL(rel, window.location.href).href;
-  } catch (_) {
-    return rel;
-  }
-}
-
-const SETUP_WIZARD_OVERLAY_INLINE =
-  'position:fixed;inset:0;z-index:200000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(8,12,24,0.88);';
-
-const SETUP_WIZARD_CARD_INLINE =
-  'background:#ffffff;color:#101a3a;border:2px solid #c5cad6;border-radius:18px;padding:28px 26px 22px;box-sizing:border-box;width:100%;max-width:540px;max-height:min(90vh,720px);overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.45);';
-
-function ensureStylesheet() {
-  if (document.querySelector('link[data-pdeffy-setup-wizard]')) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = setupWizardStylesheetHref();
-  link.setAttribute('data-pdeffy-setup-wizard', '1');
-  document.head.appendChild(link);
 }
 
 function mountWizardRoot() {
@@ -118,7 +87,7 @@ function updateModelHint(w, model) {
   w.modelHint.textContent = fillName(
     msg(
       'setupWizardModelHint',
-      'Choose and download {name} for PDF summaries. Required to finish setup.'
+      'Choose {name} for PDF summaries. The rest of Pdeffy works without a summary model.'
     ),
     model.displayName
   );
@@ -179,8 +148,8 @@ async function applyThemeSafe(theme) {
 
 function buildWizardMarkup() {
   return `
-<div class="setupWizardOverlay" id="setupWizardOverlay" role="dialog" aria-modal="true" aria-labelledby="setupWizardWelcomeTitle" style="${SETUP_WIZARD_OVERLAY_INLINE}">
-  <div class="setupWizardCard" id="setupWizardCard" style="${SETUP_WIZARD_CARD_INLINE}">
+<div class="setupWizardOverlay" id="setupWizardOverlay" role="dialog" aria-modal="true" aria-labelledby="setupWizardWelcomeTitle">
+  <div class="setupWizardCard" id="setupWizardCard">
     <p class="setupWizardStepCounter langText" id="setupWizardStepCounter" data-i18n="setupWizardStepCounter">1 / 7</p>
     <div class="setupWizardProgress" id="setupWizardProgress" aria-hidden="true"></div>
 
@@ -241,7 +210,7 @@ function buildWizardMarkup() {
       <div class="setupWizardProgressTrack" id="setupOcrProgressTrack" hidden>
         <div class="setupWizardProgressBar" id="setupOcrProgressBar"></div>
       </div>
-      <button type="button" class="setupWizardBtn setupWizardBtnSecondary" id="setupOcrDownloadBtn">
+      <button type="button" class="setupWizardBtn setupWizardBtnPrimary setupWizardBtnBlock" id="setupOcrDownloadBtn">
         <span class="langText" id="settingsOcrDownloadBtn">Scarica</span>
       </button>
     </section>
@@ -255,7 +224,7 @@ function buildWizardMarkup() {
       <div class="setupWizardProgressTrack" id="setupModelProgressTrack" hidden>
         <div class="setupWizardProgressBar" id="setupModelProgressBar"></div>
       </div>
-      <button type="button" class="setupWizardBtn setupWizardBtnSecondary" id="setupModelDownloadBtn">
+      <button type="button" class="setupWizardBtn setupWizardBtnPrimary setupWizardBtnBlock" id="setupModelDownloadBtn">
         <span class="langText" id="summarizeDownloadBtn">Scarica</span>
       </button>
     </section>
@@ -267,7 +236,7 @@ function buildWizardMarkup() {
       <div class="setupWizardProgressTrack" id="setupNerProgressTrack" hidden>
         <div class="setupWizardProgressBar" id="setupNerProgressBar"></div>
       </div>
-      <button type="button" class="setupWizardBtn setupWizardBtnSecondary" id="setupNerDownloadBtn">
+      <button type="button" class="setupWizardBtn setupWizardBtnPrimary setupWizardBtnBlock" id="setupNerDownloadBtn">
         <span class="langText" id="settingsNerDownloadBtn">Scarica</span>
       </button>
     </section>
@@ -277,7 +246,7 @@ function buildWizardMarkup() {
       <p class="setupWizardHint langText" id="setupWizardLibreOfficeHint"></p>
       <p class="setupWizardDownloadStatus" id="setupLoStatus"></p>
       <p class="setupWizardHint setupWizardLoLater langText" id="setupWizardLibreOfficeLater"></p>
-      <button type="button" class="setupWizardBtn setupWizardBtnSecondary" id="setupLoOpenBtn">
+      <button type="button" class="setupWizardBtn setupWizardBtnSecondary setupWizardBtnBlock" id="setupLoOpenBtn">
         <span class="langText" id="setupWizardLibreOfficeDownloadBtn">Scarica LibreOffice</span>
       </button>
     </section>
@@ -287,11 +256,11 @@ function buildWizardMarkup() {
       <p class="setupWizardLead langText" id="setupWizardDoneLead"></p>
     </section>
 
+    <p class="setupWizardNotice" id="setupWizardError" hidden role="status"></p>
     <footer class="setupWizardActions">
       <button type="button" class="setupWizardBtn setupWizardBtnGhost langText" id="setupWizardBack" data-i18n="setupWizardBackBtn" hidden>Indietro</button>
       <button type="button" class="setupWizardBtn setupWizardBtnPrimary langText" id="setupWizardNext" data-i18n="setupWizardStartBtn">Inizia</button>
     </footer>
-    <p class="setupWizardError" id="setupWizardError" hidden role="alert"></p>
   </div>
 </div>`;
 }
@@ -339,15 +308,34 @@ function buildWizard(root) {
   };
 }
 
-function setError(w, text) {
+function setError(w, text, kind = 'error') {
   if (!w.errorEl) return;
   if (!text) {
     w.errorEl.hidden = true;
     w.errorEl.textContent = '';
+    w.errorEl.classList.remove('is-error');
+    w.errorEl.setAttribute('role', 'status');
     return;
   }
+  const isError = kind === 'error';
   w.errorEl.hidden = false;
   w.errorEl.textContent = text;
+  w.errorEl.classList.toggle('is-error', isError);
+  w.errorEl.setAttribute('role', isError ? 'alert' : 'status');
+}
+
+function notDownloadedMessage() {
+  return msg(
+    'setupWizardNotDownloaded',
+    'Not downloaded yet. You can continue and download it later in Settings.'
+  );
+}
+
+function downloadFailedMessage() {
+  return msg(
+    'setupWizardDownloadFailed',
+    'This download is temporarily unavailable. Pdeffy still works — continue now and download it later in Settings.'
+  );
 }
 
 function updateCounter(w, index) {
@@ -366,6 +354,8 @@ function createController(w) {
   let selectedModelId = null;
   /** @type {'ocr' | 'summarize' | 'ner' | null} */
   let activeDownload = null;
+  /** True only while a pack download is in flight. Next and Back stay locked then. */
+  let navigationLocked = false;
 
   function readStoredTheme() {
     try {
@@ -395,7 +385,8 @@ function createController(w) {
         w.ocrStatus.textContent = msg('setupWizardDownloadReady', 'Download completato.');
         w.ocrProgressTrack.hidden = true;
       } else {
-        w.ocrStatus.textContent = msg('settingsOcrMissing', 'Scarica il pack RapidOCR (~15–25 MB).');
+        w.ocrStatus.textContent = notDownloadedMessage();
+        w.ocrProgressTrack.hidden = true;
       }
       return downloaded;
     } catch (err) {
@@ -447,10 +438,8 @@ function createController(w) {
         );
         w.modelProgressTrack.hidden = true;
       } else if (model) {
-        w.modelStatus.textContent = fillName(
-          msg('setupWizardModelDownloadPrompt', 'Download {name} to continue.'),
-          model.displayName
-        );
+        w.modelStatus.textContent = notDownloadedMessage();
+        w.modelProgressTrack.hidden = true;
       }
       return downloaded;
     } catch (err) {
@@ -472,7 +461,8 @@ function createController(w) {
         w.nerStatus.textContent = msg('setupWizardDownloadReady', 'Download completato.');
         w.nerProgressTrack.hidden = true;
       } else {
-        w.nerStatus.textContent = msg('settingsNerMissing', 'Scarica il pack GLiNER (~200 MB).');
+        w.nerStatus.textContent = notDownloadedMessage();
+        w.nerProgressTrack.hidden = true;
       }
       return downloaded;
     } catch (err) {
@@ -517,12 +507,20 @@ function createController(w) {
     if (index === 3) await refreshModelStep();
     if (index === 4) await refreshNerStep();
     if (index === 5) await refreshLibreOfficeStep();
-    updateNextButtonState(index);
+    updateNextButtonState();
   }
 
-  function updateNextButtonState(index) {
-    if (!w.nextBtn || index === STEP_COUNT - 1) return;
-    w.nextBtn.disabled = false;
+  function setNavigationLocked(locked) {
+    navigationLocked = locked;
+    if (w.nextBtn) w.nextBtn.disabled = locked;
+    if (w.backBtn) w.backBtn.disabled = locked;
+    if (w.modelSelect) w.modelSelect.disabled = locked && activeDownload === 'summarize';
+  }
+
+  function updateNextButtonState() {
+    if (!w.nextBtn) return;
+    w.nextBtn.disabled = navigationLocked;
+    if (w.backBtn) w.backBtn.disabled = navigationLocked;
   }
 
   function showStep(index) {
@@ -553,29 +551,14 @@ function createController(w) {
     onStepEnter(stepIndex);
   }
 
-  async function validateBeforeLeave(index) {
-    if (index === 2) {
-      const ok = await refreshOcrStep();
-      if (!ok) {
-        setError(w, msg('setupWizardMustDownload', 'Completa il download per continuare.'));
-        return false;
-      }
-    }
-    if (index === 3) {
-      const ok = await refreshModelStep();
-      if (!ok) {
-        setError(w, msg('setupWizardMustDownload', 'Completa il download per continuare.'));
-        return false;
-      }
-    }
-    if (index === 4) {
-      const ok = await refreshNerStep();
-      if (!ok) {
-        setError(w, msg('setupWizardMustDownload', 'Completa il download per continuare.'));
-        return false;
-      }
-    }
-    return true;
+  function showDownloadFailure() {
+    if (stepIndex !== 2 && stepIndex !== 3 && stepIndex !== 4) return;
+    if (w.ocrProgressTrack) w.ocrProgressTrack.hidden = true;
+    if (w.modelProgressTrack) w.modelProgressTrack.hidden = true;
+    if (w.nerProgressTrack) w.nerProgressTrack.hidden = true;
+    setError(w, downloadFailedMessage(), 'notice');
+    activeDownload = null;
+    setNavigationLocked(false);
   }
 
   async function persistSettings() {
@@ -631,12 +614,16 @@ function createController(w) {
         w.modelStatus.textContent = `${msg('localModelsProgressSummarize', 'Download modello…')} ${line}`;
       }
     } else if (payload.phase === 'ready' || payload.phase === 'unloaded') {
-      activeDownload = null;
+      if (payload.phase === 'ready') {
+        activeDownload = null;
+        setNavigationLocked(false);
+      }
       refreshOcrStep();
       refreshModelStep();
       refreshNerStep();
     } else if (payload.phase === 'error') {
-      setError(w, payload.message || msg('errorPrefix', 'Errore'));
+      if (payload.message) console.warn('[setup-wizard] download failed:', payload.message);
+      showDownloadFailure();
     }
   }
 
@@ -668,11 +655,16 @@ function createController(w) {
   w.ocrDownloadBtn?.addEventListener('click', async () => {
     activeDownload = 'ocr';
     w.ocrDownloadBtn.disabled = true;
+    setNavigationLocked(true);
+    setError(w, '');
     try {
       await ipcRenderer.invoke('download-ocr-models');
     } catch (err) {
-      setError(w, err?.message || String(err));
+      console.warn('[setup-wizard] RapidOCR download failed:', err);
+      showDownloadFailure();
     } finally {
+      activeDownload = null;
+      setNavigationLocked(false);
       await refreshOcrStep();
     }
   });
@@ -680,13 +672,18 @@ function createController(w) {
   w.modelDownloadBtn?.addEventListener('click', async () => {
     activeDownload = 'summarize';
     w.modelDownloadBtn.disabled = true;
+    setNavigationLocked(true);
+    setError(w, '');
     const id = w.modelSelect?.value || selectedModelId;
     try {
       if (id) await ipcRenderer.invoke('set-selected-model', id);
       await ipcRenderer.invoke('download-model', id || null);
     } catch (err) {
-      setError(w, err?.message || String(err));
+      console.warn('[setup-wizard] model download failed:', err);
+      showDownloadFailure();
     } finally {
+      activeDownload = null;
+      setNavigationLocked(false);
       await refreshModelStep();
     }
   });
@@ -703,16 +700,24 @@ function createController(w) {
   w.nerDownloadBtn?.addEventListener('click', async () => {
     activeDownload = 'ner';
     w.nerDownloadBtn.disabled = true;
+    setNavigationLocked(true);
+    setError(w, '');
     try {
       await ipcRenderer.invoke('download-ner-models');
     } catch (err) {
-      setError(w, err?.message || String(err));
+      console.warn('[setup-wizard] GLiNER download failed:', err);
+      showDownloadFailure();
     } finally {
+      activeDownload = null;
+      setNavigationLocked(false);
       await refreshNerStep();
     }
   });
 
-  w.backBtn?.addEventListener('click', () => showStep(stepIndex - 1));
+  w.backBtn?.addEventListener('click', () => {
+    if (navigationLocked) return;
+    showStep(stepIndex - 1);
+  });
 
   w.loOpenBtn?.addEventListener('click', () => {
     ipcRenderer.invoke('open-external-url', LIBREOFFICE_DOWNLOAD_URL).catch((err) => {
@@ -721,6 +726,7 @@ function createController(w) {
   });
 
   w.nextBtn?.addEventListener('click', async () => {
+    if (navigationLocked) return;
     if (stepIndex === 1) {
       const sel = document.getElementById('setupWizardLanguageSelect');
       if (sel?.value) {
@@ -731,8 +737,6 @@ function createController(w) {
       await applyThemeSafe(selectedTheme);
     }
     if (stepIndex < STEP_COUNT - 1) {
-      const ok = await validateBeforeLeave(stepIndex);
-      if (!ok) return;
       showStep(stepIndex + 1);
       return;
     }
@@ -782,7 +786,6 @@ export async function initSetupWizardIfNeeded() {
   }
   if (!isFirst) return;
 
-  ensureStylesheet();
   blockDismiss();
 
   const host = mountWizardRoot();
