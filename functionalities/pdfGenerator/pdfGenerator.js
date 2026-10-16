@@ -103,6 +103,21 @@ function sanitizeFilePart(value) {
   return s || 'item';
 }
 
+/** One folder name segment (empty Excel cell → `_vuoto`). */
+function sanitizeDirPart(value) {
+  if (value == null || String(value).trim() === '') return '_vuoto';
+  return sanitizeFilePart(value);
+}
+
+/** Split a relative path, sanitize each segment, drop invalid parts. */
+function sanitizeRelativeDirParts(...segments) {
+  const parts = segments
+    .flatMap((seg) => String(seg ?? '').split(/[/\\]+/))
+    .map((part) => sanitizeDirPart(part))
+    .filter((part) => part && part !== 'item');
+  return parts;
+}
+
 function applyNamePattern(pattern, rowData, fallbackIndex) {
   const raw = String(pattern ?? '').trim();
   if (!raw) {
@@ -121,12 +136,7 @@ function applyNamePattern(pattern, rowData, fallbackIndex) {
 
 function groupFolderForRow(rowData, levels) {
   if (!levels || !levels.length) return '';
-  return levels
-    .map((field) => {
-      const val = rowData[field];
-      return sanitizeFilePart(val == null || val === '' ? '_vuoto' : val);
-    })
-    .join('/');
+  return sanitizeRelativeDirParts(...levels.map((field) => rowData[field])).join('/');
 }
 
 function insertPlaceholderToken(header) {
@@ -331,7 +341,8 @@ form.addEventListener('submit', async function (e) {
       });
       if (!picked) return;
       const parentDir = typeof picked === 'string' ? picked : picked;
-      outputRootDir = path.join(parentDir, `pdeffy_${docxBaseStem(selectedDocxFile)}`);
+      const batchFolder = sanitizeDirPart(`pdeffy_${docxBaseStem(selectedDocxFile)}`);
+      outputRootDir = path.join(parentDir, batchFolder);
       await fs.mkdir(outputRootDir, { recursive: true });
     }
 
@@ -417,12 +428,10 @@ form.addEventListener('submit', async function (e) {
       progressText.textContent = `${i + 1} / ${excelData.length}`;
 
       const pdfBytes = await fs.readFile(tempPdfPath);
-      const docxRelPath = groupFolder
-        ? `${groupFolder}/${currentFileName}.docx`
-        : `${currentFileName}.docx`;
-      const pdfRelPath = groupFolder
-        ? `${groupFolder}/${currentFileName}.pdf`
-        : `${currentFileName}.pdf`;
+      const dirParts = sanitizeRelativeDirParts(groupFolder);
+      const dirPrefix = dirParts.length ? `${dirParts.join('/')}/` : '';
+      const docxRelPath = `${dirPrefix}${currentFileName}.docx`;
+      const pdfRelPath = `${dirPrefix}${currentFileName}.pdf`;
 
       if (createZip) {
         finalZip.file(pdfRelPath, pdfBytes);
@@ -431,13 +440,13 @@ form.addEventListener('submit', async function (e) {
           finalZip.file(docxRelPath, docxBytes);
         }
       } else {
-        if (groupFolder) {
-          await fs.mkdir(path.join(outputRootDir, groupFolder), { recursive: true });
+        if (dirParts.length) {
+          await fs.mkdir(path.join(outputRootDir, ...dirParts), { recursive: true });
         }
-        await fs.writeFile(path.join(outputRootDir, pdfRelPath), pdfBytes);
+        await fs.writeFile(path.join(outputRootDir, ...dirParts, `${currentFileName}.pdf`), pdfBytes);
         if (keepDocx) {
           const docxBytes = await fs.readFile(tempDocxPath);
-          await fs.writeFile(path.join(outputRootDir, docxRelPath), docxBytes);
+          await fs.writeFile(path.join(outputRootDir, ...dirParts, `${currentFileName}.docx`), docxBytes);
         }
       }
 
