@@ -104,7 +104,7 @@ $word.Visible = $false
 $word.DisplayAlerts = 0
 try {{
     $doc = $word.Documents.Open('{input}')
-    $doc.SaveAs([ref]'{output}', [ref]17)
+    $doc.ExportAsFixedFormat('{output}', 17)
     $doc.Close()
     $word.Quit()
     exit 0
@@ -413,11 +413,12 @@ try {{
     }}
     $doc = $null
     try {{
-      $doc = $word.Documents.Open($inPath, $false, $true)
-      $saveFormat = 17
-      $null = $doc.SaveAs([ref]$outPath, [ref]$saveFormat)
+      # Match single-file convert: avoid ReadOnly/Close([ref]) — they break COM binding on many Word builds.
+      $doc = $word.Documents.Open($inPath)
+      $wdExportFormatPDF = 17
+      $doc.ExportAsFixedFormat($outPath, $wdExportFormatPDF)
     }} finally {{
-      if ($doc -ne $null) {{ $doc.Close([ref]$false) | Out-Null }}
+      if ($doc -ne $null) {{ $doc.Close() | Out-Null }}
     }}
     if (-not (Test-Path -LiteralPath $outPath)) {{
       throw "PDF not created: $outPath"
@@ -427,7 +428,8 @@ try {{
   [System.Runtime.InteropServices.Marshal]::ReleaseComObject($word) | Out-Null
   exit 0
 }} catch {{
-  Write-Error $_.Exception.Message
+  $err = if ($_.Exception.Message) {{ $_.Exception.Message }} else {{ $_.ToString() }}
+  [Console]::Error.WriteLine($err)
   if ($word) {{ try {{ $word.Quit() }} catch {{}} }}
   exit 1
 }}"#
