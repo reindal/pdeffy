@@ -46,19 +46,26 @@
             list.innerHTML = '';
             model.watermarks.forEach((layer, i) => {
                 const row = document.createElement('div');
-                row.className = 'pdfEditorListItem';
+                row.className =
+                    'pdfEditorListItem' + (editingWatermarkId === layer.id ? ' is-selected' : '');
                 const label =
                     layer.type === 'image'
                         ? `${msg('image', 'Image')} #${i + 1}`
                         : (layer.text || '').slice(0, 40);
                 row.innerHTML = `<span>${label}</span><button type="button" class="pdfEditorListRemove" data-id="${layer.id}">×</button>`;
-                row.querySelector('button').addEventListener('click', () => {
+                row.addEventListener('click', (e) => {
+                    if (e.target.closest('.pdfEditorListRemove')) return;
+                    PdfEditorOverlayManager.selectAnnotation?.('watermark', layer.id);
+                    beginEditWatermark(layer.id);
+                });
+                row.querySelector('button').addEventListener('click', (e) => {
+                    e.stopPropagation();
                     if (typeof global.__pdfEditorBeforeEdit === 'function') global.__pdfEditorBeforeEdit();
+                    if (editingWatermarkId === layer.id) stopEditingWatermark({ clearSelection: true });
                     PdfEditorDocumentModel.removeWatermark(model, layer.id);
                     if (!model.watermarks.length) clearWatermarkImagePreview();
                     notifyOverlayAnnotationChange();
                     renderWatermarkList();
-                    refreshWatermarkPreview();
                 });
                 list.appendChild(row);
             });
@@ -176,13 +183,6 @@
         }
 
         function switchTool(tool, options = {}) {
-            // Persist live watermark preview before leaving the watermark panel.
-            if (activeTool === 'watermark' && tool !== 'watermark') {
-                if (commitWatermarkDraft()) {
-                    notifyOverlayAnnotationChange();
-                }
-            }
-
             if (tool === 'ai') tool = aiPanels.resolveEntryTool();
             if (tool === 'text') tool = 'form';
 
@@ -225,6 +225,10 @@
             );
             if (tool !== 'watermark') {
                 PdfEditorOverlayManager.setWatermarkDraft(null);
+                if (editingWatermarkId) {
+                    editingWatermarkId = null;
+                    wmEditHistoryStarted = false;
+                }
             }
 
             if (aiPanels.isAiTool(tool)) {
@@ -277,7 +281,6 @@
             }
             if (activeTool === 'watermark') {
                 renderWatermarkList();
-                refreshWatermarkPreview();
             }
             const sel = PdfEditorOverlayManager.getSelectedAnnotation?.();
             if (sel) {
@@ -455,7 +458,7 @@
                     <div id="pdfEditorWmTextPanel">
                         <div class="pdfEditorField">
                             <label class="langText" id="watermarkTextLabel">${msg('watermarkTextLabel', 'Text')}</label>
-                            <input type="text" id="pdfEditorWmText" class="pdfEditorInput" placeholder="${msg('watermarkPlaceholder', 'CONFIDENTIAL')}" value="RISERVATO">
+                            <input type="text" id="pdfEditorWmText" class="pdfEditorInput" placeholder="${msg('watermarkPlaceholder', 'CONFIDENTIAL')}" value="">
                         </div>
                         <div class="pdfEditorFieldGrid">
                             <div class="pdfEditorField">
@@ -516,8 +519,8 @@
                         </div>
                     </details>
                     <div class="pdfEditorFormActions">
-                        <button type="button" id="pdfEditorWmAddText" class="pdfEditorPrimaryCta langText">${msg('pdfEditorWmAdd', '+ Add watermark')}</button>
-                        <button type="button" id="pdfEditorWmAddImage" class="pdfEditorPrimaryCta langText pdfEditorHidden">${msg('pdfEditorWmAdd', '+ Add watermark')}</button>
+                        <button type="button" id="pdfEditorWmAddText" class="pdfEditorPrimaryCta langText" disabled>${msg('pdfEditorWmAdd', '+ Add watermark')}</button>
+                        <button type="button" id="pdfEditorWmAddImage" class="pdfEditorPrimaryCta langText pdfEditorHidden" disabled>${msg('pdfEditorWmAdd', '+ Add watermark')}</button>
                         <button type="button" id="pdfEditorWmClearAll" class="pdfEditorPanelBtn pdfEditorPanelBtnDanger langText">${msg('pdfEditorWmClearAll', 'Remove all watermarks')}</button>
                     </div>
                     <div id="pdfEditorWmList" class="pdfEditorList"></div>
@@ -626,6 +629,9 @@
 
         let wmPreviewImageBytes = null;
         let wmPreviewImageType = null;
+        /** @type {string|null} */
+        let editingWatermarkId = null;
+        let wmEditHistoryStarted = false;
 
         function getWatermarkColor() {
             const picker = document.getElementById('pdfEditorWmColorPicker');
@@ -633,46 +639,21 @@
             return document.getElementById('pdfEditorWmColor')?.value || '#000000';
         }
 
-        function collectWatermarkDraft() {
-            const textPanel = document.getElementById('pdfEditorWmTextPanel');
-            const imageMode = textPanel?.classList.contains('pdfEditorHidden');
-            const text = document.getElementById('pdfEditorWmText')?.value.trim() || 'RISERVATO';
-            const opacity = (parseInt(document.getElementById('pdfEditorWmOpacity')?.value, 10) || 50) / 100;
-            const rotation = parseInt(document.getElementById('pdfEditorWmRot')?.value, 10) || 0;
-            const posX = parseInt(document.getElementById('pdfEditorWmX')?.value, 10) || 50;
-            const posY = parseInt(document.getElementById('pdfEditorWmY')?.value, 10) || 50;
-
-            if (imageMode) {
-                if (!wmPreviewImageBytes) return null;
-                return {
-                    type: 'image',
-                    imageBytes: wmPreviewImageBytes,
-                    imageMediaType: wmPreviewImageType,
-                    imageScale: parseInt(document.getElementById('pdfEditorWmImgScale')?.value, 10) || 50,
-                    opacity,
-                    rotation,
-                    posX,
-                    posY,
-                    isDraft: true,
-                };
-            }
-
-            return {
-                type: 'text',
-                text,
-                fontSize: parseInt(document.getElementById('pdfEditorWmSize')?.value, 10) || 48,
-                opacity,
-                rotation,
-                posX,
-                posY,
-                color: getWatermarkColor(),
-                isDraft: true,
+        function watermarkColorToHex(color) {
+            if (typeof color === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(color)) return color;
+            const map = {
+                red: '#CC0000',
+                gray: '#808080',
+                black: '#000000',
+                blue: '#0066cc',
+                green: '#009900',
             };
+            return map[color] || '#000000';
         }
 
-        function refreshWatermarkPreview() {
-            PdfEditorOverlayManager.setWatermarkDraft(collectWatermarkDraft());
-            // Defer until layout has canvas sizes (avoids empty preview right after render).
+        /** Clear any leftover draft overlay; watermarks appear only after Add. */
+        function clearWatermarkDraftPreview() {
+            PdfEditorOverlayManager.setWatermarkDraft(null);
             requestAnimationFrame(() => {
                 PdfEditorOverlayManager.syncOverlays(model, viewerApi);
             });
@@ -686,23 +667,15 @@
         }
 
         /**
-         * Promote live preview draft into model.watermarks so export matches the preview.
+         * Promote an overlay draft into model.watermarks (if any).
+         * Form fields alone are never auto-committed — user must click Add.
          * @returns {boolean} true if a draft was committed
          */
         function commitWatermarkDraft() {
-            const draft = collectWatermarkDraft();
-            if (!draft) {
-                // Form may be unmounted (other tool); fall back to overlay draft.
-                const overlayDraft = PdfEditorOverlayManager.getWatermarkDraft?.();
-                if (!overlayDraft) return false;
-                const { isDraft, ...layer } = overlayDraft;
-                PdfEditorDocumentModel.addWatermark(model, layer);
-                PdfEditorOverlayManager.setWatermarkDraft(null);
-                return true;
-            }
-            const { isDraft, ...layer } = draft;
+            const overlayDraft = PdfEditorOverlayManager.getWatermarkDraft?.();
+            if (!overlayDraft) return false;
+            const { isDraft, ...layer } = overlayDraft;
             PdfEditorDocumentModel.addWatermark(model, layer);
-            clearWatermarkFormFields();
             PdfEditorOverlayManager.setWatermarkDraft(null);
             return true;
         }
@@ -714,20 +687,161 @@
             if (fileInput) fileInput.value = '';
         }
 
+        function syncWmPrimaryButtons() {
+            const addText = document.getElementById('pdfEditorWmAddText');
+            const addImage = document.getElementById('pdfEditorWmAddImage');
+            const text = document.getElementById('pdfEditorWmText')?.value.trim() || '';
+            if (editingWatermarkId) {
+                const wm = model.watermarks.find((w) => w.id === editingWatermarkId);
+                if (addText) {
+                    addText.disabled = wm?.type === 'text' ? !text : true;
+                    addText.textContent = msg('pdfEditorWmUpdate', 'Update watermark');
+                }
+                if (addImage) {
+                    addImage.disabled = wm?.type !== 'image';
+                    addImage.textContent = msg('pdfEditorWmUpdate', 'Update watermark');
+                }
+                return;
+            }
+            if (addText) {
+                addText.disabled = !text;
+                addText.textContent = msg('pdfEditorWmAdd', '+ Add watermark');
+            }
+            if (addImage) {
+                addImage.disabled = !wmPreviewImageBytes;
+                addImage.textContent = msg('pdfEditorWmAdd', '+ Add watermark');
+            }
+        }
+
+        function setWmType(type) {
+            if (editingWatermarkId) {
+                const wm = model.watermarks.find((w) => w.id === editingWatermarkId);
+                if (wm && wm.type !== type) return;
+            }
+            const textPanel = document.getElementById('pdfEditorWmTextPanel');
+            const imagePanel = document.getElementById('pdfEditorWmImagePanel');
+            const addText = document.getElementById('pdfEditorWmAddText');
+            const addImage = document.getElementById('pdfEditorWmAddImage');
+            document.querySelectorAll('.pdfEditorSegmentedBtn[data-wm-type]').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.wmType === type);
+                btn.disabled = !!editingWatermarkId && btn.dataset.wmType !== type;
+            });
+            textPanel?.classList.toggle('pdfEditorHidden', type !== 'text');
+            imagePanel?.classList.toggle('pdfEditorHidden', type !== 'image');
+            addText?.classList.toggle('pdfEditorHidden', type !== 'text');
+            addImage?.classList.toggle('pdfEditorHidden', type !== 'image');
+            syncWmPrimaryButtons();
+        }
+
+        function stopEditingWatermark({ clearSelection = false } = {}) {
+            editingWatermarkId = null;
+            wmEditHistoryStarted = false;
+            clearWatermarkFormFields();
+            document.querySelectorAll('.pdfEditorSegmentedBtn[data-wm-type]').forEach((btn) => {
+                btn.disabled = false;
+            });
+            setWmType('text');
+            syncWmPrimaryButtons();
+            if (clearSelection) PdfEditorOverlayManager.clearAnnotationSelection?.();
+            renderWatermarkList();
+        }
+
+        function applyEditingWatermarkFromForm() {
+            if (!editingWatermarkId) return;
+            const wm = model.watermarks.find((w) => w.id === editingWatermarkId);
+            if (!wm) {
+                stopEditingWatermark();
+                return;
+            }
+
+            const opacity = (parseInt(document.getElementById('pdfEditorWmOpacity')?.value, 10) || 50) / 100;
+            const rotation = parseInt(document.getElementById('pdfEditorWmRot')?.value, 10) || 0;
+            const posX = parseInt(document.getElementById('pdfEditorWmX')?.value, 10) || 50;
+            const posY = parseInt(document.getElementById('pdfEditorWmY')?.value, 10) || 50;
+            /** @type {Record<string, unknown>} */
+            const patch = { opacity, rotation, posX, posY };
+
+            if (wm.type === 'text') {
+                const text = document.getElementById('pdfEditorWmText')?.value.trim() || '';
+                if (!text) return;
+                patch.text = text;
+                patch.fontSize = parseInt(document.getElementById('pdfEditorWmSize')?.value, 10) || 48;
+                patch.color = getWatermarkColor();
+            } else {
+                patch.imageScale = parseInt(document.getElementById('pdfEditorWmImgScale')?.value, 10) || 50;
+                if (wmPreviewImageBytes) {
+                    patch.imageBytes = wmPreviewImageBytes;
+                    patch.imageMediaType = wmPreviewImageType;
+                }
+            }
+
+            if (!wmEditHistoryStarted) {
+                if (typeof global.__pdfEditorBeforeEdit === 'function') global.__pdfEditorBeforeEdit();
+                wmEditHistoryStarted = true;
+            }
+            PdfEditorDocumentModel.updateWatermark(model, editingWatermarkId, patch);
+            PdfEditorOverlayManager.setWatermarkDraft(null);
+            PdfEditorOverlayManager.syncOverlays(model, viewerApi);
+            if (typeof global.__pdfEditorMarkDirty === 'function') global.__pdfEditorMarkDirty();
+            else if (typeof onExportStateChange === 'function') onExportStateChange();
+            renderWatermarkList();
+            highlightAnnotationInList('watermark', editingWatermarkId);
+            syncWmPrimaryButtons();
+        }
+
+        function beginEditWatermark(id) {
+            const wm = model.watermarks.find((w) => w.id === id);
+            if (!wm) return;
+            editingWatermarkId = id;
+            wmEditHistoryStarted = false;
+            PdfEditorOverlayManager.setWatermarkDraft(null);
+
+            setWmType(wm.type === 'image' ? 'image' : 'text');
+
+            const opacityEl = document.getElementById('pdfEditorWmOpacity');
+            const rotEl = document.getElementById('pdfEditorWmRot');
+            const xEl = document.getElementById('pdfEditorWmX');
+            const yEl = document.getElementById('pdfEditorWmY');
+            if (opacityEl) opacityEl.value = String(Math.round((wm.opacity ?? 0.5) * 100));
+            if (rotEl) rotEl.value = String(wm.rotation ?? 0);
+            if (xEl) xEl.value = String(wm.posX ?? 50);
+            if (yEl) yEl.value = String(wm.posY ?? 50);
+
+            const preset = document.getElementById('pdfEditorWmPosPreset');
+            if (preset) {
+                const key = `${wm.posX ?? 50},${wm.posY ?? 50}`;
+                const match = [...preset.options].some((o) => o.value === key);
+                preset.value = match ? key : 'custom';
+                if (!match) document.getElementById('pdfEditorWmAdvanced')?.setAttribute('open', '');
+            }
+
+            if (wm.type === 'text') {
+                const textInput = document.getElementById('pdfEditorWmText');
+                const sizeEl = document.getElementById('pdfEditorWmSize');
+                const picker = document.getElementById('pdfEditorWmColorPicker');
+                const select = document.getElementById('pdfEditorWmColor');
+                if (textInput) textInput.value = wm.text || '';
+                if (sizeEl) sizeEl.value = String(wm.fontSize || 48);
+                const hex = watermarkColorToHex(wm.color);
+                if (picker) picker.value = hex;
+                if (select) select.value = hex;
+            } else {
+                wmPreviewImageBytes = wm.imageBytes || null;
+                wmPreviewImageType = wm.imageMediaType || null;
+                const scaleEl = document.getElementById('pdfEditorWmImgScale');
+                if (scaleEl) scaleEl.value = String(wm.imageScale || 50);
+            }
+
+            syncWmPrimaryButtons();
+            renderWatermarkList();
+            highlightAnnotationInList('watermark', id);
+            document.getElementById('pdfEditorWmText')?.focus?.();
+        }
+
         function wireWatermark() {
-            const setWmType = (type) => {
-                const textPanel = document.getElementById('pdfEditorWmTextPanel');
-                const imagePanel = document.getElementById('pdfEditorWmImagePanel');
-                const addText = document.getElementById('pdfEditorWmAddText');
-                const addImage = document.getElementById('pdfEditorWmAddImage');
-                document.querySelectorAll('.pdfEditorSegmentedBtn[data-wm-type]').forEach((btn) => {
-                    btn.classList.toggle('active', btn.dataset.wmType === type);
-                });
-                textPanel?.classList.toggle('pdfEditorHidden', type !== 'text');
-                imagePanel?.classList.toggle('pdfEditorHidden', type !== 'image');
-                addText?.classList.toggle('pdfEditorHidden', type !== 'text');
-                addImage?.classList.toggle('pdfEditorHidden', type !== 'image');
-                refreshWatermarkPreview();
+            const onFormChange = () => {
+                syncWmPrimaryButtons();
+                if (editingWatermarkId) applyEditingWatermarkFromForm();
             };
 
             document.querySelectorAll('.pdfEditorSegmentedBtn[data-wm-type]').forEach((btn) => {
@@ -745,17 +859,17 @@
                 const yEl = document.getElementById('pdfEditorWmY');
                 if (xEl) xEl.value = String(x);
                 if (yEl) yEl.value = String(y);
-                refreshWatermarkPreview();
+                onFormChange();
             });
 
             document.getElementById('pdfEditorWmColorPicker')?.addEventListener('input', () => {
                 const picker = document.getElementById('pdfEditorWmColorPicker');
                 const select = document.getElementById('pdfEditorWmColor');
                 if (select && picker) select.value = picker.value;
-                refreshWatermarkPreview();
+                onFormChange();
             });
 
-            const previewIds = [
+            [
                 'pdfEditorWmText',
                 'pdfEditorWmSize',
                 'pdfEditorWmOpacity',
@@ -763,26 +877,33 @@
                 'pdfEditorWmX',
                 'pdfEditorWmY',
                 'pdfEditorWmImgScale',
-            ];
-            previewIds.forEach((id) => {
+            ].forEach((id) => {
                 const el = document.getElementById(id);
-                el?.addEventListener('input', refreshWatermarkPreview);
-                el?.addEventListener('change', refreshWatermarkPreview);
+                el?.addEventListener('input', onFormChange);
+                el?.addEventListener('change', onFormChange);
             });
 
             document.getElementById('pdfEditorWmImage')?.addEventListener('change', async (e) => {
                 const file = e.target.files?.[0];
                 if (!file) {
-                    wmPreviewImageBytes = null;
-                    wmPreviewImageType = null;
+                    if (!editingWatermarkId) {
+                        wmPreviewImageBytes = null;
+                        wmPreviewImageType = null;
+                    }
                 } else {
                     wmPreviewImageBytes = new Uint8Array(await file.arrayBuffer());
                     wmPreviewImageType = file.type;
                 }
-                refreshWatermarkPreview();
+                onFormChange();
             });
 
             document.getElementById('pdfEditorWmAddText')?.addEventListener('click', () => {
+                if (editingWatermarkId) {
+                    applyEditingWatermarkFromForm();
+                    stopEditingWatermark({ clearSelection: true });
+                    clearWatermarkDraftPreview();
+                    return;
+                }
                 const text = document.getElementById('pdfEditorWmText').value.trim();
                 if (!text) return;
                 if (typeof global.__pdfEditorBeforeEdit === 'function') global.__pdfEditorBeforeEdit();
@@ -797,26 +918,34 @@
                     color: getWatermarkColor(),
                 });
                 clearWatermarkFormFields();
+                PdfEditorOverlayManager.setWatermarkDraft(null);
                 notifyOverlayAnnotationChange();
                 renderWatermarkList();
-                refreshWatermarkPreview();
+                syncWmPrimaryButtons();
             });
 
             document.getElementById('pdfEditorWmClearAll')?.addEventListener('click', () => {
                 const hadLayers = model.watermarks.length > 0;
-                const hadDraft = !!collectWatermarkDraft();
+                const hadDraft = !!PdfEditorOverlayManager.getWatermarkDraft?.();
                 if (!hadLayers && !hadDraft) return;
 
                 if (typeof global.__pdfEditorBeforeEdit === 'function') global.__pdfEditorBeforeEdit();
+                stopEditingWatermark({ clearSelection: true });
                 PdfEditorDocumentModel.clearAllWatermarks(model);
                 clearWatermarkFormFields();
                 PdfEditorOverlayManager.setWatermarkDraft(null);
-                if (hadLayers) notifyOverlayAnnotationChange();
-                else refreshWatermarkPreview();
+                notifyOverlayAnnotationChange();
                 renderWatermarkList();
+                syncWmPrimaryButtons();
             });
 
             document.getElementById('pdfEditorWmAddImage')?.addEventListener('click', async () => {
+                if (editingWatermarkId) {
+                    applyEditingWatermarkFromForm();
+                    stopEditingWatermark({ clearSelection: true });
+                    clearWatermarkDraftPreview();
+                    return;
+                }
                 const fileInput = document.getElementById('pdfEditorWmImage');
                 const file = fileInput.files?.[0];
                 if (!file && !wmPreviewImageBytes) return;
@@ -835,12 +964,25 @@
                     posY: parseInt(document.getElementById('pdfEditorWmY').value, 10) || 50,
                 });
                 clearWatermarkFormFields();
+                PdfEditorOverlayManager.setWatermarkDraft(null);
                 notifyOverlayAnnotationChange();
                 renderWatermarkList();
-                refreshWatermarkPreview();
+                syncWmPrimaryButtons();
             });
-            renderWatermarkList();
-            refreshWatermarkPreview();
+
+            const selected = PdfEditorOverlayManager.getSelectedAnnotation?.();
+            if (selected?.type === 'watermark' && selected.id) {
+                beginEditWatermark(selected.id);
+            } else if (editingWatermarkId && model.watermarks.some((w) => w.id === editingWatermarkId)) {
+                beginEditWatermark(editingWatermarkId);
+            } else {
+                editingWatermarkId = null;
+                wmEditHistoryStarted = false;
+                renderWatermarkList();
+                clearWatermarkDraftPreview();
+                setWmType('text');
+                syncWmPrimaryButtons();
+            }
         }
 
         function wireRedact() {
@@ -1877,6 +2019,11 @@
                     }
                     highlightAnnotationInList(type, id);
                     syncManualFormStylePanel();
+                    if (type === 'watermark' && id) {
+                        beginEditWatermark(id);
+                    } else if (editingWatermarkId && type !== 'watermark') {
+                        stopEditingWatermark();
+                    }
                 });
             });
             document.querySelectorAll('.pdfEditorToolTab[data-tool]').forEach((tab) => {

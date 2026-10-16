@@ -490,7 +490,7 @@ export async function openAboutModal() {
   applyTheme(getTheme());
   const modal = document.getElementById('pdeffyAboutModal');
   const versionEl = document.getElementById('pdeffyAboutVersion');
-  let version = '2.0.1';
+  let version = '2.0.2';
   try {
     const { getVersion } = await import('@tauri-apps/api/app');
     version = await getVersion();

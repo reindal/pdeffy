@@ -178,6 +178,13 @@
         model.watermarks = model.watermarks.filter((w) => w.id !== id);
     }
 
+    function updateWatermark(model, id, patch) {
+        const wm = model.watermarks.find((w) => w.id === id);
+        if (!wm || !patch || typeof patch !== 'object') return false;
+        Object.assign(wm, patch, { id: wm.id });
+        return true;
+    }
+
     function clearAllWatermarks(model) {
         model.watermarks = [];
     }
@@ -338,6 +345,7 @@
         hasExportableEdits,
         addWatermark,
         removeWatermark,
+        updateWatermark,
         clearAllWatermarks,
         addRedaction,
         removeRedaction,

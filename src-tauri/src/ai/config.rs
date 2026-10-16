@@ -82,7 +82,7 @@ pub const MODELS: &[ModelDef] = &[
     ModelDef {
         id: "qwen2.5-1.5b-instruct-Q4_K_M",
         display_name: "Qwen2.5 1.5B Instruct",
-        filename: "Qwen2.5-1.5B-Instruct-Q4_K_M.gguf",
+        filename: "qwen2.5-1.5b-instruct-q4_k_m.gguf",
         url: "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf",
         fallback_url: "https://pdeffy.reindal.com/downloads/model/qwen2.5-1.5b-instruct-q4_k_m.gguf",
         expected_bytes: 1_120_000_000,

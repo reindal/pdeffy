@@ -380,31 +380,47 @@ pub fn batch_convert_docx_to_pdf(jobs: &[(PathBuf, PathBuf)]) -> Result<(), Stri
         }
     }
 
-    // Join without a trailing comma — PowerShell rejects `$jobs = @(@(...),)` (MissingExpressionAfterToken).
-    let pairs = jobs
+    // Use hashtable jobs (@{ Input=...; Output=... }) so a single job never flattens to
+    // @('in','out') — in that shape foreach ($job in $jobs) yields strings and $job[0] is 'C'.
+    let job_entries = jobs
         .iter()
         .map(|(input, output)| {
             let inp = escape_ps_single_quoted(&path_for_com(input));
             let out = escape_ps_single_quoted(&path_for_com(output));
-            format!("@('{inp}','{out}')")
+            format!("  @{{ Input = '{inp}'; Output = '{out}' }}")
         })
         .collect::<Vec<_>>()
-        .join(",");
+        .join("\n");
 
     let ps_script = format!(
         r#"$ErrorActionPreference = 'Stop'
 $word = New-Object -ComObject Word.Application
 $word.Visible = $false
 $word.DisplayAlerts = 0
-$jobs = @({pairs})
+$jobs = @(
+{job_entries}
+)
 try {{
   foreach ($job in $jobs) {{
+    $inPath = [string]$job.Input
+    $outPath = [string]$job.Output
+    if (-not (Test-Path -LiteralPath $inPath)) {{
+      throw "DOCX not found: $inPath"
+    }}
+    $outDir = Split-Path -LiteralPath $outPath -Parent
+    if ($outDir -and -not (Test-Path -LiteralPath $outDir)) {{
+      New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+    }}
     $doc = $null
     try {{
-      $doc = $word.Documents.Open([string]$job[0], $false, $true)
-      $null = $doc.SaveAs([ref]([string]$job[1]), [ref]17)
+      $doc = $word.Documents.Open($inPath, $false, $true)
+      $saveFormat = 17
+      $null = $doc.SaveAs([ref]$outPath, [ref]$saveFormat)
     }} finally {{
       if ($doc -ne $null) {{ $doc.Close([ref]$false) | Out-Null }}
+    }}
+    if (-not (Test-Path -LiteralPath $outPath)) {{
+      throw "PDF not created: $outPath"
     }}
   }}
   $word.Quit()

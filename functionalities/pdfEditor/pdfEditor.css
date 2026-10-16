@@ -3512,6 +3512,7 @@ body.pdfEditorToolCapture .textLayer.pdfEditorTextLayer {
     outline: 1px dashed rgba(52, 120, 246, 0.55);
     outline-offset: 4px;
 }
+
 .pdfEditorWatermarkItem.pdfEditorAnnotationSelected {
     outline: 2px solid var(--pdeffy-blue, #3478f6);
     outline-offset: 4px;
@@ -3760,6 +3761,20 @@ body.pdfEditorToolCapture .textLayer.pdfEditorTextLayer {
     color: var(--pdeffy-text);
 }
 
+.pdfEditorPrimaryCta:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: none;
+    transform: none;
+    box-shadow: none;
+}
+
+.pdfEditorPrimaryCta:disabled:hover {
+    filter: none;
+    transform: none;
+    box-shadow: none;
+}
+
 .pdfEditorPrimaryCta {
     width: 100%;
     min-height: 42px;
@@ -3956,6 +3971,7 @@ body.pdfEditorToolCapture .textLayer.pdfEditorTextLayer {
     border: 1px solid var(--pdeffy-border);
     background: var(--pdeffy-bg);
     font-size: 0.82rem;
+    cursor: pointer;
 }
 .pdfEditorListItem.is-selected {
     border-color: var(--pdeffy-blue, #3478f6);

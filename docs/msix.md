@@ -111,6 +111,18 @@ For Store submission, also run the [Windows App Certification Kit](https://learn
 
 ## Architecture
 
-- **x64 only** for now (`ProcessorArchitecture="x64"`), matching current Windows CI.
-- Capability: `runFullTrust` only (desktop Win32 packaged as MSIX).
+- **x64 only** for now (`ProcessorArchitecture="x64"`), matching current Windows CI).
+- Capabilities: `internetClient` (model downloads) + `runFullTrust` (desktop Win32).
 - Entry point: `Windows.FullTrustApplication`.
+
+## Microsoft Store — AI model downloads
+
+Store certification may test **Settings / setup wizard → Download model**. Downloads use HTTPS (Hugging Face + optional Reindal mirror).
+
+Before resubmitting, verify that these URLs return **HTTP 200** (not 404) from a clean network:
+
+- `https://pdeffy.reindal.com/downloads/model/` (GGUF mirrors)
+- `https://pdeffy.reindal.com/downloads/gliner/` (GLiNER pack)
+- `https://pdeffy.reindal.com/downloads/rapidocr/` (RapidOCR ONNX)
+
+If mirrors are missing, the app still tries Hugging Face first; large files can fail with `read failed: request or response body error` on strict networks. Hosting the mirrors on Reindal infrastructure is the recommended fix for Store QA.

@@ -27,10 +27,7 @@ fn probe_pack_bytes(assets: &[&NerAsset]) -> Option<u64> {
     if assets.is_empty() {
         return Some(0);
     }
-    let client = reqwest::blocking::Client::builder()
-        .timeout(std::time::Duration::from_secs(20))
-        .build()
-        .ok()?;
+    let client = crate::ai::download::build_download_client().ok()?;
     let mut total = 0u64;
     for asset in assets {
         let len = head_len(&client, asset.url).or_else(|| head_len(&client, asset.fallback_url))?;

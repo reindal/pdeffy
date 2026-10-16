@@ -1,6 +1,6 @@
 [package]
 name = "pdeffy"
-version = "2.0.1"
+version = "2.0.2"
 description = "Application for manipulating PDF files"
 authors = ["Reindal"]
 license = "MIT"
