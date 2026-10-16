@@ -86,9 +86,21 @@ function bytesForWrite(data) {
   return new Uint8Array(data);
 }
 
+/** Safe segment for temp paths and output names (Windows / Word / shell). ASCII [A-Za-z0-9._-] only. */
 function sanitizeFilePart(value) {
-  const raw = String(value ?? '').trim() || 'item';
-  return raw.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').replace(/\s+/g, ' ').slice(0, 80);
+  let s = String(value ?? '')
+    .trim()
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '');
+  if (!s) return 'item';
+  s = s
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '_')
+    .replace(/[''`´]/g, '_')
+    .replace(/[^A-Za-z0-9._-]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^[._-]+|[._-]+$/g, '')
+    .slice(0, 80);
+  return s || 'item';
 }
 
 function applyNamePattern(pattern, rowData, fallbackIndex) {
