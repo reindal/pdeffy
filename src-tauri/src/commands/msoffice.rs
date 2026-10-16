@@ -104,7 +104,7 @@ $word.Visible = $false
 $word.DisplayAlerts = 0
 try {{
     $doc = $word.Documents.Open('{input}')
-    $doc.ExportAsFixedFormat('{output}', 17)
+    $null = $doc.SaveAs('{output}', 17)
     $doc.Close()
     $word.Quit()
     exit 0
@@ -380,48 +380,58 @@ pub fn batch_convert_docx_to_pdf(jobs: &[(PathBuf, PathBuf)]) -> Result<(), Stri
         }
     }
 
-    // Use hashtable jobs (@{ Input=...; Output=... }) so a single job never flattens to
-    // @('in','out') — in that shape foreach ($job in $jobs) yields strings and $job[0] is 'C'.
-    let job_entries = jobs
+    // JSON job list avoids PowerShell quoting bugs (e.g. apostrophes in "Andre' RENATO.docx").
+    let job_json: Vec<serde_json::Value> = jobs
         .iter()
         .map(|(input, output)| {
-            let inp = escape_ps_single_quoted(&path_for_com(input));
-            let out = escape_ps_single_quoted(&path_for_com(output));
-            format!("  @{{ Input = '{inp}'; Output = '{out}' }}")
+            serde_json::json!({
+                "input": path_for_com(input),
+                "output": path_for_com(output),
+            })
         })
-        .collect::<Vec<_>>()
-        .join("\n");
+        .collect();
+    let jobs_json_body =
+        serde_json::to_string(&job_json).map_err(|e| format!("batch jobs JSON: {e}"))?;
 
+    let temp_dir = std::env::temp_dir();
+    let stamp = chrono::Utc::now().timestamp_millis();
+    let json_path = temp_dir.join(format!("msoffice_batch_{stamp}.json"));
+    let ps_path = temp_dir.join(format!("msoffice_batch_{stamp}.ps1"));
+    fs::write(&json_path, jobs_json_body).map_err(|e| e.to_string())?;
+
+    let jobs_json_path = escape_ps_single_quoted(&path_for_com(&json_path));
+
+    // ExportAsFixedFormat with 2 args often fails COM parameter binding; late-bound SaveAs works.
     let ps_script = format!(
         r#"$ErrorActionPreference = 'Stop'
 $word = New-Object -ComObject Word.Application
 $word.Visible = $false
 $word.DisplayAlerts = 0
-$jobs = @(
-{job_entries}
-)
+$jobs = @(Get-Content -LiteralPath '{jobs_json_path}' -Raw -Encoding UTF8 | ConvertFrom-Json)
 try {{
+  $idx = 0
   foreach ($job in $jobs) {{
-    $inPath = [string]$job.Input
-    $outPath = [string]$job.Output
+    $idx++
+    $inPath = [string]$job.input
+    $outPath = [string]$job.output
     if (-not (Test-Path -LiteralPath $inPath)) {{
-      throw "DOCX not found: $inPath"
+      throw "Job $idx DOCX not found: $inPath"
     }}
     $outDir = Split-Path -LiteralPath $outPath -Parent
     if ($outDir -and -not (Test-Path -LiteralPath $outDir)) {{
-      New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+      New-Item -ItemType Directory -LiteralPath $outDir -Force | Out-Null
     }}
     $doc = $null
     try {{
-      # Match single-file convert: avoid ReadOnly/Close([ref]) — they break COM binding on many Word builds.
       $doc = $word.Documents.Open($inPath)
-      $wdExportFormatPDF = 17
-      $doc.ExportAsFixedFormat($outPath, $wdExportFormatPDF)
+      $null = $doc.SaveAs($outPath, 17)
+    }} catch {{
+      throw "Job $idx Word SaveAs failed ($inPath): $($_.Exception.Message)"
     }} finally {{
-      if ($doc -ne $null) {{ $doc.Close() | Out-Null }}
+      if ($null -ne $doc) {{ $null = $doc.Close() }}
     }}
     if (-not (Test-Path -LiteralPath $outPath)) {{
-      throw "PDF not created: $outPath"
+      throw "Job $idx PDF not created: $outPath"
     }}
   }}
   $word.Quit()
@@ -435,8 +445,6 @@ try {{
 }}"#
     );
 
-    let temp_dir = std::env::temp_dir();
-    let ps_path = temp_dir.join(format!("msoffice_batch_{}.ps1", chrono::Utc::now().timestamp_millis()));
     fs::write(&ps_path, ps_script).map_err(|e| e.to_string())?;
 
     const CREATE_NO_WINDOW: u32 = 0x0800_0000;
@@ -455,13 +463,19 @@ try {{
         .output()
         .map_err(|e| format!("Failed to run PowerShell: {e}"))?;
     let _ = fs::remove_file(&ps_path);
+    let _ = fs::remove_file(&json_path);
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         let stdout = String::from_utf8_lossy(&output.stdout);
-        return Err(format!(
-            "MS Office batch conversion failed: {stderr}{stdout}"
-        ));
+        let detail = format!("{stderr}{stdout}");
+        // Fallback: one Word process per file (slower, same script as single DOCX→PDF).
+        for (input, out) in jobs {
+            convert_with_msoffice(input, out, "pdf", ".docx").map_err(|e| {
+                format!("MS Office batch conversion failed: {detail}\nFallback: {e}")
+            })?;
+        }
+        return Ok(());
     }
 
     for (_, output) in jobs {
